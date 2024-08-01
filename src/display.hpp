@@ -34,8 +34,8 @@ BUILD_FLAGS(Display,
   DF_NONE                   {Flag[0]}, DF_FOCUSED                {Flag[1]},
   // Exclusive mode full-screen?       Full-screen locked?
   DF_EXCLUSIVE              {Flag[2]}, DF_NATIVEFS               {Flag[3]},
-  // Window is in it's own thread?     Window is actually in fullscreen?
-  DF_WINTHREADED            {Flag[4]}, DF_INFULLSCREEN           {Flag[5]},
+  // Window is actually in fullscreen?
+  DF_INFULLSCREEN           {Flag[4]},
   /* -- End-user configuration flags --------------------------------------- */
   // Use forward compatible context?   Use double-buffering?
   DF_FORWARD               {Flag[47]}, DF_DOUBLEBUFFER          {Flag[48]},
@@ -1067,7 +1067,7 @@ static class Display final :
   /* -- Destructor --------------------------------------------------------- */
   DTORHELPER(~Display, DeInit())
   /* ----------------------------------------------------------------------- */
-  DELETECOPYCTORS(Display)             // Do not need copy defaults
+  DELETECOPYCTORS(Display)             // Suppress default functions for safety
   /* -- Helper macro for boolean based CVars based on OS ------------------- */
 #define CBCVARFLAG(n, f) CVarReturn n(const bool bState) \
     { FlagSetOrClear(f, bState); return ACCEPT; }

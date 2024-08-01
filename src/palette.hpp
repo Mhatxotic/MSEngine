@@ -12,18 +12,23 @@ namespace IPalette {                   // Start of private module namespace
 using namespace ICollector::P;         using namespace IError::P;
 using namespace IFboDef::P;            using namespace IIdent::P;
 using namespace IImage::P;             using namespace IImageDef::P;
-using namespace IShaders::P;           using namespace IStd::P;
-using namespace ISysUtil::P;           using namespace ITexDef::P;
-using namespace IUtil::P;              using namespace Lib::OS::GlFW;
+using namespace ILuaLib::P;            using namespace IShaders::P;
+using namespace IStd::P;               using namespace ISysUtil::P;
+using namespace ITexDef::P;            using namespace IUtil::P;
+using namespace Lib::OS::GlFW;
 /* ------------------------------------------------------------------------- */
 typedef array<FboColour, 256> PalData; // Palette data
 /* ------------------------------------------------------------------------- */
 namespace P {                          // Start of public module namespace
 /* ------------------------------------------------------------------------- */
-struct Pal :                           // Members initially public
+class Pal :                            // Members initially public
   /* -- Base classes ------------------------------------------------------- */
   public PalData                       // Palette data class
-{ /* -- Get PalData -------------------------------------------------------- */
+{ /* -- Private typedefs --------------------------------------------------- */
+  typedef PalData::reverse_iterator PalDataRevIt;   // Reverse iterator
+  typedef PalData::iterator         PalDataIt;      // Forward iterator
+  typedef PalData::const_iterator   PalDataConstIt; // Const forward iterator
+  /* -- Get PalData ------------------------------------------------ */ public:
   const FboColour &GetSlotConst(const size_t stSlot) const
     { return (*this)[stSlot]; }
   FboColour &GetSlot(const size_t stSlot) { return (*this)[stSlot]; }
@@ -88,15 +93,16 @@ struct Pal :                           // Members initially public
   void ShiftBck(const ssize_t stBegin, const ssize_t stEnd,
     const ssize_t stRot)
   { // Get starting position and rotate backwards
-    const auto itStart{ rbegin() + (SizeM1() - stEnd) };
-    StdRotate(seq, itStart, itStart + stRot, rbegin() + (Size() - stBegin));
+    const PalDataRevIt pdriStart{ rbegin() + (SizeM1() - stEnd) };
+    StdRotate(seq, pdriStart, pdriStart + stRot,
+      rbegin() + (Size() - stBegin));
   }
   /* -- Shift limited palette entries forwards ----------------------------- */
   void ShiftFwd(const ssize_t stBegin, const ssize_t stEnd,
     const ssize_t stRot)
   { // Get starting position and rotate forwards
-    const auto itStart{ begin() + stBegin };
-    StdRotate(seq, itStart, itStart + stRot, begin() + stEnd + 1);
+    const PalDataIt pdiStart{ begin() + stBegin };
+    StdRotate(seq, pdiStart, pdiStart + stRot, begin() + stEnd + 1);
   }
   /* -- Shift palette entries backwards or forwards ------------------------ */
   void Shift(const ssize_t stBegin, const ssize_t stLimit,
@@ -110,16 +116,16 @@ struct Pal :                           // Members initially public
   void Copy(const size_t stDstPos, const PalData &pdSrc, const size_t stSrcPos,
     const size_t stSrcCount)
   { // Get source data position and then copy it to output
-    const auto itBegin{ pdSrc.cbegin() + stSrcPos };
-    StdCopy(par_unseq, itBegin, itBegin + stSrcCount, begin() + stDstPos);
+    const PalDataConstIt pdciIt{ pdSrc.cbegin() + stSrcPos };
+    StdCopy(par_unseq, pdciIt, pdciIt + stSrcCount, begin() + stDstPos);
   }
   /* -- Fill with specified value ------------------------------------------ */
   void Fill(const size_t stIndex, const size_t stCount,
     const GLfloat fRed=0.0f, const GLfloat fGreen=0.0f,
     const GLfloat fBlue=0.0f, const GLfloat fAlpha=0.0f)
   { // Get start and fill in the array
-    const auto itStart{ begin() + stIndex };
-    StdFill(par_unseq, itStart, itStart + stCount,
+    const PalDataIt pdiStart{ begin() + stIndex };
+    StdFill(par_unseq, pdiStart, pdiStart + stCount,
       FboColour{ fRed, fGreen, fBlue, fAlpha }); }
   /* ----------------------------------------------------------------------- */
   Pal(void) :                          // No parameters
@@ -192,7 +198,8 @@ CTOR_MEM_BEGIN_CSLAVE(Palettes, Palette, ICHelperUnsafe),
     /* -- Code  ------------------------------------------------------------ */
     { }                                // No code
 };/* ----------------------------------------------------------------------- */
-CTOR_END(Palettes, Palette,,,, palDefault{{{ // Init default palette to VGA
+CTOR_END(Palettes, Palette, PALETTE,,,,
+  palDefault{{{ // Init default palette to VGA
 /* -- 0-15 ----------------------------------------------------------------- */
 {.0f,.0f,.0f,.0f}, {   0,   2, 170 }, {  20, 170,   0 }, {   0, 170, 170 },
 { 170,   0,   3 }, { 170,   0, 170 }, { 170,  85,   0 }, { 170, 170, 170 },

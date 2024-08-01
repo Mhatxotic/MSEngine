@@ -16,24 +16,25 @@ local tonumber<const>, tostring<const>, pairs<const>, remove<const>,
     tonumber, tostring, pairs, table.remove, string.format, math.floor,
     math.cos, math.sin, math.min, math.max, string.rep, utf8.len, ipairs;
 -- M-Engine function aliases ----------------------------------------------- --
-local InfoMonitor<const>, InfoMonitorData<const>, InfoMonitors<const>,
-  InfoVidModeData<const>, InfoVidModes<const>, InfoTime<const>,
-  InfoCPUUsage<const>, InfoRAM<const>, InfoGPUFPS<const>, InfoEngine<const>,
-  UtilGetRatio<const>, UtilClampInt<const>, UtilClamp<const>,
-  UtilExplode<const>, AudioGetNumPBDs<const>, AudioGetPBDName<const>,
-  AudioReset<const>, VariableGetInt<const>, VariableSetInt<const>,
-  DisplayVReset<const>, DisplayReset<const>, CreditItem<const>,
-  CreditLicense<const>, VariableResetInt<const>,
+local CoreMonitor<const>, CoreMonitorData<const>, CoreMonitors<const>,
+  CoreVidModeData<const>, CoreVidModes<const>, CoreTime<const>,
+  CoreCPUUsage<const>, CoreRAM<const>, CoreGPUFPS<const>, CoreEngine<const>,
+  DisplayGetSize<const>, UtilGetRatio<const>, UtilClampInt<const>,
+  UtilClamp<const>, UtilExplode<const>, AudioGetNumPBDs<const>,
+  AudioGetPBDName<const>, AudioReset<const>, VariableGetInt<const>,
+  VariableSetInt<const>, DisplayVReset<const>, DisplayReset<const>,
+  CoreLibrary<const>, CoreLicense<const>, VariableResetInt<const>,
   UtilWordWrap<const>, DisplayFSType<const> =
     Display.Monitor, Display.MonitorData, Display.Monitors,
-    Display.VidModeData, Display.VidModes, Info.Time, Info.CPUUsage, Info.RAM,
-    Display.GPUFPS, Info.Engine, Util.GetRatio, Util.ClampInt, Util.Clamp,
+    Display.VidModeData, Display.VidModes, Core.Time, Core.CPUUsage, Core.RAM,
+    Display.GPUFPS, Core.Engine, Display.GetSize, Util.GetRatio, Util.ClampInt,
+    Util.Clamp,
     Util.Explode, Audio.GetNumPBDevices, Audio.GetPBDeviceName, Audio.Reset,
     Variable.GetInt, Variable.SetInt, Display.VReset, Display.Reset,
-    Credit.Item, Credit.License, Variable.ResetInt, Util.WordWrap,
+    Core.Library, Core.License, Variable.ResetInt, Util.WordWrap,
     Display.FSType;
 -- Constants --------------------------------------------------------------- --
-local iCredits<const> = Credit.Libs.MAX;
+local iCredits<const> = Core.Libraries.MAX;
 local aCVars<const> = Variable.Internal;
 local aKeys<const> = Input.KeyCodes;
 local iKeyEscape<const>, iKeyPageUp<const>, iKeyPageDown<const>,
@@ -45,7 +46,7 @@ local iNativeMode<const> = Display.FSTypes.NATIVE;
 -- Read and prepare engine version information ----------------------------- --
 local sAppTitle, sAppVersion<const>, iAppMajor<const>, iAppMinor<const>,
   iAppBuild<const>, iAppRevision<const>, _, _, sAppExeType =
-    InfoEngine();
+    CoreEngine();
 sAppTitle, sAppExeType = sAppTitle:upper(), sAppExeType:upper();
 -- Read game version information ------------------------------------------- --
 local sGameVersion<const>, sGameName<const>, sGameCopyr<const>,
@@ -93,11 +94,23 @@ local aWindowLabels<const> = {
   "Windowed Mode", "Borderless Full-screen Mode", "Exclusive Full-screen Mode",
   "Native Full-screen Mode"
 };
--- Window sizes ----------------------------------------------------------- --
+-- Custom window size labels ----------------------------------------------- --
+local aCustomLabels<const> = { "<Custom>", "<Auto>" };
+-- Window sizes ------------------------------------------------------------ --
 local aWindowSizes<const> = {          -- Keep to arbitrary aspect ratios
-  {   0,   0}, { 320, 240}, { 512, 384}, { 640, 360}, { 640, 480}, {1024, 576},
-  { 800, 600}, { 900, 600}, { 960, 720}, {1280, 720}, {1280, 960}, {1600,1200},
-  {1680,1050}, {1600,1200}, {1920,1080}, {1920,1200}, {2560,1440}
+  {   0,   0}, --[[ Default (auto)  --]] { 320, 240}, --[[ ( 4:3 ) QVGA    --]]
+  { 480, 360}, --[[ ( 4:3 ) Trivial --]] { 512, 384}, --[[ ( 4:3 ) 0.20M3  --]]
+  { 640, 360}, --[[ (16:9 ) 0.23M9  --]] { 640, 400}, --[[ (16:10) 0.26M3  --]]
+  { 640, 480}, --[[ ( 4:3 ) 0.29M4  --]] { 720, 540}, --[[ ( 4:3 ) Trivial --]]
+  { 768, 480}, --[[ (16:10) WVGA    --]] { 800, 600}, --[[ ( 4:3 ) SVGA    --]]
+  { 960, 540}, --[[ (16:9 ) qHD     --]] { 960, 720}, --[[ ( 4:3 ) 0.69M3  --]]
+  {1024, 576}, --[[ (16:9 ) 0.59M9  --]] {1280, 720}, --[[ (16:9 ) WXGA    --]]
+  {1280, 800}, --[[ (16:10) WXGA    --]] {1280, 960}, --[[ ( 4:3 ) SXGA-   --]]
+  {1400, 900}, --[[ (16:9)  WSXGA   --]] {1600,1200}, --[[ (16:9 ) HD+     --]]
+  {1680,1050}, --[[ (16:10) WSXGA+  --]] {1920,1080}, --[[ (16:9 ) FHD     --]]
+  {1920,1200}, --[[ (16:10) WUXGA   --]] {2048,1280}, --[[ (16:10) 2.62MA  --]]
+  {2304,1440}, --[[ (16:10) 3.32MA  --]] {2560,1440}, --[[ (16:9)  WQHD    --]]
+  {2560,1600}  --[[ (16:10) WQXGA   --]]
 };
 -- Other ----------------------------------------------------------------------
 local iOColour, aColours<const> = 1, {-- Colour transition animations
@@ -129,7 +142,7 @@ local iStageW, iStageH, iStageL, iStageT, iStageR, iStageB;
 local function GetMonitorIdOrPrimary()
   -- If the monitor id is set to the primary monitor then we need to return
   -- the actual id of the primary monitor instead
-  if iMonitorId == -1 then return InfoMonitor() end;
+  if iMonitorId == -1 then return CoreMonitor() end;
   -- Return selected monitor id
   return iMonitorId;
 end
@@ -144,7 +157,7 @@ end
 -- ------------------------------------------------------------------------- --
 local function MonitorUpdate()
   if iMonitorId == -1 then return "Primary Monitor" end;
-  local sMsg<const> = InfoMonitorData(iMonitorId);
+  local sMsg<const> = CoreMonitorData(iMonitorId);
   if #sMsg > 34 then return sMsg:sub(0,30).."..." end;
   return sMsg;
 end
@@ -154,7 +167,7 @@ local function MonitorDown()
   UpdateLabels()
 end
 local function MonitorUp()
-  if iMonitorId == InfoMonitors()-1 then return end;
+  if iMonitorId == CoreMonitors()-1 then return end;
   iMonitorId = iMonitorId + 1;
   UpdateLabels()
 end
@@ -184,7 +197,7 @@ local function FSResUpdate()
   if iFullScreenMode == -1 then return "Automatic" end;
   -- Which one
   local iWidth<const>, iHeight<const>, iBits<const>, nRefresh<const> =
-    InfoVidModeData(GetMonitorIdOrPrimary(), iFullScreenMode);
+    CoreVidModeData(GetMonitorIdOrPrimary(), iFullScreenMode);
   -- Return data
   return iWidth.."x"..iHeight.."x"..iBits.." "..nRefresh.."hz ("..
     UtilGetRatio(iWidth, iHeight)..")";
@@ -198,7 +211,7 @@ end
 local function FSResUp()
   if iFullScreenMode <= -2 or
      DisplayFSType() == iNativeMode or
-     iFullScreenMode >= InfoVidModes(GetMonitorIdOrPrimary())-1 then
+     iFullScreenMode >= CoreVidModes(GetMonitorIdOrPrimary())-1 then
     return end;
   iFullScreenMode = iFullScreenMode + 1;
 end
@@ -208,15 +221,17 @@ local function WSizeUpdate()
   if iFullScreenState ~= 0 or
      DisplayFSType() == iNativeMode then
     return "Disabled" end;
-  -- Custom resolution?
-  if iWindowId == 0 then return "Custom" end;
-  if iWindowId == 1 then return "Automatic" end;
+  -- Custom resolution? Return custom resolution label with size
+  if iWindowId <= 1 then
+    local iWinX<const>, iWinY<const> = DisplayGetSize();
+    return aCustomLabels[iWindowId + 1].." "..
+      iWinX.."x"..iWinY.." ("..UtilGetRatio(iWinX, iWinY)..")";
+  end
   -- Which one
   local aData<const> = aWindowSizes[iWindowId];
   if not aData then return "Unknown ("..iWindowId..")" end;
   -- Return data
-  return aData[1].."x"..aData[2].." ("..
-    UtilGetRatio(aData[1], aData[2])..")";
+  return aData[1].."x"..aData[2].." ("..UtilGetRatio(aData[1], aData[2])..")";
 end
 local function WSizeDown()
   if iFullScreenState ~= 0 or
@@ -454,7 +469,7 @@ local function Refresh()
   local function RefreshMonitorSettings()
     -- Initialise monitor video modes and use primary monitor if invalid
     iMonitorId = tonumber(VariableGetInt(iCVvidmonitor));
-    if iMonitorId < -1 or iMonitorId >= InfoMonitors() then
+    if iMonitorId < -1 or iMonitorId >= CoreMonitors() then
       iMonitorId = -1 end;
     iMonitorIdOriginal = iMonitorId;
     -- Initialise video resolution and use desktop resolution if invalid
@@ -473,7 +488,7 @@ local function Refresh()
     -- If the full-screen mode CVar is invalid then reset to 'automatic' mode
     -- where the engine will set the full-screen mode to the desktop mode.
     if iFullScreenMode < -2 or
-      iFullScreenMode >= InfoVidModes(GetMonitorIdOrPrimary()) then
+      iFullScreenMode >= CoreVidModes(GetMonitorIdOrPrimary()) then
         iFullScreenMode = -1 end;
     -- Record the the initialised variables so we can check if they were
     -- modified when the user clicks the apply button.
@@ -570,11 +585,11 @@ end
 local nAlpha<const> = 1/60;
 local function ProcSysInfo()
   -- Get time
-  nTime = InfoTime();
+  nTime = CoreTime();
   -- Get cpu info, ram info and nGPUFramesPerSecond
-  nCPUUsageProcess, nCPUUsageSystem = InfoCPUUsage();
-  nRAMUsePercentage = InfoRAM();
-  nGPUFramesPerSecond = (nAlpha * InfoGPUFPS()) + (1.0 - nAlpha) *
+  nCPUUsageProcess, nCPUUsageSystem = CoreCPUUsage();
+  nRAMUsePercentage = CoreRAM();
+  nGPUFramesPerSecond = (nAlpha * CoreGPUFPS()) + (1.0 - nAlpha) *
     (nGPUFramesPerSecond or 60);
 end
 -- ------------------------------------------------------------------------- --
@@ -877,15 +892,15 @@ local function InitConfig()
   -- Initialise status bars
   sStatusLine1 = format("%s (%s) %s.%u.%u.%u.%u - %s", sGameName, sAppExeType,
     sGameVersion, iAppMajor, iAppMinor, iAppBuild, iAppRevision, sGameWebsite);
-  sStatusLine2 = "MS-DESIGN PROUDLY PRESENTS DIGGERS! A REMAKE FOR MODERN "..
-    "OPERATING SYSTEMS AND HARDWARE FROM THE CLASSIC CD32 AND DOS DAYS. "..
-    "THIS IS THE CONFIGURATION SCREEN. PRESS ESCAPE OR THE 'DONE' BUTTON "..
-    "TO RETURN TO THE GAME OR MOVE YOUR MOUSE OVER AN OPTION TO HAVE MORE "..
-    "EXPLAINED ABOUT IT HERE. USE YOUR MOUSE OR JOYSTICK TO MOVE THE CURSOR "..
-    "AND THE BUTTONS TO CHANGE OPTIONS. PRESS F2 AT ANY TIME TO SEE THIS "..
-    "SCREEN OR F1 FOR DOCUMENTATION. PRESS ALT+ENTER AT ANY TIME TO TOGGLE "..
-    "FULL-SCREEN AND WINDOW. PRESS F11 TO RESET THE WINDOW SIZE AND F12 TO "..
-    "TAKE A SCREENSHOT";
+  sStatusLine2 = "MS-DESIGN PROUDLY PRESENTS DIGGERS! A REMAKE FOR MODERN \z
+    OPERATING SYSTEMS AND HARDWARE FROM THE CLASSIC CD32 AND DOS DAYS. \z
+    THIS IS THE CONFIGURATION SCREEN. PRESS ESCAPE OR THE 'DONE' BUTTON \z
+    TO RETURN TO THE GAME OR MOVE YOUR MOUSE OVER AN OPTION TO HAVE MORE \z
+    EXPLAINED ABOUT IT HERE. USE YOUR MOUSE OR JOYSTICK TO MOVE THE CURSOR \z
+    AND THE BUTTONS TO CHANGE OPTIONS. PRESS F1 AT ANY TIME TO SEE THIS \z
+    SCREEN OR F2 FOR DOCUMENTATION. PRESS ALT+ENTER AT ANY TIME TO TOGGLE \z
+    FULL-SCREEN AND WINDOW. PRESS F11 TO RESET THE WINDOW SIZE AND F12 TO \z
+    TAKE A SCREENSHOT";
   sStatusLineSave = sStatusLine2;
   SetTip(0, sStatusLineSave);
   -- Refresh all settings
@@ -924,12 +939,12 @@ local function InitThirdPartyCredits()
   local iCreditsM1<const> = iCredits - 1;
   for iIndex = 0, iCreditsM1, 2 do
     -- Get credit information
-    local sName<const>, sVersion<const> = CreditItem(iIndex);
+    local sName<const>, sVersion<const> = CoreLibrary(iIndex);
     -- If we can show another?
     iIndex = iIndex + 1;
     if iIndex <= iCreditsM1 then
       -- Get second credit information
-      local sName2<const>, sVersion2<const> = CreditItem(iIndex);
+      local sName2<const>, sVersion2<const> = CoreLibrary(iIndex);
       -- Insert both credits
       aCreditLines[1 + #aCreditLines] =
         format("%2d: %-15s %17s  %2d: %-17s %15s",
@@ -947,7 +962,7 @@ local function InitThirdPartyCredits()
   for iIndex = 0, iCreditsM1 do
     -- Get credit information
     local sName<const>, sVersion<const>, bCopyright, sAuthor<const> =
-      CreditItem(iIndex);
+      CoreLibrary(iIndex);
     -- Set copyright
     if bCopyright then bCopyright = "(C)";
                   else bCopyright = "BY" end;
@@ -955,7 +970,7 @@ local function InitThirdPartyCredits()
     Header((iIndex+1)..". USES "..sName:upper().." "..bCopyright.." "..
       sAuthor:upper());
     -- Add credit license
-    local aLines<const> = UtilExplode(CreditLicense(iIndex), "\n");
+    local aLines<const> = UtilExplode(CoreLicense(iIndex), "\n");
     for iI = 1, #aLines do
       local sLine<const> = aLines[iI];
       if #sLine > 78 then
@@ -1005,7 +1020,7 @@ local function DoInitSetup(bDoReadMe)
     -- Backup current cursor id
     iCursorId = GetCursor();
     -- Get time
-    nTime = InfoTime();
+    nTime = CoreTime();
     -- Calculate bottom of categories
     iCatBottom = 28 + (#aOptionData * iCatSize);
     -- Do readme or do setup?
@@ -1038,12 +1053,11 @@ return { A = { InitSetup = InitSetup }, F = function(GetAPI)
   GetAPI("GetCallbacks", "GetCursor", "GetMouseY", "GetMusic",  "IsButtonHeld",
     "IsButtonPressed", "IsFading", "IsKeyPressed", "IsKeyRepeating",
     "IsMouseInBounds", "IsMouseYGreaterEqualThan", "IsMouseYLessThan",
-    "IsScrollingDown", "IsScrollingLeft", "IsScrollingRight",
-    "IsScrollingUp", "LoadResources", "PlayMusic", "PlayStaticSound",
-    "RegisterFBUCallback", "RenderFade", "RenderShadow", "SetCallbacks",
-    "SetCursor", "StopMusic", "aSetupButtonData", "aCursorIdData",
-    "aSetupOptionData", "aSfxData", "fontLarge", "fontLittle", "fontTiny",
-    "texSpr");
+    "IsScrollingDown", "IsScrollingLeft", "IsScrollingRight", "IsScrollingUp",
+    "LoadResources", "PlayMusic", "PlayStaticSound", "RegisterFBUCallback",
+    "RenderFade", "RenderShadow", "SetCallbacks", "SetCursor", "StopMusic",
+    "aSetupButtonData", "aCursorIdData", "aSetupOptionData", "aSfxData",
+    "fontLarge", "fontLittle", "fontTiny", "texSpr");
   -- Apply functions to static button table -------------------------------- --
   for sK, fCb in pairs({ APPLY = ApplySettings, DONE = Finish,
     RESET = SetDefaults, ABOUT = InitReadme }) do aButtonData[sK][6] = fCb end;

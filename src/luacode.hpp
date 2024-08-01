@@ -116,7 +116,7 @@ static void LuaCodeDoCompileBuffer(lua_State*const lS, const char *cpBuf,
   switch(const int iR = luaL_loadbuffer(lS, cpBuf, stSize, strRef.c_str()))
   { // No error? Execute functions and log success. We should always be in
     // the sandbox, so no pcall is needed.
-    case 0: return;
+    case LUA_OK: return;
     // Syntax error? Show error
     case LUA_ERRSYNTAX:
       XC(StrAppend("Compile error! > ", LuaUtilGetAndPopStr(lS)));

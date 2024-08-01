@@ -226,8 +226,8 @@ LLFUNC(SetInterval, 1, cTimer->TimerSetInterval(AgUInt64LG{lS, 1,
 // ? for widescreen window sizes.
 /* ------------------------------------------------------------------------- */
 LLFUNC(SetMatrix, 0,
-  const AgNumberL aWidth{lS, 1, 1.0f},
-                  aHeight{lS, 2, 1.0f};
+  const AgNumberL<GLfloat> aWidth{lS, 1, 1.0f},
+                           aHeight{lS, 2, 1.0f};
   cFboCore->AutoMatrix(aWidth, aHeight, false))
 /* ========================================================================= */
 // $ Display.SetPos

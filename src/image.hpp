@@ -15,11 +15,11 @@ using namespace ICollector::P;         using namespace IError::P;
 using namespace IEvtMain::P;           using namespace IFileMap::P;
 using namespace IIdent::P;             using namespace IImageDef::P;
 using namespace IImageFormat::P;       using namespace IImageLib::P;
-using namespace ILog::P;               using namespace IMemory::P;
-using namespace IOgl::P;               using namespace IStd::P;
-using namespace IString::P;            using namespace ISysUtil::P;
-using namespace ITexDef::P;            using namespace IUtil::P;
-using namespace Lib::OS::GlFW;
+using namespace ILog::P;               using namespace ILuaLib::P;
+using namespace IMemory::P;            using namespace IOgl::P;
+using namespace IStd::P;               using namespace IString::P;
+using namespace ISysUtil::P;           using namespace ITexDef::P;
+using namespace IUtil::P;              using namespace Lib::OS::GlFW;
 /* ------------------------------------------------------------------------- */
 namespace P {                          // Start of public module namespace
 /* == Image collector and member class ===================================== */
@@ -924,9 +924,9 @@ CTOR_MEM_BEGIN_ASYNC_CSLAVE(Images, Image, ICHelperUnsafe),
   /* -- Destructor --------------------------------------------------------- */
   ~Image(void) { AsyncCancel(); }      // Wait for loading thread to cancel
   /* ----------------------------------------------------------------------- */
-  DELETECOPYCTORS(Image)               // Disable copy constructor and operator
+  DELETECOPYCTORS(Image)               // Suppress default functions for safety
 };/* -- End ---------------------------------------------------------------- */
-CTOR_END_ASYNC(Images, Image, IMAGE,,,, idFormatModes{{ // Pixel format modes
+CTOR_END_ASYNC(Images, Image, IMAGE, IMAGE,,,, idFormatModes{{ // Pixel formats
   /* ----------------------------------------------------------------------- */
   IDMAPSTR(TT_NONE),                   IDMAPSTR(TT_BGR),
   IDMAPSTR(TT_BGRA),                   IDMAPSTR(TT_DXT1),

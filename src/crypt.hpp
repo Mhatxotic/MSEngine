@@ -14,7 +14,8 @@ using namespace IClock::P;             using namespace ICollector::P;
 using namespace IError::P;             using namespace ILog::P;
 using namespace IMemory::P;            using namespace IStd::P;
 using namespace IString::P;            using namespace ISystem::P;
-using namespace ISysUtil::P;           using namespace IUtf;
+using namespace ISysUtil::P;           using namespace IToken::P;
+using namespace IUtf;
 using namespace IUtil::P;              using namespace Lib::OS::OpenSSL;
 using namespace Lib::OS::SevenZip;
 /* ------------------------------------------------------------------------- */
@@ -205,7 +206,7 @@ static const string CryptBin2HexL(const uint8_t*const ucStr,
 static const string CryptBin2HexL(const MemConst &mcSrc)
   { return CryptBin2HexL(mcSrc.MemPtr<uint8_t>(), mcSrc.MemSize()); }
 /* ------------------------------------------------------------------------- */
-void CryptAddEntropyPtr(const void*const vpPtr, const size_t stSize)
+static void CryptAddEntropyPtr(const void*const vpPtr, const size_t stSize)
   { RAND_add(vpPtr, UtilIntOrMax<int>(stSize), static_cast<double>(stSize)); }
 /* ------------------------------------------------------------------------- */
 template<typename IntType>void CryptAddEntropyInt(const IntType itValue)
@@ -640,6 +641,56 @@ static const Memory CryptRandomBlock(const size_t stSize)
   // Return array
   return mData;
 }
+/* -- Sanitise a string removing excessive letters and words --------------- */
+static string CryptSanitise(const string &strMessage)
+{ // Create output string and pre-allocate memory
+  string strOutput;
+  strOutput.reserve(strMessage.capacity());
+  // Last character processed and count
+  char cLastChar = '\0';
+  size_t stCount = 0;
+  // Enumerate through the string
+  for(char cChar : strMessage)
+  { // Character is different
+    if(cChar != cLastChar)
+    { // Set new character found and reset times found
+      cLastChar = cChar;
+      stCount = 0;
+      // Add character
+      strOutput.push_back(cChar);
+      // Next character
+      continue;
+    } // Increase repetition count and continue if over 2 repetitions
+    if(++stCount > 1) continue;
+    // Add character
+    strOutput.push_back(cChar);
+  } // Now split the string into words
+  Token tWords{ strOutput, cCommon->Space() };
+  // Return if empty?
+  if(tWords.empty()) return {};
+  // return single word?
+  if(tWords.size() == 1) return tWords.front();
+  // Clear output and recover memory now we've done with it
+  strOutput.clear();
+  strOutput.shrink_to_fit();
+  // Repeated words
+  string strWord;
+  // For each word
+  for(StrVectorIt svciIt{ tWords.begin() }; svciIt != tWords.end(); )
+  { // Character is different?
+    if(*svciIt != strWord)
+    { // Set new character found and reset times found
+      strWord = *svciIt;
+      stCount = 0;
+      // Next word
+      continue;
+    } // Increase repetition count and continue if repeated
+    if(++stCount < 2) { ++svciIt; continue; }
+    // Remove word
+    svciIt = tWords.erase(svciIt);
+  } // Implode words and return output
+  return StrImplode(tWords);
+}
 /* -- Crypt manager class -------------------------------------------------- */
 static class Crypt final :
   /* -- Base classes ------------------------------------------------------- */
@@ -897,7 +948,7 @@ static class Crypt final :
   // Done
   DTORHELPEREND(~Crypt)
   /* -- Macros ---------------------------------------------------- */ private:
-  DELETECOPYCTORS(Crypt)               // Do not need defaults
+  DELETECOPYCTORS(Crypt)               // Suppress default functions for safety
   /* ----------------------------------------------------------------------- */
 } *cCrypt = nullptr;                   // Pointer to static class
 /* -- URL decode the specified string -------------------------------------- */

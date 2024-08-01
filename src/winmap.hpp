@@ -174,6 +174,6 @@ class SysMap :                         // Members initially private
   /* -- Destructor --------------------------------------------------------- */
   ~SysMap(void) { SysMapDeInitInternal(); }
   /* ----------------------------------------------------------------------- */
-  DELETECOPYCTORS(SysMap);             // Disable copy constructor and operator
+  DELETECOPYCTORS(SysMap)              // Suppress default functions for safety
 };/* -- End ---------------------------------------------------------------- */
 /* == EoF =========================================================== EoF == */

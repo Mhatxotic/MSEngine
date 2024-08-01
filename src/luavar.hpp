@@ -12,10 +12,10 @@ namespace ILuaVariable {               // Start of private module namespace
 using namespace ICollector::P;         using namespace ICVarDef::P;
 using namespace ICVar::P;              using namespace ICVarLib::P;
 using namespace IError::P;             using namespace IIdent::P;
-using namespace ILuaUtil::P;           using namespace ILuaFunc::P;
-using namespace ILua::P;               using namespace IString::P;
-using namespace IStat::P;              using namespace IStd::P;
-using namespace ISysUtil::P;
+using namespace ILuaLib::P;            using namespace ILuaUtil::P;
+using namespace ILuaFunc::P;           using namespace ILua::P;
+using namespace IString::P;            using namespace IStat::P;
+using namespace IStd::P;               using namespace ISysUtil::P;
 /* ------------------------------------------------------------------------- */
 typedef IdMap<CVarFlagsType> IdMapCVarEnums;
 /* ------------------------------------------------------------------------- */
@@ -116,7 +116,7 @@ CTOR_MEM_BEGIN_CSLAVE(Variables, Variable, ICHelperUnsafe),
     // Since the userdata for this class object is at arg 5, we need to make
     // sure the callback function is ahead of it in arg 6 or the LuaFunc()
     // class which calls luaL_ref will fail as it ONLY reads position -1.
-    lua_pushvalue(lS, 4);
+    LuaUtilCopyValue(lS, 4);
     // Save the function at the top of the stack used for the callback
     lcvmiIt = cVariables->lcvmMap.insert(GetLuaVarListEnd(), { strName,
       make_pair(LuaFunc{ StrAppend("CV:", strName), true },
@@ -145,9 +145,9 @@ CTOR_MEM_BEGIN_CSLAVE(Variables, Variable, ICHelperUnsafe),
     /* --------------------------------------------------------------------- */
     { }
   /* ----------------------------------------------------------------------- */
-  DELETECOPYCTORS(Variable)            // Disable copy constructor and operator
+  DELETECOPYCTORS(Variable)            // Suppress default functions for safety
 };/* ----------------------------------------------------------------------- */
-CTOR_END(Variables, Variable,,,,       // Finish off collector class with inits
+CTOR_END(Variables, Variable, VARIABLE,,,, // Finish off collector class
 /* ------------------------------------------------------------------------- */
 imcveTypes{{                           // Cvar types
   IDMAPSTR(TSTRING),                   IDMAPSTR(TINTEGER),
@@ -246,17 +246,18 @@ template<class MapType>
 { // Get pending cvars list and ignore if empty
   if(mtMap.empty()) return "No cvars exist in this category!";
   // Try to find the cvar outright first (only make work when not in release)
-  const auto aItExact{ mtMap.find(strFilter) };
-  if(aItExact != mtMap.cend())
+  typedef typename MapType::const_iterator MapTypeConstIt;
+  const MapTypeConstIt mtciExactIt{ mtMap.find(strFilter) };
+  if(mtciExactIt != mtMap.cend())
   {  // Type could either be CVarMap?
     if constexpr(is_same_v<MapType, CVarMap>)
-      return VariablesMakeInformation(aItExact->second);
+      return VariablesMakeInformation(mtciExactIt->second);
     // ..or the type could either be LuaCVarMap
     else if constexpr(is_same_v<MapType, LuaCVarMap>)
-      return VariablesMakeInformation(aItExact->second.second->second);
+      return VariablesMakeInformation(mtciExactIt->second.second->second);
   } // Try as a lower bound (partial) check?
-  auto aIt{ mtMap.lower_bound(strFilter) };
-  if(aIt != mtMap.cend())
+  MapTypeConstIt mtciIt{ mtMap.lower_bound(strFilter) };
+  if(mtciIt != mtMap.cend())
   { // Formatted output. Can assume all variables will be printed
     Statistic sTable;
     sTable.Header("FLAGS").Header("NAME", false).Header("VALUE", false)
@@ -266,18 +267,18 @@ template<class MapType>
     // Build output string
     do
     { // If no match found? return original string
-      const string &strKey = aIt->first;
+      const string &strKey = mtciIt->first;
       if(strKey.compare(0, strFilter.size(), strFilter)) continue;
       // Increment matched counter
       ++stMatched;
       // Type could either be CVarMap?
       if constexpr(is_same_v<MapType, CVarMap>)
-        VariablesMakeInformationTokens(sTable, aIt->second);
+        VariablesMakeInformationTokens(sTable, mtciIt->second);
       // ..or the type could either be LuaCVarMap
       else if constexpr(is_same_v<MapType, LuaCVarMap>)
-        VariablesMakeInformationTokens(sTable, aIt->second.second->second);
+        VariablesMakeInformationTokens(sTable, mtciIt->second.second->second);
     } // Until no more commands
-    while(++aIt != mtMap.cend());
+    while(++mtciIt != mtMap.cend());
     // Print output if we matched commands
     if(stMatched) return StrFormat("$$ of $ matched.", sTable.Finish(),
         stMatched, StrCPluraliseNum(mtMap.size(), "cvar", "cvars"));

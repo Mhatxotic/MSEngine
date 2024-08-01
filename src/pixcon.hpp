@@ -543,7 +543,7 @@ class SysCon :                         // All members initially private
     { // Set cursor position
       SetCursor(1 + iLen, diSizeM1.DimGetHeight());
       // Reset again and write the string
-      WriteLine(UtfDecoder(strIR), diSizeM1.DimGetWidth(), false);
+      WriteLine(UtfDecoder{ strIR }, diSizeM1.DimGetWidth(), false);
     } // Actually set cursor position
     ciCursor.CoordSet(UtilMinimum(diSizeM1.DimGetWidth(), 1 + iLen),
                                   diSizeM1.DimGetHeight());
@@ -622,25 +622,26 @@ class SysCon :                         // All members initially private
   void RedrawTitleBar(const string &strTL, const string &strTR)
     { RedrawStatus(0, strTL, strTR); }
   /* -- Redraw console buffer ---------------------------------------------- */
-  void RedrawBuffer(const ConLines &cL, const ConLinesConstRevIt &lS)
+  void RedrawBuffer(const ConLines &clLines,
+    const ConLinesConstRevIt &clcriStart)
   { // Reset cursor position to top left of drawing area
     SetCursor(0, diSizeM1.DimGetHeight());
     // Set default text colour
     SetColour(15);
     // Draw until we go off the top of the screen
-    for(ConLinesConstRevIt lL{ lS };
-                           lL != cL.rend() && ValidY(CoordGetY());
-                         ++lL)
+    for(ConLinesConstRevIt clcriIt{ clcriStart };
+                           clcriIt != clLines.crend() && ValidY(CoordGetY());
+                         ++clcriIt)
     { // Get structure
-      const ConLine &lD = *lL;
+      const ConLine &clLine = *clcriIt;
       // Convert RGB colour to Win32 console id colour
-      SetColour(lD.cColour);
+      SetColour(clLine.cColour);
       // Put text in a utf container and write the data. Note: Although
       // CoordGetY() could go effectively negative and we're not using a signed
       // value we can make sure we don't access any OOB memory by just checking
       // that the co-ordinates while drawing, we don't have to worry about the
       // integer wrapping at all we are not drawing.
-      CoordDecY(WriteLineWU(UtfDecoder{ lD.strLine }) - 1);
+      CoordDecY(WriteLineWU(UtfDecoder{ clLine.strLine }) - 1);
     } // Clear extra lines we didn't draw too
     while(CoordGetY() > 1) { CoordSetX(0); CoordDecY(); ClearLine(); }
   }
@@ -695,6 +696,11 @@ class SysCon :                         // All members initially private
     IHInitialise();
     // System console is initialising
     cLog->LogDebugSafe("SysCon initialising...");
+    // NCurses will just suspend us and calls below will fail if we're in the
+    // background of the terminal by using & or 'bg' command.
+    if(IsInBackground())
+      XC("Terminal NCurses mode cannot operate in the background so "
+         "please try again running the process in the foreground instead!");
     // Set locale
     if(const char*const cpLocale = setlocale(LC_ALL, cCommon->CBlank()))
       { cLog->LogDebugExSafe("SysCon initialised locale to $.", cpLocale); }
@@ -816,7 +822,7 @@ class SysCon :                         // All members initially private
   /* -- Destructor --------------------------------------------------------- */
   DTORHELPER(~SysCon, SysConDeInit())
   /* ----------------------------------------------------------------------- */
-  DELETECOPYCTORS(SysCon)              // Do not need defaults
+  DELETECOPYCTORS(SysCon)              // Suppress default functions for safety
   /* -- Set maximum console line length ---------------------------- */ public:
   CVarReturn RowsModified(const size_t stRows)
   { // Deny if out of range. The maximum value is a SHORT from Win32 API.

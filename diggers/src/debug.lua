@@ -14,10 +14,11 @@ local max<const>, min<const>, random<const>, format<const>, ceil<const>,
   sin<const>, cos<const> =
   math.max, math.min, math.random, string.format, math.ceil, math.sin, math.cos;
 -- M-Engine function aliases ----------------------------------------------- --
-local UtilHex<const>, InfoCPUUsage<const>, InfoRAM<const>,
-  DisplayGPUFPS<const>, InfoUptime<const>, InfoLUATime<const> =
-    Util.Hex, Info.CPUUsage, Info.RAM, Display.GPUFPS, Info.Uptime,
-    Info.LUATime;
+local UtilHex<const>, CoreCPUUsage<const>, CoreRAM<const>,
+  DisplayGPUFPS<const>, CoreUptime<const>, CoreLUATime<const>,
+  CoreLUAUsage<const> =
+    Util.Hex, Core.CPUUsage, Core.RAM, Display.GPUFPS, Core.Uptime,
+    Core.LUATime, Core.LUAUsage;
 -- Diggers function and data aliases --------------------------------------- --
 local Fade, GetGameTicks, GetMouseX, GetMouseY, aPlayers, aObjects,
   RenderTerrain, RenderObjects, RenderShroud, BCBlit, texSpr, fontLarge,
@@ -187,10 +188,10 @@ local function InitDebugPlay(iId)
     texSpr:SetCA(0.9);
     RenderShroud();
     -- Get system information
-    local nCpu<const>, nSys<const> = InfoCPUUsage();
+    local nCpu<const>, nSys<const> = CoreCPUUsage();
     nGPUFramesPerSecond = (nAlpha * DisplayGPUFPS()) + (1.0 - nAlpha) *
         (nGPUFramesPerSecond or 60);
-    local nPerc<const>, _, _, _, nProc<const>, nPeak<const> = InfoRAM();
+    local nPerc<const>, _, _, _, nProc<const>, nPeak<const> = CoreRAM();
     -- Get player one data
     local iMoney1<const> = aActivePlayer.M;
     local iDiggers1<const> = aActivePlayer.DC;
@@ -242,7 +243,7 @@ local function InitDebugPlay(iId)
        CPUS %7.3f %%\n\z
        RAMS %7.3f %%\n\z",
       nGPUFramesPerSecond, nCpu, nProc / 1048576, nPeak / 1048576,
-      Info.LUAUsage() / 1048576, nSys, nPerc));
+      CoreLUAUsage() / 1048576, nSys, nPerc));
     -- Draw viewport info
     fontTiny:Print(iStageL + 5, 5,
       format("VPXC %4d/%4d\n\z
@@ -275,12 +276,12 @@ local function InitDebugPlay(iId)
         GetGameTicks() // 216000 % 1000,
         GetGameTicks() // 3600 % 60,
         GetGameTicks() / 60 % 60,
-        InfoLUATime() // 3600 % 1000,
-        InfoLUATime() // 60 % 60,
-        InfoLUATime() % 60,
-        InfoUptime() // 3600 % 1000,
-        InfoUptime() // 60 % 60,
-        InfoUptime() % 60));
+        CoreLUATime() // 3600 % 1000,
+        CoreLUATime() // 60 % 60,
+        CoreLUATime() % 60,
+        CoreUptime() // 3600 % 1000,
+        CoreUptime() // 60 % 60,
+        CoreUptime() % 60));
     -- Flash debug mode
     fontTiny:PrintR(iStageR - 5, 5, "DEBUG MODE");
     -- Draw gems and dug count

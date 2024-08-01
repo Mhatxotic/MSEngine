@@ -694,12 +694,6 @@ const CVarItemStaticList cvislList{ {  // Default cvars (from cvars.hpp)
 { CFL_NONE, "lua_randomseed", cCommon->Zero(),
   CB(cLua->SetSeed, lua_Integer), TUINTEGER|PSYSTEM },
 /* ------------------------------------------------------------------------- */
-// ! LUA_APIFLAGS
-// ? Specifies to enable or disable certain Lua namespaces.
-/* ------------------------------------------------------------------------- */
-{ CFL_NONE, "lua_apiflags", "3",
-  CB(cLua->SetFlags, LuaFlagsType), TUINTEGER|PSYSTEM },
-/* ------------------------------------------------------------------------- */
 // ! LUA_SCRIPT
 // ? Specifies the script to load and execute automatically at startup. It must
 // ? be a safe filename that does not leave the engines active parent
@@ -767,12 +761,14 @@ const CVarItemStaticList cvislList{ {  // Default cvars (from cvars.hpp)
 { CFL_AUDIO, "aud_strbufcount", "4",
   CB(StreamSetBufferCount, size_t), TUINTEGERSAVE|PANY },
 /* ------------------------------------------------------------------------- */
-// ! AUD_STRBUFSIZ
-// ? Specifies the size (in bytes) of each stream buffer for Stream classes.
-// ? We need sufficiently large enough buffers to make streamed audio playback
-// ? consistent.
+// ! AUD_STRBUFFER
+// ? Specifies the size (in bytes) of memory to allocate for use with buffering
+// ? data for the Stream class. Stream classes try to load up as much data in
+// ? this buffer as possible before dispatching it to the audio renderer. The
+// ? default is to allocate 32 kilobytes of RAM which should be enough and will
+// ? need to be raised if any distortions occur in playback.
 /* ------------------------------------------------------------------------- */
-{ CFL_AUDIO, "aud_strbufsiz", "32768",
+{ CFL_AUDIO, "aud_strbuffer", "32768",
   CB(StreamSetBufferSize, size_t), TUINTEGERSAVE|CPOW2|PANY },
 /* ------------------------------------------------------------------------- */
 // ! AUD_STRVOL
@@ -794,8 +790,7 @@ const CVarItemStaticList cvislList{ {  // Default cvars (from cvars.hpp)
 // ? Specifies whether to use HRTF dynamics on audio output. This could cause
 // ? strange audio stereo quality issues so it is recommended to disable.
 /* ------------------------------------------------------------------------- */
-{ CFL_AUDIO, "aud_hrtf", cCommon->Zero(),
-  NoOp, TUINTEGERSAVE|PANY },
+{ CFL_AUDIO, "aud_hrtf", cCommon->Zero(), NoOp, TUINTEGERSAVE|PANY },
 /* == Console cvars ======================================================== */
 // ! CON_KEYPRIMARY
 // ? The primary GLFW console key virtual key code to use to toggle console
@@ -1036,7 +1031,8 @@ const CVarItemStaticList cvislList{ {  // Default cvars (from cvars.hpp)
 /* ------------------------------------------------------------------------- */
 // ! CON_TMCNOCLOSE
 // ? Disables the X button and close in the application context menu. This does
-// ? not prevent CONTROL+C/BREAK keys.
+// ? not prevent CONTROL+C/BREAK keys. This only applies to the Windows
+// ? operating system console only and a nullop on any other system!
 /* ------------------------------------------------------------------------- */
 { CFL_TERMINAL, "con_tmcnoclose", cCommon->One(), NoOp,
   TBOOLEAN|PBOOT|PSYSTEM },
@@ -1678,16 +1674,6 @@ const CVarItemStaticList cvislList{ {  // Default cvars (from cvars.hpp)
 { CFL_VIDEO, "win_sizable", cCommon->One(),
   CB(cDisplay->SizableChanged, bool), TBOOLEAN|PANY },
 /* ------------------------------------------------------------------------- */
-// ! WIN_THREAD
-// ? Set to 1 to allow the window to be managed in it's own thread for optimum
-// ? performance. Set to 0 to have it share with the engine main thread. This
-// ? variable is defaulted to 0 on anything but Windows due to what appears to
-// ? be upstream issues on both Wayland and MacOS. This can only be changed at
-// ? the in the application configuration file and not saved to the persistence
-// ? database.
-/* ------------------------------------------------------------------------- */
-{ CFL_VIDEO, "win_thread", cCommon->One(), NoOp, TBOOLEANSAVE|PANY },
-/* ------------------------------------------------------------------------- */
 // ! WIN_WIDTH
 // ? Sets the initial width of the window. This value is saved to the
 // ? persistence database when changed.
@@ -1720,13 +1706,6 @@ const CVarItemStaticList cvislList{ {  // Default cvars (from cvars.hpp)
 /* ------------------------------------------------------------------------- */
 { CFL_NONE, "log_dylibs", cCommon->Zero(),
   CB(cSystem->DumpModuleList, bool), TBOOLEAN|PANY },
-/* ------------------------------------------------------------------------- */
-// ! APP_COMPATFLAGS
-// ? Specifies to test system for compatibility and override any settings
-// ? depending on the system environment.
-/* ------------------------------------------------------------------------- */
-{ CFL_NONE, "app_comflags", cCommon->One(),
-  CB(cCVars->SetCompatFlags, bool), TBOOLEAN|PBOOT },
 /* -- Undefines ------------------------------------------------------------ */
 #undef CBSTR                           // Done with string function callback
 #undef CB                              // Done with int function callback

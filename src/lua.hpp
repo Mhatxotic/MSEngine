@@ -26,21 +26,10 @@ using namespace ISystem::P;            using namespace ISysUtil::P;
 using namespace ITimer::P;             using namespace IUtil::P;
 /* ------------------------------------------------------------------------- */
 namespace P {                          // Start of public module namespace
-/* -- Flags for setting up environment ------------------------------------- */
-BUILD_FLAGS(Lua,
-  /* ----------------------------------------------------------------------- */
-  // Load nothing                      // Load engine core api
-  LF_NONE                   {Flag[0]}, LF_ENGINE                 {Flag[1]},
-  // Load lua core api
-  LF_CORE                   {Flag[2]},
-  /* -- Mask bits ---------------------------------------------------------- */
-  LF_MASK{ LF_ENGINE|LF_CORE }
-);/* ----------------------------------------------------------------------- */
 /* == Lua class ============================================================ */
 static class Lua final :
   /* -- Base classes ------------------------------------------------------- */
   public ClockChrono<CoreClock>,       // Runtime clock
-  public LuaFlags,                     // Lua startup flags
   private EvtMain::RegVec              // Events list to register
 { /* -- Private typedefs --------------------------------------------------- */
   typedef unique_ptr<lua_State, function<decltype(lua_close)>> LuaPtr;
@@ -204,140 +193,156 @@ static class Lua final :
     LuaUtilGCSet(GetState(), LUA_GCINC, iGCPause, iGCStep);
     cLog->LogDebugExSafe("Lua initialised incremental gc to $:$.",
       iGCPause, iGCStep);
-    // Init engine variables?
-    if(FlagIsSet(LF_ENGINE))
-    { // Log progress
-      cLog->LogDebugSafe("Lua registering engine namespaces...");
-      // Counters for logging stats
-      int iCount        = 0,           // Number of global namespaces used
-          iTotal        = 0,           // Number of global namespaces in total
-          iMembers      = 0,           // Number of static functions used
-          iMethods      = 0,           // Number of class methods used
-          iTables       = 0,           // Number of tables used
-          iTotalMembers = 0,           // Number of static functions in total
-          iTotalMethods = 0,           // Number of class methods in total
-          iTotalTables  = 0;           // Number of tables in total
-      // Init core libraries
-      for(const LuaLibStatic &llRef : llsaAPI)
-      { // Increment total statistics
-        iTotalMembers += llRef.iLLCount;
-        iTotalMethods += llRef.iLLMFCount;
-        iTotalTables += llRef.iLLKICount;
-        ++iTotal;
-        // Ignore if this API is not allowed in the current operation mode
-        if(!cSystem->IsCoreFlagsHave(llRef.cfcRequired)) continue;
-        // Increment used statistics
-        iMembers += llRef.iLLCount;
-        iMethods += llRef.iLLMFCount;
-        iTables += llRef.iLLKICount;
-        ++iCount;
-        // Load class creation functions
-        LuaUtilPushTable(GetState(), 0,
-          llRef.iLLCount + llRef.iLLMFCount + llRef.iLLKICount);
-        luaL_setfuncs(GetState(), llRef.libList, 0);
-        // If we have consts list?
+    // Clear class references
+    llcirAPI.fill(LUA_REFNIL);
+    // Log progress
+    cLog->LogDebugSafe("Lua registering engine namespaces...");
+    // Counters for logging stats
+    int iCount        = 0,           // Number of global namespaces used
+        iTotal        = 0,           // Number of global namespaces in total
+        iMembers      = 0,           // Number of static functions used
+        iMethods      = 0,           // Number of class methods used
+        iTables       = 0,           // Number of tables used
+        iStatics      = 0,           // Number of static vars registered
+        iTotalMembers = 0,           // Number of static functions in total
+        iTotalMethods = 0,           // Number of class methods in total
+        iTotalTables  = 0,           // Number of tables in total
+        iTotalStatics = 0;           // Number of static vars in total
+    // Init core libraries
+    for(const LuaLibStatic &llRef : llsaAPI)
+    { // Increment total statistics
+      iTotalMembers += llRef.iLLCount;
+      iTotalMethods += llRef.iLLMFCount;
+      iTotalTables += llRef.iLLKICount;
+      ++iTotal;
+      // Ignore if this API is not allowed in the current operation mode
+      if(!cSystem->IsCoreFlagsHave(llRef.cfcRequired))
+      { // If we have consts list?
         if(llRef.lkiList)
-        { // Walk through the table
+        { // Number of static vars registered in this namespace
+          int iStaticsNS = 0;
+          // Walk through the table
           for(const LuaTable *ltPtr = llRef.lkiList; ltPtr->cpName; ++ltPtr)
-          { // Get reference to table
-            const LuaTable &ltRef = *ltPtr;
-            // Create a table
-            LuaUtilPushTable(GetState(), 0, ltRef.iCount);
-            // Walk through the key/value pairs
-            for(const LuaKeyInt *kiPtr = ltRef.kiList; kiPtr->cpName; ++kiPtr)
-            { // Get reference to key/value pair
-              const LuaKeyInt &kiRef = *kiPtr;
-              // Push the name of the item
-              LuaUtilPushInt(GetState(), kiRef.liValue);
-              lua_setfield(GetState(), -2, kiRef.cpName);
-            } // Set field name and finalise const table
-            lua_setfield(GetState(), -2, ltRef.cpName);
-          }
-        } // If we have don't have member functions?
-        if(!llRef.libmfList)
-        { // Set this current list to global
-          lua_setglobal(GetState(), llRef.strvName.data());
-          // Log progress
-          cLog->LogDebugExSafe("- $ ($ members and $ tables).",
-            llRef.strvName, llRef.iLLCount, llRef.iLLKICount);
-          // Continue
-          continue;
-        } // Load members into this namespace too for possible aliasing.
-        luaL_setfuncs(GetState(), llRef.libmfList, 0);
-        // Set to global variable
-        lua_setglobal(GetState(), llRef.strvName.data());
-        // Pre-cache the metadata for the class and it's members. Note that
-        // all threads of the same lua state share a single registry so this is
-        // very safe. Start by creating a new metadata table for 4 entries.
-        LuaUtilPushTable(GetState(), 0, 4);
-        // Push the name of the metatable
-        LuaUtilPushStrView(GetState(), llRef.strvName);
-        lua_setfield(GetState(), -2, "__name");
-        // Set methods so var:func() works
-        LuaUtilPushTable(GetState(), 0, llRef.iLLMFCount);
-        luaL_setfuncs(GetState(), llRef.libmfList, 0);
-        lua_setfield(GetState(), -2, "__index");
-        // Protect metadata. getmetatable(x) returns the type instead.
-        LuaUtilPushStrView(GetState(), llRef.strvName);
-        lua_setfield(GetState(), -2, "__metatable");
-        // Push destructor function, this is copied to __gc when as classes
-        // are constructed. See CreateClass in luautil.hpp.
-        LuaUtilPushCFunc(GetState(), llRef.lcfpDestroy);
-        lua_setfield(GetState(), -2, "__dtor");
-        // Register the metatable
-        lua_pushvalue(GetState(), -1);
-        lua_setfield(GetState(), LUA_REGISTRYINDEX, llRef.strvName.data());
-        // Remove the table (not sure why this table wasn't removed).
-        LuaUtilRmStack(GetState());
+            // Add to total static variables registered for this namespace
+            iStaticsNS += ltPtr->iCount;
+          // Add to total static variables registered
+          iTotalStatics += iStaticsNS;
+        } // Next namespace
+        continue;
+      } // Increment used statistics
+      iMembers += llRef.iLLCount;
+      iMethods += llRef.iLLMFCount;
+      iTables += llRef.iLLKICount;
+      ++iCount;
+      // Load class creation functions
+      LuaUtilPushTable(GetState(), 0,
+        llRef.iLLCount + llRef.iLLMFCount + llRef.iLLKICount);
+      luaL_setfuncs(GetState(), llRef.libList, 0);
+      // Number of static vars registered in this namespace
+      int iStaticsNS = 0;
+      // If we have consts list?
+      if(llRef.lkiList)
+      { // Walk through the table
+        for(const LuaTable *ltPtr = llRef.lkiList; ltPtr->cpName; ++ltPtr)
+        { // Get reference to table
+          const LuaTable &ltRef = *ltPtr;
+          // Create a table
+          LuaUtilPushTable(GetState(), 0, ltRef.iCount);
+          // Walk through the key/value pairs
+          for(const LuaKeyInt *kiPtr = ltRef.kiList; kiPtr->cpName; ++kiPtr)
+          { // Get reference to key/value pair
+            const LuaKeyInt &kiRef = *kiPtr;
+            // Push the name of the item
+            LuaUtilPushInt(GetState(), kiRef.liValue);
+            LuaUtilSetField(GetState(), -2, kiRef.cpName);
+          } // Set field name and finalise const table
+          LuaUtilSetField(GetState(), -2, ltRef.cpName);
+          // Add to total static variables registered for this namespace
+          iStaticsNS += ltRef.iCount;
+        } // Add to total static variables registered
+        iStatics += iStaticsNS;
+        iTotalStatics += iStaticsNS;
+      } // If we have don't have member functions?
+      if(!llRef.libmfList)
+      { // Set this current list to global
+        LuaUtilSetGlobal(GetState(), llRef.strvName.data());
         // Log progress
-        cLog->LogDebugExSafe("- $ ($ members, $ tables and $ methods).",
-          llRef.strvName, llRef.iLLCount, llRef.iLLKICount, llRef.iLLMFCount);
-        // For some reason, I cannot specify a __gc member for the garbage
-        // collector in this metadata part above because LUA seems to remove
-        // the __gc for some reason. My guess it is to protect from double
-        // clean-ups which is obviously fatal.
-      } // Count libraries and report them
-      cLog->LogDebugExSafe(
-        "Lua registered $ of $ global namespaces...\n"
-        "- $ of $ const tables are registered.\n"
-        "- $ of $ member functions are registered.\n"
-        "- $ of $ method functions are registered.\n"
-        "- $ of $ functions are registered in total.",
-        iCount,             iTotal,
-        iTables,            iTotalTables,
-        iMembers,           iTotalMembers,
-        iMethods,           iTotalMethods,
-        iMembers+iMethods, iTotalMembers+iTotalMethods);
-    } // Init enviornment variables?
-    if(FlagIsSet(LF_CORE))
-    { // Log progress
-      cLog->LogDebugSafe("Lua registering core namespaces...");
-      // Load default libraries
-      luaL_openlibs(GetState());
+        cLog->LogDebugExSafe("- $ ($ members, $ tables, $ statics).",
+          llRef.strvName, llRef.iLLCount, llRef.iLLKICount, iStaticsNS);
+        // Continue
+        continue;
+      } // Load members into this namespace too for possible aliasing.
+      luaL_setfuncs(GetState(), llRef.libmfList, 0);
+      // Set to global variable
+      LuaUtilSetGlobal(GetState(), llRef.strvName.data());
+      // Pre-cache the metadata for the class and it's methods.
+      LuaUtilPushTable(GetState(), 0, 4);
+      // Copy a reference to the table and set an internal reference to it.
+      LuaUtilCopyValue(GetState(), -1);
+      const int iReference = LuaUtilRefInit(GetState());
+      if(LuaUtilIsNotRefValid(iReference))
+        XC("Could not create reference to metatable!",
+           "Name", llRef.strvName);
+      llcirAPI[llRef.lciId] = iReference;
+      // Push the name of the object for 'tostring()' LUA function.
+      LuaUtilPushStrView(GetState(), llRef.strvName);
+      LuaUtilSetField(GetState(), -2, cCommon->LuaName().c_str());
+      // Set function methods so var:func() works.
+      LuaUtilPushTable(GetState(), 0, llRef.iLLMFCount);
+      luaL_setfuncs(GetState(), llRef.libmfList, 0);
+      LuaUtilSetField(GetState(), -2, "__index");
+      // Getmetatable(x) just returns the type name for now.
+      LuaUtilPushStrView(GetState(), llRef.strvName);
+      LuaUtilSetField(GetState(), -2, "__metatable");
+      // Push garbage collector function.
+      LuaUtilPushCFunc(GetState(), llRef.lcfpDestroy);
+      LuaUtilSetField(GetState(), -2, "__gc");
+      // Register the table in the global namespace.
+      LuaUtilSetField(GetState(), LUA_REGISTRYINDEX, llRef.strvName.data());
       // Log progress
-      cLog->LogDebugSafe("Lua registered core namespaces.");
-      // Initialise random number generator and if pre-defined?
-      if(liSeed)
-      { // Init pre-defined seed
-        LuaUtilInitRNGSeed(GetState(), liSeed);
-        // Warn developer/user that there is a pre-defined random seed
-        cLog->LogWarningExSafe("Lua using pre-defined random seed $ (0x$$)!",
-          liSeed, hex, liSeed);
-      } // Use a random number instead
-      else
-      { // Get the random number seed
-        const lua_Integer liRandSeed = CryptRandom<lua_Integer>();
-        // Set the random number seed
-        LuaUtilInitRNGSeed(GetState(), liRandSeed);
-        // Log it
-        cLog->LogDebugExSafe("Lua generated random seed $ (0x$$)!",
-          liRandSeed, hex, liRandSeed);
-      }
-    } // Standard library not available so we can only set C-Lib seed
-    else StdSRand(!!liSeed ? static_cast<unsigned int>(liSeed) :
-                             CryptRandom<unsigned int>());
-    // Get variables namespace
-    lua_getglobal(GetState(), "Variable");
+      cLog->LogDebugExSafe(
+        "- $ ($ members, $ methods, $ tables and $ statics); Id:$; Ref:$.",
+        llRef.strvName, llRef.iLLMFCount, llRef.iLLCount,
+        llRef.iLLKICount, iStaticsNS, llRef.lciId, iReference);
+    } // Report summary of API usage
+    cLog->LogDebugExSafe(
+      "Lua registered $ of $ global namespaces...\n"
+      "- $ of $ static tables are registered.\n"
+      "- $ of $ static variables are registered.\n"
+      "- $ of $ member functions are registered.\n"
+      "- $ of $ method functions are registered.\n"
+      "- $ of $ functions are registered in total.\n"
+      "- $ of $ variables are registered in total.",
+      iCount,             iTotal,
+      iTables,            iTotalTables,
+      iStatics,           iTotalStatics,
+      iMembers,           iTotalMembers,
+      iMethods,           iTotalMethods,
+      iMembers+iMethods,  iTotalMembers+iTotalMethods,
+      iMembers+iMethods+iTables+iStatics,
+      iTotalMembers+iTotalMethods+iTotalTables+iTotalStatics);
+    // Load default libraries and log progress
+    cLog->LogDebugSafe("Lua registering core namespaces...");
+    luaL_openlibs(GetState());
+    cLog->LogDebugSafe("Lua registered core namespaces.");
+    // Initialise random number generator and if pre-defined?
+    if(liSeed)
+    { // Init pre-defined seed
+      LuaUtilInitRNGSeed(GetState(), liSeed);
+      // Warn developer/user that there is a pre-defined random seed
+      cLog->LogWarningExSafe("Lua using pre-defined random seed $ (0x$$)!",
+        liSeed, hex, liSeed);
+    } // Use a random number instead
+    else
+    { // Get the random number seed
+      const lua_Integer liRandSeed = CryptRandom<lua_Integer>();
+      // Set the random number seed
+      LuaUtilInitRNGSeed(GetState(), liRandSeed);
+      // Log it
+      cLog->LogDebugExSafe("Lua generated random seed $ (0x$$)!",
+        liRandSeed, hex, liRandSeed);
+    } // Get variables namespace
+    LuaUtilGetGlobal(GetState(), "Variable");
     // Create a table of the specified number of variables
     LuaUtilPushTable(GetState(), 0, CVAR_MAX);
     // Push each cvar id to the table
@@ -348,11 +353,11 @@ static class Lua final :
       { // Push internal id value name
         LuaUtilPushInt(GetState(), liIndex);
         // Assign the id to the cvar name
-        lua_setfield(GetState(), -2, cvmiIt->first.c_str());
+        LuaUtilSetField(GetState(), -2, cvmiIt->first.c_str());
       } // Next id
       ++liIndex;
     } // Push cvar id table into the core namespace
-    lua_setfield(GetState(), -2, "Internal");
+    LuaUtilSetField(GetState(), -2, "Internal");
     // Remove the table
     LuaUtilRmStack(GetState());
     // Log that we added the variables
@@ -475,7 +480,6 @@ static class Lua final :
   /* -- Constructor -------------------------------------------------------- */
   Lua(void) :
     /* --------------------------------------------------------------------- */
-    LuaFlags{ LF_NONE },               // No flags set
     EvtMain::RegVec{                   // Lua events
       { EMC_LUA_REDRAW,                // Redraw event data
           bind(&Lua::SendRedraw,       // - Redraw callback
@@ -498,16 +502,7 @@ static class Lua final :
   /* -- Destructor --------------------------------------------------------- */
   DTORHELPER(~Lua, DeInit())
   /* ----------------------------------------------------------------------- */
-  DELETECOPYCTORS(Lua)                 // Do not need defaults
-  /* -- Set GC step -------------------------------------------------------- */
-  CVarReturn SetFlags(const LuaFlagsType lftFlags)
-  { // Convert flags and fail if flags are invalid
-    if(lftFlags != LF_MASK && (lftFlags & ~LF_MASK)) return DENY;
-    // Flags validated so set and return success
-    FlagReset(lftFlags);
-    // Accepted
-    return ACCEPT;
-  }
+  DELETECOPYCTORS(Lua)                 // Suppress default functions for safety
   /* -- When operations count have changed --------------------------------- */
   CVarReturn SetOpsInterval(const int iCount)
     { return CVarSimpleSetIntNL(iOperations, iCount, 1); }

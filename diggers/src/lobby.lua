@@ -13,9 +13,9 @@
 local error<const>, tostring<const>, unpack<const> =
   error, tostring, table.unpack;
 -- M-Engine aliases (optimisation) ----------------------------------------- --
-local InfoTicks<const>, UtilIsTable<const>, UtilIsBoolean<const>,
+local CoreTicks<const>, UtilIsTable<const>, UtilIsBoolean<const>,
   UtilIsInteger<const> =
-    Info.Ticks, Util.IsTable, Util.IsBoolean, Util.IsInteger;
+    Core.Ticks, Util.IsTable, Util.IsBoolean, Util.IsInteger;
 -- Diggers function and data aliases --------------------------------------- --
 local EndConditionsCheck, Fade, GameProc, InitBank, InitCon, InitContinueGame,
   InitScene, InitShop, InitTitle, IsButtonReleased, IsMouseInBounds,
@@ -88,7 +88,7 @@ local function InitLobby(aActiveObject, bNoSetMusic, iSaveMusicPos)
         -- Render backdrop shadow
         RenderShadow(8, 8, 312, 208);
         -- Render fire
-        local iFrame<const> = InfoTicks() % 9;
+        local iFrame<const> = CoreTicks() % 9;
         if iFrame >= 6 then texLobby:BlitSLT(1, 113, 74);
         elseif iFrame >= 3 then texLobby:BlitSLT(2, 113, 74) end;
         -- Render tip
@@ -179,7 +179,7 @@ local function InitLobby(aActiveObject, bNoSetMusic, iSaveMusicPos)
         -- Render lobby shadow
         RenderShadow(8, 8, 312, 208);
         -- Render fire
-        local iFrame<const> = InfoTicks() % 9;
+        local iFrame<const> = CoreTicks() % 9;
         if iFrame >= 6 then texLobby:BlitSLT(5, 113, 74);
         elseif iFrame >= 3 then texLobby:BlitSLT(4, 113, 74);
         -- Flash if not ready to play

@@ -19,12 +19,13 @@ using namespace ICollector::P;         using namespace ICVarDef::P;
 using namespace IError::P;             using namespace IEvtMain::P;
 using namespace IFileMap::P;           using namespace IIdent::P;
 using namespace ILog::P;               using namespace ILuaEvt::P;
-using namespace ILuaUtil::P;           using namespace IMemory::P;
-using namespace IOal::P;               using namespace IPcmFormat::P;
-using namespace IPcmLib::P;            using namespace ISource::P;
-using namespace IStd::P;               using namespace IString::P;
-using namespace ISysUtil::P;           using namespace IUtil::P;
-using namespace Lib::Ogg;              using namespace Lib::OpenAL;
+using namespace ILuaLib::P;            using namespace ILuaUtil::P;
+using namespace IMemory::P;            using namespace IOal::P;
+using namespace IPcmFormat::P;         using namespace IPcmLib::P;
+using namespace ISource::P;            using namespace IStd::P;
+using namespace IString::P;            using namespace ISysUtil::P;
+using namespace IUtil::P;              using namespace Lib::Ogg;
+using namespace Lib::OpenAL;
 /* ------------------------------------------------------------------------- */
 namespace P {                          // Start of public module namespace
 /* ------------------------------------------------------------------------- */
@@ -71,7 +72,6 @@ CTOR_MEM_BEGIN_ASYNC_CSLAVE(Streams, Stream, ICHelperUnsafe),
 { /* -- Variables ---------------------------------------------------------- */
   FileMap          fmFile;             // FileMap class
   OggVorbis_File   ovfContext;         // Ogg vorbis file context
-  ov_callbacks     ovcFuncs;           // Ogg vorbis callbacks
   vorbis_info      viData;             // Vorbis information structure
   ALUIntVector     vBuffers,           // Stream buffers space
                    vUnQBuffers;        // Unqueued buffers space
@@ -86,41 +86,7 @@ CTOR_MEM_BEGIN_ASYNC_CSLAVE(Streams, Stream, ICHelperUnsafe),
   ALfloat          fVolume;            // Saved volume
   StrNCStrMap      ssMetaData;         // Metadata strings
   mutex            mMutex;             // Mutex for thread safety
-  /* -- Callback when Vorbis routines need to read data -------------------- */
-  static size_t VorbisCallbackRead(void*const vpP, size_t stS, size_t stR,
-    void*const vC)
-      { return reinterpret_cast<Stream*>(vC)->
-          fmFile.FileMapReadToAddr(vpP, stS * stR); }
-  /* -- Callback when Vorbis routines need to set position in data --------- */
-  static int VorbisCallbackSeek(void*const vC, ogg_int64_t qOffset, int iLoc)
-    { return static_cast<int>(reinterpret_cast<Stream*>(vC)->
-        fmFile.FileMapSeek(static_cast<size_t>(qOffset), iLoc)); }
-  /* -- Callback when Vorbis routines need to close the stream ------------- */
-  static int VorbisCallbackClose(void*const)
-    { return 1; }
-  /* -- Callback when Vorbis routines need to know the position in data ---- */
-  static long VorbisCallbackTell(void*const vC)
-    { return static_cast<long>(reinterpret_cast<Stream*>(vC)->
-        fmFile.FileMapTell()); }
-  /* --------------------------------------------------------------- */ public:
-  static void VorbisFramesToF32PCM(const ALfloat*const*const fpFramesIn,
-    const size_t stFrames, const size_t stChannels, ALfloat *fpPCMOut)
-  { // Convert ogg frames data to native PCM float 32-bit audio
-    for(size_t stFrameIndex = 0; stFrameIndex < stFrames; ++stFrameIndex)
-      for(size_t stChanIndex = 0; stChanIndex < stChannels; ++stChanIndex)
-        *(fpPCMOut++) = fpFramesIn[stChanIndex][stFrameIndex];
-  }
-  /* ----------------------------------------------------------------------- */
-  static void VorbisFramesToI16PCM(const ALfloat*const*const fpFramesIn,
-    const size_t stFrames, const size_t stChannels, ALshort *wPCMOut)
-  { // Convert ogg frames data to native PCM integer 16-bit audio
-    for(size_t stFrameIndex = 0; stFrameIndex < stFrames; ++stFrameIndex)
-      for(size_t stChanIndex = 0; stChanIndex < stChannels; ++stChanIndex)
-        *(wPCMOut++) = UtilClamp(static_cast<ALshort>
-          (rint(fpFramesIn[stChanIndex][stFrameIndex]*32767.f)),
-            -32767, 32767);
-  }
-  /* -- Updates the PCM position ---------------------------------- */ private:
+  /* -- Updates the PCM position ------------------------------------------- */
   void UpdatePosition(void) { qDecPos = qLivePos = ov_pcm_tell(&ovfContext); }
   /* -- Get time elapsed --------------------------------------------------- */
   ALdouble GetElapsed(void) { return ov_time_tell(&ovfContext); }
@@ -218,7 +184,7 @@ CTOR_MEM_BEGIN_ASYNC_CSLAVE(Streams, Stream, ICHelperUnsafe),
           // Converted to float buffer
           ALfloat*const fpPCMout = MemRead<ALfloat>(stBSize);
           // Process frames to buffer (iFI=FrameIndex / iCI=ChanIndex)
-          VorbisFramesToF32PCM(fpPCM, stBytes, stChannels, fpPCMout);
+          PcmF32FromVorbisFrames(fpPCM, stBytes, stChannels, fpPCMout);
           // Increase buffer
           stBSize += sizeof(ALfloat) * stBytes * stChannels;
         } // Break loop when no bytes read
@@ -307,7 +273,7 @@ CTOR_MEM_BEGIN_ASYNC_CSLAVE(Streams, Stream, ICHelperUnsafe),
     // Generate OpenAL buffers
     AL(cOal->CreateBuffers(vBuffers),
       "Failed to generate buffers for stream!",
-        "Identifier", IdentGet(), "Count", vBuffers.size());
+      "Identifier", IdentGet(), "Count", vBuffers.size());
     // Generate space for queued buffers
     vUnQBuffers.resize(vBuffers.size());
   }
@@ -421,13 +387,13 @@ CTOR_MEM_BEGIN_ASYNC_CSLAVE(Streams, Stream, ICHelperUnsafe),
             // Log problem
             cLog->LogWarningExSafe(
               "Stream '$' was stopped and was unable to be rebuffered!",
-                fmFile.IdentGet());
+              fmFile.IdentGet());
             // Done
             return;
           } // Log problem
           cLog->LogWarningExSafe(
             "Stream '$' stopped unexpectedly and is being replayed!",
-              fmFile.IdentGet());
+            fmFile.IdentGet());
           // Replay the buffers
           sCptr->Play();
           // Done
@@ -444,10 +410,10 @@ CTOR_MEM_BEGIN_ASYNC_CSLAVE(Streams, Stream, ICHelperUnsafe),
             // slightly before the decoder position instead of at the decoder
             // position which will be way after the live playback position.
             qLivePos += cOal->GetBufferInt<ogg_int64_t>(uiBuffer, AL_SIZE) /
-                      // This could be 16 (if no AL_EXT_FLOAT32) or 32.
-                      (cOal->GetBufferInt<ogg_int64_t>(uiBuffer, AL_BITS)/8) /
-                      // This should always be 1 or 2.
-                      (cOal->GetBufferInt<ogg_int64_t>(uiBuffer, AL_CHANNELS));
+              // This could be 16 (if no AL_EXT_FLOAT32) or 32.
+              (cOal->GetBufferInt<ogg_int64_t>(uiBuffer, AL_BITS)/8) /
+              // This should always be 1 or 2.
+              (cOal->GetBufferInt<ogg_int64_t>(uiBuffer, AL_CHANNELS));
             // Try to rebuffer data to it and if failed?
             if(Rebuffer(uiBuffer)) continue;
             // Run out of loops? Finish playing and stop
@@ -546,33 +512,17 @@ CTOR_MEM_BEGIN_ASYNC_CSLAVE(Streams, Stream, ICHelperUnsafe),
   void PlaySafe(void) { const LockGuard lgStreamSync{ mMutex }; Play(); }
   /* -- Stop with lock ----------------------------------------------------- */
   void StopSafe(const StreamStopReason srReason)
-    {  const LockGuard lgStreamSync{ mMutex }; Stop(srReason); }
-  /* -- Parse vorbis comments block ---------------------------------------- */
-  static StrNCStrMap ParseComments(char **const clpPtr, const int iCount)
-  { // Metadata to return
-    StrNCStrMap ssMetaData;
-    // Enumerate all the strings...
-    StdForEach(seq, clpPtr, clpPtr+iCount, [&ssMetaData](char*const cpStr)
-    { // Find equals delimiter and if we find it?
-      if(char*const cpPtr = strchr(cpStr, '='))
-      { // Remove separator (safe), add key/value pair and readd separator
-        *cpPtr = '\0';
-        ssMetaData.insert(ssMetaData.cend(), { cpStr, cpPtr+1 });
-      } // We at least have a string so add it as key with empty value
-      else ssMetaData.insert(ssMetaData.cend(), { cpStr, cCommon->CBlank() });
-    }); // Return built metadata
-    return ssMetaData;
-  }
+    { const LockGuard lgStreamSync{ mMutex }; Stop(srReason); }
   /* -- Load from memory --------------------------------------------------- */
   void AsyncReady(FileMap &fmData)
   { // Set file class
     fmFile.FileMapSwap(fmData);
     // Initialise context and test for error
-    if(const int iResult =
-       ov_open_callbacks(this, &ovfContext, nullptr, 0, ovcFuncs))
+    if(const int iResult = ov_open_callbacks(&fmFile, &ovfContext, nullptr, 0,
+         PcmGetOggCallbacks()))
       XC("Init OGG decoder context failed!",
-         "Identifier", IdentGet(), "Code", iResult,
-         "Reason",     cOal->GetOggErr(iResult));
+        "Identifier", IdentGet(), "Code", iResult,
+        "Reason",     cOal->GetOggErr(iResult));
     // We don't need to create more buffers than we need. If we don't do this
     // then Rebuffer() will not fill all the buffers and subsequent OpenAL
     // calls will fail. We'll add a minimum value of 1 too just incase we get
@@ -601,16 +551,14 @@ CTOR_MEM_BEGIN_ASYNC_CSLAVE(Streams, Stream, ICHelperUnsafe),
     // Parse vorbis comments and if we got them?
     if(vorbis_comment*const vcStrings = ov_comment(&ovfContext, -1))
     { // Parse the comments and then free the strings
-      ssMetaData = StdMove(ParseComments(vcStrings->user_comments,
+      ssMetaData = StdMove(PcmVorbisParseComments(vcStrings->user_comments,
         vcStrings->comments));
       vorbis_comment_clear(vcStrings);
-      // Write vorbis comments to log
+      // Write vorbis comments to log if debug mode set
       if(cLog->HasLevel(LH_DEBUG))
-      { // Write Vorbis comments
-        for(auto &aPair : ssMetaData)
+        for(const StrNCStrMapPair &sncsmpPair : ssMetaData)
           cLog->LogNLCDebugExSafe("- Vorbis comment: $ -> $.",
-            aPair.first, aPair.second);
-      }
+            sncsmpPair.first, sncsmpPair.second);
     } // Generate buffers, recommending this amount
     GenerateBuffers();
     // Log ogg loaded
@@ -632,11 +580,6 @@ CTOR_MEM_BEGIN_ASYNC_CSLAVE(Streams, Stream, ICHelperUnsafe),
     LuaEvtSlave{ this,                 // Initialise stream event manager
       EMC_STR_EVENT },                 //   with our stremaing event
     ovfContext{},                      // No file opened yet
-    ovcFuncs{                          // Initialise callbacks
-      VorbisCallbackRead,              // Read data callback
-      VorbisCallbackSeek,              // Seek data callback
-      VorbisCallbackClose,             // Close data callback
-      VorbisCallbackTell },            // Tell data callback
     viData{},                          // No vorbis information yet
     sCptr(nullptr),                    // No associated OAL source yet
     eFormat(AL_NONE),                  // No OAL format id yet
@@ -662,9 +605,9 @@ CTOR_MEM_BEGIN_ASYNC_CSLAVE(Streams, Stream, ICHelperUnsafe),
     cLog->LogDebugExSafe("Stream unloaded '$'!", IdentGet());
   }
   /* ----------------------------------------------------------------------- */
-  DELETECOPYCTORS(Stream)              // Supress copy constructor for safety
+  DELETECOPYCTORS(Stream)              // Suppress default functions for safety
 };/* -- End ---------------------------------------------------------------- */
-CTOR_END_ASYNC_NOFUNCS(Streams, Stream, STREAM, // Finish collector
+CTOR_END_ASYNC_NOFUNCS(Streams, Stream, STREAM, STREAM,
   /* -- Initialisers ------------------------------------------------------- */
   LuaEvtMaster{ EMC_STR_EVENT },       // Initialise streaming event master
   srStrings{{                          // Initialise stop reason strings
@@ -686,44 +629,38 @@ CTOR_END_ASYNC_NOFUNCS(Streams, Stream, STREAM, // Finish collector
   stBufSize(0)                         // No buffer size yet
 ) /* == Manage streams ===================================================== */
 static void StreamManage(void)
-{ // Lock access to bitmap collector list
+{ // Lock access to bitmap collector list and process each stream
   const LockGuard lgStreamsSync{ cStreams->CollectorGetMutex() };
-  // Manage each stream
   for(Stream*const sPtr : *cStreams) sPtr->Main();
 }
 /* == Unload all source and buffers ======================================== */
 static void StreamDeInit(void)
-{ // Lock access to bitmap collector list
+{ // Lock access to bitmap collector list and unload each stream
   const LockGuard lgStreamsSync{ cStreams->CollectorGetMutex() };
-  // Unload each stream
   for(Stream*const sPtr : *cStreams) sPtr->UnloadSourceAndBuffers();
 }
 /* == Clear event callbacks on all streams ================================= */
 static void StreamClearEvents(void)
-{ // Lock access to bitmap collector list
+{ // Lock access to bitmap collector list and clear event callbacks
   const LockGuard lgStreamsSync{ cStreams->CollectorGetMutex() };
-  // Re-allocate a source and buffers for the stream
   for(Stream*const sPtr : *cStreams) sPtr->LuaEvtDeInit();
 }
 /* == Generate all source and buffers ====================================== */
 static void StreamReInit(void)
-{ // Lock access to bitmap collector list
+{ // Lock access to bitmap collector list and re-init source/buffers
   const LockGuard lgStreamsSync{ cStreams->CollectorGetMutex() };
-  // Re-allocate a source and buffers for the stream
   for(Stream*const sPtr : *cStreams) sPtr->GenerateSourceAndBuffers();
 }
 /* == Stop all streams ===================================================== */
 static void StreamStop(void)
-{ // Lock access to bitmap collector list
+{ // Lock access to bitmap collector list and stop all streams
   const LockGuard lgStreamsSync{ cStreams->CollectorGetMutex() };
-  // Re-allocate a source and buffers for the stream
   for(Stream*const sPtr : *cStreams) sPtr->StopSafe(SR_STOPALL);
 }
 /* == Update all streams base volume======================================== */
 static void StreamCommitVolume(void)
-{ // Lock access to bitmap collector list
+{ // Lock access to bitmap collector list and update all stream volumes
   const LockGuard lgStreamsSync{ cStreams->CollectorGetMutex() };
-  // Walk through all the streams and update the volume
   for(Stream*const sPtr : *cStreams) sPtr->UpdateVolume();
 }
 /* == Set number of buffers to allocate per stream ========================= */

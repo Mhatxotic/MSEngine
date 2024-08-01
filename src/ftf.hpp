@@ -26,9 +26,10 @@ using namespace ICollector::P;         using namespace IDim;
 using namespace IError::P;             using namespace IEvtMain::P;
 using namespace IFileMap::P;           using namespace IFreeType::P;
 using namespace IIdent::P;             using namespace ILog::P;
-using namespace ILuaUtil::P;           using namespace IMemory::P;
-using namespace IStd::P;               using namespace ISysUtil::P;
-using namespace IUtil::P;              using namespace Lib::OS::GlFW;
+using namespace ILuaLib::P;            using namespace ILuaUtil::P;
+using namespace IMemory::P;            using namespace IStd::P;
+using namespace ISysUtil::P;           using namespace IUtil::P;
+using namespace Lib::OS::GlFW;
 using namespace Lib::FreeType;
 /* ------------------------------------------------------------------------- */
 namespace P {                          // Start of public module namespace
@@ -200,9 +201,9 @@ CTOR_BEGIN_ASYNC_DUO(Ftfs, Ftf, CLHelperUnsafe, ICHelperUnsafe),
   /* -- Destructor --------------------------------------------------------- */
   ~Ftf(void) { AsyncCancel(); DoDeInit(); }
   /* ----------------------------------------------------------------------- */
-  DELETECOPYCTORS(Ftf)                 // Disable copy constructor and operator
+  DELETECOPYCTORS(Ftf)                 // Suppress default functions for safety
 };/* -- End ---------------------------------------------------------------- */
-CTOR_END_ASYNC_NOFUNCS(Ftfs, Ftf, FONT) // Finish collector class
+CTOR_END_ASYNC_NOFUNCS(Ftfs, Ftf, FTF, FONT) // Finish collector class
 /* ------------------------------------------------------------------------- */
 }                                      // End of public module namespace
 /* ------------------------------------------------------------------------- */

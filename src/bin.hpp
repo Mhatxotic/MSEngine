@@ -11,8 +11,9 @@
 namespace IBin {                       // Start of private module namespace
 /* -- Dependencies --------------------------------------------------------- */
 using namespace ICollector::P;         using namespace IDim;
-using namespace IIdent::P;             using namespace IStd::P;
-using namespace ISysUtil::P;           using namespace IUtil::P;
+using namespace IIdent::P;             using namespace ILuaLib::P;
+using namespace IStd::P;               using namespace ISysUtil::P;
+using namespace IUtil::P;
 /* ------------------------------------------------------------------------- */
 namespace P {                          // Start of public module namespace
 /* ------------------------------------------------------------------------- */
@@ -42,7 +43,7 @@ class Pack :
   { // The best node that will be returned
     iBestShortSideFit = iBestLongSideFit = numeric_limits<Int>::max();
     Rect rFound;
-    for(auto &rNode : rlFree)
+    for(const Rect &rNode : rlFree)
     { // Try to place the rectangle in upright (non-flipped) orientation.
       if(rNode.DimGetWidth() < iW || rNode.DimGetHeight() < iH) continue;
       const Int iLeftOverHoriz = abs(rNode.DimGetWidth() - iW),
@@ -89,7 +90,7 @@ class Pack :
   bool SplitFreeNode(const size_t stIndex, const Rect &rUsed)
   { // Get reference to free node
     const Rect &rFree = rlFree[stIndex];
-     // Calculate maximum bounds of the free and used rslRects.
+    // Calculate maximum bounds of the free and used rslRects.
     const Int iFreeH = rFree.CoordGetX() + rFree.DimGetWidth(),
               iUsedH = rUsed.CoordGetX() + rUsed.DimGetWidth(),
               iFreeV = rFree.CoordGetY() + rFree.DimGetHeight(),
@@ -120,12 +121,12 @@ class Pack :
   { // Return if the src rect bounds are contained in dest bounds
     return rSrc.CoordGetX() >= rDest.CoordGetX()
         && rSrc.CoordGetY() >= rDest.CoordGetY()
-        && rSrc.CoordGetX() + rSrc.DimGetWidth()
-        <= rDest.CoordGetX() + rDest.DimGetWidth()
-        && rSrc.CoordGetY() + rSrc.DimGetHeight()
-        <= rDest.CoordGetY() + rDest.DimGetHeight();
+        && rSrc.CoordGetX() + rSrc.DimGetWidth() <=
+           rDest.CoordGetX() + rDest.DimGetWidth()
+        && rSrc.CoordGetY() + rSrc.DimGetHeight() <=
+           rDest.CoordGetY() + rDest.DimGetHeight();
   }
-  /* -- Goes through free rectangle list and removes any redundan ---------- */
+  /* -- Goes through free rectangle list and removes any redundant rects --- */
   void PruneFreeList(void)
   { // Go through each free rectangle
     for(size_t stIndex = 0; stIndex < rlFree.size(); ++stIndex)
@@ -211,30 +212,37 @@ class Pack :
   }
   /* -- Test insert a single rectangle into the bin ------------------------ */
   const Rect Test(const UInt iW, const UInt iH) const
-  { Int iScore1 = numeric_limits<Int>::max(), iScore2 = iScore1;
+  { // Initialise two score values and init to maximum supported int value
+    Int iScore1 = numeric_limits<Int>::max(), iScore2 = iScore1;
+    // Find position for new node and return if the size will fit
     return FindPositionForNewNodeBestShortSideFit(static_cast<Int>(iW),
       static_cast<Int>(iH), iScore1, iScore2);
   }
   /* -- Inserts a single rectangle into the bin ---------------------------- */
   const Rect Insert(const UInt uiW, const UInt uiH)
-  { // Unused in this function. We don't need to know the score after finding
-    // the position.
+  { // Initialise two score values and init to maximum supported int value
     Int iScore1 = numeric_limits<Int>::max(), iScore2 = iScore1;
+    // Find position for new node and return zero (rNew={0,0}) if failed
     const Rect rNew{ FindPositionForNewNodeBestShortSideFit(
       static_cast<Int>(uiW), static_cast<Int>(uiH), iScore1, iScore2) };
     if(rNew.DimGetHeight() == 0) return rNew;
+    // Get number of free rectangles and enumerate through them
     size_t stRectanglesToProcess = rlFree.size();
     for(size_t stIndex = 0; stIndex < stRectanglesToProcess; ++stIndex)
-    { if(!SplitFreeNode(stIndex, rNew)) continue;
+    { // Split the free node to accommodate new value and ignore if failed
+      if(!SplitFreeNode(stIndex, rNew)) continue;
+      // Remove from free list and update index and counter
       PruneFreeRect(stIndex);
       --stIndex;
       --stRectanglesToProcess;
-    }
+    } // Remove redundant rectangles
     PruneFreeList();
+    // Insert new rect into used list
     rlUsed.emplace_back(rNew);
+    // Return size to caller
     return rNew;
   }
-  /* ----------------------------------------------------------------------- */
+  /* -- Returns the % total filled ----------------------------------------- */
   double Occupancy(void) const
   { // Return the ratio of used surface area to the total bin area.
     return accumulate(rlUsed.cbegin(), rlUsed.cend(), 0.0,
@@ -243,9 +251,11 @@ class Pack :
                           rNode.DimGetHeight(); }) /
       (this->template DimGetWidth<double>() * this->DimGetHeight());
   }
-  /* ----------------------------------------------------------------------- */
+  /* -- Return number of rectangles created in the used list --------------- */
   size_t Used(void) const { return rlUsed.size(); }
+  /* -- Return number of rectangles created in the free list --------------- */
   size_t Free(void) const { return rlFree.size(); }
+  /* -- Return number of total rectangles created -------------------------- */
   size_t Total(void) const { return rlFree.size() + rlUsed.size(); }
   /* -- Default constructor that instantiates an empty bin of size 0x0 ----- */
   Pack(void)
@@ -285,7 +295,7 @@ CTOR_BEGIN_DUO(Bins, Bin, CLHelperUnsafe, ICHelperUnsafe),
     /* --------------------------------------------------------------------- */
     { }
 };/* ----------------------------------------------------------------------- */
-CTOR_END_NOINITS(Bins, Bin)            // End of bin objects collector
+CTOR_END_NOINITS(Bins, Bin, BIN)       // End of bin objects collector
 /* ------------------------------------------------------------------------- */
 }                                      // End of public module namespace
 /* ------------------------------------------------------------------------- */

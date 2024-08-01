@@ -13,16 +13,31 @@ namespace ICollector {                 // Start of private module namespace
 /* -- Dependencies --------------------------------------------------------- */
 using namespace IClock::P;             using namespace ICVarDef::P;
 using namespace IError::P;             using namespace IIdent::P;
-using namespace ILog::P;               using namespace IStd::P;
-using namespace IString::P;            using namespace ISysUtil::P;
+using namespace ILog::P;               using namespace ILuaLib::P;
+using namespace IStd::P;               using namespace IString::P;
+using namespace ISysUtil::P;
 /* ------------------------------------------------------------------------- */
 namespace P {                          // Start of public module namespace
-/* -- Class for collector class name in Lua -------------------------------- */
-class LuaIdent { const string_view svName; public:
+/* -- Class for collector class name in LUA -------------------------------- */
+class LuaIdent {
+  /* -- Private variables -------------------------------------------------- */
+  const string_view svName;            // Name of class
+  /* -- Public variables ------------------------------------------- */ public:
+  int             &iRef;               // Reference to namespace in Lua
+  /* -- Get name of class -------------------------------------------------- */
   const char* CStr(void) const { return svName.data(); }
+  /* -- Get string view name of class -------------------------------------- */
   const string_view &Str(void) const { return svName; }
-  explicit LuaIdent(const string_view svNName) : svName{svNName}{} };
-/* -- Collector header ----------------------------------------------------- */
+  /* -- Constructor -------------------------------------------------------- */
+  explicit LuaIdent(const string_view svNName, const LuaClassId lciId) :
+    /* --------------------------------------------------------------------- */
+    svName{svNName},                   // Set name of class
+    iRef(llcirAPI[lciId])              // Alias Lua class reference storage
+    /* -- No code ---------------------------------------------------------- */
+    { }
+  /* ----------------------------------------------------------------------- */
+  DELETECOPYCTORS(LuaIdent)            // Suppress default functions for safety
+};/* -- Collector header --------------------------------------------------- */
 #define CTOR_HDR_BEGIN(p,              /* The parent (collector) class type */\
                        m,              /* The member class type             */\
                        l,              /* The parent container type typedef */\
@@ -43,7 +58,7 @@ class LuaIdent { const string_view svName; public:
     public LuaIdent,                   /* Name of object for Lua            */\
     public hn                          /* Derived by our collector class    */\
     __VA_ARGS__                        /* Any other custom class derives    */\
-  { DELETECOPYCTORS(p)                 /* Remove default functions          */\
+  { DELETECOPYCTORS(p)                 /* Suppress copy constructor         */\
     p(void);                           /* Constructor prototype             */\
     ~p(void) noexcept(false);          /* Destructor prototype              */\
     x                                  /* Any extra variables? (no comma!)  */
@@ -80,22 +95,23 @@ class LuaIdent { const string_view svName; public:
 /* -- Tailing collector class macro with init and deinit calls ------------- */
 #define CTOR_END_EX(p,                 /* The parent (collector) class type */\
                     m,                 /* The child (member) class type     */\
+                    c,                 /* Lua class id code (luadef.hpp)    */\
                     i,                 /* Constructor initialisation code   */\
                     d,                 /* Destructor de-initialisation code */\
                     ...)               /* Constructor initialisers code     */\
-  p::p(void) : LuaIdent{#m}, __VA_ARGS__ { IHInitialise(); i; } \
+  p::p(void) : LuaIdent{#m, LMT_ ## c}, __VA_ARGS__ { IHInitialise(); i; } \
   DTORHELPER(p::~p, if(IHNotDeInitialise()) return; d)
 /* -- Tailing collector class macro that inits a collector helper ---------- */
-#define CTOR_END(p,m,i,d,...) \
-  CTOR_END_EX(p,m,i,d,CLHelper{STR(p)} __VA_ARGS__)
+#define CTOR_END(p,m,c,i,d,...) \
+  CTOR_END_EX(p,m,c,i,d,CLHelper{STR(p)} __VA_ARGS__)
 /* -- Tailing collector class macro with no init and deinit calls ---------- */
-#define CTOR_END_NOINITS(p,m) CTOR_END(p,m,,,)
+#define CTOR_END_NOINITS(p,m,c) CTOR_END(p,m,c,,,)
 /* -- Tailing async collector class macro with init and deinit calls ------- */
-#define CTOR_END_ASYNC(p,m,e,i,d,...)  /* 'e' is the EvtMain event id       */\
-  CTOR_END_EX(p,m,i,d,CLHelperAsync{STR(p), EMC_MP_ ## e} __VA_ARGS__);
+#define CTOR_END_ASYNC(p,m,c,e,i,d,...)  /* 'e' is the EvtMain event id     */\
+  CTOR_END_EX(p,m,c,i,d,CLHelperAsync{STR(p), EMC_MP_ ## e} __VA_ARGS__);
 /* -- Tailing async collector class macro with no init nor deinit calls ---- */
-#define CTOR_END_ASYNC_NOFUNCS(p,m,e,...) \
-  CTOR_END_ASYNC(p,m,e,,,,## __VA_ARGS__)
+#define CTOR_END_ASYNC_NOFUNCS(p,m,c,e,...) \
+  CTOR_END_ASYNC(p,m,c,e,,,,## __VA_ARGS__)
 /* -- Start building a member class for a collector ------------------------ */
 #define CTOR_MEM_BEGIN_EX(p,           /* The collector type                */\
                           m,           /* The member type                   */\
@@ -184,7 +200,7 @@ class IHelper :                        // The Init Helper class
     /* -- No code ---------------------------------------------------------- */
     { }
   /* -- Default suppressions ----------------------------------------------- */
-  DELETECOPYCTORS(IHelper)             // Remove copy ctor/assign oper
+  DELETECOPYCTORS(IHelper)             // Suppress default functions for safety
 };/* ----------------------------------------------------------------------- */
 /* == Collector class helper =============================================== **
 ** ######################################################################### **
@@ -243,7 +259,7 @@ class CLHelperBase :
     /* -- No code ---------------------------------------------------------- */
     { }
   /* ----------------------------------------------------------------------- */
-  DELETECOPYCTORS(CLHelperBase)        // Don't need the default constructor
+  DELETECOPYCTORS(CLHelperBase)        // Suppress default functions for safety
   /* -- Set limit ---------------------------------------------------------- */
   CVarReturn CLBaseSetLimitUnsafe(const size_t stLimit)
     { return CVarSimpleSetInt(stMaximum, stLimit); }
@@ -286,7 +302,7 @@ class CLHelperSafe :
   /* -- Destructor --------------------------------------------------------- */
   ~CLHelperSafe(void) { }
   /* ----------------------------------------------------------------------- */
-  DELETECOPYCTORS(CLHelperSafe)        // Don't need the default constructor
+  DELETECOPYCTORS(CLHelperSafe)        // Suppress default functions for safety
   /* -- Return the mutex ------------------------------------------- */ public:
   mutex &CollectorGetMutex(void) { return *this; }
   /* -- Lock the mutex and return the removed iterator --------------------- */
@@ -322,7 +338,7 @@ class CLHelperUnsafe :                 // Members initially private
   /* -- Destructor --------------------------------------------------------- */
   ~CLHelperUnsafe(void) { }
   /* ----------------------------------------------------------------------- */
-  DELETECOPYCTORS(CLHelperUnsafe)      // Don't need the default constructor
+  DELETECOPYCTORS(CLHelperUnsafe)      // Suppress default functions for safety
   /* -- Set maximum objects ------------------------------------------------ */
   CVarReturn CLSetLimit(const size_t stLimit)
     { return this->CLBaseSetLimitUnsafe(stLimit); }
@@ -366,7 +382,7 @@ struct CLHelper :                      // Members initially public
   /* -- Destructor --------------------------------------------------------- */
   ~CLHelper(void) { this->CLBaseCheckAndDestroyUnsafe(); }
   /* ----------------------------------------------------------------------- */
-  DELETECOPYCTORS(CLHelper)            // Don't need the default constructor
+  DELETECOPYCTORS(CLHelper)            // Suppress default functions for safety
   /* -- Set maximum objects ------------------------------------------------ */
   CVarReturn CollectorSetLimit(const size_t stLimit)
     { return this->CLSetLimit(stLimit); }
@@ -455,7 +471,7 @@ struct ICHelperBase                    // Members initially public
   /* ----------------------------------------------------------------------- */
   ~ICHelperBase(void) { }
   /* ----------------------------------------------------------------------- */
-  DELETECOPYCTORS(ICHelperBase)        // Remove default functions
+  DELETECOPYCTORS(ICHelperBase)        // Suppress default functions for safety
 };/* ----------------------------------------------------------------------- */
 /* == Collector class helper WITH locks ==================================== **
 ** ######################################################################### **
@@ -495,7 +511,7 @@ class ICHelperSafe :                   // Members initially private
   explicit ICHelperSafe(CollectorType*const ctPtr, MemberType*const mtPtr) :
     BaseType(ctPtr, StdMove(ICHelperInit(ctPtr, mtPtr))) { }
   /* ----------------------------------------------------------------------- */
-  DELETECOPYCTORS(ICHelperSafe)        // Remove default functions
+  DELETECOPYCTORS(ICHelperSafe)        // Suppress default functions for safety
 };/* ----------------------------------------------------------------------- */
 /* == Collector class helper without locks ================================= **
 ** ######################################################################### **
@@ -535,7 +551,7 @@ class ICHelperUnsafe :                 // Members initially private
     /* -- No code ---------------------------------------------------------- */
     { }
   /* ----------------------------------------------------------------------- */
-  DELETECOPYCTORS(ICHelperUnsafe)      // Remove default functions
+  DELETECOPYCTORS(ICHelperUnsafe)      // Suppress default functions for safety
 };/* ----------------------------------------------------------------------- */
 /* == Collector class ====================================================== **
 ** ######################################################################### **
@@ -581,7 +597,7 @@ struct ICHelper :                      // Members initially public
     /* -- No code ---------------------------------------------------------- */
     { }
   /* ----------------------------------------------------------------------- */
-  DELETECOPYCTORS(ICHelper)            // Remove default functions
+  DELETECOPYCTORS(ICHelper)            // Suppress default functions for safety
 };/* ----------------------------------------------------------------------- */
 /* == Lua userdata helper ================================================== **
 ** ######################################################################### **
@@ -612,7 +628,7 @@ class Lockable                         // Members initially private
     /* -- No code ---------------------------------------------------------- */
     { }
   /* ----------------------------------------------------------------------- */
-  DELETECOPYCTORS(Lockable)            // Remove default functions
+  DELETECOPYCTORS(Lockable)            // Suppress default functions for safety
 };/* -- End ---------------------------------------------------------------- */
 };                                     // End of private module namespace
 /* ------------------------------------------------------------------------- */

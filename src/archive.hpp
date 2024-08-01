@@ -16,11 +16,11 @@ using namespace ICVarDef::P;           using namespace IDir::P;
 using namespace IError::P;             using namespace IEvtMain::P;
 using namespace IFileMap::P;           using namespace IFlags;
 using namespace IIdent::P;             using namespace ILog::P;
-using namespace IPSplit::P;            using namespace IMemory::P;
-using namespace IStd::P;               using namespace IString::P;
-using namespace ISystem::P;            using namespace ISysUtil::P;
-using namespace IUtf;                  using namespace IUtil::P;
-using namespace Lib::OS::SevenZip;
+using namespace ILuaLib::P;            using namespace IPSplit::P;
+using namespace IMemory::P;            using namespace IStd::P;
+using namespace IString::P;            using namespace ISystem::P;
+using namespace ISysUtil::P;           using namespace IUtf;
+using namespace IUtil::P;              using namespace Lib::OS::SevenZip;
 /* ------------------------------------------------------------------------- */
 namespace P {                          // Start of public module namespace
 /* == Archive collector with extract buffer size =========================== */
@@ -415,13 +415,13 @@ CTOR_MEM_BEGIN_ASYNC_CSLAVE(Archives, Archive, ICHelperUnsafe),
     cLog->LogInfoExSafe("Archive unloaded '$' successfully.", IdentGet());
   }
   /* ----------------------------------------------------------------------- */
-  DELETECOPYCTORS(Archive)             // Supress copy constructor for safety
+  DELETECOPYCTORS(Archive)             // Suppress default functions for safety
   /* -- Done with these defines -------------------------------------------- */
 #undef LZMAGetHandle                   // Done with this macro
 #undef LZMAOpen                        // Done with this macro
 #undef ISzAllocPtr                     // Done with this macro
 };/* ----------------------------------------------------------------------- */
-CTOR_END_ASYNC_NOFUNCS(Archives, Archive, ARCHIVE, // Finish collector
+CTOR_END_ASYNC_NOFUNCS(Archives, Archive, ARCHIVE, ARCHIVE, // Finish collector
   /* -- Collector initialisers --------------------------------------------- */
   stExtractBufSize(0),                 // Init extract buffer size
   isaData{ Alloc, Free }               // Init custom allocators

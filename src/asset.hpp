@@ -15,7 +15,7 @@ using namespace ICodec::P;             using namespace ICollector::P;
 using namespace ICVarDef::P;           using namespace IDir::P;
 using namespace IError::P;             using namespace IEvtMain::P;
 using namespace IIdent::P;             using namespace IFlags;
-using namespace ILog::P;
+using namespace ILog::P;               using namespace ILuaLib::P;
 using namespace IMemory::P;            using namespace IStd::P;
 using namespace IString::P;            using namespace ISysUtil::P;
 /* ------------------------------------------------------------------------- */
@@ -221,9 +221,9 @@ CTOR_MEM_BEGIN_ASYNC_CSLAVE(Assets, Asset, ICHelperUnsafe),
   /* -- Destructor --------------------------------------------------------- */
   ~Asset(void) { AsyncCancel(); }
   /* ----------------------------------------------------------------------- */
-  DELETECOPYCTORS(Asset)               // Disable copy constructor and operator
+  DELETECOPYCTORS(Asset)               // Suppress default functions for safety
 };/* ======================================================================= */
-CTOR_END_ASYNC_NOFUNCS(Assets, Asset, ASSET, bOverride(false));
+CTOR_END_ASYNC_NOFUNCS(Assets, Asset, ASSET, ASSET, bOverride(false));
 /* -- Class to help enumerate files ---------------------------------------- */
 struct AssetList :
   /* -- Dependents --------------------------------------------------------- */

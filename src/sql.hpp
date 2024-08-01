@@ -61,7 +61,7 @@ class SqlData :                        // Query response data item class
     /* -- No code ---------------------------------------------------------- */
     { }
   /* ----------------------------------------------------------------------- */
-  DELETECOPYCTORS(SqlData)             // Remove copy assign operator/ctor
+  DELETECOPYCTORS(SqlData)             // Suppress default functions for safety
 };/* ----------------------------------------------------------------------- */
 MAPPACK_BUILD(SqlRecords, const string, SqlData);
 typedef list<SqlRecordsMap> SqlResult; // vector of key/raw data blocks
@@ -586,7 +586,7 @@ static struct Sql final :              // Members initially public
               { // Variable is actually an integer?
                 if(LuaUtilIsInteger(lS, iParam))
                 { // Get integer, log it and add it as integer
-                  const lua_Integer liInt = lua_tointeger(lS, iParam);
+                  const lua_Integer liInt = LuaUtilToInt(lS, iParam);
                   cLog->LogDebugExSafe("- Arg #$<Integer/Int> = $ <$0x$>.",
                     iCol, liInt, hex, liInt);
                   SetError(sqlite3_bind_int64(stmtData, iCol,
@@ -594,7 +594,7 @@ static struct Sql final :              // Members initially public
                 } // Variable is actually a number
                 else
                 { // Get double, log it and add it as number
-                  const lua_Number lnFloat = lua_tonumber(lS, iParam);
+                  const lua_Number lnFloat = LuaUtilToNum(lS, iParam);
                   cLog->LogDebugExSafe("- Arg #$<Number/Float> = $$.",
                     iCol, fixed, lnFloat);
                   SetError(sqlite3_bind_double(stmtData, iCol,
@@ -605,7 +605,7 @@ static struct Sql final :              // Members initially public
               case LUA_TSTRING:
               { // Get string, store size, log parameter, add as string
                 size_t stS;
-                const char*const cpStr = lua_tolstring(lS, iParam, &stS);
+                const char*const cpStr = LuaUtilToLString(lS, iParam, stS);
                 cLog->LogDebugExSafe(
                   "- Arg #$<String/Text> = \"$\" ($ bytes).",
                   iCol, cpStr, stS);
@@ -615,7 +615,7 @@ static struct Sql final :              // Members initially public
               } // Variable is a boolean
               case LUA_TBOOLEAN:
               { // Get boolean, log parameter, convert and add as integer
-                const bool bBool = lua_toboolean(lS, iParam);
+                const bool bBool = LuaUtilToBool(lS, iParam);
                 cLog->LogDebugExSafe("- Arg #$<Bool/Int> = $.",
                   iCol, StrFromBoolTF(bBool));
                 SetError(sqlite3_bind_int64(stmtData, iCol,
@@ -641,7 +641,7 @@ static struct Sql final :              // Members initially public
               } // Other variable (ignore)
               default: XC("Unsupported parameter type!",
                           "Param", iParam, "LuaType", iType,
-                          "Typename", lua_typename(lS, iType));
+                          "Typename", LuaUtilGetType(lS, iType));
             } // Do the step if needed break if not needed or error
             if(!DoExecuteParamCheckCommit(stmtData, iCol, iMax)) break;
           } // ...until no parameters left
@@ -707,9 +707,9 @@ static struct Sql final :              // Members initially public
                       "Type",   sdRef.iType);
                    break;
         } // Push key name
-        lua_setfield(lS, -2, srmpRef.first.c_str());
+        LuaUtilSetField(lS, -2, srmpRef.first.c_str());
       } // Push key pair as integer table
-      lua_rawset(lS, -3);
+      LuaUtilSetRaw(lS, -3);
       // Next result number
       ++liId;
     }
@@ -1284,11 +1284,13 @@ static struct Sql final :              // Members initially public
     const string &strDb = strPrefix.empty() ? strMemoryDBName : strPrefix;
     cLog->LogDebugExSafe("Sql initialising database '$'...", strDb);
     // Open database with a temporary sqlite handle so if the open fails,
-    // the old one stays intact
+    // the old one stays intact. The cast of the sqlDBtemp for the last
+    // parameter (VFS) that resolves to 'nullptr' is just to shut CppCheck up
+    // with a false positive.
     sqlite3 *sqlDBtemp = nullptr;
     if(const int iCode = sqlite3_open_v2(strDb.c_str(), &sqlDBtemp,
          SQLITE_OPEN_READWRITE | SQLITE_OPEN_CREATE | SQLITE_OPEN_FULLMUTEX |
-         SQLITE_OPEN_SHAREDCACHE, nullptr))
+         SQLITE_OPEN_SHAREDCACHE, reinterpret_cast<char*>(sqlDBtemp)))
     { // Log error result
       cLog->LogWarningExSafe("Sql could not open '$' because $ ($)!", strDb,
         GetErrorStr(), iCode);
@@ -1354,7 +1356,7 @@ static struct Sql final :              // Members initially public
   /* -- Destructor --------------------------------------------------------- */
   DTORHELPER(~Sql, DeInit(); sqlite3_shutdown())
   /* ----------------------------------------------------------------------- */
-  DELETECOPYCTORS(Sql)                 // Do not need defaults
+  DELETECOPYCTORS(Sql)                 // Suppress default functions for safety
   /* -- Set a pragma on or off (used only with cvar callbacks) ---- CVARS -- */
   CVarReturn PragmaOnOff(const string &strVar, const bool bState)
     { Pragma(strVar, bState ? strvOn : strvOff); return ACCEPT; }

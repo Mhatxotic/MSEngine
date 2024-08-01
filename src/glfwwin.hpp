@@ -430,7 +430,7 @@ class GlFWWindow :                     // GLFW window class
     /* -- No code ---------------------------------------------------------- */
     { }
   /* ----------------------------------------------------------------------- */
-  DELETECOPYCTORS(GlFWWindow)          // Do not need defaults
+  DELETECOPYCTORS(GlFWWindow)          // Suppress default functions for safety
 };/* ----------------------------------------------------------------------- */
 }                                      // End of public module namespace
 /* ------------------------------------------------------------------------- */

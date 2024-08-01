@@ -16,9 +16,10 @@ namespace ISource {                    // Start of private module namespace
 /* -- Dependencies --------------------------------------------------------- */
 using namespace ICollector::P;         using namespace ICVarDef::P;
 using namespace IIdent::P;             using namespace ILog::P;
-using namespace ILuaUtil::P;           using namespace IOal::P;
-using namespace IStd::P;               using namespace ISysUtil::P;
-using namespace IUtil::P;              using namespace Lib::OpenAL;
+using namespace ILuaLib::P;            using namespace ILuaUtil::P;
+using namespace IOal::P;               using namespace IStd::P;
+using namespace ISysUtil::P;           using namespace IUtil::P;
+using namespace Lib::OpenAL;
 /* ------------------------------------------------------------------------- */
 namespace P {                          // Start of public module namespace
 /* -- Source collector class for collector data and custom variables ------- */
@@ -58,20 +59,18 @@ CTOR_MEM_BEGIN_CSLAVE(Sources, Source, ICHelperSafe),
   /* -- Get source integer ------------------------------------------------- */
   template<typename IntType=ALint>
     const IntType GetSourceInt(const ALenum eParam) const
-  { // Store result into this integer
+  { // Get the specified value and store the result and return a cast of it
     ALint iValue;
-    // Get the value
     AL(cOal->GetSourceInt(uiId, eParam, &iValue),
       "Get source integer failed!", "Index", uiId, "Param", eParam);
-    // Return casted value
     return static_cast<IntType>(iValue);
   }
   /* -- Get/set source triple-float -------------------------------- */
   void GetSource3Float(const ALenum eP,
     ALfloat &fX, ALfloat &fY, ALfloat &fZ) const
       { AL(cOal->GetSourceVector(uiId, eP, &fX, &fY, &fZ),
-           "Get source vector failed!",
-           "Index", uiId, "Param", eP, "X", fX, "Y", fY, "Z", fZ); }
+          "Get source vector failed!",
+          "Index", uiId, "Param", eP, "X", fX, "Y", fY, "Z", fZ); }
   void SetSource3Float(const ALenum eP,
     const ALfloat fX, const ALfloat fY, const ALfloat fZ) const
       { AL(cOal->SetSourceVector(uiId, eP, fX, fY, fZ),
@@ -300,10 +299,10 @@ CTOR_MEM_BEGIN_CSLAVE(Sources, Source, ICHelperSafe),
     if(uiId) ALL(cOal->DeleteSource(uiId), "Source failed to delete $!", uiId);
   }
   /* ----------------------------------------------------------------------- */
-  DELETECOPYCTORS(Source)              // Supress copy constructor for safety
+  DELETECOPYCTORS(Source)              // Suppress default functions for safety
 };/* -- End ---------------------------------------------------------------- */
-CTOR_END(Sources, Source,,,, fGVolume(0.0f), fMVolume(0.0f), fVVolume(0.0f),
-  fSVolume(0.0f))
+CTOR_END(Sources, Source, SOURCE,,,,
+  fGVolume(0.0f), fMVolume(0.0f), fVVolume(0.0f), fSVolume(0.0f))
 /* -- Stop (multiple buffers) ---------------------------------------------- */
 static unsigned int SourceStop(const ALUIntVector &uiBuffers)
 { // Done if no buffers
@@ -334,9 +333,8 @@ static Source *SourceGetFree(void)
   for(Source*const sCptr : *cSources)
   { // Is a locked stream? Then it's active and locked!
     if(sCptr->GetExternal() || sCptr->IsPlaying()) continue;
-    // Reset source
+    // Reset source and return it
     sCptr->ReInit();
-    // Return the source
     return sCptr;
   } // Couldn't find one
   return nullptr;
@@ -375,11 +373,8 @@ static void SourceAlloc(const size_t stCount)
 }
 /* == Set number of sources ================================================ */
 static CVarReturn SourceSetCount(const size_t stCount)
-{ // Ignore if not initialised
-  if(!cOal->IsInitialised()) return ACCEPT;
-  // Reallocate the sources
-  SourceAlloc(stCount);
-  // Success
+{ // If AL is initialised reallocate the sources and return success
+  if(cOal->IsInitialised()) SourceAlloc(stCount);
   return ACCEPT;
 }
 /* ------------------------------------------------------------------------- */

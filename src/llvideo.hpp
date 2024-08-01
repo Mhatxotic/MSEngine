@@ -349,24 +349,6 @@ LLFUNC(SetVLTWH, 0,
                   aHeight{lS, 5};
   aVideo().FboItemSetVertexWH(aLeft, aTop, aWidth, aHeight))
 /* ========================================================================= */
-// $ Video:SetVLTRBA
-// > Left:number=The destination left co-ordinate.
-// > Top:number=The destination top co-ordinate.
-// > Right:number=The destination right co-ordinate.
-// > Bottom:number=The destination bottom co-ordinate.
-// > Angle:number=The angle of the vertex
-// ? Allows you to set basic vertex co-ordinates when blitting the video's
-// ? frame buffer object.
-/* ------------------------------------------------------------------------- */
-LLFUNC(SetVLTRBA, 0,
-  const AgVideo aVideo{lS, 1};
-  const AgGLfloat aLeft{lS, 2},
-                  aTop{lS, 3},
-                  aRight{lS, 4},
-                  aBottom{lS, 5};
-  const AgAngle aAngle{lS, 6};
-  aVideo().FboItemSetVertex(aLeft, aTop, aRight, aBottom, aAngle))
-/* ========================================================================= */
 // $ Video:SetVLTWHA
 // > Left:number=The destination left co-ordinate.
 // > Top:number=The destination top co-ordinate.
@@ -427,9 +409,8 @@ LLRSMFBEGIN                            // Video:* member functions begin
   LLRSFUNC(SetCRGBA),      LLRSFUNC(SetCX),     LLRSFUNC(SetFilter),
   LLRSFUNC(SetKeyColour),  LLRSFUNC(SetKeyed),  LLRSFUNC(SetLoop),
   LLRSFUNC(SetTCLTRB),     LLRSFUNC(SetTCLTWH), LLRSFUNC(SetTCX),
-  LLRSFUNC(SetVLTRB),      LLRSFUNC(SetVLTRBA), LLRSFUNC(SetVLTWH),
-  LLRSFUNC(SetVLTWHA),     LLRSFUNC(SetVX),     LLRSFUNC(SetVolume),
-  LLRSFUNC(Stop),
+  LLRSFUNC(SetVLTRB),      LLRSFUNC(SetVLTWH),  LLRSFUNC(SetVLTWHA),
+  LLRSFUNC(SetVX),         LLRSFUNC(SetVolume), LLRSFUNC(Stop),
 LLRSEND                                // Video:* member functions end
 /* ========================================================================= */
 // $ Video.Asset

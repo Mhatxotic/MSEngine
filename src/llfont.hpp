@@ -235,14 +235,14 @@ LLFUNC(PrintTS, 1,
 // ? the text will cleanly wrap if it cannot draw any word past the specified
 // ? 'Right' position and position the cursor at the specified 'Indent'.
 /* ------------------------------------------------------------------------- */
-LLFUNC(PrintW, 0,
+LLFUNC(PrintW, 1,
   const AgFont aFont{lS, 1};
   const AgGLfloat aX{lS, 2},
                   aY{lS, 3};
   const AgPositive aWidth{lS, 4},
                    aIndent{lS, 5};
   const AgGLString aString{lS, 6};
-  aFont().PrintW(aX, aY, aWidth, aIndent, aString))
+  LuaUtilPushVar(lS, aFont().PrintW(aX, aY, aWidth, aIndent, aString)))
 /* ========================================================================= */
 // $ Font:PrintR
 // > X:number=The X screen position of the string.

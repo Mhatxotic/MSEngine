@@ -173,11 +173,10 @@ enum CVarEnums : size_t
   ERR_LMRESETLIMIT, ERR_MINVRAM,       ERR_MINRAM,
   /* -- Lua cvars ---------------------------------------------------------- */
   LUA_TICKTIMEOUT,  LUA_TICKCHECK,     LUA_CACHE,           LUA_SIZESTACK,
-  LUA_GCPAUSE,      LUA_GCSTEPMUL,     LUA_RANDOMSEED,      LUA_APIFLAGS,
-  LUA_SCRIPT,
+  LUA_GCPAUSE,      LUA_GCSTEPMUL,     LUA_RANDOMSEED,      LUA_SCRIPT,
   /* -- Audio cvars -------------------------------------------------------- */
   AUD_DELAY,        AUD_VOL,           AUD_INTERFACE,       AUD_CHECK,
-  AUD_NUMSOURCES,   AUD_SAMVOL,        AUD_STRBUFCOUNT,     AUD_STRBUFSIZ,
+  AUD_NUMSOURCES,   AUD_SAMVOL,        AUD_STRBUFCOUNT,     AUD_STRBUFFER,
   AUD_STRVOL,       AUD_FMVVOL,        AUD_HRTF,
   /* -- Console cvars ------------------------------------------------------ */
   CON_KEYPRIMARY,   CON_KEYSECONDARY,  CON_AUTOCOMPLETE,    CON_AUTOSCROLL,
@@ -215,12 +214,11 @@ enum CVarEnums : size_t
   WIN_ALPHA,        WIN_ASPECT,        WIN_BORDER,          WIN_CLOSEABLE,
   WIN_FLOATING,     WIN_FOCUSED,       WIN_HEIGHT,          WIN_HEIGHTMAX,
   WIN_HEIGHTMIN,    WIN_MAXIMISED,     WIN_MINIMISEAUTO,    WIN_POSX,
-  WIN_POSY,         WIN_SIZABLE,       WIN_THREAD,          WIN_WIDTH,
-  WIN_WIDTHMAX,     WIN_WIDTHMIN,
+  WIN_POSY,         WIN_SIZABLE,       WIN_WIDTH,           WIN_WIDTHMAX,
+  WIN_WIDTHMIN,
   /* -- Logging cvars ------------------------------------------------------ */
   LOG_CREDITS,      LOG_DYLIBS,
   /* -- Misc (do not (re)move) --------------------------------------------- */
-  APP_COMFLAGS,                        // Compatibility flags
   CVAR_MAX,                            // Maximum cvars
   CVAR_FIRST = LOG_LEVEL,              // The first cvar item
 };/* ----------------------------------------------------------------------- */

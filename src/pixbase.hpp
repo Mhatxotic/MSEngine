@@ -10,7 +10,9 @@
 ** ========================================================================= */
 #pragma once                           // Only one incursion allowed
 /* -- Signals to support --------------------------------------------------- */
-static array<pair<const int,void(*)(int)>,14>iaSignals{ {
+typedef pair<const int, void(*)(int)> SignalPair;
+typedef array<SignalPair, 14> SignalList;
+static SignalList slSignals{ {
   { SIGABRT, nullptr }, { SIGBUS,  nullptr },
   { SIGFPE,  nullptr }, { SIGHUP,  nullptr }, { SIGILL,  nullptr },
   { SIGINT,  nullptr }, { SIGPIPE, nullptr }, { SIGQUIT, nullptr },
@@ -25,8 +27,8 @@ class SysBase :                        // Safe exception handler namespace
   public SysVersion,                   // Version information class
   public Ident                         // Mutex name
 { /* ----------------------------------------------------------------------- */
-  typedef map<const int, struct rlimit> ResourceLimit; // Modifyable
-  ResourceLimit    rLimits;            // Resource limits database
+  MAPPACK_BUILD(ResourceLimit, const int, struct rlimit)
+  ResourceLimitMap rlmLimits;          // Resource limits database
   /* ----------------------------------------------------------------------- */
   enum ExitState { ES_SAFE, ES_UNSAFE, ES_CRITICAL }; // Signal exit types
   /* --------------------------------------------------------------- */ public:
@@ -200,10 +202,10 @@ class SysBase :                        // Safe exception handler namespace
     staData.Header("DESCRIPTION").Header("VERSION", false)
            .Header("VENDOR", false).Header("MODULE", false)
            .Reserve(size());
-    // list modules
-    for(const auto &mD : *this)
-    { // Get mod data
-      const SysModuleData &smdData = mD.second;
+    // Enumerate each detected module
+    for(const SysModMapPair &smmpPair : *this)
+    { // Get reference to mod data and add to table
+      const SysModuleData &smdData = smmpPair.second;
       staData.Data(smdData.GetDesc()).Data(smdData.GetVersion())
              .Data(smdData.GetVendor()).Data(smdData.GetFull());
     } // Finished enumeration of modules
@@ -412,12 +414,18 @@ class SysBase :                        // Safe exception handler namespace
            (setsockopt(iFd, SOL_SOCKET, SO_SNDTIMEO,
               reinterpret_cast<void*>(&tWT), sizeof(tWT)) < 0 ? 2 : 0);
   }
+  /* -- Check if process is in background ---------------------------------- */
+  static bool IsInBackground(void)
+  { // Get terminal foreground process and return if in backround
+    const pid_t pTerminal = tcgetpgrp(STDOUT_FILENO), pParent = getpgrp();
+    return pTerminal != pParent;
+  }
   /* ----------------------------------------------------------------------- */
   SysBase(SysModMap &&smmMap, const size_t stI) :
     /* -- Initialisers ----------------------------------------------------- */
     SysVersion{                        // Initialise version info class
       StdMove(smmMap), stI },          // Move sent mod list into ours
-    rLimits{{                          // Limits data
+    rlmLimits{{                        // Limits data
 #if !defined(MACOS)                    // Not all resources supported
       { RLIMIT_LOCKS,  { 0, 0 } },     { RLIMIT_MSGQUEUE,   { 0, 0 } },
       { RLIMIT_NICE,   { 0, 0 } },     { RLIMIT_RTPRIO,     { 0, 0 } },
@@ -431,49 +439,49 @@ class SysBase :                        // Safe exception handler namespace
     }}
     /* -- ------------------------------------------------------------------ */
   { // Now install all those signal handlers
-    for(auto &aSignal : iaSignals)
+    for(SignalPair &spPair : slSignals)
     { // Set the signal and check for error
-      aSignal.second = signal(aSignal.first, HandleSignalStatic);
-      if(aSignal.second == SIG_ERR)
-        XCL("Failed to install signal handler!", "Id", aSignal.first);
+      spPair.second = signal(spPair.first, HandleSignalStatic);
+      if(spPair.second == SIG_ERR)
+        XCL("Failed to install signal handler!", "Id", spPair.first);
     } // Increase resource limits we can change so the engine can do more
-    for(auto &aResource : rLimits)
+    for(ResourceLimitMapPair &rlmpPair : rlmLimits)
     { // Get the limit for this resource
-      if(!getrlimit(aResource.first, &aResource.second))
+      if(!getrlimit(rlmpPair.first, &rlmpPair.second))
       { // Ignore if value doesn't need to change
-        if(aResource.second.rlim_cur >= aResource.second.rlim_max) continue;
+        if(rlmpPair.second.rlim_cur >= rlmpPair.second.rlim_max) continue;
         // Set maximum allowed and if failed?
-        const rlim_t rtOld = aResource.second.rlim_cur;
-        aResource.second.rlim_cur = aResource.second.rlim_max;
-        if(setrlimit(aResource.first, &aResource.second))
+        const rlim_t rtOld = rlmpPair.second.rlim_cur;
+        rlmpPair.second.rlim_cur = rlmpPair.second.rlim_max;
+        if(setrlimit(rlmpPair.first, &rlmpPair.second))
         { // Restore original value
-          aResource.second.rlim_cur = rtOld;
+          rlmpPair.second.rlim_cur = rtOld;
           // Log a message
           cLog->LogWarningExSafe(
             "System failed to set resource limit $<0x$$$> from $<0x$$$> to "
             "$<0x$$$>: $!",
-            aResource.first, hex, aResource.first, dec, rtOld, hex, rtOld, dec,
-            aResource.second.rlim_max, hex, aResource.second.rlim_max, dec,
+            rlmpPair.first, hex, rlmpPair.first, dec, rtOld, hex, rtOld, dec,
+            rlmpPair.second.rlim_max, hex, rlmpPair.second.rlim_max, dec,
             SysError());
         }
       } // Failed to get limit so log the error and why
       else cLog->LogWarningExSafe(
         "System failed to get limit for resource $<0x$$$>: $!",
-        aResource.first, hex, aResource.first, dec, SysError());
+        rlmpPair.first, hex, rlmpPair.first, dec, SysError());
     }
   }
   /* ----------------------------------------------------------------------- */
   ~SysBase(void) noexcept(true)
   { // Uninstall safe signals
-    for(auto &aSignal : iaSignals)
-      if(signal(aSignal.first, aSignal.second) == SIG_ERR && cLog)
+    for(SignalPair &spPair : slSignals)
+      if(signal(spPair.first, spPair.second) == SIG_ERR && cLog)
         cLog->LogWarningExSafe("Failed to restore signal $ handler! $.",
-          aSignal.first, StrFromErrNo());
+          spPair.first, StrFromErrNo());
     // Delete global mutex
     DeleteGlobalMutex();
   }
   /* ----------------------------------------------------------------------- */
-  DELETECOPYCTORS(SysBase)             // Suppress copy constructor for safety
+  DELETECOPYCTORS(SysBase)             // Suppress default functions for safety
 };/* ----------------------------------------------------------------------- */
 #define MSENGINE_SYSBASE_CALLBACKS() \
   void SysBase::SysBase::HandleSignalStatic(int iSignal) \

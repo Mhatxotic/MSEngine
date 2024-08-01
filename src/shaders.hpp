@@ -8,10 +8,10 @@
 /* ------------------------------------------------------------------------- */
 namespace IShaders {                   // Start of private module namespace
 /* -- Dependencies --------------------------------------------------------- */
-using namespace ICVarDef::P;           using namespace ILog::P;
-using namespace IOgl::P;               using namespace IShader::P;
-using namespace IStd::P;               using namespace IString::P;
-using namespace Lib::OS::GlFW;
+using namespace ICVarDef::P;           using namespace IFboDef::P;
+using namespace ILog::P;               using namespace IOgl::P;
+using namespace IShader::P;            using namespace IStd::P;
+using namespace IString::P;            using namespace Lib::OS::GlFW;
 /* ------------------------------------------------------------------------- */
 namespace P {                          // Start of public module namespace
 /* == Shader core class ==================================================== */
@@ -38,11 +38,10 @@ static struct ShaderCore final
   { // Add vertex shader program
     shS.AddShaderEx(strName, GL_VERTEX_SHADER,
       // > The vertex shader is for modifying vertice coord data
-      // Input parameters           (ONE TRIANGLE)  V1     V2     V3
-      "in vec2 texcoord;"              // [3][2]=( {xy},  {xy},  {xy} )
-      "in vec2 vertex;"                // [3][2]=( {xy},  {xy},  {xy} )
-      "in vec4 colour;"                // [3][4]=({rgba},{rgba},{rgba})
-      "out vec4 texcoordout;"          // Texcoords sent to frag shader
+      "in vec$ texcoord;"              // Texture coordinates for vertice
+      "in vec$ vertex;"                // Position coordinates for vertice
+      "in vec$ colour;"                // Colour intensity for vertice
+      "out vec4 texcoordout;"          // Tex coords sent to fragment shader
       "out vec4 colourout;"            // Colour multiplier sent to frag shader
       "uniform vec4 matrix;"           // Current 2D matrix
       "void main(void){"               // Entry point
@@ -53,7 +52,8 @@ static struct ShaderCore final
         "texcoordout = tc;"            // Set colour from glColorPointer
         "colourout = c;"               // Set colour
         "gl_Position = v;"             // Set vertex position
-      "}", cpCode);
+      "}",                             // End of main function
+      stCompsPerCoord, stCompsPerPos, stCompsPerColour, cpCode);
   }
   /* -- Add vertex shader with template ------------------------------------ */
   void AddVertexShaderWith3DTemplate(Shader &shS, const string &strName)
@@ -90,8 +90,8 @@ static struct ShaderCore final
     const char*const cpCode)
   { // Add vertex shader program
     AddVertexShaderWith3DTemplate(shS, strName, StrFormat("$"
-      "v[0] = -1.0+(((matrix[0]+$(v[0]))/matrix[2])*2.0);"  // X-coord
-      "v[1] = -1.0+(((matrix[1]+$(v[1]))/matrix[3])*2.0);", // Y-coord
+      "v.x = -1.0+(((matrix.x+$(v.x))/matrix.z)*2.0);"  // X-coord
+      "v.y = -1.0+(((matrix.y+$(v.y))/matrix.w)*2.0);", // Y-coord
         cpCode, strSPRMethod, strSPRMethod).c_str());
   }
   /* -- Add vertex shader with template ------------------------------------ */
@@ -262,7 +262,7 @@ static struct ShaderCore final
     /* -- Code ------------------------------------------------------------- */
     { }                                // No code
   /* ----------------------------------------------------------------------- */
-  DELETECOPYCTORS(ShaderCore)          // No copy constructor
+  DELETECOPYCTORS(ShaderCore)          // Suppress default functions for safety
   /* -- Set rounding method for the shader --------------------------------- */
   CVarReturn SetSPRoundingMethod(const size_t stMethod)
   { // Return if specified value is outrageous!

@@ -16,8 +16,8 @@ local unpack<const>, error<const>, pairs<const>, ipairs<const>, max<const>,
     table.unpack, error, pairs, ipairs, math.max, math.min, math.floor,
     math.sin, math.cos, tostring, math.mininteger;
 -- M-Engine function aliases ----------------------------------------------- --
-local InfoTime<const>, UtilIsInteger<const>, UtilIsString<const> =
-  Info.Time, Util.IsInteger, Util.IsString;
+local CoreTime<const>, UtilIsInteger<const>, UtilIsString<const> =
+  Core.Time, Util.IsInteger, Util.IsString;
 -- Diggers function and data aliases --------------------------------------- --
 local Fade, InitTitle, IsButtonReleased, LoadResources, PlayMusic,
   PlayStaticSound, RegisterFBUCallback, aGlobalData, RenderFade, SetCallbacks,
@@ -115,10 +115,13 @@ local function InitScore()
     local iTotalScore = 0;
     -- Draw animated logos
     local function DrawLogos()
+      -- Don't draw anything if in 4:3 mode
+      if iStageL >= 0 then return end;
+      -- Draw sidebar scrolling logo's
       local Width = -iStageL-4;
       local Aspect = 208/58;
       local Height = Width*Aspect;
-      local LX = (InfoTime()*100)%240;
+      local LX = (CoreTime()*100)%240;
       local LY = -LX;
       local X = iStageL+4;
       texTitle:SetCA(0.25);
@@ -198,7 +201,7 @@ local function InitScore()
           else
             if iTotalId > iI then texSpr:SetCRGB(0, 0, 0.5);
                              else texSpr:SetCRGB(0.5, 0, 0) end;
-            local nVal = InfoTime()+iI/4;
+            local nVal = CoreTime()+iI/4;
             RenderFade(sin(nVal)*cos(nVal)+0.75,
               aData[7]+8, aData[8]-2, aData[7]+312, aData[8]+10, 1022);
             fontLittle:SetCRGBA(0.75, 0.75, 0.75, 1);
@@ -237,7 +240,7 @@ local function InitScore()
           fontLittle:PrintC(160, 12, sTitleText);
           -- Draw pulsating score
           fontLittle:SetSize(3);
-          local nVal = InfoTime();
+          local nVal = CoreTime();
           fontLittle:SetCA(sin(nVal) * cos(nVal) + 0.75);
           fontLittle:PrintR(304, 213, strScore);
           -- Draw rank

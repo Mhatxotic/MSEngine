@@ -16,12 +16,12 @@ local abs<const>, ceil<const>, error<const>, floor<const>, format<const>,
     math.abs, math.ceil, error, math.floor, string.format, math.max,
     math.maxinteger, math.min, math.random, table.remove, tostring;
 -- M-Engine function aliases ----------------------------------------------- --
-local CoreLog<const>, CoreQuit<const>, CoreWrite<const>, InfoTicks<const>,
-  InfoTime<const>, MaskCreateZero<const>, UtilBlank<const>, UtilClamp<const>,
+local CoreLog<const>, CoreQuit<const>, CoreWrite<const>, CoreTicks<const>,
+  CoreTime<const>, MaskCreateZero<const>, UtilBlank<const>, UtilClamp<const>,
   UtilClampInt<const>, UtilFormatNTime<const>, UtilIsBoolean<const>,
   UtilIsFunction<const>, UtilIsInteger<const>, UtilIsString<const>,
   UtilIsTable<const>, UtilRound<const> =
-    Core.Log, Core.Quit, Core.WriteEx, Info.Ticks, Info.Time, Mask.CreateZero,
+    Core.Log, Core.Quit, Core.WriteEx, Core.Ticks, Core.Time, Mask.CreateZero,
     Util.Blank, Util.Clamp, Util.ClampInt, Util.FormatNTime, Util.IsBoolean,
     Util.IsFunction, Util.IsInteger, Util.IsString, Util.IsTable, Util.Round;
 -- Assets required --------------------------------------------------------- --
@@ -3170,39 +3170,51 @@ local function InitCreateObject()
     -- Ignore if a rare random value occurs or object is busy
     if random() > 0.001 or aObject.F & OFL.BUSY ~= 0 then return end;
     -- Go left, right or stop
-    if random() > 0.5 then SetAction(ACT.WALK, JOB.SEARCH, DIR.LR);
-                      else SetAction(ACT.STOP, JOB.SEARCH, DIR.NONE) end;
+    if random() > 0.5 then
+      SetAction(aObject, ACT.WALK, JOB.SEARCH, DIR.LR);
+    else
+      SetAction(aObject, ACT.STOP, JOB.SEARCH, DIR.NONE);
+    end
   end
   -- AI for lift ----------------------------------------------------------- --
   local function AILift(aObject)
     -- Ignore if a rare random value occurs or object is busy
     if random() > 0.001 or aObject.F & OFL.BUSY ~= 0 then return end;
     -- Go up or down or stop
-    if random() > 0.5 then SetAction(ACT.CREEP, JOB.NONE, DIR.UD);
-                      else SetAction(ACT.STOP, JOB.NONE, DIR.NONE) end;
+    if random() > 0.5 then
+      SetAction(aObject, ACT.CREEP, JOB.NONE, DIR.UD);
+    else
+      SetAction(aObject, ACT.STOP, JOB.NONE, DIR.NONE);
+    end
   end
   -- AI for inflatable boat ------------------------------------------------ --
   local function AIBoat(aObject)
     -- Ignore if a rare random value occurs or object is busy
     if random() > 0.001 or aObject.F & OFL.BUSY ~= 0 then return end;
     -- Go up or down or stop
-    if random() > 0.5 then SetAction(ACT.CREEP, JOB.NONE, DIR.LR);
-                      else SetAction(ACT.STOP, JOB.NONE, DIR.NONE) end;
+    if random() > 0.5 then
+      SetAction(aObject, ACT.CREEP, JOB.NONE, DIR.LR);
+    else
+      SetAction(aObject, ACT.STOP, JOB.NONE, DIR.NONE);
+    end
   end
   -- AI for anything deployable -------------------------------------------- --
   local function AIDeploy(aObject)
     -- Ignore if a rare random value occurs or object is busy
     if random() > 0.0001 or aObject.F & OFL.BUSY ~= 0 then return end;
     -- Deploy the object
-    SetAction(ACT.DEPLOY, JOB.NONE, DIR.NONE);
+    SetAction(aObject, ACT.DEPLOY, JOB.NONE, DIR.NONE);
   end
   -- AI for flood gate ----------------------------------------------------- --
   local function AIGate(aObject)
     -- Ignore if a rare random value occurs or object is busy
     if random() > 0.00001 or aObject.F & OFL.BUSY ~= 0 then return end;
     -- Open or close the gate
-    if random() < 0.5 then SetAction(ACT.OPEN, JOB.NONE, DIR.NONE);
-                      else SetAction(ACT.CLOSE, JOB.NONE, DIR.NONE) end;
+    if random() < 0.5 then
+      SetAction(aObject, ACT.OPEN, JOB.NONE, DIR.NONE);
+    else
+      SetAction(aObject, ACT.CLOSE, JOB.NONE, DIR.NONE);
+    end
   end
   -- AI id to function list ------------------------------------------------ --
   local aAIFuncs<const> = {
@@ -3356,32 +3368,6 @@ local function CheckObjectFloating(aObject)
     MoveY(aObject, -1);
   end
   -- Object is floating
-  return true;
-end
--- Check if object is falling ---------------------------------------------- --
-local function CheckObjectFalling(aObject)
-  -- If object...
-  if CheckObjectFloating(aObject) or -- ...is floating?
-     aObject.F & OFL.FALL == 0 or    -- *or* is not supposed to fall?
-     IsCollideY(aObject, 1) then     -- *or* blocked below?
-    return false end;                -- Then the object is not falling!
-  -- Start from fall speed pixels and count down to 1
-  for iYAdj = aObject.FS, 1, -1 do
-    -- No collision found with terrain?
-    if not IsCollideY(aObject, iYAdj) then
-      -- Move Y position down
-      MoveY(aObject, iYAdj);
-      -- Increase fall speed
-      if aObject.FS < 5 then aObject.FS = aObject.FS + 1 end;
-      -- Increase fall damage
-      aObject.FD = aObject.FD + 1;
-      -- break loop
-      break;
-    end
-    -- Collision detected, but we must find how many pixels exactly to fall
-    -- by, so reduce the pixel count and try to find the exact value.
-  end
-  -- Success
   return true;
 end
 -- Process phasing logic function ------------------------------------------ --
@@ -3691,6 +3677,109 @@ local function ProcessFloodData()
     end
   end
 end
+-- Check if object is falling ---------------------------------------------- --
+local function CheckObjectFalling(aObject)
+  -- If object...
+  if not CheckObjectFloating(aObject) and -- ...is not floating?
+         aObject.F & OFL.FALL ~= 0 and    -- *and* is supposed to fall?
+     not IsCollideY(aObject, 1) then      -- *and* not blocked below?
+    -- Start from fall speed pixels and count down to 1
+    for iYAdj = aObject.FS, 1, -1 do
+      -- No collision found with terrain?
+      if not IsCollideY(aObject, iYAdj) then
+        -- Move Y position down
+        MoveY(aObject, iYAdj);
+        -- Increase fall speed and clamp maximum speed to half a tile
+        if aObject.FS < 8 then aObject.FS = aObject.FS + 1 end;
+        -- increase fall damage
+        aObject.FD = aObject.FD + 1;
+        -- Still falling
+        return true;
+      end
+      -- Collision detected, but we must find how many pixels exactly to fall
+      -- by, so reduce the pixel count and try to find the exact value.
+    end
+  end
+  -- We were falling?
+  if aObject.FS > 1 then
+    -- Reset fall speed
+    aObject.FS = 1;
+    -- If fall damage is set then object fell and now we must reduce its
+    -- health
+    local iDamage = aObject.FD;
+    if iDamage > 0 then
+      -- Object still has fall flag set and object fell >= 16 pixels
+      if aObject.F & OFL.FALL ~= 0 and iDamage >= 5 then
+        -- Object is delicate? Remove more health
+        if aObject.F & OFL.DELICATE ~= 0 then iDamage = -iDamage;
+        else iDamage = -(iDamage // 2) end;
+        -- Reduce health
+        AdjustObjectHealth(aObject, iDamage);
+        -- Damage would reduce health < 10 %. Stop object moving
+        local iHealth<const> = aObject.H;
+        if iHealth > 0 and iHealth < 10 then
+          SetAction(aObject, ACT.STOP, JOB.INDANGER, DIR.NONE);
+        end
+      end
+      -- Reset fall damage;
+      aObject.FD = 0;
+    end
+  end
+  -- Can't fall (anymore)
+  return false;
+end
+-- Process object movement logic ------------------------------------------- --
+local function ProcessObjectMovement()
+  -- Move object functions
+  local function OBJMoveUp(aObj) MoveY(aObj, -1) end;
+  local function OBJMoveDown(aObj) MoveY(aObj, 1) end;
+  local function OBJMoveLeft(aObj) MoveX(aObj, -1) end;
+  local function OBJMoveRight(aObj) MoveX(aObj, 1) end;
+  -- Object move callbacks
+  local aMoveFuncs<const> = {
+    [DIR.U]  = OBJMoveUp,    [DIR.D] = OBJMoveDown,
+    [DIR.UL] = OBJMoveLeft,  [DIR.L] = OBJMoveLeft,  [DIR.DL] = OBJMoveLeft,
+    [DIR.UR] = OBJMoveRight, [DIR.R] = OBJMoveRight, [DIR.DR] = OBJMoveRight
+  };
+  -- Actual function
+  local function ProcessObjectMovement(aObj)
+    -- Object wants to dig down and object X position is in the middle of
+    -- the tile? Make object dig down
+    if aObj.J == JOB.DIGDOWN and aObj.X % 16 == 0 then
+      SetAction(aObj, ACT.DIG, JOB.DIGDOWN, DIR.D);
+    -- Object wants to enter the trading centre? Stop object
+    elseif aObj.J == JOB.HOME and ObjectIsAtHome(aObj) then
+      -- Go into trade centre
+      SetAction(aObj, ACT.PHASE, JOB.PHASE, DIR.UL);
+    -- Object is for rails only and train is not on track
+    elseif aObj.F & OFL.TRACK ~= 0 then
+      -- Get X pos adjust depending on direction
+      local iId;
+      if aObj.D == DIR.L then iId = 7 else iId = 9 end;
+      -- Get absolute tile position and get tile id
+      local iLoc<const> = GetLevelOffsetFromObject(aObj, iId, 0);
+      if iLoc then
+        iId = aLevelData[1 + iLoc];
+        -- Tile at end of track? Stop!
+        if aTileData[1 + iId] & aTileFlags.T == 0 then
+          SetAction(aObj, ACT.STOP, JOB.NONE, DIR.NONE);
+        -- Move train
+        elseif aObj.D == DIR.L then MoveX(aObj,-1);
+        elseif aObj.D == DIR.R then MoveX(aObj, 1) end;
+      end
+    else
+      -- If timer goes over 1 second and object is busy
+      -- Unset busy flag as abnormal digging can make it stick
+      if aObj.AT >= 60 and aObj.F & OFL.BUSY ~= 0 then
+        aObj.F = aObj.F & ~OFL.BUSY end;
+      -- Get function associated with direction and move appropriately. It is
+      -- assumed that all directions are catered for thus no check required.
+      aMoveFuncs[aObj.D](aObj);
+    end
+  end
+  -- Return new function
+  return ProcessObjectMovement;
+end
 -- Process object logic ---------------------------------------------------- --
 local function ProcessObjects()
   -- Enumerate through all objects (while/do because they could be deleted)
@@ -3702,25 +3791,6 @@ local function ProcessObjects()
     if fcbAI then fcbAI(aObj) end;
     -- If object can't fall or it finished falling and isn't floating?
     if not CheckObjectFalling(aObj) then
-      -- If fall damage is set then object fell and now we must reduce its
-      -- health
-      if aObj.FD > 0 then
-        -- Object still has fall flag set and object fell >= 16 pixels
-        if aObj.F & OFL.FALL ~= 0 and aObj.FD >= 5 then
-          -- Object is delicate? Remove more health
-          if aObj.F & OFL.DELICATE ~= 0 then
-            AdjustObjectHealth(aObj, -aObj.FD);
-          else AdjustObjectHealth(aObj, -(aObj.FD // 2)) end;
-          -- Damage would reduce health < 10 %. Stop object moving
-          if aObj.H > 0 and aObj.H < 10 then
-            SetAction(aObj, ACT.STOP, JOB.INDANGER, DIR.NONE);
-          end
-        end
-        -- Reset fall damage;
-        aObj.FD = 0;
-      end
-      -- Reset fall speed;
-      aObj.FS = 1;
       -- Object is jumping?
       if aObj.F & OFL.JUMPRISE ~= 0 then
         -- Object can move up and the rise limit hasn't been reached yet
@@ -3780,47 +3850,8 @@ local function ProcessObjects()
       elseif (aObj.A == ACT.CREEP and aObj.AT % 4 == 0) or
              (aObj.A == ACT.WALK and aObj.AT % 2 == 0) or
               aObj.A == ACT.RUN then
-        -- Object wants to dig down and object X position is in the middle of
-        -- the tile? Make object dig down
-        if aObj.J == JOB.DIGDOWN and aObj.X % 16 == 0 then
-          SetAction(aObj, ACT.DIG, JOB.DIGDOWN, DIR.D);
-        -- Object wants to enter the trading centre? Stop object
-        elseif aObj.J == JOB.HOME and ObjectIsAtHome(aObj) then
-          -- Go into trade centre
-          SetAction(aObj, ACT.PHASE, JOB.PHASE, DIR.UL);
-        -- Object is for rails only and train is not on track
-        elseif aObj.F & OFL.TRACK ~= 0 then
-          -- Get X pos adjust depending on direction
-          local iId;
-          if aObj.D == DIR.L then iId = 7 else iId = 9 end;
-          -- Get absolute tile position and get tile id
-          local iLoc<const> = GetLevelOffsetFromObject(aObj, iId, 0);
-          if iLoc then
-            iId = aLevelData[1 + iLoc];
-            -- Tile at end of track? Stop!
-            if aTileData[1 + iId] & aTileFlags.T == 0 then
-              SetAction(aObj, ACT.STOP, JOB.NONE, DIR.NONE);
-            -- Move train
-            elseif aObj.D == DIR.L then MoveX(aObj,-1);
-            elseif aObj.D == DIR.R then MoveX(aObj, 1) end;
-          end
-        else
-          -- If timer goes over 1 second and object is busy
-          -- Unset busy flag as abnormal digging can make it stick
-          if aObj.AT >= 60 and aObj.F & OFL.BUSY ~= 0 then
-            aObj.F = aObj.F & ~OFL.BUSY end;
-          -- Compare direction. Object is moving up? Move object up
-          if aObj.D == DIR.U then MoveY(aObj, -1);
-          -- Object is moving down? Move object down
-          elseif aObj.D == DIR.D then MoveY(aObj, 1);
-          -- Object is moving up-left, left or down-left? Move object left
-          elseif aObj.D == DIR.UL or aObj.D == DIR.L or aObj.D == DIR.DL then
-            MoveX(aObj, -1);
-          -- Object is moving up-right, right or down-right? Move object right
-          elseif aObj.D == DIR.UR or aObj.D == DIR.R or aObj.D == DIR.DR then
-            MoveX(aObj, 1);
-          end
-        end
+        -- Process object movement logic
+        ProcessObjectMovement(aObj);
       -- Object is digging and digging delay reached?
       elseif aObj.A == ACT.DIG and aObj.AT >= aObj.DID then
         -- Terrain dig was successful?
@@ -4247,11 +4278,11 @@ local function ProcInput()
       -- Pause logic callback
       local function ProcPause()
         -- Ignore if next update not elapsed
-        if InfoTime() < nTimeNext then return end;
+        if CoreTime() < nTimeNext then return end;
         -- Set new pause string
         strPause = UtilFormatNTime("%a/%H:%M:%S");
         -- Set next update time
-        nTimeNext = InfoTime() + 0.25;
+        nTimeNext = CoreTime() + 0.25;
       end
       -- Pause render callback
       local function RenderPause()
@@ -4700,6 +4731,7 @@ return { A = {                         -- Exports
   CreateObject = InitCreateObject();
   MoveOtherObjects = InitMoveOtherObjects();
   SetAction = InitSetAction();
+  ProcessObjectMovement = ProcessObjectMovement();
   PhaseLogic();
   -- ----------------------------------------------------------------------- --
 end };

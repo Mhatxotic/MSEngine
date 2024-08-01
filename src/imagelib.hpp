@@ -16,8 +16,8 @@ using namespace ICollector::P;         using namespace IDir::P;
 using namespace IError::P;             using namespace IFileMap::P;
 using namespace IFStream::P;           using namespace IIdent::P;
 using namespace IImageDef::P;          using namespace ILog::P;
-using namespace IStd::P;               using namespace IString::P;
-using namespace ISysUtil::P;
+using namespace ILuaLib::P;            using namespace IStd::P;
+using namespace IString::P;            using namespace ISysUtil::P;
 /* ------------------------------------------------------------------------- */
 namespace P {                          // Start of public module namespace
 /* -- Image libraries collector class as a vector for direct access -------- */
@@ -74,9 +74,10 @@ CTOR_MEM_BEGIN_CSLAVE(ImageLibs, ImageLib, ICHelperUnsafe)
     /* -- No code ---------------------------------------------------------- */
     { }
   /* ----------------------------------------------------------------------- */
-  DELETECOPYCTORS(ImageLib)            // Omit copy constructor for safety
+  DELETECOPYCTORS(ImageLib)            // Suppress default functions for safety
 };/* -- End of objects collector (reserve and set limit for formats) ------- */
-CTOR_END(ImageLibs, ImageLib, reserve(IFMT_MAX); CollectorSetLimit(IFMT_MAX),)
+CTOR_END(ImageLibs, ImageLib, IMAGELIB,
+  reserve(IFMT_MAX); CollectorSetLimit(IFMT_MAX),)
 /* -- Save a image using a specific type ----------------------------------- */
 static void ImageSave(const ImageFormat ifId, const string &strFile,
   const ImageData &idData, const ImageSlot &isData)

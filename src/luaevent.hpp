@@ -92,7 +92,7 @@ class LuaEvts :
   /* -- Destructor --------------------------------------------------------- */
   ~LuaEvts(void) { LuaEvtsDeInit(); }
   /* ----------------------------------------------------------------------- */
-  DELETECOPYCTORS(LuaEvts)             // Disable copy operator and constructor
+  DELETECOPYCTORS(LuaEvts)             // Suppress default functions for safety
 };/* ----------------------------------------------------------------------- */
 /* == Class type for master class (send parameters on event trigger) ======= */
 template<class MemberType>struct LuaEvtTypeParam
@@ -117,7 +117,7 @@ template<class MemberType>struct LuaEvtTypeParam
   /* -- Constructor (not interested) --------------------------------------- */
   LuaEvtTypeParam(void) { }
   /* ----------------------------------------------------------------------- */
-  DELETECOPYCTORS(LuaEvtTypeParam)     // Remove Assignment operator/ctor
+  DELETECOPYCTORS(LuaEvtTypeParam)     // Suppress default functions for safety
 };/* ----------------------------------------------------------------------- */
 /* == Class type for master class (send no parameters on event trigger) ==== */
 template<class MemberType>struct LuaEvtTypeAsync // Used in async class
@@ -143,7 +143,7 @@ template<class MemberType>struct LuaEvtTypeAsync // Used in async class
   /* -- Constructor (not interested) --------------------------------------- */
   LuaEvtTypeAsync(void) { }
   /* -- Delete defaults ---------------------------------------------------- */
-  DELETECOPYCTORS(LuaEvtTypeAsync)     // Remove Assignment operator/ctor
+  DELETECOPYCTORS(LuaEvtTypeAsync)     // Suppress default functions for safety
 };/* ----------------------------------------------------------------------- */
 /* == Class for master class =============================================== */
 template<class MemberType,             // Member object type
@@ -162,7 +162,7 @@ class LuaEvtMaster :
   /* -- Unregister the event ----------------------------------------------- */
   ~LuaEvtMaster(void) { cEvtMain->Unregister(emcCmd); }
   /* -- Delete defaults ---------------------------------------------------- */
-  DELETECOPYCTORS(LuaEvtMaster)        // Remove Assignment operator/ctor
+  DELETECOPYCTORS(LuaEvtMaster)        // Suppress default functions for safety
 };/* == Routines for a collectors child class ============================== */
 template<class MemberType,             // Member object type
          size_t stRefs=1>              // Number of references to store
@@ -316,7 +316,7 @@ class LuaEvtSlave :
   /* -- Destructor to clean up any leftover events and references ---------- */
   ~LuaEvtSlave(void) { LuaEvtDeInit(); }
   /* ----------------------------------------------------------------------- */
-  DELETECOPYCTORS(LuaEvtSlave)         // Disable copy constructor
+  DELETECOPYCTORS(LuaEvtSlave)         // Suppress default functions for safety
 };/* ----------------------------------------------------------------------- */
 }                                      // End of public module namespace
 /* ------------------------------------------------------------------------- */

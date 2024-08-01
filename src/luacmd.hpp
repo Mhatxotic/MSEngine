@@ -12,9 +12,10 @@ namespace ILuaCommand {                // Start of private module namespace
 using namespace IArgs;                 using namespace ICollector::P;
 using namespace IConsole::P;           using namespace IError::P;
 using namespace IIdent::P;             using namespace ILog::P;
-using namespace ILuaFunc::P;           using namespace ILuaUtil::P;
-using namespace ILua::P;               using namespace IStd::P;
-using namespace IString::P;            using namespace ISysUtil::P;
+using namespace ILuaFunc::P;           using namespace ILuaLib::P;
+using namespace ILuaUtil::P;           using namespace ILua::P;
+using namespace IStd::P;               using namespace IString::P;
+using namespace ISysUtil::P;
 /* ------------------------------------------------------------------------- */
 namespace P {                          // Start of public module namespace
 /* ------------------------------------------------------------------------- */
@@ -86,7 +87,7 @@ CTOR_MEM_BEGIN_CSLAVE(Commands, Command, ICHelperUnsafe),
     // Since the userdata for this class object is at arg 5, we need to make
     // sure the callback function is ahead of it in arg 6 or the LuaFunc()
     // class which calls luaL_ref will fail as it ONLY reads position -1.
-    lua_pushvalue(lS, 4);
+    LuaUtilCopyValue(lS, 4);
     // Register the variable and get the iterator to the new cvar. Don't
     // forget the lua reference needs to be in place for when the callback
     // is called. Create a function and reference the function on the lua
@@ -116,9 +117,9 @@ CTOR_MEM_BEGIN_CSLAVE(Commands, Command, ICHelperUnsafe),
     /* --------------------------------------------------------------------- */
     { }
   /* ----------------------------------------------------------------------- */
-  DELETECOPYCTORS(Command)             // Disable copy constructor and operator
+  DELETECOPYCTORS(Command)             // Suppress default functions for safety
 };/* ----------------------------------------------------------------------- */
-CTOR_END_NOINITS(Commands, Command)    // Finish global Files collector
+CTOR_END_NOINITS(Commands, Command, COMMAND) // Finish global Files collector
 /* -- Build a command list (for conlib) ------------------------------------ */
 template<class ListType>
   static size_t CommandsBuildList(const ListType &ltList,

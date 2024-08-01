@@ -237,7 +237,7 @@ static class EvtMain final :           // Event list for render thread
     /* --------------------------------------------------------------------- */
     { }
   /* ----------------------------------------------------------------------- */
-  DELETECOPYCTORS(EvtMain)             // Delete copy constructor and operator
+  DELETECOPYCTORS(EvtMain)             // Suppress default functions for safety
   /* -- End ---------------------------------------------------------------- */
 } *cEvtMain = nullptr;                 // Pointer to static class
 /* ------------------------------------------------------------------------- */

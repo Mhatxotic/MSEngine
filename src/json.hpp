@@ -14,9 +14,10 @@ using namespace IAsset::P;             using namespace IASync::P;
 using namespace ICollector::P;         using namespace IError::P;
 using namespace IEvtMain::P;           using namespace IFileMap::P;
 using namespace IFStream::P;           using namespace IIdent::P;
-using namespace ILuaUtil::P;           using namespace IMemory::P;
-using namespace IStd::P;               using namespace ISysUtil::P;
-using namespace IUtil::P;              using namespace Lib::RapidJson;
+using namespace ILuaLib::P;            using namespace ILuaUtil::P;
+using namespace IMemory::P;            using namespace IStd::P;
+using namespace ISysUtil::P;           using namespace IUtil::P;
+using namespace Lib::RapidJson;
 /* ------------------------------------------------------------------------- */
 using Lib::RapidJson::Value;
 /* ------------------------------------------------------------------------- */
@@ -31,7 +32,7 @@ CTOR_BEGIN_ASYNC_DUO(Jsons, Json, CLHelperUnsafe, ICHelperUnsafe),
 { /* -- Build a json string from lua string ----------------------- */ private:
   Value ToStr(lua_State*const lS, const int iId)
   { // Get string and length from LUA
-    size_t stStr; const char*const cpStr = lua_tolstring(lS, iId, &stStr);
+    size_t stStr; const char*const cpStr = LuaUtilToLString(lS, iId, stStr);
     // Return as a json string. Unfortunately, ALL strings from LUA are
     // volatile so we need to copy the string.
     return { cpStr, static_cast<SizeType>(stStr), GetAllocator() };
@@ -97,12 +98,12 @@ CTOR_BEGIN_ASYNC_DUO(Jsons, Json, CLHelperUnsafe, ICHelperUnsafe),
         { // Variable is a number
           case LUA_TNUMBER:
             if(LuaUtilIsInteger(lS, -1))
-              rjvRoot.PushBack(Value().SetInt64(lua_tointeger(lS, -1)),
-                GetAllocator());
-            else rjvRoot.PushBack(lua_tonumber(lS, -1), GetAllocator());
+              rjvRoot.PushBack(Value().
+                SetInt64(LuaUtilToInt(lS, -1)), GetAllocator());
+            else rjvRoot.PushBack(LuaUtilToNum(lS, -1), GetAllocator());
             break;
           // Variable is a boolean
-          case LUA_TBOOLEAN: rjvRoot.PushBack(lua_toboolean(lS, -1),
+          case LUA_TBOOLEAN: rjvRoot.PushBack(LuaUtilToBool(lS, -1),
             GetAllocator()); break;
           // Variable is a table
           case LUA_TTABLE: rjvRoot.PushBack(ParseTable(lS, -1, -2),
@@ -130,14 +131,15 @@ CTOR_BEGIN_ASYNC_DUO(Jsons, Json, CLHelperUnsafe, ICHelperUnsafe),
       { // Variable is a number
         case LUA_TNUMBER:
           if(LuaUtilIsInteger(lS, -1))
-            rjvRoot.AddMember(vKey, Value().SetInt64(lua_tointeger(lS, -1)),
+            rjvRoot.AddMember(vKey,
+              Value().SetInt64(LuaUtilToInt(lS, -1)),
               GetAllocator());
           else
-            rjvRoot.AddMember(vKey, lua_tonumber(lS, -1), GetAllocator());
+            rjvRoot.AddMember(vKey, LuaUtilToNum(lS, -1), GetAllocator());
           break;
         // Variable is a boolean
         case LUA_TBOOLEAN:
-          rjvRoot.AddMember(vKey, lua_toboolean(lS, -1), GetAllocator());
+          rjvRoot.AddMember(vKey, LuaUtilToBool(lS, -1), GetAllocator());
           break;
         // Variable is a table
         case LUA_TTABLE: rjvRoot.AddMember(vKey,
@@ -161,7 +163,7 @@ CTOR_BEGIN_ASYNC_DUO(Jsons, Json, CLHelperUnsafe, ICHelperUnsafe),
     { // What type is the value?
       ProcessValueType(lS, rjvRef.value);
       // Push key name
-      lua_setfield(lS, -2, rjvRef.name.GetString());
+      LuaUtilSetField(lS, -2, rjvRef.name.GetString());
     }
   }
   /* -- Convert json value to lua array table and put it on stack ---------- */
@@ -179,7 +181,7 @@ CTOR_BEGIN_ASYNC_DUO(Jsons, Json, CLHelperUnsafe, ICHelperUnsafe),
       // What type is the value?
       ProcessValueType(lS, rjvRef);
       // Push key pair as integer table
-      lua_rawset(lS, -3);
+      LuaUtilSetRaw(lS, -3);
     }
   }
   /* -- Convert json value to lua table and put it on stack ---------------- */
@@ -270,9 +272,9 @@ CTOR_BEGIN_ASYNC_DUO(Jsons, Json, CLHelperUnsafe, ICHelperUnsafe),
     /* -- No code ---------------------------------------------------------- */
     { }
   /* ----------------------------------------------------------------------- */
-  DELETECOPYCTORS(Json)                // Disable copy constructor and operator
+  DELETECOPYCTORS(Json)                // Suppress default functions for safety
 };/* -- End ---------------------------------------------------------------- */
-CTOR_END_ASYNC_NOFUNCS(Jsons, Json, JSON) // Finish collector class
+CTOR_END_ASYNC_NOFUNCS(Jsons, Json, JSON, JSON) // Finish collector class
 /* ------------------------------------------------------------------------- */
 }                                      // End of public module namespace
 /* ------------------------------------------------------------------------- */

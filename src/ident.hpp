@@ -46,7 +46,7 @@ template<class StringType>             // STL string type to use
   /* -- Standby constructor ------------------------------------------------ */
   IdentBase(void) { }
   /* -- Default suppressions ----------------------------------------------- */
-  DELETECOPYCTORS(IdentBase)           // Remove default functions
+  DELETECOPYCTORS(IdentBase)           // Suppress default functions for safety
 };/* -- Identifier class --------------------------------------------------- */
 struct Ident :                         // Members initially public
   /* -- Base classes ------------------------------------------------------- */
@@ -96,7 +96,7 @@ struct Ident :                         // Members initially public
     /* -- No code ---------------------------------------------------------- */
     { }
   /* -- Default suppressions ----------------------------------------------- */
-  DELETECOPYCTORS(Ident)               // Remove default functions
+  DELETECOPYCTORS(Ident)               // Suppress default functions for safety
 };/* ----------------------------------------------------------------------- */
 typedef IdentBase<const string_view> IdentConst; // Const type of Ident
 /* == Id to string list helper class ======================================= */

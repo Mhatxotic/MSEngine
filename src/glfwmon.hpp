@@ -175,11 +175,12 @@ struct GlFWMonitors :
   /* -- Find a match from specified glfw monitor context ------------------- */
   const GlFWMonitor *Find(GLFWmonitor*const moCptr)
   { // Find the GLFW context in our structured classes
-    const auto moitIt{ StdFindIf(par_unseq, cbegin(), cend(),
-      [moCptr](const GlFWMonitor &moIt)
+    typedef GlFWMonitorList::const_iterator GlFWMonitorListConstIt;
+    const GlFWMonitorListConstIt gwmlciIt{
+      StdFindIf(par_unseq, cbegin(), cend(), [moCptr](const GlFWMonitor &moIt)
         { return moIt.Context() == moCptr; }) };
     // Return the pointer to it or NULL if not found
-    return moitIt != cend() ? &(*moitIt) : nullptr;
+    return gwmlciIt != cend() ? &(*gwmlciIt) : nullptr;
   }
   /* ----------------------------------------------------------------------- */
   void Refresh(void)

@@ -15,11 +15,11 @@ using namespace ICollector::P;         using namespace IError::P;
 using namespace IFboDef::P;            using namespace IFbo::P;
 using namespace IFboItem::P;           using namespace IImage::P;
 using namespace IImageDef::P;          using namespace ILog::P;
-using namespace IMemory::P;            using namespace IOgl::P;
-using namespace IShader::P;            using namespace IShaders::P;
-using namespace IStd::P;               using namespace ISysUtil::P;
-using namespace ITexDef::P;            using namespace IUtil::P;
-using namespace Lib::OS::GlFW;
+using namespace ILuaLib::P;            using namespace IMemory::P;
+using namespace IOgl::P;               using namespace IShader::P;
+using namespace IShaders::P;           using namespace IStd::P;
+using namespace ISysUtil::P;           using namespace ITexDef::P;
+using namespace IUtil::P;              using namespace Lib::OS::GlFW;
 /* ------------------------------------------------------------------------- */
 namespace P {                          // Start of public module namespace
 /* -- Texture collector class for collector data and custom variables ------ */
@@ -92,7 +92,7 @@ class TextureBase :                    // All members initially private
     /* -- Code ------------------------------------------------------------- */
     { }                                // No code
   /* ----------------------------------------------------------------------- */
-  DELETECOPYCTORS(TextureBase)         // No defaults
+  DELETECOPYCTORS(TextureBase)         // Suppress default functions for safety
 };/* ----------------------------------------------------------------------- */
 CTOR_MEM_BEGIN(Textures, Texture, ICHelperUnsafe, /* No IdentCSlave<> */),
   /* -- Base classes ------------------------------------------------------- */
@@ -564,13 +564,6 @@ CTOR_MEM_BEGIN(Textures, Texture, ICHelperUnsafe, /* No IdentCSlave<> */),
         BlitQuad(GetSubName(stSubTexId), cdTex,
           FboItemSetAndGetVertex(fLeft, fTop, fLeft + cdTex.DimGetWidth(),
             fTop + cdTex.DimGetHeight(), fAngle), FboItemGetCData()); }
-  /* -- Blit quad with bounds and angle ------------------------------------ */
-  void BlitLTRBA(const size_t stSubTexId, const size_t stTileId,
-    const GLfloat fLeft, const GLfloat fTop, const GLfloat fRight,
-    const GLfloat fBottom, const GLfloat fAngle)
-      { BlitQuad(GetSubName(stSubTexId), clTiles[stSubTexId][stTileId],
-          FboItemSetAndGetVertex(fLeft, fTop, fRight, fBottom, fAngle),
-          FboItemGetCData()); }
   /* -- Blit quad with coords, dimensions and angle ------------------------ */
   void BlitLTWHA(const size_t stSubTexId, const size_t stTileId,
     const GLfloat fLeft, const GLfloat fTop, const GLfloat fWidth,
@@ -823,9 +816,9 @@ CTOR_MEM_BEGIN(Textures, Texture, ICHelperUnsafe, /* No IdentCSlave<> */),
   /* -- Destructor (Unregistration then deinitialisation) ------------------ */
   ~Texture(void) { DeInit(); }
   /* ----------------------------------------------------------------------- */
-  DELETECOPYCTORS(Texture)             // Supress copy constructor for safety
+  DELETECOPYCTORS(Texture)             // Suppress default functions for safety
 };/* -- Finish the collector ----------------------------------------------- */
-CTOR_END_NOINITS(Textures, Texture)    // Finish collector class
+CTOR_END_NOINITS(Textures, Texture, TEXTURE)
 /* -- DeInit Textures ------------------------------------------------------ */
 static void TextureDeInitTextures(void)
 { // Ignore if no textures

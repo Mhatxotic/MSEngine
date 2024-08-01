@@ -19,8 +19,8 @@ local ceil<const>, collectgarbage<const>, error<const>, floor<const>,
 -- M-Engine aliases (optimisation) ----------------------------------------- --
 local AssetParseBlock<const>, CoreLog<const>, CoreOnTick<const>,
   CoreStack<const>, CoreWrite<const>, DisplayReset<const>,
-  FboConEnabled<const>, FboDraw<const>, InfoCatchup<const>, InfoTicks<const>,
-  InfoTime<const>, InputClearStates<const>, InputGetJoyAxis<const>,
+  FboConEnabled<const>, FboDraw<const>, CoreCatchup<const>, CoreTicks<const>,
+  CoreTime<const>, InputClearStates<const>, InputGetJoyAxis<const>,
   InputGetJoyButton<const>, InputGetNumJoyAxises<const>, InputSetCursor<const>,
   InputSetCursorPos<const>, SShotFbo<const>, TextureCreate<const>,
   UtilBlank<const>, UtilClamp<const>, UtilClampInt<const>, UtilDuration<const>,
@@ -28,8 +28,8 @@ local AssetParseBlock<const>, CoreLog<const>, CoreOnTick<const>,
   UtilIsInteger<const>, UtilIsNumber<const>, UtilIsString<const>,
   UtilIsTable<const>, UtilRoundInt<const>, VariableRegister<const> =
     Asset.ParseBlock, Core.Log, Core.OnTick, Core.Stack,
-    Core.Write, Display.Reset, Fbo.ConEnabled, Fbo.Draw, Info.Catchup,
-    Info.Ticks, Info.Time, Input.ClearStates, Input.GetJoyAxis,
+    Core.Write, Display.Reset, Fbo.ConEnabled, Fbo.Draw, Core.Catchup,
+    Core.Ticks, Core.Time, Input.ClearStates, Input.GetJoyAxis,
     Input.GetJoyButton, Input.GetNumJoyAxises, Input.SetCursor,
     Input.SetCursorPos, SShot.Fbo, Texture.Create, Util.Blank, Util.Clamp,
     Util.ClampInt, Util.Duration, Util.Explode, Util.Implode, Util.IsFunction,
@@ -319,11 +319,11 @@ local function SetErrorMessage(sReason)
   Core.LogEx(sFullReason, 1);
   -- Add generic info to the message
   local sMessage<const> =
-    "ERROR!\n\n"..
-    "\rcffffff00The program has halted and cannot continue.\rr\n\n"..
-    "Reason:-\n\n"..
-    "\rcffffff00"..tostring(sReason).."\rr\n\n"..
-    "Press C to copy to clipboard, R to retry or X to quit.";
+    "ERROR!\n\n\z
+     \rcffffff00The program has halted and cannot continue.\rr\n\n\z
+     Reason:-\n\n\z
+     \rcffffff00"..tostring(sReason).."\rr\n\n\z
+     Press C to copy to clipboard, R to retry or X to quit.";
   -- Keys used in tick function
   local iKeyC<const>, iKeyR<const>, iKeyX<const> = aKeys.C, aKeys.R, aKeys.X;
   -- Second change bool
@@ -337,7 +337,7 @@ local function SetErrorMessage(sReason)
       if IsKeyPressed(iKeyX) then return Core.Quit() end;
     end
     -- Set clear colour depending on time
-    local nTime<const>, nRed = InfoTime();
+    local nTime<const>, nRed = CoreTime();
     if nTime % 1 < 0.5 then nRed = 0.5 else nRed = 1.0 end;
     -- Show error message
     fboMain:SetClearColour(nRed, 0, 0, 1);
@@ -410,12 +410,12 @@ local function TimeIt(sName, fcbCallback, ...)
   if not UtilIsFunction(fcbCallback) then
     error("Function is invalid! "..tostring(fcbCallback)) end;
   -- Save time
-  local nTime<const> = InfoTime();
+  local nTime<const> = CoreTime();
   -- Execute function
   fcbCallback(...);
   -- Put result in console
   CoreLog("Procedure '"..sName.."' completed in "..
-    UtilDuration(InfoTime()-nTime, 3).." sec!");
+    UtilDuration(CoreTime()-nTime, 3).." sec!");
 end
 -- Asset types supported --------------------------------------------------- --
 local aTypes<const> = {
@@ -478,7 +478,7 @@ local function LoadResources(sProcedure, aResources, fComplete)
       -- Cache the handle unless requested not to
       if not bNoCache then aNCache[sDst] = vHandle end;
       -- Set stage 2 duration and total duration
-      aResource.ST2 = InfoTime() - aResource.ST2;
+      aResource.ST2 = CoreTime() - aResource.ST2;
       aResource.ST3 = aResource.ST1 + aResource.ST2;
       -- Loaded counter increment
       iLoaded = iLoaded + 1;
@@ -515,7 +515,7 @@ local function LoadResources(sProcedure, aResources, fComplete)
     -- Setup handle
     local function SetupSecondStage()
       -- Get current time
-      local nTime<const> = InfoTime();
+      local nTime<const> = CoreTime();
       -- Set stage 1 duration and stage 2 start time
       aResource.ST1 = nTime - aResource.ST1;
       aResource.ST2 = nTime;
@@ -534,7 +534,7 @@ local function LoadResources(sProcedure, aResources, fComplete)
     end
     aDstParams[1 + #aDstParams] = OnLoaded;
     -- Set stage 1 time
-    aResource.ST1 = InfoTime();
+    aResource.ST1 = CoreTime();
     -- Reset info for progress update
     while #aInfo > 0 do remove(aInfo, #aInfo) end;
     -- Send cached handle if it exists
@@ -749,7 +749,7 @@ local function Fade(S, E, C, D, A, M, L, T, R, B, Z)
     -- Garbage collect
     collectgarbage();
     -- Reset hi-res timer
-    InfoCatchup();
+    CoreCatchup();
   end
   -- Fade out?
   if S < E then
@@ -1045,7 +1045,7 @@ local function fcbTick()
       CBProc();
       CBRender();
       -- Draw mouse cursor
-      texSpr:BlitSLT(InfoTicks() // 4 % CursorMax + CursorMin,
+      texSpr:BlitSLT(CoreTicks() // 4 % CursorMax + CursorMin,
         iCursorX + CursorOX, iCursorY + CursorOY);
       -- Draw screen at end of LUA tick
       FboDraw();
@@ -1139,7 +1139,7 @@ local function fcbTick()
     fFont:Print(iX, iYText, sFile);
     fFont:PrintR(iXText, iYText, format("%.f%% Completed", nPercent*100));
     -- Catchup accumulator (we don't care about it);
-    InfoCatchup();
+    CoreCatchup();
     -- Draw screen at end of LUA tick
     FboDraw();
   end

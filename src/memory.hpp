@@ -202,12 +202,12 @@ class MemConst                         // Start of const MemBase Block Class
   MemConst(const size_t stBytes, const void*const vpSrc) :
     MemConst(stBytes, const_cast<void*>(vpSrc)) { }
   /* ----------------------------------------------------------------------- */
-  DELETECOPYCTORS(MemConst)            // Do not need defaults
+  DELETECOPYCTORS(MemConst)            // Suppress default functions for safety
 };/* ----------------------------------------------------------------------- */
 /* == Read and write data class ============================================ */
 class MemBase :
   /* -- Base classes ------------------------------------------------------- */
-  public MemConst                     // Start of MemBase Block Class
+  public MemConst                      // Start of MemBase Block Class
 { /* -- Copy memory --------------------------------------------- */ protected:
   void MemDoWrite(const size_t stPos, const void*const vpSrc,
     const size_t stBytes) { memcpy(MemDoRead(stPos), vpSrc, stBytes); }
@@ -357,7 +357,7 @@ class MemBase :
   /* -- Uninitialised constructor -- pointer ------------------------------- */
   MemBase(void) { }
   /* ----------------------------------------------------------------------- */
-  DELETECOPYCTORS(MemBase)             // Do not need defaults
+  DELETECOPYCTORS(MemBase)             // Suppress default functions for safety
 };/* ----------------------------------------------------------------------- */
 /* == Read, write and allocation data class ================================ */
 class Memory :
@@ -568,7 +568,7 @@ class Memory :
   /* -- Destructor (just a free() needed) ---------------------------------- */
   ~Memory(void) { MemFreePtrIfSet(); }
   /* ----------------------------------------------------------------------- */
-  DELETECOPYCTORS(Memory)              // Do not need defaults
+  DELETECOPYCTORS(Memory)              // Suppress default functions for safety
 };/* -- Useful types ------------------------------------------------------- */
 typedef list<Memory> MemoryList;       // List of memory blocks
 typedef vector<Memory> MemoryVector;   // A vector of memory classes

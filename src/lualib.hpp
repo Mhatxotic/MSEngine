@@ -52,15 +52,12 @@ template<typename IntType=int, typename AnyType, IntType itSize>
 #include "llclip.hpp"                  // Clipboard namespace and methods
 #include "llcmd.hpp"                   // Command namespace and methods
 #include "llcore.hpp"                  // Core namespace and methods
-#include "llcredit.hpp"                // Credit namespace and methods
-#include "llcrypt.hpp"                 // Crypt namespace and methods
 #include "lldisplay.hpp"               // Display namespace and methods
 #include "llfbo.hpp"                   // Fbo namespace and methods
 #include "llfile.hpp"                  // File namespace and methods
 #include "llfont.hpp"                  // Font namespace and methods
 #include "llftf.hpp"                   // Ftf namespace and methods
 #include "llimage.hpp"                 // Image namespace and methods
-#include "llinfo.hpp"                  // Info namespace and methods
 #include "llinput.hpp"                 // Input namespace and methods
 #include "lljson.hpp"                  // Json namespace and methods
 #include "llmask.hpp"                  // Mask namespace and methods
@@ -118,37 +115,35 @@ template<typename IntType=int, typename AnyType, IntType itSize>
 #define LLNOMETHODS()   nullptr, 0, nullptr
 #define LLCONSTS(n)     LLPTRLEN(n, tConsts)
 #define LLNOCONSTS()    nullptr, 0
-#define LLITEM(n,l,m,c) { #n, l, LLSTATICS(n), m, c }
-/* -- Helps define a namespace (use below) --------------------------------- */
-#define LLSXX(n,l) LLITEM(n, l, LLNOMETHODS(), LLNOCONSTS()) // Meth:N,Const:N
-#define LLSMX(n,l) LLITEM(n, l, LLMETHODS(n),  LLNOCONSTS()) // Meth:Y,Const:N
-#define LLSXC(n,l) LLITEM(n, l, LLNOMETHODS(), LLCONSTS(n))  // Meth:N,Const:Y
-#define LLSMC(n,l) LLITEM(n, l, LLMETHODS(n),  LLCONSTS(n))  // Meth:Y,Const:Y
+#define LLITEM(t,n,l,m,c) { LMT_ ## t, #n, CFL_ ## l, LLSTATICS(n), m, c }
+#define LLSXX(n,l)      LLITEM(CLASSES, n, l, LLNOMETHODS(), LLNOCONSTS())
+#define LLSMX(n,l,t)    LLITEM(t, n, l, LLMETHODS(n), LLNOCONSTS())
+#define LLSXC(n,l)      LLITEM(CLASSES, n, l, LLNOMETHODS(), LLCONSTS(n))
+#define LLSMC(n,l,t)    LLITEM(t, n, l, LLMETHODS(n), LLCONSTS(n))
 /* -- Define the ms-engine api list loaded at startup ---------------------- */
 const LuaLibStaticArray llsaAPI{
 { /* -- Use the above macros to define namespaces -------------------------- **
   ** WARNING: Make sure to update 'LuaLibStaticArray' count in luadef.hpp if **
   ** the total number of elements in this list changes.                      **
   ** ----------------------------------------------------------------------- */
-  LLSMX(Archive,  CFL_NONE),           LLSMC(Asset,   CFL_NONE),
-  LLSXX(Audio,    CFL_AUDIO),          LLSMX(Bin,     CFL_NONE),
-  LLSMX(Clip,     CFL_VIDEO),          LLSXC(Core,    CFL_NONE),
-  LLSXC(Credit,   CFL_NONE),           LLSMX(Command, CFL_NONE),
-  LLSXX(Crypt,    CFL_NONE),           LLSXC(Display, CFL_VIDEO),
-  LLSMC(Fbo,      CFL_VIDEO),          LLSMC(File,    CFL_NONE),
-  LLSMC(Font,     CFL_VIDEO),          LLSMX(Ftf,     CFL_NONE),
-  LLSMC(Image,    CFL_NONE),           LLSXX(Info,    CFL_NONE),
-  LLSXC(Input,    CFL_VIDEO),          LLSMX(Json,    CFL_NONE),
-  LLSMX(Mask,     CFL_NONE),           LLSMX(Palette, CFL_VIDEO),
-  LLSMC(Pcm,      CFL_NONE),           LLSMX(Sample,  CFL_AUDIO),
-  LLSMX(SShot,    CFL_VIDEO),          LLSMX(Stat,    CFL_NONE),
-  LLSMC(Socket,   CFL_NONE),           LLSMX(Source,  CFL_AUDIO),
-  LLSXC(Sql,      CFL_NONE),           LLSMC(Stream,  CFL_AUDIO),
-  LLSMX(Texture,  CFL_VIDEO),          LLSXX(Util,    CFL_NONE),
-  LLSMC(Variable, CFL_NONE),           LLSMC(Video,   CFL_AUDIOVIDEO),
+  LLSMX(Archive, NONE, ARCHIVE),       LLSMC(Asset, NONE, ASSET),
+  LLSXX(Audio, AUDIO),                 LLSMX(Bin, NONE, BIN),
+  LLSMX(Clip, VIDEO, CLIP),            LLSXC(Core, NONE),
+  LLSMX(Command, NONE, COMMAND),       LLSXC(Display, VIDEO),
+  LLSMC(Fbo, VIDEO, FBO),              LLSMC(File, NONE, FILE),
+  LLSMC(Font, VIDEO, FONT),            LLSMX(Ftf, NONE, FTF),
+  LLSMC(Image, NONE, IMAGE),           LLSXC(Input, VIDEO),
+  LLSMX(Json, NONE, JSON),             LLSMX(Mask, NONE, MASK),
+  LLSMX(Palette, VIDEO, PALETTE),      LLSMC(Pcm, NONE, PCM),
+  LLSMX(Sample, AUDIO, SAMPLE),        LLSMX(SShot, VIDEO, SSHOT),
+  LLSMX(Stat, NONE, STAT),             LLSMC(Socket, NONE, SOCKET),
+  LLSMX(Source, AUDIO, SOURCE),        LLSXC(Sql, NONE),
+  LLSMC(Stream, AUDIO, STREAM),        LLSMX(Texture, VIDEO, TEXTURE),
+  LLSXX(Util, NONE),                   LLSMC(Variable, NONE, VARIABLE),
+  LLSMC(Video, AUDIOVIDEO, VIDEO),
 }};/* -- Done with these macros -------------------------------------------- */
-#undef LLSXC
 #undef LLSMC
+#undef LLSXC
 #undef LLSMX
 #undef LLSXX
 #undef LLITEM

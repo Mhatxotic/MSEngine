@@ -12,10 +12,10 @@ namespace ISample {                    // Start of private module namespace
 /* -- Dependencies --------------------------------------------------------- */
 using namespace ICollector::P;         using namespace ICVarDef::P;
 using namespace IError::P;             using namespace ILog::P;
-using namespace ILuaUtil::P;           using namespace IOal::P;
-using namespace IPcm::P;               using namespace IStd::P;
-using namespace ISource::P;            using namespace ISysUtil::P;
-using namespace Lib::OpenAL;
+using namespace ILuaLib::P;            using namespace ILuaUtil::P;
+using namespace IOal::P;               using namespace IPcm::P;
+using namespace IStd::P;               using namespace ISource::P;
+using namespace ISysUtil::P;           using namespace Lib::OpenAL;
 /* ------------------------------------------------------------------------- */
 namespace P {                          // Start of public module namespace
 /* -- Sample collector and member class ------------------------------------ */
@@ -285,9 +285,9 @@ CTOR_MEM_BEGIN(Samples, Sample, ICHelperUnsafe, /* n/a */),
   /* -- Destructor --------------------------------------------------------- */
   ~Sample(void) { UnloadBuffer(); }
   /* ----------------------------------------------------------------------- */
-  DELETECOPYCTORS(Sample)              // Supress copy constructor for safety
+  DELETECOPYCTORS(Sample)              // Suppress default functions for safety
 };/* -- End ---------------------------------------------------------------- */
-CTOR_END_NOINITS(Samples, Sample)      // Finish collector class
+CTOR_END_NOINITS(Samples, Sample, SAMPLE) // Finish collector class
 /* ========================================================================= */
 static void SampleStop(void)
 { // Stop all samples from playing

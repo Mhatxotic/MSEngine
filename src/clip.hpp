@@ -15,8 +15,9 @@ namespace IClipboard {                 // Start of private module namespace
 using namespace ICollector::P;         using namespace IError::P;
 using namespace IEvtMain::P;           using namespace IEvtWin::P;
 using namespace IGlFW::P;              using namespace IIdent::P;
-using namespace ILuaEvt::P;            using namespace ILuaUtil::P;
-using namespace IStd::P;               using namespace ISysUtil::P;
+using namespace ILuaEvt::P;            using namespace ILuaLib::P;
+using namespace ILuaUtil::P;           using namespace IStd::P;
+using namespace ISysUtil::P;
 /* ------------------------------------------------------------------------- */
 namespace P {                          // Start of public module namespace
 /* -- Clipboard collector and lua interface class -------------------------- */
@@ -115,7 +116,7 @@ CTOR_MEM_BEGIN_CSLAVE(Clips, Clip, ICHelperUnsafe),
     /* -- No code ---------------------------------------------------------- */
     { }
 };/* ----------------------------------------------------------------------- */
-CTOR_END(Clips, Clip,                  // Finish 'Clips' class body
+CTOR_END(Clips, Clip, CLIP,            // Finish 'Clips' class body
   /* -- Collector initialisers --------------------------------------------- */
   cEvtWin->RegisterEx(rvEvents),       // Register all events in 'rvEvents'
   cEvtWin->UnregisterEx(rvEvents),,    // Unregister all events in 'rvEvents'

@@ -12,8 +12,9 @@ namespace IThread {                    // Start of private namespace
 /* -- Dependencies --------------------------------------------------------- */
 using namespace IClock::P;             using namespace ICollector::P;
 using namespace IError::P;             using namespace IIdent::P;
-using namespace ILog::P;               using namespace IStd::P;
-using namespace IString::P;            using namespace ISysUtil::P;
+using namespace ILog::P;               using namespace ILuaLib::P;
+using namespace IStd::P;               using namespace IString::P;
+using namespace ISysUtil::P;
 /* ------------------------------------------------------------------------- */
 namespace P {                          // Start of public namespace
 /* == Thread collector class with global thread id counter ================= */
@@ -162,16 +163,30 @@ CTOR_MEM_BEGIN_CSLAVE(Threads, Thread, ICHelperUnsafe),
     ThreadCancelExit();
   }
   /* ----------------------------------------------------------------------- */
-  void ThreadStop(void)
-  { // If is this thread then this is a bad idea
-    if(ThreadIsCurrent())
-      XC("Tried to join from the same thread!", "Identifier", IdentGet());
-    // Thread is running? Inform thread loops that it should exit now
+  void ThreadStopNoCheck(void)
+  { // Thread is running? Inform thread loops that it should exit now
     if(ThreadIsRunning()) ThreadSetExit();
     // Wait for thread to complete
     ThreadWait();
     // Set to standby with a new thread
     ThreadNew();
+  }
+  /* ----------------------------------------------------------------------- */
+  void ThreadStopNoThrow(void)
+  { // If is this thread then this is a bad idea
+    if(ThreadIsCurrent())
+      return cLog->LogWarningExSafe(
+        "Thread '$' tried to join from the same thread!", IdentGet());
+    // Proceed with termination
+    ThreadStopNoCheck();
+  }
+  /* ----------------------------------------------------------------------- */
+  void ThreadStop(void)
+  { // If is this thread then this is a bad idea
+    if(ThreadIsCurrent())
+      XC("Tried to join from the same thread!", "Identifier", IdentGet());
+    // Proceed with termination
+    ThreadStopNoCheck();
   }
   /* ----------------------------------------------------------------------- */
   bool ThreadIsCurrent(void) const
@@ -279,9 +294,9 @@ CTOR_MEM_BEGIN_CSLAVE(Threads, Thread, ICHelperUnsafe),
     /* --------------------------------------------------------------------- */
     { }                                // Do nothing else
   /* ----------------------------------------------------------------------- */
-  DELETECOPYCTORS(Thread)              // Disable copy constructor and operator
+  DELETECOPYCTORS(Thread)              // Suppress default functions for safety
 };/* ======================================================================= */
-CTOR_END(Threads, Thread,,,, stRunning{0});
+CTOR_END(Threads, Thread, THREAD,,,, stRunning{0});
 /* -- Thread sync helper --------------------------------------------------- */
 template<class Callbacks>class ThreadSyncHelper : private Callbacks
 { /* -------------------------------------------------------------- */ private:
@@ -370,7 +385,7 @@ template<class Callbacks>class ThreadSyncHelper : private Callbacks
     /* --------------------------------------------------------------------- */
     { }                                // Do nothing else
   /* ----------------------------------------------------------------------- */
-  DELETECOPYCTORS(ThreadSyncHelper)    // Omit copy constructor for safety
+  DELETECOPYCTORS(ThreadSyncHelper)    // Suppress default functions for safety
 };/* ----------------------------------------------------------------------- */
 static size_t ThreadGetRunning(void) { return cThreads->stRunning; }
 /* ------------------------------------------------------------------------- */

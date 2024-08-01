@@ -531,8 +531,7 @@ GLfloat PrintW(const GLfloat fX, const GLfloat fY, const GLfloat fW,
   return fHeight;
 }
 /* -- Simluate printing a wrapped string and return height ----------------- */
-GLfloat PrintWS(const GLfloat fW, const GLfloat fI,
-  const GLubyte*const ucpStr)
+GLfloat PrintWS(const GLfloat fW, const GLfloat fI, const GLubyte*const ucpStr)
 { // Build a new utfstring class with the string
   UtfDecoder utfRef{ ucpStr };
   // Check that texture is a font and the string is valid
@@ -546,7 +545,7 @@ GLfloat PrintWS(const GLfloat fW, const GLfloat fI,
   // Return height of printed text
   return fHeight;
 }
-/* -- Print text, wrap at specified width, return height --- */
+/* -- Print text, wrap at specified width, return height ------------------- */
 GLfloat PrintWTS(const GLfloat fW, const GLfloat fI,
   const GLubyte*const ucpStr, Texture &tNGlyphs)
 { // Build a new utfstring class with the string
@@ -562,7 +561,7 @@ GLfloat PrintWTS(const GLfloat fW, const GLfloat fI,
   // Return height of printed text
   return fHeight;
 }
-/* -- Print text, wrap at specified width, return height --- */
+/* -- Print text, wrap at specified width, return height ------------------- */
 GLfloat PrintWU(const GLfloat fX, const GLfloat fY, const GLfloat fW,
   const GLfloat fI, const GLubyte*const ucpStr)
 { // Build a new utfstring class with the string
@@ -584,7 +583,7 @@ GLfloat PrintWU(const GLfloat fX, const GLfloat fY, const GLfloat fW,
   // Return height of printed text
   return fHeight;
 }
-/* -- Print text upwards ----------------------------------- */
+/* -- Print text upwards --------------------------------------------------- */
 void PrintU(const GLfloat fX, const GLfloat fY, const GLubyte*const ucpStr)
 { // Build a new utfstring class with the string
   UtfDecoder utfRef{ ucpStr };
@@ -603,7 +602,7 @@ void PrintU(const GLfloat fX, const GLfloat fY, const GLubyte*const ucpStr)
   // Restore colour intensity
   FboItemPopQuadColour();
 }
-/* -- Print text upwards align centred --------------------- */
+/* -- Print text upwards align centred ------------------------------------- */
 void PrintUC(const GLfloat fX, const GLfloat fY, const GLubyte*const ucpStr)
 { // Build a new utfstring class with the string
   UtfDecoder utfRef{ ucpStr };
@@ -622,7 +621,7 @@ void PrintUC(const GLfloat fX, const GLfloat fY, const GLubyte*const ucpStr)
   // Restore colour intensity
   FboItemPopQuadColour();
 }
-/* -- Print text upwards align centred with custom texture - */
+/* -- Print text upwards align centred with custom texture ----------------- */
 void PrintUCT(const GLfloat fX, const GLfloat fY, const GLubyte*const ucpStr,
   Texture &tNGlyphs)
 { // Build a new utfstring class with the string
@@ -642,7 +641,7 @@ void PrintUCT(const GLfloat fX, const GLfloat fY, const GLubyte*const ucpStr,
   // Check if texture needs reloading
   CheckReloadTexture();
 }
-/* -- Print text upwards align right ----------------------- */
+/* -- Print text upwards align right --------------------------------------- */
 void PrintUR(const GLfloat fX, const GLfloat fY, const GLubyte*const ucpStr)
 { // Build a new utfstring class with the string
   UtfDecoder utfRef{ ucpStr };
@@ -681,7 +680,7 @@ void PrintURT(const GLfloat fX, const GLfloat fY, const GLubyte*const ucpStr,
   // Check if texture needs reloading
   CheckReloadTexture();
 }
-/* -- Print text, wrap at specified width, return height --- */
+/* -- Print text, wrap at specified width, return height ------------------- */
 GLfloat PrintWUT(const GLfloat fX, const GLfloat fY, const GLfloat fW,
   const GLfloat fI, const GLubyte*const ucpStr, Texture &tNGlyphs)
 { // Build a new utfstring class with the string
@@ -703,7 +702,7 @@ GLfloat PrintWUT(const GLfloat fX, const GLfloat fY, const GLfloat fW,
   // Return height
   return fHeight;
 }
-/* -- Print text, wrap at specified width, return height --- */
+/* -- Print text, wrap at specified width, return height ------------------- */
 GLfloat PrintWT(const GLfloat fX, const GLfloat fY, const GLfloat fW,
   const GLfloat fI, const GLubyte*const ucpStr, Texture &tNGlyphs)
 { // Build a new utfstring class with the string
@@ -721,7 +720,7 @@ GLfloat PrintWT(const GLfloat fX, const GLfloat fY, const GLfloat fW,
   // Return height
   return fHeight;
 }
-/* -- Print text ------------------------------------------- */
+/* -- Print text ----------------------------------------------------------- */
 void PrintT(const GLfloat fX, const GLfloat fY, const GLubyte*const ucpStr,
   Texture &tNGlyphs)
 { // Build a new utfstring class with the string
@@ -737,7 +736,7 @@ void PrintT(const GLfloat fX, const GLfloat fY, const GLubyte*const ucpStr,
   // Check if texture needs reloading
   CheckReloadTexture();
 }
-/* -- Print text with right align -------------------------- */
+/* -- Print text with right align ------------------------------------------ */
 void PrintRT(const GLfloat fX, const GLfloat fY, const GLubyte*const ucpStr,
   Texture &tNGlyphs)
 { // Build a new utfstring class with the string
@@ -768,7 +767,7 @@ void Print(const GLfloat fX, const GLfloat fY, const GLubyte*const ucpStr)
   // Check if texture needs reloading
   CheckReloadTexture();
 }
-/* -- Print text with right align -------------------------- */
+/* -- Print text with right align ------------------------------------------ */
 void PrintR(const GLfloat fX, const GLfloat fY, const GLubyte*const ucpStr)
 { // Build a new utfstring class with the string
   UtfDecoder utfRef{ ucpStr };
@@ -798,7 +797,7 @@ void PrintC(const GLfloat fX, const GLfloat fY, const GLubyte*const ucpStr)
   // Check if texture needs reloading
   CheckReloadTexture();
 }
-/* -- Print text ------------------------------------------- */
+/* -- Print text ----------------------------------------------------------- */
 void PrintCT(const GLfloat fX, const GLfloat fY, const GLubyte*const ucpStr,
   Texture &tNGlyphs)
 { // Build a new utfstring class with the string
@@ -814,7 +813,7 @@ void PrintCT(const GLfloat fX, const GLfloat fY, const GLubyte*const ucpStr,
   // Check if texture needs reloading
   CheckReloadTexture();
 }
-/* -- Print text with glyphs ------------------------------- */
+/* -- Print text with glyphs ----------------------------------------------- */
 void PrintMT(const GLfloat fX, const GLfloat fY, const GLfloat fL,
   const GLfloat fR, const GLubyte*const ucpStr, Texture &tNGlyphs)
 { // Build a new utfstring class with the string
@@ -875,7 +874,7 @@ GLfloat PrintTS(const GLubyte*const ucpStr, Texture &tNGlyphs)
   // Return highest width or width
   return fWidth;
 }
-/* -- Print text ------------------------------------------- */
+/* -- Print text ----------------------------------------------------------- */
 void PrintM(const GLfloat fX, const GLfloat fY, const GLfloat fL,
   const GLfloat fR, const GLubyte*const ucpStr)
 { // Build a new utfstring class with the string

@@ -541,10 +541,10 @@ static class Oal final :
     /* -- No code ---------------------------------------------------------- */
     { }
   /* ----------------------------------------------------------------------- */
-  DELETECOPYCTORS(Oal)                 // Do not need copy constructors
+  DELETECOPYCTORS(Oal)                 // Suppress default functions for safety
   /* -- Undefines ---------------------------------------------------------- */
-#undef IAL                             //  "
-#undef IALC                            //  "
+#undef IAL                             // Done with this macro
+#undef IALC                            //   "
   /* ----------------------------------------------------------------------- */
 } *cOal = nullptr;                     // Pointer to static class
 /* ------------------------------------------------------------------------- */

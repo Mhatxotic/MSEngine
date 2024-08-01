@@ -60,9 +60,20 @@ static class FboCore final :           // The main fbo operations manager
     cOgl->SetClearColourInt(
       cCVars->GetInternal<unsigned int>(VID_CLEARCOLOUR));
   }
-  /* -- Perform rendering to the back buffer ----------------------- */ public:
-  void SwapBuffers(void)
-  { // Unbind current FBO so we select the back buffer to draw to
+  /* -- Render the main fbo from the engine thread ------------------------- */
+  void Render(void)
+  { // Finish and render the main fbo
+    FinishMain();
+    // Render all the fbos
+    FboRender();
+    // We don't want to swap if the guest has chosen not to draw but we should
+    // at least wait if the timer isn't already waiting or the GPU is going to
+    // be locked at 100% in situations where the engine is in standby mode with
+    // an empty tick function.
+    if(CannotDraw()) return cTimer->TimerForceWait();
+    // Clear redraw flag
+    ClearDraw();
+    // Unbind current FBO so we select the back buffer to draw to
     cOgl->BindFBO();
     // Set the first active texture unit
     cOgl->ActiveTexture();
@@ -83,13 +94,28 @@ static class FboCore final :           // The main fbo operations manager
       fboMain.FboItemGetData());
     // Specify format of the interlaced triangle data
     cOgl->VertexAttribPointer(A_COORD, stCompsPerCoord, 0,
-      fboMain.FboItemGetTCIndex());
+      fboMain.FboItemGetTCPos());
     cOgl->VertexAttribPointer(A_VERTEX, stCompsPerPos, 0,
-      fboMain.FboItemGetVIndex());
+      fboMain.FboItemGetVPos());
     cOgl->VertexAttribPointer(A_COLOUR, stCompsPerColour, 0,
-      fboMain.FboItemGetCIndex());
+      fboMain.FboItemGetCPos());
+ // Using MacOS?
+#if defined(MACOS)
+    // This locking code is required to fix a major crash bug in Ventura 13.3+.
+    // See https://github.com/glfw/glfw/issues/1997 for more information.
+    using namespace Lib::OS::GlFW::NSGL;
+    // Get the current NSGL context and lock it. Note there is nothing to throw
+    // in this routine so it is safe to use this as-is.
+    CGLContextObj cglcoLock = CGLGetCurrentContext();
+    CGLLockContext(cglcoLock);
     // Blit the two triangles
     cOgl->DrawArraysTriangles(stTwoTriangles);
+    // Context is unlocked when exiting this scope
+    CGLUnlockContext(cglcoLock);
+#else
+    // Blit the two triangles
+    cOgl->DrawArraysTriangles(stTwoTriangles);
+#endif
     // Swap buffers
     cGlFW->WinSwapGLBuffers();
     // Update memory
@@ -100,22 +126,6 @@ static class FboCore final :           // The main fbo operations manager
     ctpEnd = cmHiRes.GetTime();
     dRTFPS = 1.0 / ClockTimePointRangeToDouble(ctpEnd, ctpStart);
     ctpStart = ctpEnd;
-  }
-  /* -- Render the main fbo ------------------------------------------------ */
-  void Render(void)
-  { // Finish and render the main fbo
-    FinishMain();
-    // Render all the fbos
-    FboRender();
-    // We don't want to swap if the guest has chosen not to draw but we should
-    // at least wait if the timer isn't already waiting or the GPU is going to
-    // be locked at 100% in situations where the engine is in standby mode with
-    // an empty tick function.
-    if(CannotDraw()) return cTimer->TimerForceWait();
-    // Clear redraw flag
-    ClearDraw();
-    // Swap the buffers
-    SwapBuffers();
   }
   /* -- Blits the console fbo to main fbo ---------------------------------- */
   void BlitConsoleToMain(void) { fboMain.FboBlit(fboConsole); }
@@ -177,7 +187,7 @@ static class FboCore final :           // The main fbo operations manager
       // Calculate additional width over the 4:3 aspect ratio
       fAddWidth = UtilMaximum(((fWidth * fAspect) - fWidth) / 2.0f, 0.0f);
       // Calculate bounds for stage
-      fLeft = floorf(-fAddWidth);
+      fLeft = ceilf(-fAddWidth);
       fRight = floorf(fWidth + fAddWidth);
       // Set top and bottom stage bounds
       fTop = 0.0f;
@@ -305,12 +315,10 @@ static class FboCore final :           // The main fbo operations manager
     { SetColourInt(uiColour); return ACCEPT; }
   /* -- Set minimum orthagonal matrix ratio -------------------------------- */
   CVarReturn SetMinAspect(const GLfloat fMinimum)
-    { return CVarSimpleSetIntNLG(fAspectMin,
-        fMinimum, 1.0f, fAspectMax); }
+    { return CVarSimpleSetIntNLG(fAspectMin, fMinimum, 1.0f, fAspectMax); }
   /* -- Set maximum orthagonal matrix ratio -------------------------------- */
   CVarReturn SetMaxAspect(const GLfloat fMaximum)
-    { return CVarSimpleSetIntNLG(fAspectMax,
-        fMaximum, fAspectMin, 2.0f); }
+    { return CVarSimpleSetIntNLG(fAspectMax, fMaximum, fAspectMin, 2.0f); }
   /* -- Set viewport lock -------------------------------------------------- */
   CVarReturn SetLockViewport(const bool bState)
     { return CVarSimpleSetInt(bLockViewport, bState); }

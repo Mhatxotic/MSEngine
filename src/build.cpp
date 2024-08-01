@@ -42,6 +42,7 @@ namespace Engine {                     // Put everything in engine namespace
 #include "cvardef.hpp"                 // Cvars definitions
 #include "clock.hpp"                   // Time helpers
 #include "log.hpp"                     // Logging class
+#include "luadef.hpp"                  // Lua definitions
 #include "collect.hpp"                 // Collector class
 #include "stat.hpp"                    // Statistic class
 #include "thread.hpp"                  // Thread class
@@ -63,6 +64,7 @@ using namespace IClock::P;             using namespace ICmdLine::P;
 using namespace ICrypt::P;             using namespace ICodec::P;
 using namespace IDir::P;               using namespace IError::P;
 using namespace IFStream::P;           using namespace ILog::P;
+using namespace ILuaLib::P;
 using namespace IMemory::P;            using namespace IPSplit::P;
 using namespace IStd::P;               using namespace IString::P;
 using namespace ISystem::P;            using namespace ISysUtil::P;
@@ -329,11 +331,11 @@ envMacOSLLVM =                         // XCode/LLVM on MacOS
   /* ACA        */ "-g",
   /* ACB        */ envWindowsMSVC.cpACB,
   /* CCX        */ "g++",
-  /* CCM        */ "-c -stdlib=libc++",
+  /* CCM        */ "-c -stdlib=libc++ -ffast-math",
   /* CCMX       */ "-Wextra -Wall -std=$ -I$ -I" SRCDIR " -I$/curses -I$/ft",
   /* CCLIB      */ "",
   /* CCINCDBG   */ "",
-  /* CCASM      */ "-Fa",
+  /* CCASM      */ "-S -D__ASMFILE__=",
   /* CCANAL     */ envWindowsLLVM.cpCCAnal,
   /* CCAA       */ "-DALPHA -g -O0",
   /* CCAB       */ "-DBETA -O2",
@@ -4126,7 +4128,8 @@ int Compile(const bool bSelf)
   // Compile sources
   if(SpecialExecute(strCmdCC, (uiFlags & PF_MORE) ? 0xFFFFFFFF : 10)) return 1;
   // Return if only preprocessing or analysing
-  if(uiFlags & PF_PREPROC || uiFlags & PF_ANALYSE) return 0;
+  if(uiFlags & PF_PREPROC || uiFlags & PF_ANALYSE || uiFlags & PF_ASM)
+    return 0;
   // Resource manager specified?
   if(*envActive.cpCCRES)
   { // Add resource to linker command
@@ -4190,11 +4193,9 @@ bool CheckCommandLine(string &strX1, string &strX2)
     const uint64_t     uiAdd, uiRemove; // Flags to add and remove
     const char*const   cpDesc;          // Description of flag
   }; // Wrap into a list
-  typedef map<const string,const FuncData> FuncList;
-  typedef pair<const string&,const FuncData&> FuncListPair;
-  typedef FuncList::const_iterator FuncListIt;
+  MAPPACK_BUILD(FuncList, const string, const FuncData);
   // Command-line argument to flag and description list
-  const FuncList flData{
+  const FuncListMap flData{
   /* ----------------------------------------------------------------------- */
   { "?", { 0, PF_USAGE,           PF_NONE,
     "Display this usage output."} },
@@ -4285,7 +4286,7 @@ bool CheckCommandLine(string &strX1, string &strX2)
   // Iterate through the tokens we found in the string
   for(const char ucP : strTokens)
   { // Find the command and if we couldn't find it?
-    const FuncListIt flItem{ flData.find(string{ &ucP, 1 }) };
+    const FuncListMapConstIt flItem{ flData.find(string{ &ucP, 1 }) };
     if(flItem == flData.end())
     { // Report invalid token and goto next token
       cout << "Invalid token '" << ucP << "' ignored.\n";
@@ -4315,7 +4316,7 @@ bool CheckCommandLine(string &strX1, string &strX2)
   } // If we're not calling for the usage?
   if(!(uiFlags & PF_USAGE))
   { // Walk through available flags and write them out
-    for(auto &flItem : flData)
+    for(const FuncListMapPair &flItem : flData)
       if(uiFlags & flItem.second.uiAdd)
         cout << "* " << flItem.second.cpDesc << '\n';
     cout << '\n';
@@ -4329,7 +4330,7 @@ bool CheckCommandLine(string &strX1, string &strX2)
        << left;
   // Buffer for left side option
   size_t stWidth = 32, stMax = stWidth;
-  for(const auto &flI : flData)
+  for(const FuncListMapPair &flI : flData)
   { // Write option to screen
     cout << ((uiFlags & flI.second.uiAdd) ? '*' : ' ')
          << flI.first

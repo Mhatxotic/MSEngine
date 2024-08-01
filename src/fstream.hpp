@@ -344,7 +344,7 @@ class FStreamBase :                    // File stream base class
   ~FStreamBase(void)
     { if(FStreamOpened() && FStreamIsHandleNotStd()) FStreamDoClose(); }
   /* ----------------------------------------------------------------------- */
-  DELETECOPYCTORS(FStreamBase)         // Disable copy constructor and operator
+  DELETECOPYCTORS(FStreamBase)         // Suppress default functions for safety
 };/* ----------------------------------------------------------------------- */
 class FStream :                        // Main file stream class
   /* -- Base classes ------------------------------------------------------- */
@@ -363,7 +363,7 @@ class FStream :                        // Main file stream class
   /* -- MOVE assignment constructor ---------------------------------------- */
   FStream(FStream &&fsOther) : FStreamBase{ StdMove(fsOther) } { }
   /* ----------------------------------------------------------------------- */
-  DELETECOPYCTORS(FStream)             // Disable copy constructor and operator
+  DELETECOPYCTORS(FStream)             // Suppress default functions for safety
 };/* ----------------------------------------------------------------------- */
 }                                      // End of public module namespace
 /* ------------------------------------------------------------------------- */

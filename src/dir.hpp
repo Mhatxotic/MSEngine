@@ -280,7 +280,7 @@ class DirFile                          // Files container class
     /* -- No code ---------------------------------------------------------- */
     { }
   /* ----------------------------------------------------------------------- */
-  DELETECOPYCTORS(DirFile)             // Disable copy constructor and operator
+  DELETECOPYCTORS(DirFile)             // Suppress default functions for safety
 };/* -- DirCore class ------------------------------------------------------ */
 class DirCore :                        // System specific implementation
   /* -- Base classes ------------------------------------------------------- */
@@ -424,7 +424,7 @@ class DirCore :                        // System specific implementation
   /* ----------------------------------------------------------------------- */
 #endif                                 // End of system implementation check
   /* ----------------------------------------------------------------------- */
-  DELETECOPYCTORS(DirCore)             // Disable copy constructor and operator
+  DELETECOPYCTORS(DirCore)             // Suppress default functions for safety
 };/* == Dir class ========================================================== */
 class Dir :                            // Directory information class
   /* -- Base classes ------------------------------------------------------- */
@@ -495,7 +495,7 @@ class Dir :                            // Directory information class
   Dir(const string &strDir, const string &strExt) :
     DirFile{ ScanDirExt(strDir, strExt) } { }
   /* ----------------------------------------------------------------------- */
-  DELETECOPYCTORS(Dir)                 // Disable copy constructor and operator
+  DELETECOPYCTORS(Dir)                 // Suppress default functions for safety
 };/* ----------------------------------------------------------------------- */
 /* -- Get current directory ------------------------------------------------ */
 static const string DirGetCWD(void)

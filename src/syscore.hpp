@@ -99,7 +99,7 @@ class SysModuleData :                  // Members initially private
     /* -- No code ---------------------------------------------------------- */
     { }
   /* ----------------------------------------------------------------------- */
-  DELETECOPYCTORS(SysModuleData)       // Disable copy constructor and operator
+  DELETECOPYCTORS(SysModuleData)       // Suppress default functions for safety
 };/* ----------------------------------------------------------------------- */
 /* == System modules ======================================================= **
 ** ######################################################################### **
@@ -124,7 +124,7 @@ struct SysModules :
     /* -- No code ---------------------------------------------------------- */
     { }
   /* --------------------------------------------------------------- */ public:
-  DELETECOPYCTORS(SysModules)          // Disable copy constructor and operator
+  DELETECOPYCTORS(SysModules)          // Suppress default functions for safety
   /* -- Dump module list --------------------------------------------------- */
   CVarReturn DumpModuleList(const unsigned int uiShow)
   { // No modules? Return okay
@@ -156,7 +156,7 @@ class SysVersion :
 { /* ----------------------------------------------------------------------- */
   const SysModuleData &smdEng;         // Engine executable information
   /* --------------------------------------------------------------- */ public:
-  DELETECOPYCTORS(SysVersion)          // Disable copy constructor and operator
+  DELETECOPYCTORS(SysVersion)          // Suppress default functions for safety
   /* -- Access to engine version data -------------------------------------- */
   const char *ENGBuildType(void) const { return BUILD_TYPE_LABEL; }
   const char *ENGCompVer(void) const { return COMPILER_VERSION; }
@@ -326,7 +326,7 @@ class SysCommon                        // Common system structs and funcs
     { return static_cast<double>(RAMProcUse()) / 1048576; }
   size_t RAMProcPeak(void) const { return memData.stMProcPeak; }
   /* ----------------------------------------------------------------------- */
-  DELETECOPYCTORS(SysCommon)           // Disable copy constructor and operator
+  DELETECOPYCTORS(SysCommon)           // Suppress default functions for safety
   /* -- Constructor --------------------------------------------- */ protected:
   SysCommon(ExeData &&edExe, OSData &&osdOS, CPUData &&cpudCPU) :
     /* -- Initialisers ----------------------------------------------------- */
@@ -561,7 +561,7 @@ static class System final :            // The main system class
   /* -- Restore old unexpected and termination handlers -------------------- */
   DTORHELPER(~System, set_terminate(thHandler))
   /* ----------------------------------------------------------------------- */
-  DELETECOPYCTORS(System)              // Disable copy constructor and operator
+  DELETECOPYCTORS(System)              // Suppress default functions for safety
   /* -- CVar callbacks to update guest descriptor strings ------------------ */
   CVarReturn SetGuestTitle(const string&, const string &strV)
     { strvTitle = strV; return ACCEPT; }

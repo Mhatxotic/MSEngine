@@ -115,7 +115,7 @@ class EvtCore                          // Start of common event system class
       /* -- No code -------------------------------------------------------- */
       { }
     /* --------------------------------------------------------------------- */
-    DELETECOPYCTORS(Event)             // No copying of this structure allowed
+    DELETECOPYCTORS(Event)             // Suppress default functions for safety
   };/* -- Private variables --------------------------------------- */ private:
   Funcs            fFuncs;             // Event callback storage
   mutex            mMutex;             // Primary events list mutex
@@ -335,7 +335,7 @@ class EvtCore                          // Start of common event system class
   explicit EvtCore(const string &strN) : strName{StdMove(strN)}
     { fFuncs.fill(bind(&EvtCore::BlankFunction, this, _1)); }
   /* ----------------------------------------------------------------------- */
-  DELETECOPYCTORS(EvtCore)             // Delete copy constructor and operator
+  DELETECOPYCTORS(EvtCore)             // Suppress default functions for safety
 };/* ----------------------------------------------------------------------- */
 };                                     // End of public module namespace
 /* ------------------------------------------------------------------------- */

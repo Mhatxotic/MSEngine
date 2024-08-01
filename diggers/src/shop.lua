@@ -13,8 +13,8 @@
 local random<const>, format<const>, error<const>, tostring<const> =
   math.random, string.format, error, tostring;
 -- M-Engine function aliases ----------------------------------------------- --
-local InfoTicks<const>, UtilIsInteger<const>, UtilIsTable<const> =
-  Info.Ticks, Util.IsInteger, Util.IsTable;
+local CoreTicks<const>, UtilIsInteger<const>, UtilIsTable<const> =
+  Core.Ticks, Util.IsInteger, Util.IsTable;
 -- Diggers function and data aliases --------------------------------------- --
 local BuyItem, Fade, GameProc, InitCon, InitLobby, IsButtonPressed,
   IsButtonReleased, IsMouseInBounds, IsMouseNotInBounds, IsScrollingDown,
@@ -125,14 +125,14 @@ local function InitShop(aActiveObject)
       -- Perform game functions in the background
       GameProc();
       -- Time elapsed to animate the holographic emitter?
-      if InfoTicks() % 4 == 0 then
+      if CoreTicks() % 4 == 0 then
         -- Animate the holographic emitter
         iHoloAnimTileId = iHoloAnimTileId + iHoloAnimTileIdMod;
         if iHoloAnimTileId == 19 then iHoloAnimTileIdMod = -1;
         elseif iHoloAnimTileId == 15 then iHoloAnimTileIdMod = 1 end;
       end
       -- Time elapsed to animate the door and forklift?
-      if InfoTicks() % 8 == 0 then
+      if CoreTicks() % 8 == 0 then
         -- Animate the door
         iAnimDoor = iAnimDoor + iAnimDoorMod;
         if iAnimDoor == iAnimDoorMax then iAnimDoorMod = -1;
@@ -154,7 +154,7 @@ local function InitShop(aActiveObject)
       -- Draw animations
       if iAnimDoor ~= 0 then texShop:BlitSLT(iAnimDoor, 272, 79) end;
       if random() < 0.001 and iAnimDoorMod == 0 then iAnimDoorMod = 1 end;
-      texShop:BlitSLT(InfoTicks() // 10 % 3 + iTileLights, 9, 174);
+      texShop:BlitSLT(CoreTicks() // 10 % 3 + iTileLights, 9, 174);
       if iForkAnim ~= 0 then texShop:BlitSLT(iForkAnim, 112, 95) end;
       if random() < 0.001 and iForkAnimMod == 0 then iForkAnimMod = 1 end;
       -- Shop is open
@@ -173,7 +173,7 @@ local function InitShop(aActiveObject)
       end
       -- Speech ticks set
       if iSpeechTicks > 0 then
-        texShop:BlitSLT(InfoTicks() // 10 % 4 + iTileKeeper, 112, 127);
+        texShop:BlitSLT(CoreTicks() // 10 % 4 + iTileKeeper, 112, 127);
         texShop:BlitSLT(iTileSpeech, 0, 160);
         fontSpeech:PrintC(57, 168, sMsg);
         iSpeechTicks = iSpeechTicks-1;

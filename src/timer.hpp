@@ -180,7 +180,7 @@ static class Timer final               // Members initially private
     /* -- No code ---------------------------------------------------------- */
     { }
   /* ----------------------------------------------------------------------- */
-  DELETECOPYCTORS(Timer)               // Disable copy constructor and operator
+  DELETECOPYCTORS(Timer)               // Suppress default functions for safety
   /* -- TimerSetDelay ------------------------------------------------------ */
   CVarReturn TimerSetTimeOut(const unsigned int uiTimeOut)
     { return CVarSimpleSetIntNL(cdTimeOut,

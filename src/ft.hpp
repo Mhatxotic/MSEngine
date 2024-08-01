@@ -103,7 +103,7 @@ static class FreeType final :          // Members initially private
   /* ----------------------------------------------------------------------- */
   DTORHELPER(~FreeType, DoDeInit())
   /* ----------------------------------------------------------------------- */
-  DELETECOPYCTORS(FreeType)            // No copying of class allowed
+  DELETECOPYCTORS(FreeType)            // Suppress default functions for safety
   /* ----------------------------------------------------------------------- */
 } *cFreeType = nullptr;                // Pointer to static class
 /* ------------------------------------------------------------------------- */

@@ -168,6 +168,11 @@ template<class MemberType, class ColType>class AsyncLoader :
   /* -- Get thread --------------------------------------------------------- */
   bool AsyncThreadIsCurrent(void) const
     { return tAsyncThread.ThreadIsCurrent(); }
+  /* -- Prepend message to the full stack message -------------------------- */
+  void AsyncDoAddStackMessage(const char*const *cpMsg)
+    { strAsyncError.insert(0, cpMsg); }
+  void AsyncDoAddStackMessage(const string &strMsg)
+    { strAsyncError.insert(0, strMsg); }
   /* -- Execute function (returns exit code) ----------------------- */ public:
   int64_t AsyncExecute(void)
   { // Duration of execution
@@ -301,7 +306,7 @@ template<class MemberType, class ColType>class AsyncLoader :
     } // exception occured?
     catch(const exception &E)
     { // Prepend the reason incase there are nested exceptions
-      strAsyncError.insert(0, E.what());
+      AsyncDoAddStackMessage(E.what());
       // Signal completion
       AsyncCompletionDispatch(AR_ERROR);
       // Report error in log
@@ -356,20 +361,20 @@ template<class MemberType, class ColType>class AsyncLoader :
   { // Compare error code
     switch(LuaUtilPCallExSafe(lecAsync.LuaRefGetState(), iParams, 0, iHandler))
     { // No error so remove error handler value and return
-      case 0: return;
+      case LUA_OK: return;
       // Run-time error
       case LUA_ERRRUN:
-        strAsyncError.insert(0, StrAppend("Async runtime error! > ",
+        AsyncDoAddStackMessage(StrAppend("Async runtime error! > ",
           LuaUtilGetAndPopStr(lecAsync.LuaRefGetState()))); break;
       // Memory allocation error
       case LUA_ERRMEM:
-        strAsyncError.insert(0, "Async memory allocation error!"); break;
+        AsyncDoAddStackMessage("Async memory allocation error!"); break;
       // Error + error in error handler
       case LUA_ERRERR:
-        strAsyncError.insert(0, "Error in async error handler!"); break;
+        AsyncDoAddStackMessage("Error in async error handler!"); break;
       // Unknown error
       default:
-        strAsyncError.insert(0, "Unknown error in async callback!"); break;
+        AsyncDoAddStackMessage("Unknown error in async callback!"); break;
     } // Throw error back to user error handler
     AsyncDoLuaThrowErrorHandler(emeEvent);
   }
@@ -612,7 +617,7 @@ template<class MemberType, class ColType>class AsyncLoader :
     AsyncStop();
   }
   /* ----------------------------------------------------------------------- */
-  DELETECOPYCTORS(AsyncLoader)         // Disable copy constructor
+  DELETECOPYCTORS(AsyncLoader)         // Suppress default functions for safety
 };/* -- Function to wait for async of all members in a collector ----------- */
 template<class MemberType,
          class LockType,
@@ -643,7 +648,7 @@ class CLHelperAsync :
     /* -- No code ---------------------------------------------------------- */
     { }
   /* ----------------------------------------------------------------------- */
-  DELETECOPYCTORS(CLHelperAsync)       // Supress copy constructor for safety
+  DELETECOPYCTORS(CLHelperAsync)       // Suppress default functions for safety
 };/* ----------------------------------------------------------------------- */
 }                                      // End of public module namespace
 /* ------------------------------------------------------------------------- */

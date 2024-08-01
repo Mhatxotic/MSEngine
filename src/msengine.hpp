@@ -11,10 +11,10 @@
 #define VER_NAME    "MS-Engine"                       // Name of engine
 #define VER_AUTHOR  "MS-Design"                       // Author of engine
 #define VER_MAJOR   24                                // Version major (year)
-#define VER_MINOR   8                                 // Version minor (month)
-#define VER_BUILD   1                                 // Version build (day)
-#define VER_REV     18                                // Version rev (build#)
-#define VER_STR_NQ  24,8,1,18                         // Version as literal
-#define VER_STR     "24.8.1.18"                       // Version as string
-#define VER_DATE    "Thu Aug 01 14:29:35 2024 +0100"  // Compilation date
+#define VER_MINOR   9                                 // Version minor (month)
+#define VER_BUILD   17                                // Version build (day)
+#define VER_REV     1                                 // Version rev (build#)
+#define VER_STR_NQ  24,9,17,1                         // Version as literal
+#define VER_STR     "24.9.17.1"                       // Version as string
+#define VER_DATE    "Tue Sep 17 00:05:28 2024 +0100"  // Compilation date
 /* == EoF =========================================================== EoF == */

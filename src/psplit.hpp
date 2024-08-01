@@ -73,7 +73,7 @@ class FileParts                        // Contains parts of a filename
     /* -- No code ---------------------------------------------------------- */
     { }
   /* ----------------------------------------------------------------------- */
-  DELETECOPYCTORS(FileParts)           // Disable copy constructor and operator
+  DELETECOPYCTORS(FileParts)           // Suppress default functions for safety
 };/* -- PathSplit class ---------------------------------------------------- */
 class PathSplit :
   /* -- Base classes ------------------------------------------------------- */
@@ -182,7 +182,7 @@ class PathSplit :
     /* -- No code ---------------------------------------------------------- */
     { }
   /* ----------------------------------------------------------------------- */
-  DELETECOPYCTORS(PathSplit)           // Disable copy constructor and operator
+  DELETECOPYCTORS(PathSplit)           // Suppress default functions for safety
 };/* ----------------------------------------------------------------------- */
 }                                      // End of public module namespace
 /* ------------------------------------------------------------------------- */

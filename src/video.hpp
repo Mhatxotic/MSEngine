@@ -15,16 +15,17 @@ using namespace ICVarDef::P;           using namespace IError::P;
 using namespace IEvtMain::P;           using namespace IFbo::P;
 using namespace IFileMap::P;           using namespace IFlags;
 using namespace IIdent::P;             using namespace ILog::P;
-using namespace ILuaEvt::P;            using namespace ILuaUtil::P;
-using namespace IMemory::P;            using namespace IOal::P;
-using namespace IOgl::P;               using namespace IPcmLib::P;
-using namespace IShader::P;            using namespace IShaders::P;
-using namespace ISource::P;            using namespace IStd::P;
-using namespace IStream::P;            using namespace IString::P;
-using namespace ISysUtil::P;           using namespace IThread::P;
-using namespace ITimer::P;             using namespace IUtil::P;
-using namespace Lib::Ogg;              using namespace Lib::Ogg::Theora;
-using namespace Lib::OpenAL;           using namespace Lib::OS::GlFW;
+using namespace ILuaEvt::P;            using namespace ILuaLib::P;
+using namespace ILuaUtil::P;           using namespace IMemory::P;
+using namespace IOal::P;               using namespace IOgl::P;
+using namespace IPcmLib::P;            using namespace IShader::P;
+using namespace IShaders::P;           using namespace ISource::P;
+using namespace IStd::P;               using namespace IStream::P;
+using namespace IString::P;            using namespace ISysUtil::P;
+using namespace IThread::P;            using namespace ITimer::P;
+using namespace IUtil::P;              using namespace Lib::Ogg;
+using namespace Lib::Ogg::Theora;      using namespace Lib::OpenAL;
+using namespace Lib::OS::GlFW;
 /* ------------------------------------------------------------------------- */
 namespace P {                          // Start of public module namespace
 /* -- Video collector class for collector data and custom variables -------- */
@@ -60,22 +61,22 @@ CTOR_MEM_BEGIN_ASYNC(Videos, Video, ICHelperSafe, /* No CLHelper */),
   private ClockInterval<>              // Frame playback timing helper
 { /* -- Typedefs ----------------------------------------------------------- */
   struct YCbCr                         // Y/Cb/Cr plane data
-  { /* ------------------------------------------------------------------- */
+  { /* --------------------------------------------------------------------- */
     const size_t   stI;                // Unique index
     th_img_plane   tipP;               // Plane data
-    /* ------------------------------------------------------------------- */
+    /* --------------------------------------------------------------------- */
     void Reset(void) {
       tipP.width = tipP.height = tipP.stride = 0;
       tipP.data = nullptr;
     }
-    /* -- Constructor that initialises id -------------------------------- */
+    /* -- Constructor that initialises id ---------------------------------- */
     explicit YCbCr(const size_t stNIndex) :
-      /* -- Initialisers ------------------------------------------------- */
+      /* -- Initialisers --------------------------------------------------- */
       stI(stNIndex),                   // Set unique id
       tipP{0, 0, 0, nullptr}           // Initialise frame data
-      /* -- No code ------------------------------------------------------ */
+      /* -- No code -------------------------------------------------------- */
       { }
-  };/* ------------------------------------------------------------------- */
+  };/* --------------------------------------------------------------------- */
   struct Frame                         // Frame data
   { /* --------------------------------------------------------------------- */
     bool           bDraw;              // Draw this frame?
@@ -180,13 +181,6 @@ CTOR_MEM_BEGIN_ASYNC(Videos, Video, ICHelperSafe, /* No CLHelper */),
     // Reset counters
     dVideoTime = dAudioTime = dDrift = dAudioBuffer = 0.0;
   }
-  /* -- Tell worker thread to exit ----------------------------------------- */
-  void InformExit(const Unblock ubNewReason = UB_PAUSE)
-  { // Set exit reason
-    ubReason = ubNewReason;
-    // DeInit the thread, unblock the worker thread and stop and unload buffers
-    tThread.ThreadStop();
-  }
   /* -- Get/Set theora decoder control ------------------------------------- */
   template<typename AnyType>
     int SetParameter(const int iVariable, AnyType atValue)
@@ -239,7 +233,7 @@ CTOR_MEM_BEGIN_ASYNC(Videos, Video, ICHelperSafe, /* No CLHelper */),
         if(cOal->Have32FPPB())
         { // Allocate required memory and do the conversion
           MemResizeUp(stFrameSize);
-          Stream::VorbisFramesToF32PCM(fpPCM, stFrames, stChannels,
+          PcmF32FromVorbisFrames(fpPCM, stFrames, stChannels,
             MemPtr<ALfloat>());
         } // If the hardware only supports 16-bit (2b) integer playback?
         else
@@ -249,7 +243,7 @@ CTOR_MEM_BEGIN_ASYNC(Videos, Video, ICHelperSafe, /* No CLHelper */),
           // of CPU time to keep reallocating it hence the MemResizeUp().
           stFrameSize >>= 1;
           MemResizeUp(stFrameSize);
-          Stream::VorbisFramesToI16PCM(fpPCM, stFrames, stChannels,
+          PcmI16FromVorbisFrames(fpPCM, stFrames, stChannels,
             MemPtr<ALshort>());
         } // Generate a buffer for the pcm data and if succeeded?
         const ALuint uiBuffer = cOal->CreateBuffer();
@@ -721,7 +715,7 @@ CTOR_MEM_BEGIN_ASYNC(Videos, Video, ICHelperSafe, /* No CLHelper */),
     if(FlagIsSet(FL_THEORA))
     { // Parse the comments and then free the strings
       ssThMetaData =
-        StdMove(Stream::ParseComments(tcData.user_comments, tcData.comments));
+        StdMove(PcmVorbisParseComments(tcData.user_comments, tcData.comments));
       th_comment_clear(&tcData);
       // Allocate a new one and throw error if not allocated
       tdcPtr = th_decode_alloc(&tiData, tsiPtr);
@@ -774,7 +768,7 @@ CTOR_MEM_BEGIN_ASYNC(Videos, Video, ICHelperSafe, /* No CLHelper */),
     if(FlagIsSet(FL_VORBIS))
     { // Parse the comments and then free the strings
       ssVoMetaData =
-        StdMove(Stream::ParseComments(vcData.user_comments, vcData.comments));
+        StdMove(PcmVorbisParseComments(vcData.user_comments, vcData.comments));
       vorbis_comment_clear(&vcData);
       // Make sure rate is sane
       if(GetSampleRate() < 1 || GetSampleRate() > 192000)
@@ -843,14 +837,22 @@ CTOR_MEM_BEGIN_ASYNC(Videos, Video, ICHelperSafe, /* No CLHelper */),
       viData.bitrate_window, StrToBits(viData.bitrate_window));
     // Parse vorbis comments and if not empty? Enumerate and log each one
     if(cLog->HasLevel(LH_DEBUG))
-    { // Write Theora comments
-      for(auto &aPair : ssThMetaData)
-        cLog->LogNLCDebugExSafe("- Theora comment: $ -> $.",
-          aPair.first, aPair.second);
-      // Write Vorbis comments
-      for(auto &aPair : ssVoMetaData)
-        cLog->LogNLCDebugExSafe("- Vorbis comment: $ -> $.",
-          aPair.first, aPair.second);
+    { // Prepare data for lists
+      typedef pair<const string_view&, StrNCStrMap&> ListPair;
+      typedef array<const ListPair, 2> Lists;
+      static const string_view svTheora{ "Theora" }, svVorbis{ "Vorbis" };
+      const Lists lLists{ { { svTheora, ssThMetaData },
+                            { svVorbis, ssVoMetaData } } };
+      // Write Theora comments iv available
+      for(const ListPair lpPair : lLists)
+      { // Ignore if empty else log metadata for specified list
+        if(lpPair.second.empty()) continue;
+        cLog->LogNLCDebugExSafe("- $ comments: $...",
+          lpPair.first, lpPair.second.size());
+        for(const StrNCStrMapPair &sncsmpPair : lpPair.second)
+          cLog->LogNLCDebugExSafe("-- $: $.",
+            sncsmpPair.first, sncsmpPair.second);
+      }
     } // Set stopped
     FlagSet(FL_STOP);
   }
@@ -953,8 +955,10 @@ CTOR_MEM_BEGIN_ASYNC(Videos, Video, ICHelperSafe, /* No CLHelper */),
   void Pause(const Unblock ubNewReason = UB_PAUSE)
   { // Make sure playing flag is removed
     FlagClear(FL_PLAY);
-    // Inform the thread to exit
-    InformExit(ubNewReason);
+    // Set exit reason
+    ubReason = ubNewReason;
+    // DeInit the thread, unblock the worker thread and stop and unload buffers
+    tThread.ThreadStop();
   }
   /* -- Stop video and free everything ------------------------------------- */
   void Stop(const Unblock ubNewReason = UB_STOP)
@@ -1187,8 +1191,10 @@ CTOR_MEM_BEGIN_ASYNC(Videos, Video, ICHelperSafe, /* No CLHelper */),
     ICHelperVideo::CollectorUnregister();
     // Prevent more events being generated
     LuaEvtDeInit();
-    // Make sure the thread is stopped
-    InformExit(UB_FINISH);
+    // Set exit reason
+    ubReason = UB_FINISH;
+    // DeInit the thread, unblock the worker thread and stop and unload buffers
+    tThread.ThreadStopNoThrow();
     // Stop and unload audio buffers
     StopAudioAndUnloadBuffers();
     // Deinit texture and reset parameters
@@ -1261,7 +1267,7 @@ CTOR_MEM_BEGIN_ASYNC(Videos, Video, ICHelperSafe, /* No CLHelper */),
     /* -- No code ---------------------------------------------------------- */
     { }
 };/* -- End ---------------------------------------------------------------- */
-CTOR_END_ASYNC_NOFUNCS(Videos, Video, VIDEO, // Finish collector class
+CTOR_END_ASYNC_NOFUNCS(Videos, Video, VIDEO, VIDEO, // Finish collector class
   /* -- Initialisers ------------------------------------------------------- */
   LuaEvtMaster{ EMC_VID_EVENT },       // Init lua event async helper
   csStrings{{                          // Init colour space strings list

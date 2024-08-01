@@ -12,9 +12,10 @@ namespace IShader {                    // Start of private module namespace
 /* -- Dependencies --------------------------------------------------------- */
 using namespace ICollector::P;         using namespace IError::P;
 using namespace IFboDef::P;            using namespace IIdent::P;
-using namespace ILog::P;               using namespace IOgl::P;
-using namespace IStd::P;               using namespace IString::P;
-using namespace ISysUtil::P;           using namespace Lib::OS::GlFW;
+using namespace ILog::P;               using namespace ILuaLib::P;
+using namespace IOgl::P;               using namespace IStd::P;
+using namespace IString::P;            using namespace ISysUtil::P;
+using namespace Lib::OS::GlFW;
 /* ------------------------------------------------------------------------- */
 namespace P {                          // Start of public module namespace
 /* -- Public typedefs ------------------------------------------------------ */
@@ -257,9 +258,9 @@ CTOR_BEGIN_DUO(Shaders, Shader, CLHelperUnsafe, ICHelperUnsafe),
   /* -- Destructor --------------------------------------------------------- */
   ~Shader(void) { DeInitShaders(); }
   /* ----------------------------------------------------------------------- */
-  DELETECOPYCTORS(Shader)              // Disable copy constructor and operator
+  DELETECOPYCTORS(Shader)              // Suppress default functions for safety
 };/* ----------------------------------------------------------------------- */
-CTOR_END_NOINITS(Shaders, Shader)      // Finish shaders collector
+CTOR_END_NOINITS(Shaders, Shader, SHADER) // Finish shaders collector
 /* ------------------------------------------------------------------------- */
 }                                      // End of public module namespace
 /* ------------------------------------------------------------------------- */

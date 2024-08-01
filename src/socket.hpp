@@ -15,13 +15,13 @@ using namespace ICVar::P;              using namespace ICVarDef::P;
 using namespace ICVarLib::P;           using namespace IError::P;
 using namespace IEvtMain::P;           using namespace IFlags;
 using namespace IIdent::P;             using namespace ILog::P;
-using namespace ILuaEvt::P;            using namespace ILuaUtil::P;
-using namespace IMemory::P;            using namespace IParser::P;
-using namespace IStd::P;               using namespace IString::P;
-using namespace ISystem::P;            using namespace ISysUtil::P;
-using namespace IThread::P;            using namespace IToken::P;
-using namespace IUtil::P;              using namespace IUtf;
-using namespace Lib::OS::OpenSSL;
+using namespace ILuaEvt::P;            using namespace ILuaLib::P;
+using namespace ILuaUtil::P;           using namespace IMemory::P;
+using namespace IParser::P;            using namespace IStd::P;
+using namespace IString::P;            using namespace ISystem::P;
+using namespace ISysUtil::P;           using namespace IThread::P;
+using namespace IToken::P;             using namespace IUtil::P;
+using namespace IUtf;                  using namespace Lib::OS::OpenSSL;
 /* ------------------------------------------------------------------------- */
 namespace P {                          // Start of public module namespace
 /* -- Connection flags ----------------------------------------------------- */
@@ -853,8 +853,8 @@ CTOR_MEM_BEGIN_CSLAVE(Sockets, Socket, ICHelperUnsafe),
       pRegistry.ParserPushOrUpdatePair(cParent->strRegVarPROTO, strProtoRecv);
       pRegistry.ParserPushOrUpdatePair(cParent->strRegVarCODE, strStatus);
       // For each response var. Push key/value pair to TX registry
-      for(const auto &vlI : pRegistry)
-        PushTXPairSafe(vlI.first, vlI.second);
+      for(const StrNCStrMapPair &sncsmpPair : pRegistry)
+        PushTXPairSafe(sncsmpPair.first, sncsmpPair.second);
       // If we got a content type?
       const StrNCStrMapConstIt sncsmciType{ pRegistry.find("content-type") };
       if(sncsmciType != pRegistry.cend())
@@ -1228,7 +1228,7 @@ CTOR_MEM_BEGIN_CSLAVE(Sockets, Socket, ICHelperUnsafe),
         // Get value string from packet and store entry
         const string strVal{ mbPacket.MemToString() };
         LuaUtilPushStr(lS, strVal);
-        lua_setfield(lS, -2, strVar.c_str());
+        LuaUtilSetField(lS, -2, strVar.c_str());
         // Clear string
         strVar.clear();
       } // ...until there are no more packets to process
@@ -1423,11 +1423,18 @@ CTOR_MEM_BEGIN_CSLAVE(Sockets, Socket, ICHelperUnsafe),
     /* --------------------------------------------------------------------- */
     { }
   /* -- Destructor --------------------------------------------------------- */
-  ~Socket(void) { SendDisconnectAndWait(); }
+  ~Socket(void)
+  { // Send disconnect to socket
+    SendDisconnect();
+    // Have read thread running? Tell the thread to stop and wait for it. The
+    // end of the thread should call FinishDisconnect() already.
+    if(tReader.ThreadIsRunning()) tReader.ThreadStopNoThrow();
+    // Cleanup the disconnect
+    FinishDisconnect();
+  }
   /* ----------------------------------------------------------------------- */
-  DELETECOPYCTORS(Socket)              // Supress copy constructor for safety
+  DELETECOPYCTORS(Socket)              // Suppress default functions for safety
 };/* ----------------------------------------------------------------------- */
-/* ------------------------------------------------------------------------- */
 static void DestroyAllSockets(void)
 { // No sockets? Ignore
   if(cSockets->empty()) return;
@@ -1456,7 +1463,7 @@ static void InitSockets(void)
   BIO_sock_init();
 }
 /* ------------------------------------------------------------------------- */
-CTOR_END(Sockets, Socket, InitSockets(), DeInitSockets(),,
+CTOR_END(Sockets, Socket, SOCKET, InitSockets(), DeInitSockets(),,
   /* -- Initialisers ------------------------------------------------------- */
   LuaEvtMaster{ EMC_MP_SOCKET },       // Setup async socket event
   strRegVarREQ{ "\001" },              // Init reg key name for request data

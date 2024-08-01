@@ -50,7 +50,7 @@ class SysProcess                       // Need this before of System init order
     /* -- No code ---------------------------------------------------------- */
     { }
   /* ----------------------------------------------------------------------- */
-  DELETECOPYCTORS(SysProcess)          // Supress copy constructor for safety
+  DELETECOPYCTORS(SysProcess)          // Suppress default functions for safety
 };/* == Class ============================================================== */
 class SysCore :
   /* -- Dependency classes ------------------------------------------------- */
@@ -626,7 +626,11 @@ class SysCore :
                      uidM4{ { 2890, 4400 } }; // Apple M4 (Inexact)
     // Processor table with speeds. This is because there is no API to get
     // the speed of Apple branded processors.
-    const map<const string, const UIntDouble&> smList{
+    typedef pair<const string, const UIntDouble &> MacCpuListMapPair;
+    typedef map<MacCpuListMapPair::first_type, MacCpuListMapPair::second_type>
+      MacCpuListMap;
+    typedef MacCpuListMap::const_iterator MacCpuListMapConstIt;
+    const MacCpuListMap mclmData{
       { "Apple M1",       uidM1 }, { "Apple M1 Pro",   uidM1 },
       { "Apple M1 Max",   uidM1 }, { "Apple M1 Ultra", uidM1 },
       { "Apple M2",       uidM2 }, { "Apple M2 Pro",   uidM2 },
@@ -638,11 +642,11 @@ class SysCore :
     };
     // Find processor name to speed table and if we found it? Then copy the
     // value from the table as the actual speed.
-    const auto smListIt{ smList.find(strProcessorName) };
-    const unsigned int uiSpeed = smListIt == smList.cend() ?
+    const MacCpuListMapConstIt mclmciIt{ mclmData.find(strProcessorName) };
+    const unsigned int uiSpeed = mclmciIt == mclmData.cend() ?
       static_cast<unsigned int>
         (GetSysCTLInfoNum<uint64_t>("hw.tbfrequency")/10000) :
-      smListIt->second[1];
+      mclmciIt->second[1];
     // Using INTEL processor?
 #elif defined(CISC)
     // Get family model and stepping
@@ -719,7 +723,7 @@ class SysCore :
                GetProcessorData() },
     bWindowInitialised(false) { }
   /* ----------------------------------------------------------------------- */
-  DELETECOPYCTORS(SysCore)             // Supress copy constructor for safety
+  DELETECOPYCTORS(SysCore)             // Suppress default functions for safety
 }; /* ---------------------------------------------------------------------- */
 }                                      // End of module namespace
 /* == EoF =========================================================== EoF == */

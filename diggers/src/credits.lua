@@ -167,6 +167,9 @@ local function InitCredits(bRolling)
         RenderObjects();
         -- Render vignette
         texVig:BlitLTRB(iStageL, iStageT, iStageR, iStageB);
+        -- Prepare font colours
+        fontLarge:SetCRGBA(1, 1, 1, 1);
+        fontLittle:SetCRGBA(0, 1, 0, 1);
       end
       -- Render function
       local function RenderCreditsBottomLeft()

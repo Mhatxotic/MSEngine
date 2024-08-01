@@ -12,8 +12,8 @@
 -- Core function aliases --------------------------------------------------- --
 local pairs<const>, random<const> = pairs, math.random;
 -- M-Engine function aliases ----------------------------------------------- --
-local InfoRAM<const>, DisplayVRAM<const>, UtilBytes<const>,
-  VariableGetInt<const> = Info.RAM, Display.VRAM, Util.Bytes, Variable.GetInt;
+local CoreRAM<const>, DisplayVRAM<const>, UtilBytes<const>,
+  VariableGetInt<const> = Core.RAM, Display.VRAM, Util.Bytes, Variable.GetInt;
 -- Consts ------------------------------------------------------------------ --
 local iCVAppTitle<const> = Variable.Internal.app_version;
 local strVersion<const> = VariableGetInt(iCVAppTitle).." ";
@@ -144,7 +144,7 @@ local function InitTitle()
         -- No VRAM callback
         local function NoVRAM()
           -- Get and display only RAM
-          local _, _, nFree<const> = InfoRAM();
+          local _, _, nFree<const> = CoreRAM();
           strSubTitle = strVersion..UtilBytes(nFree, 1).." RAM FREE";
         end
         -- Set NO VRAM available callback
@@ -159,7 +159,7 @@ local function InitTitle()
           -- Is dedicated memory?
           else
             -- Get free main memory
-            local _, _, nFree<const> = InfoRAM();
+            local _, _, nFree<const> = CoreRAM();
             -- If both the same the memory is shared
             strSubTitle = strVersion..UtilBytes(nFree, 1).."(S)/"..
                                       UtilBytes(nVFree, 1).. "(V) FREE";

@@ -345,7 +345,7 @@ struct CodecDDS final :                // Members initially public
     /* -- No code ---------------------------------------------------------- */
     { }
   /* ----------------------------------------------------------------------- */
-  DELETECOPYCTORS(CodecDDS)            // Omit copy constructor for safety
+  DELETECOPYCTORS(CodecDDS)            // Suppress default functions for safety
 };/* -- End ---------------------------------------------------------------- */
 /* ========================================================================= **
 ** ######################################################################### **
@@ -484,7 +484,7 @@ class CodecGIF final :                 // Members initially private
     /* -- No code ---------------------------------------------------------- */
     { }
   /* ----------------------------------------------------------------------- */
-  DELETECOPYCTORS(CodecGIF)            // Omit copy constructor for safety
+  DELETECOPYCTORS(CodecGIF)            // Suppress default functions for safety
 };/* -- End ---------------------------------------------------------------- */
 /* ========================================================================= **
 ** ######################################################################### **
@@ -873,7 +873,7 @@ class CodecPNG final :                 // Members initially private
     /* -- No code ---------------------------------------------------------- */
     { }
   /* ----------------------------------------------------------------------- */
-  DELETECOPYCTORS(CodecPNG)            // Omit copy constructor for safety
+  DELETECOPYCTORS(CodecPNG)            // Suppress default functions for safety
 };/* -- End ---------------------------------------------------------------- */
 /* ========================================================================= **
 ** ######################################################################### **
@@ -1052,7 +1052,7 @@ class CodecJPG final :                 // Members initially private
     /* -- No code ---------------------------------------------------------- */
     { }
   /* ----------------------------------------------------------------------- */
-  DELETECOPYCTORS(CodecJPG)            // Omit copy constructor for safety
+  DELETECOPYCTORS(CodecJPG)            // Suppress default functions for safety
 };/* ----------------------------------------------------------------------- */
 }                                      // End of public module namespace
 /* ------------------------------------------------------------------------- */

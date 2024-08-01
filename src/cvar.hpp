@@ -518,7 +518,7 @@ class CVarItem :                       // Members initially private
     /* -- No code ---------------------------------------------------------- */
     { }
   /* -- Other -------------------------------------------------------------- */
-  DELETECOPYCTORS(CVarItem)            // No copy constructor
+  DELETECOPYCTORS(CVarItem)            // Suppress default functions for safety
 };/* ----------------------------------------------------------------------- */
 }                                      // End of public module namespace
 /* ------------------------------------------------------------------------- */

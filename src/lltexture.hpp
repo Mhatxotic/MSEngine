@@ -95,25 +95,6 @@ LLFUNC(BlitILTRB, 0,
                   aBottom{lS, 6};
   aTexture().BlitLTRB(aTextureId, 0, aLeft, aTop, aRight, aBottom))
 /* ========================================================================= */
-// $ Texture:BlitILTRBA
-// > TexIndex:integer=The texture index to use.
-// > Left:number=The starting column to draw from.
-// > Top:number=The starting row to draw from.
-// > Right:number=The ending column pixel to draw to.
-// > Bottom:number=The ending row pixel to draw to.
-// > Angle:number=The angle in which to rotate from the centre point (-1 to 1).
-// ? Blits tile 0 of texture 'TexIndex' at the specified bounds.
-/* ------------------------------------------------------------------------- */
-LLFUNC(BlitILTRBA, 0,
-  const AgTexture aTexture{lS, 1};
-  const AgTextureId aTextureId{lS, 2, aTexture};
-  const AgGLfloat aLeft{lS, 3},
-                  aTop{lS, 4},
-                  aRight{lS, 5},
-                  aBottom{lS, 6};
-  const AgAngle aAngle{lS, 7};
-  aTexture().BlitLTRBA(aTextureId, 0, aLeft, aTop, aRight, aBottom, aAngle))
-/* ========================================================================= */
 // $ Texture:BlitILTWH
 // > TexIndex:integer=The texture index to use.
 // > Left:number=The starting column to draw from.
@@ -208,29 +189,6 @@ LLFUNC(BlitISLTRB, 0,
                   aBottom{lS, 7};
   aTexture().BlitLTRB(aTextureId, aTileId, aLeft, aTop, aRight, aBottom))
 /* ========================================================================= */
-// $ Texture:BlitISLTRBA
-// > TexIndex:integer=The texture index to use.
-// > TileIndex:integer=The tile index to blit.
-// > Left:number=The starting column to draw from.
-// > Top:number=The starting row to draw from.
-// > Right:number=The ending column pixel to draw to.
-// > Bottom:number=The ending row pixel to draw to.
-// > Angle:number=The angle in which to rotate from the centre point (-1 to 1).
-// ? Blits tile 'TileIndex' of texture 'TexIndex' at the specified screen
-// ? bounds.
-/* ------------------------------------------------------------------------- */
-LLFUNC(BlitISLTRBA, 0,
-  const AgTexture aTexture{lS, 1};
-  const AgTextureId aTextureId{lS, 2, aTexture};
-  const AgTileId aTileId{lS, 3, aTexture};
-  const AgGLfloat aLeft{lS, 4},
-                  aTop{lS, 5},
-                  aRight{lS, 6},
-                  aBottom{lS, 7};
-  const AgAngle aAngle{lS, 8};
-  aTexture().BlitLTRBA(aTextureId, aTileId, aLeft, aTop, aRight, aBottom,
-    aAngle))
-/* ========================================================================= */
 // $ Texture:BlitISLTWH
 // > TexIndex:integer=The texture index to use.
 // > TileIndex:integer=The tile index to blit.
@@ -315,24 +273,6 @@ LLFUNC(BlitLTRB, 0,
                   aRight{lS, 4},
                   aBottom{lS, 5};
   aTexture().BlitLTRB(0, 0, aLeft, aTop, aRight, aBottom))
-/* ========================================================================= */
-// $ Texture:BlitLTRBA
-// > Left:number=The starting column to draw from.
-// > Top:number=The starting row to draw from.
-// > Right:number=The ending column pixel to draw to.
-// > Bottom:number=The ending row pixel to draw to.
-// > Angle:number=The angle in which to rotate from the centre point (-1 to 1).
-// ? Blits tile 0 of texture 0 at the specified screen bounds and angle from
-// ? the centre of the quad.
-/* ------------------------------------------------------------------------- */
-LLFUNC(BlitLTRBA, 0,
-  const AgTexture aTexture{lS, 1};
-  const AgGLfloat aLeft{lS, 2},
-                  aTop{lS, 3},
-                  aRight{lS, 4},
-                  aBottom{lS, 5};
-  const AgAngle aAngle{lS, 6};
-  aTexture().BlitLTRBA(0, 0, aLeft, aTop, aRight, aBottom, aAngle))
 /* ========================================================================= */
 // $ Texture:BlitLTWH
 // > Left:number=The starting column to draw from.
@@ -435,26 +375,6 @@ LLFUNC(BlitSLTRB, 0,
                   aRight{lS, 5},
                   aBottom{lS, 6};
   aTexture().BlitLTRB(0, aTileId, aLeft, aTop, aRight, aBottom))
-/* ========================================================================= */
-// $ Texture:BlitSLTRBA
-// > TileIndex:integer=The tile index of the texture to blit.
-// > Left:number=The starting column to draw from.
-// > Top:number=The starting row to draw from.
-// > Right:number=The ending column pixel to draw to.
-// > Bottom:number=The ending row pixel to draw to.
-// > Angle:number=The angle in which to rotate from the centre point (-1 to 1).
-// ? Blits tile 'TileIndex' of texture 0 at the specified screenbounds and
-// ? angle.
-/* ------------------------------------------------------------------------- */
-LLFUNC(BlitSLTRBA, 0,
-  const AgTexture aTexture{lS, 1};
-  const AgTileId aTileId{lS, 2, aTexture};
-  const AgGLfloat aLeft{lS, 3},
-                  aTop{lS, 4},
-                  aRight{lS, 5},
-                  aBottom{lS, 6};
-  const AgAngle aAngle{lS, 7};
-  aTexture().BlitLTRBA(0, aTileId, aLeft, aTop, aRight, aBottom, aAngle))
 /* ========================================================================= */
 // $ Texture:BlitSLTWH
 // > TileIndex:integer=The tile index of the texture to blit.
@@ -735,24 +655,6 @@ LLFUNC(SetVLTRB, 0,
                   aRight{lS, 4},
                   aBottom{lS, 5};
   aTexture().FboItemSetVertex(aLeft, aTop, aRight, aBottom))
-/* ========================================================================= */
-// $ Texture:SetVLTRBA
-// > Left:number=The starting column to draw from.
-// > Top:number=The starting row to draw from.
-// > Right:number=The ending column pixel to draw to.
-// > Bottom:number=The ending row pixel to draw to.
-// > Angle:number=The angle in which to rotate from the centre point (-1 to 1).
-// ? Presets the specified screen bounds and angle for the next use of
-// ? Texture:BlitP*.
-/* ------------------------------------------------------------------------- */
-LLFUNC(SetVLTRBA, 0,
-  const AgTexture aTexture{lS, 1};
-  const AgGLfloat aLeft{lS, 2},
-                  aTop{lS, 3},
-                  aRight{lS, 4},
-                  aBottom{lS, 5};
-  const AgAngle aAngle{lS, 6};
-  aTexture().FboItemSetVertex(aLeft, aTop, aRight, aBottom, aAngle))
 /* ========================================================================= */
 // $ Texture:SetVLTWH
 // > Left:number=The starting column to draw from.
@@ -1040,27 +942,26 @@ LLFUNC(UploadEx, 0,
 ** ------------------------------------------------------------------------- */
 LLRSMFBEGIN                            // Texture:* member functions begin
   LLRSFUNC(Blit),        LLRSFUNC(BlitILT),     LLRSFUNC(BlitILTA),
-  LLRSFUNC(BlitILTRB),   LLRSFUNC(BlitILTRBA),  LLRSFUNC(BlitILTWH),
-  LLRSFUNC(BlitILTWHA),  LLRSFUNC(BlitISLT),    LLRSFUNC(BlitISLTA),
-  LLRSFUNC(BlitISLTRB),  LLRSFUNC(BlitISLTRBA), LLRSFUNC(BlitISLTWH),
-  LLRSFUNC(BlitISLTWHA), LLRSFUNC(BlitLT),      LLRSFUNC(BlitLTA),
-  LLRSFUNC(BlitLTRB),    LLRSFUNC(BlitLTRBA),   LLRSFUNC(BlitLTWH),
+  LLRSFUNC(BlitILTRB),   LLRSFUNC(BlitILTWH),   LLRSFUNC(BlitILTWHA),
+  LLRSFUNC(BlitISLT),    LLRSFUNC(BlitISLTA),   LLRSFUNC(BlitISLTRB),
+  LLRSFUNC(BlitISLTWH),  LLRSFUNC(BlitISLTWHA), LLRSFUNC(BlitLT),
+  LLRSFUNC(BlitLTA),     LLRSFUNC(BlitLTRB),    LLRSFUNC(BlitLTWH),
   LLRSFUNC(BlitLTWHA),   LLRSFUNC(BlitM),       LLRSFUNC(BlitSLT),
-  LLRSFUNC(BlitSLTA),    LLRSFUNC(BlitSLTRB),   LLRSFUNC(BlitSLTRBA),
-  LLRSFUNC(BlitSLTWH),   LLRSFUNC(BlitSLTWHA),  LLRSFUNC(Destroy),
-  LLRSFUNC(Download),    LLRSFUNC(Dump),        LLRSFUNC(GetHeight),
-  LLRSFUNC(GetId),       LLRSFUNC(GetName),     LLRSFUNC(GetSubCount),
-  LLRSFUNC(GetWidth),    LLRSFUNC(PopColour),   LLRSFUNC(PushColour),
-  LLRSFUNC(SetCA),       LLRSFUNC(SetCB),       LLRSFUNC(SetCG),
-  LLRSFUNC(SetCR),       LLRSFUNC(SetCRGB),     LLRSFUNC(SetCRGBA),
-  LLRSFUNC(SetCRGBAI),   LLRSFUNC(SetCX),       LLRSFUNC(SetTCLTRB),
-  LLRSFUNC(SetTCLTWH),   LLRSFUNC(SetTCX),      LLRSFUNC(SetVLTRB),
-  LLRSFUNC(SetVLTRBA),   LLRSFUNC(SetVLTWH),    LLRSFUNC(SetVLTWHA),
-  LLRSFUNC(SetVX),       LLRSFUNC(TileA),       LLRSFUNC(TileAD),
-  LLRSFUNC(TileAS),      LLRSFUNC(TileASD),     LLRSFUNC(TileGSTC),
-  LLRSFUNC(TileGTC),     LLRSFUNC(TileS),       LLRSFUNC(TileSD),
-  LLRSFUNC(TileSS),      LLRSFUNC(TileSSD),     LLRSFUNC(TileSSTC),
-  LLRSFUNC(TileSTC),     LLRSFUNC(Upload),      LLRSFUNC(UploadEx),
+  LLRSFUNC(BlitSLTA),    LLRSFUNC(BlitSLTRB),   LLRSFUNC(BlitSLTWH),
+  LLRSFUNC(BlitSLTWHA),  LLRSFUNC(Destroy),     LLRSFUNC(Download),
+  LLRSFUNC(Dump),        LLRSFUNC(GetHeight),   LLRSFUNC(GetId),
+  LLRSFUNC(GetName),     LLRSFUNC(GetSubCount), LLRSFUNC(GetWidth),
+  LLRSFUNC(PopColour),   LLRSFUNC(PushColour),  LLRSFUNC(SetCA),
+  LLRSFUNC(SetCB),       LLRSFUNC(SetCG),       LLRSFUNC(SetCR),
+  LLRSFUNC(SetCRGB),     LLRSFUNC(SetCRGBA),    LLRSFUNC(SetCRGBAI),
+  LLRSFUNC(SetCX),       LLRSFUNC(SetTCLTRB),   LLRSFUNC(SetTCLTWH),
+  LLRSFUNC(SetTCX),      LLRSFUNC(SetVLTRB),    LLRSFUNC(SetVLTWH),
+  LLRSFUNC(SetVLTWHA),   LLRSFUNC(SetVX),       LLRSFUNC(TileA),
+  LLRSFUNC(TileAD),      LLRSFUNC(TileAS),      LLRSFUNC(TileASD),
+  LLRSFUNC(TileGSTC),    LLRSFUNC(TileGTC),     LLRSFUNC(TileS),
+  LLRSFUNC(TileSD),      LLRSFUNC(TileSS),      LLRSFUNC(TileSSD),
+  LLRSFUNC(TileSSTC),    LLRSFUNC(TileSTC),     LLRSFUNC(Upload),
+  LLRSFUNC(UploadEx),
 LLRSEND                                // Texture:* member functions end
 /* ========================================================================= */
 // $ Texture.Console

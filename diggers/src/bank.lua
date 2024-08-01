@@ -13,8 +13,8 @@
 local format<const>, unpack<const>, error<const> =
   string.format, table.unpack, error;
 -- M-Engine function aliases ----------------------------------------------- --
-local InfoTicks<const>, UtilBlank<const>, UtilIsTable<const> =
-  Info.Ticks, Util.Blank, Util.IsTable;
+local CoreTicks<const>, UtilBlank<const>, UtilIsTable<const> =
+  Core.Ticks, Util.Blank, Util.IsTable;
 -- Diggers function and data aliases --------------------------------------- --
 local Fade, GameProc, GetGameTicks, HaveZogsToWin, InitLobby, IsButtonPressed,
   IsMouseInBounds, IsMouseNotInBounds, IsScrollingDown, IsScrollingUp,
@@ -167,7 +167,7 @@ local function InitBank(aActiveObject)
       -- Speech bubble should show?
       if iSpeechTimer > 0 then
         -- Show banker talking graphic, speech bubble and text
-        texBank:BlitSLT(InfoTicks() // 10 % 4 + iBankerTexId,
+        texBank:BlitSLT(CoreTicks() // 10 % 4 + iBankerTexId,
           iBankerX, iBankerY);
         texBank:BlitSLT(tileSpeech, iSpeechBubbleX, iSpeechBubbleY);
         fontSpeech:PrintC(iSpeechTextX, iSpeechTextY, strBankerSpeech);

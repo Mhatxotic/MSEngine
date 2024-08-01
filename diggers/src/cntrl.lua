@@ -12,7 +12,7 @@
 -- Core function aliases --------------------------------------------------- --
 local unpack<const> = table.unpack;
 -- M-Engine function aliases ----------------------------------------------- --
-local InfoTicks<const> = Info.Ticks;
+local CoreTicks<const> = Core.Ticks;
 -- Diggers function and data aliases --------------------------------------- --
 local Fade, InitBook, InitFile, InitLobby, InitMap, InitRace, IsButtonReleased,
   IsMouseInBounds, IsMouseNotInBounds, IsMouseNotInBounds, LoadResources,
@@ -107,7 +107,7 @@ local function InitCon()
     -- Render callback
     local function RenderCon()
       -- Frame timer slowed down
-      local iAnimTime<const> = InfoTicks() // 10;
+      local iAnimTime<const> = CoreTicks() // 10;
       -- Draw backdrop, controller screen and animated fish
       texLobby:BlitLT(-54, 0);
       texCon:BlitSLT(tileCon, 8, 8);

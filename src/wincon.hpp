@@ -562,7 +562,7 @@ class SysCon :                         // Members initially private
     { // Set cursor position
       stX = 1 + stLen, stY = stHm1;
       // Reset again and write the string
-      WriteLine(UtfDecoder(strIR), stWm2 - stLen, false);
+      WriteLine(UtfDecoder{ strIR }, stWm2 - stLen, false);
     } // Set cursor position
     SetCursor({ static_cast<SHORT>(UtilMinimum(stWm1, 1 + stLen)),
                 static_cast<SHORT>(stHm1) });
@@ -639,24 +639,27 @@ class SysCon :                         // Members initially private
   void RedrawTitleBar(const string &strTL, const string &strTR)
     { RedrawStatus(0, strTL, strTR); }
   /* -- Redraw console buffer ---------------------------------------------- */
-  void RedrawBuffer(const ConLines &cL, const ConLinesConstRevIt &lS)
+  void RedrawBuffer(const ConLines &clLines,
+    const ConLinesConstRevIt clcriStart)
   { // Reset cursor position to top left of drawing area
     stX = 0;
     stY = stHm1;
     // Set default text colour
     SetColour(FOREGROUND_RED|FOREGROUND_GREEN|FOREGROUND_BLUE);
     // Draw until we go off the top of the screen
-    for(ConLinesConstRevIt lL(lS); lL != cL.rend() && ValidY(stY); ++lL)
+    for(ConLinesConstRevIt clcriIt{ clcriStart };
+                           clcriIt != clLines.crend() && ValidY(stY);
+                         ++clcriIt)
     { // Get structure
-      const ConLine &lD = *lL;
+      const ConLine &clLine = *clcriIt;
       // Convert RGB colour to Win32 console id colour
-      SetColour(wNDXtoW32C[lD.cColour]);
+      SetColour(wNDXtoW32C[clLine.cColour]);
       // Put text in a utf container and write the data. Note: Although
       // stY could go effectively negative and we're not using a signed value
       // we can make sure we don't access any OOB memory by just checking that
       // the co-ordinates while drawing, we don't have to worry about the
       // integer wrapping at all we are not drawing.
-      stY -= WriteLineWU(UtfDecoder(lD.strLine)) - 1;
+      stY -= WriteLineWU(UtfDecoder{ clLine.strLine }) - 1;
     } // Done if there is no lines to clear up to the top
     if(!ValidY(stY)) return;
     // Goto beginning so we can clear lines
@@ -839,7 +842,7 @@ class SysCon :                         // Members initially private
   /* -- Destructor --------------------------------------------------------- */
   DTORHELPER(~SysCon, SysConDeInit());
   /* ----------------------------------------------------------------------- */
-  DELETECOPYCTORS(SysCon);             // Disable copy constructor and operator
+  DELETECOPYCTORS(SysCon)              // Suppress default functions for safety
   /* -- Set maximum console line length ------------------------------------ */
   CVarReturn RowsModified(const size_t stRows)
   { // Deny if out of range. The maximum value is a SHORT from Win32 API.

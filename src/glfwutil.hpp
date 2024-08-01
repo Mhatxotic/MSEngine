@@ -184,7 +184,6 @@ static const char *GlFWGetJoystickName(const int iJ)
 static void GlFWSetVSync(const int iI) { glfwSwapInterval(iI); }
 /* -- Wait for window event ------------------------------------------------ */
 static void GlFWWaitEvents(void) { glfwWaitEvents(); }
-static void GlFWPollEvents(void) { glfwPollEvents(); }
 /* -- Release current context ---------------------------------------------- */
 static void GlFWReleaseContext(void) { glfwMakeContextCurrent(nullptr); }
 /* -- Set gamma ------------------------------------------------------------ */

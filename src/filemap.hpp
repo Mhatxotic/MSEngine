@@ -236,7 +236,7 @@ class FileMap :
   ~FileMap(void) { if(MemIsPtrSet() && MemPtr() != SysMapGetMemory())
                      MemFreePtr(); }
   /* ----------------------------------------------------------------------- */
-  DELETECOPYCTORS(FileMap)             // Disable copy constructor and operator
+  DELETECOPYCTORS(FileMap)             // Suppress default functions for safety
 };/* ----------------------------------------------------------------------- */
 }                                      // End of public module namespace
 /* ------------------------------------------------------------------------- */

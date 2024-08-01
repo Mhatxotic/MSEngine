@@ -18,14 +18,14 @@ using namespace ICollector::P;         using namespace IDim;
 using namespace IError::P;             using namespace IFboDef::P;
 using namespace IFileMap::P;           using namespace IFreeType::P;
 using namespace IFtf::P;               using namespace IImageDef::P;
-using namespace ILog::P;               using namespace IMemory::P;
-using namespace IOgl::P;               using namespace IParser::P;
-using namespace IPSplit::P;            using namespace IStd::P;
-using namespace IString::P;            using namespace ISysUtil::P;
-using namespace ITexDef::P;            using namespace ITexture::P;
-using namespace IToken::P;             using namespace IUtf;
-using namespace IUtil::P;              using namespace Lib::FreeType;
-using namespace Lib::OS::GlFW;
+using namespace ILog::P;               using namespace ILuaLib::P;
+using namespace IMemory::P;            using namespace IOgl::P;
+using namespace IParser::P;            using namespace IPSplit::P;
+using namespace IStd::P;               using namespace IString::P;
+using namespace ISysUtil::P;           using namespace ITexDef::P;
+using namespace ITexture::P;           using namespace IToken::P;
+using namespace IUtf;                  using namespace IUtil::P;
+using namespace Lib::FreeType;         using namespace Lib::OS::GlFW;
 /* ------------------------------------------------------------------------- */
 namespace P {                          // Start of public namespace
 /* == Font collector class for collector data and custom variables ========= */
@@ -127,7 +127,7 @@ class FontBase :                       // Members initially private
     /* --------------------------------------------------------------------- */
     { }
   /* ----------------------------------------------------------------------- */
-  DELETECOPYCTORS(FontBase)            // No copy constructors
+  DELETECOPYCTORS(FontBase)            // Suppress default functions for safety
 };/* ----------------------------------------------------------------------- */
 /* == Font Class (which inherits a Texture) ================================ */
 CTOR_MEM_BEGIN(Fonts, Font, ICHelperUnsafe, /* n/a */),
@@ -471,9 +471,9 @@ CTOR_MEM_BEGIN(Fonts, Font, ICHelperUnsafe, /* n/a */),
     /* --------------------------------------------------------------------- */
     { }                                // Do nothing else
   /* ----------------------------------------------------------------------- */
-  DELETECOPYCTORS(Font)                // Omit copy constructor for safety
+  DELETECOPYCTORS(Font)                // Suppress default functions for safety
 };/* ----------------------------------------------------------------------- */
-CTOR_END_NOINITS(Fonts, Font)          // End of collector class
+CTOR_END_NOINITS(Fonts, Font, FONT)    // End of collector class
 /* -- DeInit Font Textures ------------------------------------------------- */
 static void FontDeInitTextures(void)
 { // Ignore if no fonts

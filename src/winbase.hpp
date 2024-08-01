@@ -845,7 +845,7 @@ class SysBase :                        // Members initially private
   /* -- Install unhandled exception filter --------------------------------- */
   { SetUnhandledExceptionFilter(HandleExceptionStatic); }
   /* ----------------------------------------------------------------------- */
-  DELETECOPYCTORS(SysBase);            // Suppress copy constructor for safety
+  DELETECOPYCTORS(SysBase)             // Suppress default functions for safety
 };/* ======================================================================= */
 #define MSENGINE_SYSBASE_CALLBACKS() \
   LONG WINAPI SysBase::SysBase::HandleExceptionStatic(LPEXCEPTION_POINTERS \

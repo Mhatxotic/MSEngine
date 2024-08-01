@@ -1,7 +1,7 @@
 <!DOCTYPE html>
-<!-- Reference for the MS-Engine API version 24.8.1.18 -->
-<!-- Automatically built at Thu Aug 01 14:29:36 2024 +0100 -->
-<!-- With MS-Engine Project Management Utility version 24.8.1.18 -->
+<!-- Reference for the MS-Engine API version 24.9.17.1 -->
+<!-- Automatically built at Tue Sep 17 00:08:28 2024 +0100 -->
+<!-- With MS-Engine Project Management Utility version 24.9.17.1 -->
 <!-- Copyright (c) 2006-2024 MS-Design, All Rights Reserved Worldwide -->
 <HTML lang="en-GB">
 <HEAD>
@@ -11,18 +11,18 @@
 	<META name="apple-mobile-web-app-title" content="MS-Engine API">
 	<META name="author" content="MS-Design">
 	<META name="copyright" content="Copyright © 2006-2024 MS-Design, All Rights Reserved">
-	<META name="description" content="Reference for the MS-Engine API version 24.8.1.18">
+	<META name="description" content="Reference for the MS-Engine API version 24.9.17.1">
 	<META name="format-detection" content="telephone=no">
-	<META name="generator" content="MS-Engine Project Management Utility version 24.8.1.18">
+	<META name="generator" content="MS-Engine Project Management Utility version 24.9.17.1">
 	<META name="google-site-verification" content="BvWxrqmgaIxqe_W8AW3OGK0fdCI_JfB_-gcOOxCF9_4">
 	<META name="googlebot" content="index,follow">
-	<META name="og:description" content="Reference for the MS-Engine API version 24.8.1.18">
+	<META name="og:description" content="Reference for the MS-Engine API version 24.9.17.1">
 	<META name="og:image" content="https://repository-images.githubusercontent.com/611875607/ee7aa468-9797-4763-9a2d-ea3d782ef413">
-	<META name="og:title" content="MS-Engine 24.8.1.18 API reference">
+	<META name="og:title" content="MS-Engine 24.9.17.1 API reference">
 	<META name="og:url" content="https://xmhat.github.io/MSEngine/">
 	<META name="robots" content="index,follow">
 	<META name="viewport" content="width=device-width, initial-scale=1">
-	<TITLE>MS-Engine 24.8.1.18 API reference</TITLE>
+	<TITLE>MS-Engine 24.9.17.1 API reference</TITLE>
 	<STYLE media="screen">
 	* { margin:0; padding:0 }
 	BODY { background-color:#111; border:0; font-family:sans-serif; overflow-x:hidden; text-shadow: 1px 1px #111 }
@@ -60,7 +60,7 @@
 	</STYLE>
 </HEAD>
 <BODY id="idx.top">
-	<H1>MS-Engine 24.8.1.18 API reference</H1>
+	<H1>MS-Engine 24.9.17.1 API reference</H1>
 	<NOSCRIPT>
 		<H2>JavaScript is required to show and hide elements.</H2>
 	</NOSCRIPT>
@@ -99,12 +99,12 @@
 	</SCRIPT>
 	<DIV id="idx" style="display:none">
 		<H2>Table of contents:-</H2>
-		<P>This build of the MS-Engine API consists of 827 functions (385 members, 442 methods) and 27 consts in 32 namespaces with 83 commands and 209 cvars.</P>
+		<P>This build of the MS-Engine API consists of 821 functions (386 members, 435 methods) and 27 consts in 29 namespaces with 83 commands and 206 cvars.</P>
 		<OL id="toc">
 			<LI id="idx.ns">
 				<DIV>
 					<DIV>
-						<A href="#idx.ns">Namespaces</A> <I>(32 namespaces)</I>
+						<A href="#idx.ns">Namespaces</A> <I>(29 namespaces)</I>
 						<OL>
 							<LI><P>Categorised functions that interact with the engine.</P></LI>
 							<LI>
@@ -116,15 +116,12 @@
 									<LI><A href="#idx:Clip">Clip</A></LI>
 									<LI><A href="#idx:Command">Command</A></LI>
 									<LI><A href="#idx:Core">Core</A></LI>
-									<LI><A href="#idx:Credit">Credit</A></LI>
-									<LI><A href="#idx:Crypt">Crypt</A></LI>
 									<LI><A href="#idx:Display">Display</A></LI>
 									<LI><A href="#idx:Fbo">Fbo</A></LI>
 									<LI><A href="#idx:File">File</A></LI>
 									<LI><A href="#idx:Font">Font</A></LI>
 									<LI><A href="#idx:Ftf">Ftf</A></LI>
 									<LI><A href="#idx:Image">Image</A></LI>
-									<LI><A href="#idx:Info">Info</A></LI>
 									<LI><A href="#idx:Input">Input</A></LI>
 									<LI><A href="#idx:Json">Json</A></LI>
 									<LI><A href="#idx:Mask">Mask</A></LI>
@@ -379,22 +376,48 @@
 					<DIV>
 						<A href="#idx:Core">Core namespace</A>
 						<OL>
-							<LI><P>The core class allows manipulation of the game engine itself.</P></LI>
+							<LI><P>The core class allows manipulation of and retrieve information from the game engine itself.</P></LI>
 							<LI>
-								<B>Members</B> <I>(26 members)</I>
+								<B>Members</B> <I>(59 members)</I>
 								<OL>
+									<LI><A href="#Core.CPU">CPU</A></LI>
+									<LI><A href="#Core.CPUFPS">CPUFPS</A></LI>
+									<LI><A href="#Core.CPUProcUsage">CPUProcUsage</A></LI>
+									<LI><A href="#Core.CPUSysUsage">CPUSysUsage</A></LI>
+									<LI><A href="#Core.CPUUsage">CPUUsage</A></LI>
+									<LI><A href="#Core.Catchup">Catchup</A></LI>
 									<LI><A href="#Core.Delay">Delay</A></LI>
 									<LI><A href="#Core.Done">Done</A></LI>
 									<LI><A href="#Core.End">End</A></LI>
+									<LI><A href="#Core.Engine">Engine</A></LI>
+									<LI><A href="#Core.Env">Env</A></LI>
 									<LI><A href="#Core.Events">Events</A></LI>
+									<LI><A href="#Core.IsOSLinux">IsOSLinux</A></LI>
+									<LI><A href="#Core.IsOSMac">IsOSMac</A></LI>
+									<LI><A href="#Core.IsOSWindows">IsOSWindows</A></LI>
 									<LI><A href="#Core.KillPid">KillPid</A></LI>
+									<LI><A href="#Core.LUAMicroTime">LUAMicroTime</A></LI>
+									<LI><A href="#Core.LUAMilliTime">LUAMilliTime</A></LI>
+									<LI><A href="#Core.LUANanoTime">LUANanoTime</A></LI>
+									<LI><A href="#Core.LUATime">LUATime</A></LI>
+									<LI><A href="#Core.LUAUsage">LUAUsage</A></LI>
+									<LI><A href="#Core.Library">Library</A></LI>
+									<LI><A href="#Core.License">License</A></LI>
+									<LI><A href="#Core.Locale">Locale</A></LI>
 									<LI><A href="#Core.Log">Log</A></LI>
 									<LI><A href="#Core.LogEx">LogEx</A></LI>
+									<LI><A href="#Core.OS">OS</A></LI>
+									<LI><A href="#Core.OSMicroTime">OSMicroTime</A></LI>
+									<LI><A href="#Core.OSMilliTime">OSMilliTime</A></LI>
+									<LI><A href="#Core.OSNanoTime">OSNanoTime</A></LI>
+									<LI><A href="#Core.OSNumTime">OSNumTime</A></LI>
+									<LI><A href="#Core.OSTime">OSTime</A></LI>
 									<LI><A href="#Core.OnEnd">OnEnd</A></LI>
 									<LI><A href="#Core.OnTick">OnTick</A></LI>
 									<LI><A href="#Core.Pause">Pause</A></LI>
 									<LI><A href="#Core.PidRunning">PidRunning</A></LI>
 									<LI><A href="#Core.Quit">Quit</A></LI>
+									<LI><A href="#Core.RAM">RAM</A></LI>
 									<LI><A href="#Core.Reset">Reset</A></LI>
 									<LI><A href="#Core.Restart">Restart</A></LI>
 									<LI><A href="#Core.RestartFresh">RestartFresh</A></LI>
@@ -406,90 +429,27 @@
 									<LI><A href="#Core.Stack">Stack</A></LI>
 									<LI><A href="#Core.StatusLeft">StatusLeft</A></LI>
 									<LI><A href="#Core.StatusRight">StatusRight</A></LI>
+									<LI><A href="#Core.Suspend">Suspend</A></LI>
+									<LI><A href="#Core.Ticks">Ticks</A></LI>
+									<LI><A href="#Core.Time">Time</A></LI>
+									<LI><A href="#Core.UpMicroTime">UpMicroTime</A></LI>
+									<LI><A href="#Core.UpMilliTime">UpMilliTime</A></LI>
+									<LI><A href="#Core.UpNanoTime">UpNanoTime</A></LI>
+									<LI><A href="#Core.Uptime">Uptime</A></LI>
 									<LI><A href="#Core.WaitAsync">WaitAsync</A></LI>
 									<LI><A href="#Core.Write">Write</A></LI>
 									<LI><A href="#Core.WriteEx">WriteEx</A></LI>
 								</OL>
 							</LI>
 							<LI>
-								<B>Consts</B> <I>(2 consts)</I>
+								<B>Consts</B> <I>(3 consts)</I>
 								<OL>
 									<LI><A href="#Core.Colours">Colours</A></LI>
+									<LI><A href="#Core.Libraries">Libraries</A></LI>
 									<LI><A href="#Core.LogLevels">LogLevels</A></LI>
 								</OL>
 							</LI>
 							<LI><A href="#idx:Core">&#x25B2; Return to summary</A> / <A href="#idx.top">top</A></LI>
-						</OL>
-					</DIV>
-				</DIV>
-			</LI>
-			<LI id="idx:Credit">
-				<DIV>
-					<DIV>
-						<A href="#idx:Credit">Credit namespace</A>
-						<OL>
-							<LI><P>Allows access to engine credits information.</P></LI>
-							<LI>
-								<B>Members</B> <I>(2 members)</I>
-								<OL>
-									<LI><A href="#Credit.Credit">Credit</A></LI>
-									<LI><A href="#Credit.License">License</A></LI>
-								</OL>
-							</LI>
-							<LI>
-								<B>Consts</B> <I>(1 const)</I>
-								<OL>
-									<LI><A href="#Credit.Libs">Libs</A></LI>
-								</OL>
-							</LI>
-							<LI><A href="#idx:Credit">&#x25B2; Return to summary</A> / <A href="#idx.top">top</A></LI>
-						</OL>
-					</DIV>
-				</DIV>
-			</LI>
-			<LI id="idx:Crypt">
-				<DIV>
-					<DIV>
-						<A href="#idx:Crypt">Crypt namespace</A>
-						<OL>
-							<LI><P>The crypt class allows access to cryptographic, compression and decompression functions.</P></LI>
-							<LI>
-								<B>Members</B> <I>(31 members)</I>
-								<OL>
-									<LI><A href="#Crypt.B64D">B64D</A></LI>
-									<LI><A href="#Crypt.B64DA">B64DA</A></LI>
-									<LI><A href="#Crypt.B64E">B64E</A></LI>
-									<LI><A href="#Crypt.B64EA">B64EA</A></LI>
-									<LI><A href="#Crypt.CRC">CRC</A></LI>
-									<LI><A href="#Crypt.CRCA">CRCA</A></LI>
-									<LI><A href="#Crypt.EntDecode">EntDecode</A></LI>
-									<LI><A href="#Crypt.EntEncode">EntEncode</A></LI>
-									<LI><A href="#Crypt.HMSHA1">HMSHA1</A></LI>
-									<LI><A href="#Crypt.HMSHA224">HMSHA224</A></LI>
-									<LI><A href="#Crypt.HMSHA256">HMSHA256</A></LI>
-									<LI><A href="#Crypt.HMSHA384">HMSHA384</A></LI>
-									<LI><A href="#Crypt.HMSHA512">HMSHA512</A></LI>
-									<LI><A href="#Crypt.HexDecode">HexDecode</A></LI>
-									<LI><A href="#Crypt.HexDecodeA">HexDecodeA</A></LI>
-									<LI><A href="#Crypt.HexEncode">HexEncode</A></LI>
-									<LI><A href="#Crypt.HexEncodeA">HexEncodeA</A></LI>
-									<LI><A href="#Crypt.HexEncodeL">HexEncodeL</A></LI>
-									<LI><A href="#Crypt.HexEncodeLA">HexEncodeLA</A></LI>
-									<LI><A href="#Crypt.SHA1">SHA1</A></LI>
-									<LI><A href="#Crypt.SHA1A">SHA1A</A></LI>
-									<LI><A href="#Crypt.SHA224">SHA224</A></LI>
-									<LI><A href="#Crypt.SHA224A">SHA224A</A></LI>
-									<LI><A href="#Crypt.SHA256">SHA256</A></LI>
-									<LI><A href="#Crypt.SHA256A">SHA256A</A></LI>
-									<LI><A href="#Crypt.SHA384">SHA384</A></LI>
-									<LI><A href="#Crypt.SHA384A">SHA384A</A></LI>
-									<LI><A href="#Crypt.SHA512">SHA512</A></LI>
-									<LI><A href="#Crypt.SHA512A">SHA512A</A></LI>
-									<LI><A href="#Crypt.UrlDecode">UrlDecode</A></LI>
-									<LI><A href="#Crypt.UrlEncode">UrlEncode</A></LI>
-								</OL>
-							</LI>
-							<LI><A href="#idx:Crypt">&#x25B2; Return to summary</A> / <A href="#idx.top">top</A></LI>
 						</OL>
 					</DIV>
 				</DIV>
@@ -576,7 +536,7 @@
 								</OL>
 							</LI>
 							<LI>
-								<B>Methods</B> <I>(27 methods)</I>
+								<B>Methods</B> <I>(26 methods)</I>
 								<OL>
 									<LI><A href="#Fbo:Activate">Activate</A></LI>
 									<LI><A href="#Fbo:Blit">Blit</A></LI>
@@ -600,7 +560,6 @@
 									<LI><A href="#Fbo:SetTCLTWH">SetTCLTWH</A></LI>
 									<LI><A href="#Fbo:SetTCX">SetTCX</A></LI>
 									<LI><A href="#Fbo:SetVLTRB">SetVLTRB</A></LI>
-									<LI><A href="#Fbo:SetVLTRBA">SetVLTRBA</A></LI>
 									<LI><A href="#Fbo:SetVLTWH">SetVLTWH</A></LI>
 									<LI><A href="#Fbo:SetVLTWHA">SetVLTWHA</A></LI>
 									<LI><A href="#Fbo:SetVX">SetVX</A></LI>
@@ -840,53 +799,6 @@
 								</OL>
 							</LI>
 							<LI><A href="#idx:Image">&#x25B2; Return to summary</A> / <A href="#idx.top">top</A></LI>
-						</OL>
-					</DIV>
-				</DIV>
-			</LI>
-			<LI id="idx:Info">
-				<DIV>
-					<DIV>
-						<A href="#idx:Info">Info namespace</A>
-						<OL>
-							<LI><P>The info namespace allows the programmer to gain information about the engine. Check out the Display namespace for more system information functions when graphical mode is enabled.</P></LI>
-							<LI>
-								<B>Members</B> <I>(31 members)</I>
-								<OL>
-									<LI><A href="#Info.CPU">CPU</A></LI>
-									<LI><A href="#Info.CPUFPS">CPUFPS</A></LI>
-									<LI><A href="#Info.CPUProcUsage">CPUProcUsage</A></LI>
-									<LI><A href="#Info.CPUSysUsage">CPUSysUsage</A></LI>
-									<LI><A href="#Info.CPUUsage">CPUUsage</A></LI>
-									<LI><A href="#Info.Catchup">Catchup</A></LI>
-									<LI><A href="#Info.Delay">Delay</A></LI>
-									<LI><A href="#Info.Engine">Engine</A></LI>
-									<LI><A href="#Info.Env">Env</A></LI>
-									<LI><A href="#Info.IsOSLinux">IsOSLinux</A></LI>
-									<LI><A href="#Info.IsOSMac">IsOSMac</A></LI>
-									<LI><A href="#Info.IsOSWindows">IsOSWindows</A></LI>
-									<LI><A href="#Info.LUAMicroTime">LUAMicroTime</A></LI>
-									<LI><A href="#Info.LUAMilliTime">LUAMilliTime</A></LI>
-									<LI><A href="#Info.LUANanoTime">LUANanoTime</A></LI>
-									<LI><A href="#Info.LUATime">LUATime</A></LI>
-									<LI><A href="#Info.LUAUsage">LUAUsage</A></LI>
-									<LI><A href="#Info.Locale">Locale</A></LI>
-									<LI><A href="#Info.OS">OS</A></LI>
-									<LI><A href="#Info.OSMicroTime">OSMicroTime</A></LI>
-									<LI><A href="#Info.OSMilliTime">OSMilliTime</A></LI>
-									<LI><A href="#Info.OSNanoTime">OSNanoTime</A></LI>
-									<LI><A href="#Info.OSNumTime">OSNumTime</A></LI>
-									<LI><A href="#Info.OSTime">OSTime</A></LI>
-									<LI><A href="#Info.RAM">RAM</A></LI>
-									<LI><A href="#Info.Ticks">Ticks</A></LI>
-									<LI><A href="#Info.Time">Time</A></LI>
-									<LI><A href="#Info.UpMicroTime">UpMicroTime</A></LI>
-									<LI><A href="#Info.UpMilliTime">UpMilliTime</A></LI>
-									<LI><A href="#Info.UpNanoTime">UpNanoTime</A></LI>
-									<LI><A href="#Info.Uptime">Uptime</A></LI>
-								</OL>
-							</LI>
-							<LI><A href="#idx:Info">&#x25B2; Return to summary</A> / <A href="#idx.top">top</A></LI>
 						</OL>
 					</DIV>
 				</DIV>
@@ -1427,32 +1339,28 @@
 								</OL>
 							</LI>
 							<LI>
-								<B>Methods</B> <I>(66 methods)</I>
+								<B>Methods</B> <I>(61 methods)</I>
 								<OL>
 									<LI><A href="#Texture:Blit">Blit</A></LI>
 									<LI><A href="#Texture:BlitILT">BlitILT</A></LI>
 									<LI><A href="#Texture:BlitILTA">BlitILTA</A></LI>
 									<LI><A href="#Texture:BlitILTRB">BlitILTRB</A></LI>
-									<LI><A href="#Texture:BlitILTRBA">BlitILTRBA</A></LI>
 									<LI><A href="#Texture:BlitILTWH">BlitILTWH</A></LI>
 									<LI><A href="#Texture:BlitILTWHA">BlitILTWHA</A></LI>
 									<LI><A href="#Texture:BlitISLT">BlitISLT</A></LI>
 									<LI><A href="#Texture:BlitISLTA">BlitISLTA</A></LI>
 									<LI><A href="#Texture:BlitISLTRB">BlitISLTRB</A></LI>
-									<LI><A href="#Texture:BlitISLTRBA">BlitISLTRBA</A></LI>
 									<LI><A href="#Texture:BlitISLTWH">BlitISLTWH</A></LI>
 									<LI><A href="#Texture:BlitISLTWHA">BlitISLTWHA</A></LI>
 									<LI><A href="#Texture:BlitLT">BlitLT</A></LI>
 									<LI><A href="#Texture:BlitLTA">BlitLTA</A></LI>
 									<LI><A href="#Texture:BlitLTRB">BlitLTRB</A></LI>
-									<LI><A href="#Texture:BlitLTRBA">BlitLTRBA</A></LI>
 									<LI><A href="#Texture:BlitLTWH">BlitLTWH</A></LI>
 									<LI><A href="#Texture:BlitLTWHA">BlitLTWHA</A></LI>
 									<LI><A href="#Texture:BlitM">BlitM</A></LI>
 									<LI><A href="#Texture:BlitSLT">BlitSLT</A></LI>
 									<LI><A href="#Texture:BlitSLTA">BlitSLTA</A></LI>
 									<LI><A href="#Texture:BlitSLTRB">BlitSLTRB</A></LI>
-									<LI><A href="#Texture:BlitSLTRBA">BlitSLTRBA</A></LI>
 									<LI><A href="#Texture:BlitSLTWH">BlitSLTWH</A></LI>
 									<LI><A href="#Texture:BlitSLTWHA">BlitSLTWHA</A></LI>
 									<LI><A href="#Texture:Destroy">Destroy</A></LI>
@@ -1477,7 +1385,6 @@
 									<LI><A href="#Texture:SetTCLTWH">SetTCLTWH</A></LI>
 									<LI><A href="#Texture:SetTCX">SetTCX</A></LI>
 									<LI><A href="#Texture:SetVLTRB">SetVLTRB</A></LI>
-									<LI><A href="#Texture:SetVLTRBA">SetVLTRBA</A></LI>
 									<LI><A href="#Texture:SetVLTWH">SetVLTWH</A></LI>
 									<LI><A href="#Texture:SetVLTWHA">SetVLTWHA</A></LI>
 									<LI><A href="#Texture:SetVX">SetVX</A></LI>
@@ -1507,17 +1414,23 @@
 					<DIV>
 						<A href="#idx:Util">Util namespace</A>
 						<OL>
-							<LI><P>This contains miscellenious utility functions such as string, number and time manipulation functions.</P></LI>
+							<LI><P>This contains miscellaneous utility functions such as crypto, string, number integer and time manipulation functions.</P></LI>
 							<LI>
-								<B>Members</B> <I>(75 members)</I>
+								<B>Members</B> <I>(107 members)</I>
 								<OL>
 									<LI><A href="#Util.AscNTime">AscNTime</A></LI>
 									<LI><A href="#Util.AscNTimeUTC">AscNTimeUTC</A></LI>
 									<LI><A href="#Util.AscTime">AscTime</A></LI>
 									<LI><A href="#Util.AscTimeUTC">AscTimeUTC</A></LI>
+									<LI><A href="#Util.B64D">B64D</A></LI>
+									<LI><A href="#Util.B64DA">B64DA</A></LI>
+									<LI><A href="#Util.B64E">B64E</A></LI>
+									<LI><A href="#Util.B64EA">B64EA</A></LI>
 									<LI><A href="#Util.Bits">Bits</A></LI>
 									<LI><A href="#Util.Blank">Blank</A></LI>
 									<LI><A href="#Util.Bytes">Bytes</A></LI>
+									<LI><A href="#Util.CRC">CRC</A></LI>
+									<LI><A href="#Util.CRCA">CRCA</A></LI>
 									<LI><A href="#Util.Capitalise">Capitalise</A></LI>
 									<LI><A href="#Util.Clamp">Clamp</A></LI>
 									<LI><A href="#Util.ClampInt">ClampInt</A></LI>
@@ -1526,6 +1439,8 @@
 									<LI><A href="#Util.DecodeUUID">DecodeUUID</A></LI>
 									<LI><A href="#Util.Duration">Duration</A></LI>
 									<LI><A href="#Util.EncodeUUID">EncodeUUID</A></LI>
+									<LI><A href="#Util.EntDecode">EntDecode</A></LI>
+									<LI><A href="#Util.EntEncode">EntEncode</A></LI>
 									<LI><A href="#Util.Explode">Explode</A></LI>
 									<LI><A href="#Util.ExplodeEx">ExplodeEx</A></LI>
 									<LI><A href="#Util.FormatNTime">FormatNTime</A></LI>
@@ -1536,7 +1451,18 @@
 									<LI><A href="#Util.FormatTimeUTC">FormatTimeUTC</A></LI>
 									<LI><A href="#Util.GetRatio">GetRatio</A></LI>
 									<LI><A href="#Util.Grouped">Grouped</A></LI>
+									<LI><A href="#Util.HMSHA1">HMSHA1</A></LI>
+									<LI><A href="#Util.HMSHA224">HMSHA224</A></LI>
+									<LI><A href="#Util.HMSHA256">HMSHA256</A></LI>
+									<LI><A href="#Util.HMSHA384">HMSHA384</A></LI>
+									<LI><A href="#Util.HMSHA512">HMSHA512</A></LI>
 									<LI><A href="#Util.Hex">Hex</A></LI>
+									<LI><A href="#Util.HexDecode">HexDecode</A></LI>
+									<LI><A href="#Util.HexDecodeA">HexDecodeA</A></LI>
+									<LI><A href="#Util.HexEncode">HexEncode</A></LI>
+									<LI><A href="#Util.HexEncodeA">HexEncodeA</A></LI>
+									<LI><A href="#Util.HexEncodeL">HexEncodeL</A></LI>
+									<LI><A href="#Util.HexEncodeLA">HexEncodeLA</A></LI>
 									<LI><A href="#Util.HexL">HexL</A></LI>
 									<LI><A href="#Util.HighByte">HighByte</A></LI>
 									<LI><A href="#Util.HighDWord">HighDWord</A></LI>
@@ -1561,7 +1487,6 @@
 									<LI><A href="#Util.MakeDWord">MakeDWord</A></LI>
 									<LI><A href="#Util.MakeQWord">MakeQWord</A></LI>
 									<LI><A href="#Util.MakeWord">MakeWord</A></LI>
-									<LI><A href="#Util.MkUTF8Char">MkUTF8Char</A></LI>
 									<LI><A href="#Util.ParseArgs">ParseArgs</A></LI>
 									<LI><A href="#Util.ParseTime">ParseTime</A></LI>
 									<LI><A href="#Util.ParseTime2">ParseTime2</A></LI>
@@ -1581,10 +1506,24 @@
 									<LI><A href="#Util.RoundInt">RoundInt</A></LI>
 									<LI><A href="#Util.RoundMul">RoundMul</A></LI>
 									<LI><A href="#Util.RoundPow2">RoundPow2</A></LI>
+									<LI><A href="#Util.SHA1">SHA1</A></LI>
+									<LI><A href="#Util.SHA1A">SHA1A</A></LI>
+									<LI><A href="#Util.SHA224">SHA224</A></LI>
+									<LI><A href="#Util.SHA224A">SHA224A</A></LI>
+									<LI><A href="#Util.SHA256">SHA256</A></LI>
+									<LI><A href="#Util.SHA256A">SHA256A</A></LI>
+									<LI><A href="#Util.SHA384">SHA384</A></LI>
+									<LI><A href="#Util.SHA384A">SHA384A</A></LI>
+									<LI><A href="#Util.SHA512">SHA512</A></LI>
+									<LI><A href="#Util.SHA512A">SHA512A</A></LI>
+									<LI><A href="#Util.Sanitise">Sanitise</A></LI>
 									<LI><A href="#Util.StretchInner">StretchInner</A></LI>
 									<LI><A href="#Util.StretchOuter">StretchOuter</A></LI>
 									<LI><A href="#Util.TableSize">TableSize</A></LI>
 									<LI><A href="#Util.Trim">Trim</A></LI>
+									<LI><A href="#Util.UTF8Char">UTF8Char</A></LI>
+									<LI><A href="#Util.UrlDecode">UrlDecode</A></LI>
+									<LI><A href="#Util.UrlEncode">UrlEncode</A></LI>
 									<LI><A href="#Util.WordWrap">WordWrap</A></LI>
 								</OL>
 							</LI>
@@ -1653,7 +1592,7 @@
 								</OL>
 							</LI>
 							<LI>
-								<B>Methods</B> <I>(38 methods)</I>
+								<B>Methods</B> <I>(37 methods)</I>
 								<OL>
 									<LI><A href="#Video:Advance">Advance</A></LI>
 									<LI><A href="#Video:Awaken">Awaken</A></LI>
@@ -1687,7 +1626,6 @@
 									<LI><A href="#Video:SetTCLTWH">SetTCLTWH</A></LI>
 									<LI><A href="#Video:SetTCX">SetTCX</A></LI>
 									<LI><A href="#Video:SetVLTRB">SetVLTRB</A></LI>
-									<LI><A href="#Video:SetVLTRBA">SetVLTRBA</A></LI>
 									<LI><A href="#Video:SetVLTWH">SetVLTWH</A></LI>
 									<LI><A href="#Video:SetVLTWHA">SetVLTWHA</A></LI>
 									<LI><A href="#Video:SetVX">SetVX</A></LI>
@@ -1807,7 +1745,7 @@
 			<LI id="idx.cv">
 				<DIV>
 					<DIV>
-						<A href="#cvars">CVars</A> <I>(209 cvars)</I>
+						<A href="#cvars">CVars</A> <I>(206 cvars)</I>
 						<OL>
 							<LI><P>Variables that change the behaviour of the engine.</P></LI>
 							<LI>
@@ -1817,7 +1755,6 @@
 									<LI><A href="#cv.app_cflags">app_cflags</A></LI>
 									<LI><A href="#cv.app_clearmutex">app_clearmutex</A></LI>
 									<LI><A href="#cv.app_cmdline">app_cmdline</A></LI>
-									<LI><A href="#cv.app_compatflags">app_compatflags</A></LI>
 									<LI><A href="#cv.app_config">app_config</A></LI>
 									<LI><A href="#cv.app_copyright">app_copyright</A></LI>
 									<LI><A href="#cv.app_delay">app_delay</A></LI>
@@ -1843,7 +1780,7 @@
 									<LI><A href="#cv.aud_numsources">aud_numsources</A></LI>
 									<LI><A href="#cv.aud_samvol">aud_samvol</A></LI>
 									<LI><A href="#cv.aud_strbufcount">aud_strbufcount</A></LI>
-									<LI><A href="#cv.aud_strbufsiz">aud_strbufsiz</A></LI>
+									<LI><A href="#cv.aud_strbuffer">aud_strbuffer</A></LI>
 									<LI><A href="#cv.aud_strvol">aud_strvol</A></LI>
 									<LI><A href="#cv.aud_vol">aud_vol</A></LI>
 									<LI><A href="#cv.con_autocomplete">con_autocomplete</A></LI>
@@ -1902,7 +1839,6 @@
 									<LI><A href="#cv.log_file">log_file</A></LI>
 									<LI><A href="#cv.log_level">log_level</A></LI>
 									<LI><A href="#cv.log_lines">log_lines</A></LI>
-									<LI><A href="#cv.lua_apiflags">lua_apiflags</A></LI>
 									<LI><A href="#cv.lua_cache">lua_cache</A></LI>
 									<LI><A href="#cv.lua_gcpause">lua_gcpause</A></LI>
 									<LI><A href="#cv.lua_gcstepmul">lua_gcstepmul</A></LI>
@@ -2017,7 +1953,6 @@
 									<LI><A href="#cv.win_posx">win_posx</A></LI>
 									<LI><A href="#cv.win_posy">win_posy</A></LI>
 									<LI><A href="#cv.win_sizable">win_sizable</A></LI>
-									<LI><A href="#cv.win_thread">win_thread</A></LI>
 									<LI><A href="#cv.win_width">win_width</A></LI>
 									<LI><A href="#cv.win_widthmax">win_widthmax</A></LI>
 									<LI><A href="#cv.win_widthmin">win_widthmin</A></LI>
@@ -3004,14 +2939,72 @@
 		<PRE>Returns the name of the console command this object was registered with&#x2e;<BR></PRE>
 		<H4><A href="#idx:Command">&#x25B2; Return to table of contents</A></H4>
 	</DIV>
+	<DIV id="Core.CPU" style="display:none">
+		<H3>Core.CPU</H3>
+		<H4>Syntax:-</H4>
+		<PRE><U>CPUid</U>, <U>Count</U>, <U>Speed</U>, <U>Family</U>, <U>Model</U>, <U>Stepping</U> = Core.CPU()</PRE>
+		<H4>Return Parameters:-</H4>
+		<PRE><U>CPUid</U> <I>(string)</I> = The CPUID string.<BR><U>Count</U> <I>(integer)</I> = Number of threads available to the engine.<BR><U>Speed</U> <I>(integer)</I> = Processor frequency in Hz.<BR><U>Family</U> <I>(integer)</I> = Processor family.<BR><U>Model</U> <I>(integer)</I> = Processor model.<BR><U>Stepping</U> <I>(integer)</I> = Processor stepping.<BR></PRE>
+		<H4>Synopsis:-</H4>
+		<PRE>Returns information about the installed Central Processing Unit&#x2e;<BR></PRE>
+		<H4><A href="#idx:Core">&#x25B2; Return to table of contents</A></H4>
+	</DIV>
+	<DIV id="Core.CPUFPS" style="display:none">
+		<H3>Core.CPUFPS</H3>
+		<H4>Syntax:-</H4>
+		<PRE><U>FPS</U> = Core.CPUFPS()</PRE>
+		<H4>Return Parameters:-</H4>
+		<PRE><U>FPS</U> <I>(number)</I> = Frames per second.<BR></PRE>
+		<H4>Synopsis:-</H4>
+		<PRE>Get CPU loops processed in the last second&#x2e; Should be the same as GPU for most people but at times may be different&#x2c; sometimes much higher&#x2e;<BR></PRE>
+		<H4><A href="#idx:Core">&#x25B2; Return to table of contents</A></H4>
+	</DIV>
+	<DIV id="Core.CPUProcUsage" style="display:none">
+		<H3>Core.CPUProcUsage</H3>
+		<H4>Syntax:-</H4>
+		<PRE><U>Percent</U> = Core.CPUProcUsage()</PRE>
+		<H4>Return Parameters:-</H4>
+		<PRE><U>Percent</U> <I>(number)</I> = Percentage process.<BR></PRE>
+		<H4>Synopsis:-</H4>
+		<PRE>Returns the engine CPU load&#x2e; It is hard&#x2d;coded to only update once a a second so constant calls won&#x27;t stress the kernel&#x2e;<BR></PRE>
+		<H4><A href="#idx:Core">&#x25B2; Return to table of contents</A></H4>
+	</DIV>
+	<DIV id="Core.CPUSysUsage" style="display:none">
+		<H3>Core.CPUSysUsage</H3>
+		<H4>Syntax:-</H4>
+		<PRE><U>Percent</U> = Core.CPUSysUsage()</PRE>
+		<H4>Return Parameters:-</H4>
+		<PRE><U>Percent</U> <I>(number)</I> = Percentage system.<BR></PRE>
+		<H4>Synopsis:-</H4>
+		<PRE>Returns the system CPU load&#x2e; It is hard&#x2d;coded to only update once a a second so constant calls won&#x27;t stress the kernel&#x2e;<BR></PRE>
+		<H4><A href="#idx:Core">&#x25B2; Return to table of contents</A></H4>
+	</DIV>
+	<DIV id="Core.CPUUsage" style="display:none">
+		<H3>Core.CPUUsage</H3>
+		<H4>Syntax:-</H4>
+		<PRE><U>Percent</U>, <U>Percent</U> = Core.CPUUsage()</PRE>
+		<H4>Return Parameters:-</H4>
+		<PRE><U>Percent</U> <I>(number)</I> = Percentage process.<BR><U>Percent</U> <I>(number)</I> = Percentage system.<BR></PRE>
+		<H4>Synopsis:-</H4>
+		<PRE>Returns the engine and system CPU load&#x2e; Use this instead of the other two cpu usage functions if you need both values&#x2e; This omits a second check to update cpu usage and very slightly more optimal than calling both cpu usage functions which are hard&#x2d;coded to only update once a a second so constant calls won&#x27;t stress the kernel&#x2e;<BR></PRE>
+		<H4><A href="#idx:Core">&#x25B2; Return to table of contents</A></H4>
+	</DIV>
+	<DIV id="Core.Catchup" style="display:none">
+		<H3>Core.Catchup</H3>
+		<H4>Syntax:-</H4>
+		<PRE>Core.Catchup()</PRE>
+		<H4>Synopsis:-</H4>
+		<PRE>Resets the high resolution timer and resets the accumulator&#x2e; Please be advised that the video system relies on this timer so videos will not play properly if this is constantly used&#x2e; Only use when doing loading screens&#x2e;<BR></PRE>
+		<H4><A href="#idx:Core">&#x25B2; Return to table of contents</A></H4>
+	</DIV>
 	<DIV id="Core.Delay" style="display:none">
 		<H3>Core.Delay</H3>
 		<H4>Syntax:-</H4>
-		<PRE>Core.Delay(<I><U>Millisecs</U></I>)</PRE>
-		<H4>Function Parameters:-</H4>
-		<PRE><U>Millisecs</U> <I>(integer)</I> = Time in seconds.<BR></PRE>
+		<PRE><U>Time</U> = Core.Delay()</PRE>
+		<H4>Return Parameters:-</H4>
+		<PRE><U>Time</U> <I>(number)</I> = Delay time in seconds.<BR></PRE>
 		<H4>Synopsis:-</H4>
-		<PRE>Delays the engine thread for this amount of time&#x2e;<BR></PRE>
+		<PRE>Returns the current thread delay time in seconds without having to read the &#x27;vid_delay&#x27; variable&#x2e; This would be useful if you are actually using the delay and you want to offset a time point by the thread delay&#x2e;<BR></PRE>
 		<H4><A href="#idx:Core">&#x25B2; Return to table of contents</A></H4>
 	</DIV>
 	<DIV id="Core.Done" style="display:none">
@@ -3030,6 +3023,28 @@
 		<PRE>Ends LUA execution and enables the console&#x2e;<BR></PRE>
 		<H4><A href="#idx:Core">&#x25B2; Return to table of contents</A></H4>
 	</DIV>
+	<DIV id="Core.Engine" style="display:none">
+		<H3>Core.Engine</H3>
+		<H4>Syntax:-</H4>
+		<PRE><U>Title</U>, <U>Vendor</U>, <U>Major</U>, <U>Minor</U>, <U>Build</U>, <U>Revision</U>, <U>Bits</U>, <U>Type</U>, <U>Target</U>, <U>Compiled</U>, <U>Compiler</U>, <U>CompVersion</U> = Core.Engine()</PRE>
+		<H4>Return Parameters:-</H4>
+		<PRE><U>Title</U> <I>(string)</I> = Title of engine (normally MS-Engine).<BR><U>Vendor</U> <I>(string)</I> = Author of engine (normally MS-Design).<BR><U>Major</U> <I>(integer)</I> = Major version number of engine.<BR><U>Minor</U> <I>(integer)</I> = Minor version number of engine.<BR><U>Build</U> <I>(integer)</I> = Build version number of engine.<BR><U>Revision</U> <I>(integer)</I> = Revision version number of engine.<BR><U>Bits</U> <I>(integer)</I> = Bits version number of engine (32 or 64).<BR><U>Type</U> <I>(string)</I> = Text representation of built type (Release,Alpha,Beta).<BR><U>Target</U> <I>(string)</I> = Text string of the type of executable file.<BR><U>Compiled</U> <I>(string)</I> = The timestamp of the executable compilation time.<BR><U>Compiler</U> <I>(string)</I> = The name of the compiler that built the executable.<BR><U>CompVersion</U> <I>(string)</I> = The version of the compiler that built the executable.<BR></PRE>
+		<H4>Synopsis:-</H4>
+		<PRE>Returns version information about the engine&#x2e;<BR></PRE>
+		<H4><A href="#idx:Core">&#x25B2; Return to table of contents</A></H4>
+	</DIV>
+	<DIV id="Core.Env" style="display:none">
+		<H3>Core.Env</H3>
+		<H4>Syntax:-</H4>
+		<PRE><U>Value</U> = Core.Env(<I><U>Value</U></I>)</PRE>
+		<H4>Function Parameters:-</H4>
+		<PRE><U>Value</U> <I>(string)</I> = The name of the variable to query.<BR></PRE>
+		<H4>Return Parameters:-</H4>
+		<PRE><U>Value</U> <I>(string)</I> = The value of the specified variable.<BR></PRE>
+		<H4>Synopsis:-</H4>
+		<PRE>Queries the specified environment variable&#x2e; Returns a blank string if empty&#x2e; All environment variables are converted to upper&#x2d;case at startup&#x2e;<BR>Type &#x27;env&#x27; in the console to see the current environment&#x2e;<BR></PRE>
+		<H4><A href="#idx:Core">&#x25B2; Return to table of contents</A></H4>
+	</DIV>
 	<DIV id="Core.Events" style="display:none">
 		<H3>Core.Events</H3>
 		<H4>Syntax:-</H4>
@@ -3038,6 +3053,36 @@
 		<PRE><U>Events</U> <I>(integer)</I> = Number of events in the engine events system.<BR></PRE>
 		<H4>Synopsis:-</H4>
 		<PRE>Returns the number of events in the engine event system&#x2e; Helps with synchronising Video or Stream class events&#x2e;<BR></PRE>
+		<H4><A href="#idx:Core">&#x25B2; Return to table of contents</A></H4>
+	</DIV>
+	<DIV id="Core.IsOSLinux" style="display:none">
+		<H3>Core.IsOSLinux</H3>
+		<H4>Syntax:-</H4>
+		<PRE><U>Boolean</U> = Core.IsOSLinux()</PRE>
+		<H4>Return Parameters:-</H4>
+		<PRE><U>Boolean</U> <I>(boolean)</I> = True if using Linux, false if not.<BR></PRE>
+		<H4>Synopsis:-</H4>
+		<PRE>Returns true if executable was built for Linux&#x2c; false if not&#x2e;<BR></PRE>
+		<H4><A href="#idx:Core">&#x25B2; Return to table of contents</A></H4>
+	</DIV>
+	<DIV id="Core.IsOSMac" style="display:none">
+		<H3>Core.IsOSMac</H3>
+		<H4>Syntax:-</H4>
+		<PRE><U>Boolean</U> = Core.IsOSMac()</PRE>
+		<H4>Return Parameters:-</H4>
+		<PRE><U>Boolean</U> <I>(boolean)</I> = True if using MacOS, false if not.<BR></PRE>
+		<H4>Synopsis:-</H4>
+		<PRE>Returns true if executable was built for MacOS&#x2c; false if not&#x2e;<BR></PRE>
+		<H4><A href="#idx:Core">&#x25B2; Return to table of contents</A></H4>
+	</DIV>
+	<DIV id="Core.IsOSWindows" style="display:none">
+		<H3>Core.IsOSWindows</H3>
+		<H4>Syntax:-</H4>
+		<PRE><U>Boolean</U> = Core.IsOSWindows()</PRE>
+		<H4>Return Parameters:-</H4>
+		<PRE><U>Boolean</U> <I>(boolean)</I> = True if using Windows, false if not.<BR></PRE>
+		<H4>Synopsis:-</H4>
+		<PRE>Returns true if executable was built for Windows&#x2c; false if not&#x2e;<BR></PRE>
 		<H4><A href="#idx:Core">&#x25B2; Return to table of contents</A></H4>
 	</DIV>
 	<DIV id="Core.KillPid" style="display:none">
@@ -3050,6 +3095,90 @@
 		<PRE><U>Result</U> <I>(boolean)</I> = The process is killed?<BR></PRE>
 		<H4>Synopsis:-</H4>
 		<PRE>Kills the specified process id&#x2e; This only works on pids that were originally spawned by the engine&#x2e; Specifying pid zero will cause an exception&#x2e;<BR></PRE>
+		<H4><A href="#idx:Core">&#x25B2; Return to table of contents</A></H4>
+	</DIV>
+	<DIV id="Core.LUAMicroTime" style="display:none">
+		<H3>Core.LUAMicroTime</H3>
+		<H4>Syntax:-</H4>
+		<PRE><U>Time</U> = Core.LUAMicroTime()</PRE>
+		<H4>Return Parameters:-</H4>
+		<PRE><U>Time</U> <I>(integer)</I> = The time in microseconds.<BR></PRE>
+		<H4>Synopsis:-</H4>
+		<PRE>Returns the total time in the LUA sandbox in microseconds&#x2e;<BR></PRE>
+		<H4><A href="#idx:Core">&#x25B2; Return to table of contents</A></H4>
+	</DIV>
+	<DIV id="Core.LUAMilliTime" style="display:none">
+		<H3>Core.LUAMilliTime</H3>
+		<H4>Syntax:-</H4>
+		<PRE><U>Time</U> = Core.LUAMilliTime()</PRE>
+		<H4>Return Parameters:-</H4>
+		<PRE><U>Time</U> <I>(integer)</I> = The execution time in milliseconds.<BR></PRE>
+		<H4>Synopsis:-</H4>
+		<PRE>Returns the total time in the LUA sandbox in milliseconds&#x2e;<BR></PRE>
+		<H4><A href="#idx:Core">&#x25B2; Return to table of contents</A></H4>
+	</DIV>
+	<DIV id="Core.LUANanoTime" style="display:none">
+		<H3>Core.LUANanoTime</H3>
+		<H4>Syntax:-</H4>
+		<PRE><U>Time</U> = Core.LUANanoTime()</PRE>
+		<H4>Return Parameters:-</H4>
+		<PRE><U>Time</U> <I>(integer)</I> = The time in nanoseconds.<BR></PRE>
+		<H4>Synopsis:-</H4>
+		<PRE>Returns the total time in the LUA sandbox in nanoseconds&#x2e;<BR></PRE>
+		<H4><A href="#idx:Core">&#x25B2; Return to table of contents</A></H4>
+	</DIV>
+	<DIV id="Core.LUATime" style="display:none">
+		<H3>Core.LUATime</H3>
+		<H4>Syntax:-</H4>
+		<PRE><U>Timestamp</U> = Core.LUATime()</PRE>
+		<H4>Return Parameters:-</H4>
+		<PRE><U>Timestamp</U> <I>(number)</I> = The execution time as a number.<BR></PRE>
+		<H4>Synopsis:-</H4>
+		<PRE>Returns the total time in the LUA sandbox in seconds&#x2e;<BR></PRE>
+		<H4><A href="#idx:Core">&#x25B2; Return to table of contents</A></H4>
+	</DIV>
+	<DIV id="Core.LUAUsage" style="display:none">
+		<H3>Core.LUAUsage</H3>
+		<H4>Syntax:-</H4>
+		<PRE><U>Bytes</U> = Core.LUAUsage()</PRE>
+		<H4>Return Parameters:-</H4>
+		<PRE><U>Bytes</U> <I>(integer)</I> = Bytes of memory.<BR></PRE>
+		<H4>Synopsis:-</H4>
+		<PRE>Returns the amount of memory in use by Lua </PRE>
+		<H4><A href="#idx:Core">&#x25B2; Return to table of contents</A></H4>
+	</DIV>
+	<DIV id="Core.Library" style="display:none">
+		<H3>Core.Library</H3>
+		<H4>Syntax:-</H4>
+		<PRE><U>Name</U>, <U>Version</U>, <U>Id</U>, <U>Website</U>, <U>Copyright</U>, <U>Author</U> = Core.Library(<I><U>Id</U></I>)</PRE>
+		<H4>Function Parameters:-</H4>
+		<PRE><U>Id</U> <I>(integer)</I> = The index of the license.<BR></PRE>
+		<H4>Return Parameters:-</H4>
+		<PRE><U>Name</U> <I>(string)</I> = Name of the credit.<BR><U>Version</U> <I>(string)</I> = Version of the api.<BR><U>Id</U> <I>(integer)</I> = License index.<BR><U>Website</U> <I>(string)</I> = Website of the api.<BR><U>Copyright</U> <I>(string)</I> = Copyright of the api.<BR><U>Author</U> <I>(string)</I> = Author of the api.<BR></PRE>
+		<H4>Synopsis:-</H4>
+		<PRE>Shows the full credits information of the specified api index&#x2e;<BR></PRE>
+		<H4><A href="#idx:Core">&#x25B2; Return to table of contents</A></H4>
+	</DIV>
+	<DIV id="Core.License" style="display:none">
+		<H3>Core.License</H3>
+		<H4>Syntax:-</H4>
+		<PRE><U>Name</U>, <U>Text</U> = Core.License(<I><U>Id</U></I>)</PRE>
+		<H4>Function Parameters:-</H4>
+		<PRE><U>Id</U> <I>(integer)</I> = The index of the license.<BR></PRE>
+		<H4>Return Parameters:-</H4>
+		<PRE><U>Name</U> <I>(string)</I> = Name of the license.<BR><U>Text</U> <I>(string)</I> = Full text file of the license.<BR></PRE>
+		<H4>Synopsis:-</H4>
+		<PRE>Shows the full license information of the specified index&#x2e;<BR></PRE>
+		<H4><A href="#idx:Core">&#x25B2; Return to table of contents</A></H4>
+	</DIV>
+	<DIV id="Core.Locale" style="display:none">
+		<H3>Core.Locale</H3>
+		<H4>Syntax:-</H4>
+		<PRE><U>LocaleID</U> = Core.Locale()</PRE>
+		<H4>Return Parameters:-</H4>
+		<PRE><U>LocaleID</U> <I>(number)</I> = Locale id.<BR></PRE>
+		<H4>Synopsis:-</H4>
+		<PRE>Returns the system locale id&#x2e;<BR></PRE>
 		<H4><A href="#idx:Core">&#x25B2; Return to table of contents</A></H4>
 	</DIV>
 	<DIV id="Core.Log" style="display:none">
@@ -3070,6 +3199,66 @@
 		<PRE><U>Text</U> <I>(string)</I> = The line of text to write to the log.<BR><U>Level</U> <I>(integer)</I> = The log severity level.<BR></PRE>
 		<H4>Synopsis:-</H4>
 		<PRE>Writes the specified line of text to the engine log&#x2e; Note that if the current log level cvar setting is below this then the function does not log anything&#x2e;<BR></PRE>
+		<H4><A href="#idx:Core">&#x25B2; Return to table of contents</A></H4>
+	</DIV>
+	<DIV id="Core.OS" style="display:none">
+		<H3>Core.OS</H3>
+		<H4>Syntax:-</H4>
+		<PRE><U>Name</U>, <U>Major</U>, <U>Minor</U>, <U>Build</U>, <U>Platform</U>, <U>SPack</U>, <U>Suite</U>, <U>ProdType</U>, <U>Bits</U>, <U>Extra</U> = Core.OS()</PRE>
+		<H4>Return Parameters:-</H4>
+		<PRE><U>Name</U> <I>(string)</I> = Operating system type (Windows,Linux,MacOS).<BR><U>Major</U> <I>(integer)</I> = Major version number of operating system.<BR><U>Minor</U> <I>(integer)</I> = Minor version number of operating system.<BR><U>Build</U> <I>(integer)</I> = Build version number of operating system.<BR><U>Platform</U> <I>(integer)</I> = Platform version number of operating system (Windows).<BR><U>SPack</U> <I>(integer)</I> = Service pack number of operating system (Windows).<BR><U>Suite</U> <I>(integer)</I> = Suite number of operating system (Windows).<BR><U>ProdType</U> <I>(integer)</I> = Product number of operating system (Windows).<BR><U>Bits</U> <I>(integer)</I> = Bits version of operating system.<BR><U>Extra</U> <I>(string)</I> = Extra operating system information (e.g. Wine/Kernel).<BR></PRE>
+		<H4>Synopsis:-</H4>
+		<PRE>Returns version information about the operating system&#x2e;<BR></PRE>
+		<H4><A href="#idx:Core">&#x25B2; Return to table of contents</A></H4>
+	</DIV>
+	<DIV id="Core.OSMicroTime" style="display:none">
+		<H3>Core.OSMicroTime</H3>
+		<H4>Syntax:-</H4>
+		<PRE><U>Time</U> = Core.OSMicroTime()</PRE>
+		<H4>Return Parameters:-</H4>
+		<PRE><U>Time</U> <I>(integer)</I> = The time in microseconds.<BR></PRE>
+		<H4>Synopsis:-</H4>
+		<PRE>Returns the time elapsed in microseconds since the OS started&#x2e; Precision will be lost over time&#x2e;<BR></PRE>
+		<H4><A href="#idx:Core">&#x25B2; Return to table of contents</A></H4>
+	</DIV>
+	<DIV id="Core.OSMilliTime" style="display:none">
+		<H3>Core.OSMilliTime</H3>
+		<H4>Syntax:-</H4>
+		<PRE><U>Time</U> = Core.OSMilliTime()</PRE>
+		<H4>Return Parameters:-</H4>
+		<PRE><U>Time</U> <I>(integer)</I> = The time in milliseconds.<BR></PRE>
+		<H4>Synopsis:-</H4>
+		<PRE>Returns the time elapsed in milliseconds since the OS started&#x2e; Precision will be lost over time&#x2e;<BR></PRE>
+		<H4><A href="#idx:Core">&#x25B2; Return to table of contents</A></H4>
+	</DIV>
+	<DIV id="Core.OSNanoTime" style="display:none">
+		<H3>Core.OSNanoTime</H3>
+		<H4>Syntax:-</H4>
+		<PRE><U>Time</U> = Core.OSNanoTime()</PRE>
+		<H4>Return Parameters:-</H4>
+		<PRE><U>Time</U> <I>(integer)</I> = The time in nanoseconds.<BR></PRE>
+		<H4>Synopsis:-</H4>
+		<PRE>Returns the time elapsed in nanoseconds since the OS started&#x2e; Precision will be lost over time&#x2e;<BR></PRE>
+		<H4><A href="#idx:Core">&#x25B2; Return to table of contents</A></H4>
+	</DIV>
+	<DIV id="Core.OSNumTime" style="display:none">
+		<H3>Core.OSNumTime</H3>
+		<H4>Syntax:-</H4>
+		<PRE><U>Timestamp</U> = Core.OSNumTime()</PRE>
+		<H4>Return Parameters:-</H4>
+		<PRE><U>Timestamp</U> <I>(number)</I> = The UNIX timestamp as a number.<BR></PRE>
+		<H4>Synopsis:-</H4>
+		<PRE>Returns a unix timestamp of the current time in seconds as a number&#x2e;<BR></PRE>
+		<H4><A href="#idx:Core">&#x25B2; Return to table of contents</A></H4>
+	</DIV>
+	<DIV id="Core.OSTime" style="display:none">
+		<H3>Core.OSTime</H3>
+		<H4>Syntax:-</H4>
+		<PRE><U>Timestamp</U> = Core.OSTime()</PRE>
+		<H4>Return Parameters:-</H4>
+		<PRE><U>Timestamp</U> <I>(integer)</I> = The UNIX timestamp.<BR></PRE>
+		<H4>Synopsis:-</H4>
+		<PRE>Returns a unix timestamp of the current time in seconds&#x2e;<BR></PRE>
 		<H4><A href="#idx:Core">&#x25B2; Return to table of contents</A></H4>
 	</DIV>
 	<DIV id="Core.OnEnd" style="display:none">
@@ -3118,6 +3307,16 @@
 		<PRE>Core.Quit()</PRE>
 		<H4>Synopsis:-</H4>
 		<PRE>Terminates the engine process cleanly&#x2e;<BR></PRE>
+		<H4><A href="#idx:Core">&#x25B2; Return to table of contents</A></H4>
+	</DIV>
+	<DIV id="Core.RAM" style="display:none">
+		<H3>Core.RAM</H3>
+		<H4>Syntax:-</H4>
+		<PRE><U>Load</U>, <U>Total</U>, <U>Free</U>, <U>Used</U>, <U>ProcUse</U>, <U>ProcPeak</U> = Core.RAM()</PRE>
+		<H4>Return Parameters:-</H4>
+		<PRE><U>Load</U> <I>(number)</I> = % load of total physical memory.<BR><U>Total</U> <I>(integer)</I> = Total physical memory installed in system.<BR><U>Free</U> <I>(integer)</I> = Available physical memory to engine.<BR><U>Used</U> <I>(integer)</I> = Physical memory in use by the system and other apps.<BR><U>ProcUse</U> <I>(integer)</I> = The total memory in use by the engine (including Virtual).<BR><U>ProcPeak</U> <I>(integer)</I> = The peak memory usage of the engine.<BR></PRE>
+		<H4>Synopsis:-</H4>
+		<PRE>Returns information about physical memory in the computer&#x2e;<BR></PRE>
 		<H4><A href="#idx:Core">&#x25B2; Return to table of contents</A></H4>
 	</DIV>
 	<DIV id="Core.Reset" style="display:none">
@@ -3222,6 +3421,76 @@
 		<PRE>In bot mode&#x2c; this function will set the text to appear when no text is input into the input bar&#x2e; Useful for customised stats&#x2e; It will update every second&#x2e;<BR></PRE>
 		<H4><A href="#idx:Core">&#x25B2; Return to table of contents</A></H4>
 	</DIV>
+	<DIV id="Core.Suspend" style="display:none">
+		<H3>Core.Suspend</H3>
+		<H4>Syntax:-</H4>
+		<PRE>Core.Suspend(<I><U>Millisecs</U></I>)</PRE>
+		<H4>Function Parameters:-</H4>
+		<PRE><U>Millisecs</U> <I>(integer)</I> = Time in seconds.<BR></PRE>
+		<H4>Synopsis:-</H4>
+		<PRE>Delays the engine thread for this amount of time&#x2e;<BR></PRE>
+		<H4><A href="#idx:Core">&#x25B2; Return to table of contents</A></H4>
+	</DIV>
+	<DIV id="Core.Ticks" style="display:none">
+		<H3>Core.Ticks</H3>
+		<H4>Syntax:-</H4>
+		<PRE><U>Ticks</U> = Core.Ticks()</PRE>
+		<H4>Return Parameters:-</H4>
+		<PRE><U>Ticks</U> <I>(integer)</I> = Number of ticks.<BR></PRE>
+		<H4>Synopsis:-</H4>
+		<PRE>Returns the total number of frames rendered since the engine started&#x2e;<BR></PRE>
+		<H4><A href="#idx:Core">&#x25B2; Return to table of contents</A></H4>
+	</DIV>
+	<DIV id="Core.Time" style="display:none">
+		<H3>Core.Time</H3>
+		<H4>Syntax:-</H4>
+		<PRE><U>Time</U> = Core.Time()</PRE>
+		<H4>Return Parameters:-</H4>
+		<PRE><U>Time</U> <I>(number)</I> = The time in seconds.<BR></PRE>
+		<H4>Synopsis:-</H4>
+		<PRE>Returns the time elapsed in seconds since the engine started&#x2e; This is a very high resolution timer&#x2e; Use it for time&#x2d;criticial timings&#x2e; This counter can be reset with Core&#x2e;Update&#x28;&#x29; as it will lose precision over time&#x2e;<BR></PRE>
+		<H4><A href="#idx:Core">&#x25B2; Return to table of contents</A></H4>
+	</DIV>
+	<DIV id="Core.UpMicroTime" style="display:none">
+		<H3>Core.UpMicroTime</H3>
+		<H4>Syntax:-</H4>
+		<PRE><U>Time</U> = Core.UpMicroTime()</PRE>
+		<H4>Return Parameters:-</H4>
+		<PRE><U>Time</U> <I>(integer)</I> = The engine uptime in microseconds.<BR></PRE>
+		<H4>Synopsis:-</H4>
+		<PRE>Returns the total time the engine has been running in microseconds&#x2e;<BR></PRE>
+		<H4><A href="#idx:Core">&#x25B2; Return to table of contents</A></H4>
+	</DIV>
+	<DIV id="Core.UpMilliTime" style="display:none">
+		<H3>Core.UpMilliTime</H3>
+		<H4>Syntax:-</H4>
+		<PRE><U>Time</U> = Core.UpMilliTime()</PRE>
+		<H4>Return Parameters:-</H4>
+		<PRE><U>Time</U> <I>(integer)</I> = The engine uptime in milliseconds.<BR></PRE>
+		<H4>Synopsis:-</H4>
+		<PRE>Returns the total time in the engine has been running in milliseconds&#x2e;<BR></PRE>
+		<H4><A href="#idx:Core">&#x25B2; Return to table of contents</A></H4>
+	</DIV>
+	<DIV id="Core.UpNanoTime" style="display:none">
+		<H3>Core.UpNanoTime</H3>
+		<H4>Syntax:-</H4>
+		<PRE><U>Time</U> = Core.UpNanoTime()</PRE>
+		<H4>Return Parameters:-</H4>
+		<PRE><U>Time</U> <I>(integer)</I> = The engine time in nanoseconds.<BR></PRE>
+		<H4>Synopsis:-</H4>
+		<PRE>Returns the total time in the engine has been running in nanoseconds&#x2e;<BR></PRE>
+		<H4><A href="#idx:Core">&#x25B2; Return to table of contents</A></H4>
+	</DIV>
+	<DIV id="Core.Uptime" style="display:none">
+		<H3>Core.Uptime</H3>
+		<H4>Syntax:-</H4>
+		<PRE><U>Ticks</U> = Core.Uptime()</PRE>
+		<H4>Return Parameters:-</H4>
+		<PRE><U>Ticks</U> <I>(number)</I> = Uptime in seconds<BR></PRE>
+		<H4>Synopsis:-</H4>
+		<PRE>Returns the total number of seconds elapsed since the start of the engine this call maybe a little more expensive than Glfw&#x2e;Time&#x28;&#x29; but you have no choice to use this if you are using terminal mode&#x2e; This uses std&#x3a;&#x3a;chrono to retrieve this value&#x2e;<BR></PRE>
+		<H4><A href="#idx:Core">&#x25B2; Return to table of contents</A></H4>
+	</DIV>
 	<DIV id="Core.WaitAsync" style="display:none">
 		<H3>Core.WaitAsync</H3>
 		<H4>Syntax:-</H4>
@@ -3260,6 +3529,16 @@
 		<PRE>Returns all the colour palette of console colours used with ConWrite&#x2e;<BR></PRE>
 		<H4><A href="#idx:Core">&#x25B2; Return to table of contents</A></H4>
 	</DIV>
+	<DIV id="Core.Libraries" style="display:none">
+		<H3>Core.Libraries</H3>
+		<H4>Syntax:-</H4>
+		<PRE><U>Ids</U> = Core.Libraries</PRE>
+		<H4>Return Parameters:-</H4>
+		<PRE><U>Ids</U> <I>(table)</I> = The table of all library ids<BR></PRE>
+		<H4>Synopsis:-</H4>
+		<PRE>A table containing the ids of all the libraries supported&#x2e;<BR></PRE>
+		<H4><A href="#idx:Core">&#x25B2; Return to table of contents</A></H4>
+	</DIV>
 	<DIV id="Core.LogLevels" style="display:none">
 		<H3>Core.LogLevels</H3>
 		<H4>Syntax:-</H4>
@@ -3269,412 +3548,6 @@
 		<H4>Synopsis:-</H4>
 		<PRE>Returns a table of key&#x2f;value pairs that identify possible log levels&#x2e;<BR></PRE>
 		<H4><A href="#idx:Core">&#x25B2; Return to table of contents</A></H4>
-	</DIV>
-	<DIV id="Credit.Credit" style="display:none">
-		<H3>Credit.Credit</H3>
-		<H4>Syntax:-</H4>
-		<PRE><U>Name</U>, <U>Version</U>, <U>Id</U>, <U>Website</U>, <U>Copyright</U>, <U>Author</U> = Credit.Credit(<I><U>Id</U></I>)</PRE>
-		<H4>Function Parameters:-</H4>
-		<PRE><U>Id</U> <I>(integer)</I> = The index of the license.<BR></PRE>
-		<H4>Return Parameters:-</H4>
-		<PRE><U>Name</U> <I>(string)</I> = Name of the credit.<BR><U>Version</U> <I>(string)</I> = Version of the api.<BR><U>Id</U> <I>(integer)</I> = License index.<BR><U>Website</U> <I>(string)</I> = Website of the api.<BR><U>Copyright</U> <I>(string)</I> = Copyright of the api.<BR><U>Author</U> <I>(string)</I> = Author of the api.<BR></PRE>
-		<H4>Synopsis:-</H4>
-		<PRE>Shows the full credits information of the specified api index&#x2e;<BR></PRE>
-		<H4><A href="#idx:Credit">&#x25B2; Return to table of contents</A></H4>
-	</DIV>
-	<DIV id="Credit.License" style="display:none">
-		<H3>Credit.License</H3>
-		<H4>Syntax:-</H4>
-		<PRE><U>Name</U>, <U>Text</U> = Credit.License(<I><U>Id</U></I>)</PRE>
-		<H4>Function Parameters:-</H4>
-		<PRE><U>Id</U> <I>(integer)</I> = The index of the license.<BR></PRE>
-		<H4>Return Parameters:-</H4>
-		<PRE><U>Name</U> <I>(string)</I> = Name of the license.<BR><U>Text</U> <I>(string)</I> = Full text file of the license.<BR></PRE>
-		<H4>Synopsis:-</H4>
-		<PRE>Shows the full license information of the specified index&#x2e;<BR></PRE>
-		<H4><A href="#idx:Credit">&#x25B2; Return to table of contents</A></H4>
-	</DIV>
-	<DIV id="Credit.Libs" style="display:none">
-		<H3>Credit.Libs</H3>
-		<H4>Syntax:-</H4>
-		<PRE><U>Ids</U> = Credit.Libs</PRE>
-		<H4>Return Parameters:-</H4>
-		<PRE><U>Ids</U> <I>(table)</I> = The table of all library ids<BR></PRE>
-		<H4>Synopsis:-</H4>
-		<PRE>A table containing the ids of all the libraries supported&#x2e;<BR></PRE>
-		<H4><A href="#idx:Credit">&#x25B2; Return to table of contents</A></H4>
-	</DIV>
-	<DIV id="Crypt.B64D" style="display:none">
-		<H3>Crypt.B64D</H3>
-		<H4>Syntax:-</H4>
-		<PRE><U>Text</U> = Crypt.B64D(<I><U>Text</U></I>)</PRE>
-		<H4>Function Parameters:-</H4>
-		<PRE><U>Text</U> <I>(string)</I> = The string to decode.<BR></PRE>
-		<H4>Return Parameters:-</H4>
-		<PRE><U>Text</U> <I>(string)</I> = The base64 decoded string.<BR></PRE>
-		<H4>Synopsis:-</H4>
-		<PRE>Decodes the specified string from base64&#x2e;<BR></PRE>
-		<H4><A href="#idx:Crypt">&#x25B2; Return to table of contents</A></H4>
-	</DIV>
-	<DIV id="Crypt.B64DA" style="display:none">
-		<H3>Crypt.B64DA</H3>
-		<H4>Syntax:-</H4>
-		<PRE><U>Data</U> = Crypt.B64DA(<I><U>Text</U></I>)</PRE>
-		<H4>Function Parameters:-</H4>
-		<PRE><U>Text</U> <I>(string)</I> = The string to decode.<BR></PRE>
-		<H4>Return Parameters:-</H4>
-		<PRE><U>Data</U> <I>(Asset)</I> = The base64 decoded data array.<BR></PRE>
-		<H4>Synopsis:-</H4>
-		<PRE>Decodes the specified string from base64 to a data array class&#x2e; Useful if you&#x27;re handling binary data and&#x2f;or not sure if the data is binary&#x2f;text and need to check&#x2e;<BR></PRE>
-		<H4><A href="#idx:Crypt">&#x25B2; Return to table of contents</A></H4>
-	</DIV>
-	<DIV id="Crypt.B64E" style="display:none">
-		<H3>Crypt.B64E</H3>
-		<H4>Syntax:-</H4>
-		<PRE><U>Hash</U> = Crypt.B64E(<I><U>Data</U></I>)</PRE>
-		<H4>Function Parameters:-</H4>
-		<PRE><U>Data</U> <I>(string)</I> = The string to encode.<BR></PRE>
-		<H4>Return Parameters:-</H4>
-		<PRE><U>Hash</U> <I>(string)</I> = The return string encoded to base64.<BR></PRE>
-		<H4>Synopsis:-</H4>
-		<PRE>Encodes the specified string to base64&#x2e;<BR></PRE>
-		<H4><A href="#idx:Crypt">&#x25B2; Return to table of contents</A></H4>
-	</DIV>
-	<DIV id="Crypt.B64EA" style="display:none">
-		<H3>Crypt.B64EA</H3>
-		<H4>Syntax:-</H4>
-		<PRE><U>Hash</U> = Crypt.B64EA(<I><U>Data</U></I>)</PRE>
-		<H4>Function Parameters:-</H4>
-		<PRE><U>Data</U> <I>(array)</I> = The data to encode.<BR></PRE>
-		<H4>Return Parameters:-</H4>
-		<PRE><U>Hash</U> <I>(string)</I> = The return string encoded to bas64.<BR></PRE>
-		<H4>Synopsis:-</H4>
-		<PRE>Encodes the specified data array to base64&#x2e;<BR></PRE>
-		<H4><A href="#idx:Crypt">&#x25B2; Return to table of contents</A></H4>
-	</DIV>
-	<DIV id="Crypt.CRC" style="display:none">
-		<H3>Crypt.CRC</H3>
-		<H4>Syntax:-</H4>
-		<PRE><U>Hash</U> = Crypt.CRC(<I><U>Data</U></I>)</PRE>
-		<H4>Function Parameters:-</H4>
-		<PRE><U>Data</U> <I>(string)</I> = The string to hash.<BR></PRE>
-		<H4>Return Parameters:-</H4>
-		<PRE><U>Hash</U> <I>(integer)</I> = The calculated CRC hash.<BR></PRE>
-		<H4>Synopsis:-</H4>
-		<PRE>Calculates a CRC32 hash from a string&#x2e; Insecure&#x2c; only use for super fast hashing of insignificant strings&#x2e; The benefit of CRC hashing though is that the function returns an integer&#x2e;<BR></PRE>
-		<H4><A href="#idx:Crypt">&#x25B2; Return to table of contents</A></H4>
-	</DIV>
-	<DIV id="Crypt.CRCA" style="display:none">
-		<H3>Crypt.CRCA</H3>
-		<H4>Syntax:-</H4>
-		<PRE><U>Hash</U> = Crypt.CRCA(<I><U>Data</U></I>)</PRE>
-		<H4>Function Parameters:-</H4>
-		<PRE><U>Data</U> <I>(array)</I> = The data to hash.<BR></PRE>
-		<H4>Return Parameters:-</H4>
-		<PRE><U>Hash</U> <I>(integer)</I> = The calculated CRC hash.<BR></PRE>
-		<H4>Synopsis:-</H4>
-		<PRE>Calculates a CRC32 hash from an array class&#x2e; Insecure&#x2c; only use for super fast hashing of insignificant strings&#x2e; The benefit of CRC hashing though is that the function returns an integer&#x2e;<BR></PRE>
-		<H4><A href="#idx:Crypt">&#x25B2; Return to table of contents</A></H4>
-	</DIV>
-	<DIV id="Crypt.EntDecode" style="display:none">
-		<H3>Crypt.EntDecode</H3>
-		<H4>Syntax:-</H4>
-		<PRE><U>Text</U> = Crypt.EntDecode(<I><U>Text</U></I>)</PRE>
-		<H4>Function Parameters:-</H4>
-		<PRE><U>Text</U> <I>(string)</I> = The URL string to remove HTML entities from.<BR></PRE>
-		<H4>Return Parameters:-</H4>
-		<PRE><U>Text</U> <I>(string)</I> = The URL decoded string.<BR></PRE>
-		<H4>Synopsis:-</H4>
-		<PRE>Decodes HTML entities from the spcified string&#x2e;<BR></PRE>
-		<H4><A href="#idx:Crypt">&#x25B2; Return to table of contents</A></H4>
-	</DIV>
-	<DIV id="Crypt.EntEncode" style="display:none">
-		<H3>Crypt.EntEncode</H3>
-		<H4>Syntax:-</H4>
-		<PRE><U>Text</U> = Crypt.EntEncode(<I><U>Text</U></I>)</PRE>
-		<H4>Function Parameters:-</H4>
-		<PRE><U>Text</U> <I>(string)</I> = The URL string to insert HTML entities into.<BR></PRE>
-		<H4>Return Parameters:-</H4>
-		<PRE><U>Text</U> <I>(string)</I> = The URL encoded string.<BR></PRE>
-		<H4>Synopsis:-</H4>
-		<PRE>Encodes HTML entities into the spcified string&#x2e;<BR></PRE>
-		<H4><A href="#idx:Crypt">&#x25B2; Return to table of contents</A></H4>
-	</DIV>
-	<DIV id="Crypt.HMSHA1" style="display:none">
-		<H3>Crypt.HMSHA1</H3>
-		<H4>Syntax:-</H4>
-		<PRE><U>Hash</U> = Crypt.HMSHA1(<I><U>Key</U>, <U>Data</U></I>)</PRE>
-		<H4>Function Parameters:-</H4>
-		<PRE><U>Key</U> <I>(string)</I> = The entropy to use.<BR><U>Data</U> <I>(string)</I> = The string to hash.<BR></PRE>
-		<H4>Return Parameters:-</H4>
-		<PRE><U>Hash</U> <I>(string)</I> = The calculated SHA1 hash.<BR></PRE>
-		<H4>Synopsis:-</H4>
-		<PRE>Calculates a SHA1 hash from a string using the specifiy entropy&#x2e; Insecure&#x2c; only use for hashing of insignificant data&#x2e;<BR></PRE>
-		<H4><A href="#idx:Crypt">&#x25B2; Return to table of contents</A></H4>
-	</DIV>
-	<DIV id="Crypt.HMSHA224" style="display:none">
-		<H3>Crypt.HMSHA224</H3>
-		<H4>Syntax:-</H4>
-		<PRE><U>Hash</U> = Crypt.HMSHA224(<I><U>Key</U>, <U>Data</U></I>)</PRE>
-		<H4>Function Parameters:-</H4>
-		<PRE><U>Key</U> <I>(string)</I> = The entropy to use.<BR><U>Data</U> <I>(string)</I> = The string to hash.<BR></PRE>
-		<H4>Return Parameters:-</H4>
-		<PRE><U>Hash</U> <I>(string)</I> = The calculated SHA224 hash.<BR></PRE>
-		<H4>Synopsis:-</H4>
-		<PRE>Calculates a SHA224 hash from a string using the specifiy entropy&#x2e;<BR></PRE>
-		<H4><A href="#idx:Crypt">&#x25B2; Return to table of contents</A></H4>
-	</DIV>
-	<DIV id="Crypt.HMSHA256" style="display:none">
-		<H3>Crypt.HMSHA256</H3>
-		<H4>Syntax:-</H4>
-		<PRE><U>Hash</U> = Crypt.HMSHA256(<I><U>Key</U>, <U>Data</U></I>)</PRE>
-		<H4>Function Parameters:-</H4>
-		<PRE><U>Key</U> <I>(string)</I> = The entropy to use.<BR><U>Data</U> <I>(string)</I> = The string to hash.<BR></PRE>
-		<H4>Return Parameters:-</H4>
-		<PRE><U>Hash</U> <I>(string)</I> = The calculated SHA256 hash.<BR></PRE>
-		<H4>Synopsis:-</H4>
-		<PRE>Calculates a SHA256 hash from a string using the specifiy entropy&#x2e;<BR></PRE>
-		<H4><A href="#idx:Crypt">&#x25B2; Return to table of contents</A></H4>
-	</DIV>
-	<DIV id="Crypt.HMSHA384" style="display:none">
-		<H3>Crypt.HMSHA384</H3>
-		<H4>Syntax:-</H4>
-		<PRE><U>Hash</U> = Crypt.HMSHA384(<I><U>Key</U>, <U>Data</U></I>)</PRE>
-		<H4>Function Parameters:-</H4>
-		<PRE><U>Key</U> <I>(string)</I> = The entropy to use.<BR><U>Data</U> <I>(string)</I> = The string to hash.<BR></PRE>
-		<H4>Return Parameters:-</H4>
-		<PRE><U>Hash</U> <I>(string)</I> = The calculated SHA384 hash.<BR></PRE>
-		<H4>Synopsis:-</H4>
-		<PRE>Calculates a SHA384 hash from a string using the specifiy entropy&#x2e;<BR></PRE>
-		<H4><A href="#idx:Crypt">&#x25B2; Return to table of contents</A></H4>
-	</DIV>
-	<DIV id="Crypt.HMSHA512" style="display:none">
-		<H3>Crypt.HMSHA512</H3>
-		<H4>Syntax:-</H4>
-		<PRE><U>Hash</U> = Crypt.HMSHA512(<I><U>Key</U>, <U>Data</U></I>)</PRE>
-		<H4>Function Parameters:-</H4>
-		<PRE><U>Key</U> <I>(string)</I> = The entropy to use.<BR><U>Data</U> <I>(string)</I> = The string to hash.<BR></PRE>
-		<H4>Return Parameters:-</H4>
-		<PRE><U>Hash</U> <I>(string)</I> = The calculated SHA512 hash.<BR></PRE>
-		<H4>Synopsis:-</H4>
-		<PRE>Calculates a SHA512 hash from a string using the specifiy entropy&#x2e;<BR></PRE>
-		<H4><A href="#idx:Crypt">&#x25B2; Return to table of contents</A></H4>
-	</DIV>
-	<DIV id="Crypt.HexDecode" style="display:none">
-		<H3>Crypt.HexDecode</H3>
-		<H4>Syntax:-</H4>
-		<PRE><U>Text</U> = Crypt.HexDecode(<I><U>Text</U></I>)</PRE>
-		<H4>Function Parameters:-</H4>
-		<PRE><U>Text</U> <I>(string)</I> = The hex encoded string to decode.<BR></PRE>
-		<H4>Return Parameters:-</H4>
-		<PRE><U>Text</U> <I>(Asset)</I> = The text decoded string.<BR></PRE>
-		<H4>Synopsis:-</H4>
-		<PRE>Encodes the specified text to uppercase hexadecimal&#x2e;<BR></PRE>
-		<H4><A href="#idx:Crypt">&#x25B2; Return to table of contents</A></H4>
-	</DIV>
-	<DIV id="Crypt.HexDecodeA" style="display:none">
-		<H3>Crypt.HexDecodeA</H3>
-		<H4>Syntax:-</H4>
-		<PRE><U>Data</U> = Crypt.HexDecodeA(<I><U>Text</U></I>)</PRE>
-		<H4>Function Parameters:-</H4>
-		<PRE><U>Text</U> <I>(string)</I> = The hex encoded string to decode.<BR></PRE>
-		<H4>Return Parameters:-</H4>
-		<PRE><U>Data</U> <I>(Asset)</I> = The decoded data array class.<BR></PRE>
-		<H4>Synopsis:-</H4>
-		<PRE>Decodes the specified hexadecimal string to binary data&#x2e;<BR></PRE>
-		<H4><A href="#idx:Crypt">&#x25B2; Return to table of contents</A></H4>
-	</DIV>
-	<DIV id="Crypt.HexEncode" style="display:none">
-		<H3>Crypt.HexEncode</H3>
-		<H4>Syntax:-</H4>
-		<PRE><U>Text</U> = Crypt.HexEncode(<I><U>Text</U></I>)</PRE>
-		<H4>Function Parameters:-</H4>
-		<PRE><U>Text</U> <I>(string)</I> = The string.<BR></PRE>
-		<H4>Return Parameters:-</H4>
-		<PRE><U>Text</U> <I>(string)</I> = The hex encoded string.<BR></PRE>
-		<H4>Synopsis:-</H4>
-		<PRE>Encodes the specified text to uppercase hexadecimal&#x2e;<BR></PRE>
-		<H4><A href="#idx:Crypt">&#x25B2; Return to table of contents</A></H4>
-	</DIV>
-	<DIV id="Crypt.HexEncodeA" style="display:none">
-		<H3>Crypt.HexEncodeA</H3>
-		<H4>Syntax:-</H4>
-		<PRE><U>Text</U> = Crypt.HexEncodeA(<I><U>Data</U></I>)</PRE>
-		<H4>Function Parameters:-</H4>
-		<PRE><U>Data</U> <I>(Asset)</I> = The data array class to encode.<BR></PRE>
-		<H4>Return Parameters:-</H4>
-		<PRE><U>Text</U> <I>(string)</I> = The hex encoded string.<BR></PRE>
-		<H4>Synopsis:-</H4>
-		<PRE>Encodes the specified data array to uppercase hexadecimal&#x2e;<BR></PRE>
-		<H4><A href="#idx:Crypt">&#x25B2; Return to table of contents</A></H4>
-	</DIV>
-	<DIV id="Crypt.HexEncodeL" style="display:none">
-		<H3>Crypt.HexEncodeL</H3>
-		<H4>Syntax:-</H4>
-		<PRE><U>Text</U> = Crypt.HexEncodeL(<I><U>Text</U></I>)</PRE>
-		<H4>Function Parameters:-</H4>
-		<PRE><U>Text</U> <I>(string)</I> = The string.<BR></PRE>
-		<H4>Return Parameters:-</H4>
-		<PRE><U>Text</U> <I>(string)</I> = The hex encoded string.<BR></PRE>
-		<H4>Synopsis:-</H4>
-		<PRE>Encodes the specified text to lowercase hexadecimal&#x2e;<BR></PRE>
-		<H4><A href="#idx:Crypt">&#x25B2; Return to table of contents</A></H4>
-	</DIV>
-	<DIV id="Crypt.HexEncodeLA" style="display:none">
-		<H3>Crypt.HexEncodeLA</H3>
-		<H4>Syntax:-</H4>
-		<PRE><U>Text</U> = Crypt.HexEncodeLA(<I><U>Data</U></I>)</PRE>
-		<H4>Function Parameters:-</H4>
-		<PRE><U>Data</U> <I>(Asset)</I> = The data array class to encode.<BR></PRE>
-		<H4>Return Parameters:-</H4>
-		<PRE><U>Text</U> <I>(string)</I> = The hex encoded string.<BR></PRE>
-		<H4>Synopsis:-</H4>
-		<PRE>Encodes the specified data array to lowercase hexadecimal&#x2e;<BR></PRE>
-		<H4><A href="#idx:Crypt">&#x25B2; Return to table of contents</A></H4>
-	</DIV>
-	<DIV id="Crypt.SHA1" style="display:none">
-		<H3>Crypt.SHA1</H3>
-		<H4>Syntax:-</H4>
-		<PRE><U>Hash</U> = Crypt.SHA1(<I><U>Data</U></I>)</PRE>
-		<H4>Function Parameters:-</H4>
-		<PRE><U>Data</U> <I>(string)</I> = The string to hash.<BR></PRE>
-		<H4>Return Parameters:-</H4>
-		<PRE><U>Hash</U> <I>(string)</I> = The calculated SHA1 hash.<BR></PRE>
-		<H4>Synopsis:-</H4>
-		<PRE>Calculates a SHA1 hash from a string&#x2e; This hashing algorithm is obsolete and insecure and should no longer be used and is here only for compatibility reasons only&#x2e;<BR></PRE>
-		<H4><A href="#idx:Crypt">&#x25B2; Return to table of contents</A></H4>
-	</DIV>
-	<DIV id="Crypt.SHA1A" style="display:none">
-		<H3>Crypt.SHA1A</H3>
-		<H4>Syntax:-</H4>
-		<PRE><U>Hash</U> = Crypt.SHA1A(<I><U>Data</U></I>)</PRE>
-		<H4>Function Parameters:-</H4>
-		<PRE><U>Data</U> <I>(array)</I> = The data to hash.<BR></PRE>
-		<H4>Return Parameters:-</H4>
-		<PRE><U>Hash</U> <I>(string)</I> = The calculated SHA1 hash.<BR></PRE>
-		<H4>Synopsis:-</H4>
-		<PRE>Calculates a SHA1 hash from an array class&#x2e; Insecure&#x2c; only use for hashing of insignificant data&#x2e;<BR></PRE>
-		<H4><A href="#idx:Crypt">&#x25B2; Return to table of contents</A></H4>
-	</DIV>
-	<DIV id="Crypt.SHA224" style="display:none">
-		<H3>Crypt.SHA224</H3>
-		<H4>Syntax:-</H4>
-		<PRE><U>Hash</U> = Crypt.SHA224(<I><U>Data</U></I>)</PRE>
-		<H4>Function Parameters:-</H4>
-		<PRE><U>Data</U> <I>(string)</I> = The string to hash.<BR></PRE>
-		<H4>Return Parameters:-</H4>
-		<PRE><U>Hash</U> <I>(string)</I> = The calculated SHA256 hash.<BR></PRE>
-		<H4>Synopsis:-</H4>
-		<PRE>Calculates a SHA224 hash from a string&#x2e;<BR></PRE>
-		<H4><A href="#idx:Crypt">&#x25B2; Return to table of contents</A></H4>
-	</DIV>
-	<DIV id="Crypt.SHA224A" style="display:none">
-		<H3>Crypt.SHA224A</H3>
-		<H4>Syntax:-</H4>
-		<PRE><U>Hash</U> = Crypt.SHA224A(<I><U>Data</U></I>)</PRE>
-		<H4>Function Parameters:-</H4>
-		<PRE><U>Data</U> <I>(array)</I> = The data to hash.<BR></PRE>
-		<H4>Return Parameters:-</H4>
-		<PRE><U>Hash</U> <I>(string)</I> = The calculated SHA256 hash.<BR></PRE>
-		<H4>Synopsis:-</H4>
-		<PRE>Calculates a SHA224 hash from an array class&#x2e;<BR></PRE>
-		<H4><A href="#idx:Crypt">&#x25B2; Return to table of contents</A></H4>
-	</DIV>
-	<DIV id="Crypt.SHA256" style="display:none">
-		<H3>Crypt.SHA256</H3>
-		<H4>Syntax:-</H4>
-		<PRE><U>Hash</U> = Crypt.SHA256(<I><U>Data</U></I>)</PRE>
-		<H4>Function Parameters:-</H4>
-		<PRE><U>Data</U> <I>(string)</I> = The string to hash.<BR></PRE>
-		<H4>Return Parameters:-</H4>
-		<PRE><U>Hash</U> <I>(string)</I> = The calculated SHA256 hash.<BR></PRE>
-		<H4>Synopsis:-</H4>
-		<PRE>Calculates a SHA256 hash from a string&#x2e;<BR></PRE>
-		<H4><A href="#idx:Crypt">&#x25B2; Return to table of contents</A></H4>
-	</DIV>
-	<DIV id="Crypt.SHA256A" style="display:none">
-		<H3>Crypt.SHA256A</H3>
-		<H4>Syntax:-</H4>
-		<PRE><U>Hash</U> = Crypt.SHA256A(<I><U>Data</U></I>)</PRE>
-		<H4>Function Parameters:-</H4>
-		<PRE><U>Data</U> <I>(array)</I> = The data to hash.<BR></PRE>
-		<H4>Return Parameters:-</H4>
-		<PRE><U>Hash</U> <I>(string)</I> = The calculated SHA256 hash.<BR></PRE>
-		<H4>Synopsis:-</H4>
-		<PRE>Calculates a SHA256 hash from an array class&#x2e;<BR></PRE>
-		<H4><A href="#idx:Crypt">&#x25B2; Return to table of contents</A></H4>
-	</DIV>
-	<DIV id="Crypt.SHA384" style="display:none">
-		<H3>Crypt.SHA384</H3>
-		<H4>Syntax:-</H4>
-		<PRE><U>Hash</U> = Crypt.SHA384(<I><U>Data</U></I>)</PRE>
-		<H4>Function Parameters:-</H4>
-		<PRE><U>Data</U> <I>(string)</I> = The string to hash.<BR></PRE>
-		<H4>Return Parameters:-</H4>
-		<PRE><U>Hash</U> <I>(string)</I> = The calculated SHA384 hash.<BR></PRE>
-		<H4>Synopsis:-</H4>
-		<PRE>Calculates a SHA384 hash from a string&#x2e;<BR></PRE>
-		<H4><A href="#idx:Crypt">&#x25B2; Return to table of contents</A></H4>
-	</DIV>
-	<DIV id="Crypt.SHA384A" style="display:none">
-		<H3>Crypt.SHA384A</H3>
-		<H4>Syntax:-</H4>
-		<PRE><U>Hash</U> = Crypt.SHA384A(<I><U>Data</U></I>)</PRE>
-		<H4>Function Parameters:-</H4>
-		<PRE><U>Data</U> <I>(array)</I> = The data to hash.<BR></PRE>
-		<H4>Return Parameters:-</H4>
-		<PRE><U>Hash</U> <I>(string)</I> = The calculated SHA384 hash.<BR></PRE>
-		<H4>Synopsis:-</H4>
-		<PRE>Calculates a SHA384 hash from an array class&#x2e;<BR></PRE>
-		<H4><A href="#idx:Crypt">&#x25B2; Return to table of contents</A></H4>
-	</DIV>
-	<DIV id="Crypt.SHA512" style="display:none">
-		<H3>Crypt.SHA512</H3>
-		<H4>Syntax:-</H4>
-		<PRE><U>Hash</U> = Crypt.SHA512(<I><U>Data</U></I>)</PRE>
-		<H4>Function Parameters:-</H4>
-		<PRE><U>Data</U> <I>(string)</I> = The string to hash.<BR></PRE>
-		<H4>Return Parameters:-</H4>
-		<PRE><U>Hash</U> <I>(string)</I> = The calculated SHA512 hash.<BR></PRE>
-		<H4>Synopsis:-</H4>
-		<PRE>Calculates a SHA512 hash from a string&#x2e;<BR></PRE>
-		<H4><A href="#idx:Crypt">&#x25B2; Return to table of contents</A></H4>
-	</DIV>
-	<DIV id="Crypt.SHA512A" style="display:none">
-		<H3>Crypt.SHA512A</H3>
-		<H4>Syntax:-</H4>
-		<PRE><U>Hash</U> = Crypt.SHA512A(<I><U>Data</U></I>)</PRE>
-		<H4>Function Parameters:-</H4>
-		<PRE><U>Data</U> <I>(array)</I> = The data to hash.<BR></PRE>
-		<H4>Return Parameters:-</H4>
-		<PRE><U>Hash</U> <I>(string)</I> = The calculated SHA512 hash.<BR></PRE>
-		<H4>Synopsis:-</H4>
-		<PRE>Calculates a SHA384 hash from an array class&#x2e;<BR></PRE>
-		<H4><A href="#idx:Crypt">&#x25B2; Return to table of contents</A></H4>
-	</DIV>
-	<DIV id="Crypt.UrlDecode" style="display:none">
-		<H3>Crypt.UrlDecode</H3>
-		<H4>Syntax:-</H4>
-		<PRE><U>Text</U> = Crypt.UrlDecode(<I><U>Text</U></I>)</PRE>
-		<H4>Function Parameters:-</H4>
-		<PRE><U>Text</U> <I>(string)</I> = The URL string to decode.<BR></PRE>
-		<H4>Return Parameters:-</H4>
-		<PRE><U>Text</U> <I>(string)</I> = The URL decoded string.<BR></PRE>
-		<H4>Synopsis:-</H4>
-		<PRE>URL decodes the specified string&#x2e;<BR></PRE>
-		<H4><A href="#idx:Crypt">&#x25B2; Return to table of contents</A></H4>
-	</DIV>
-	<DIV id="Crypt.UrlEncode" style="display:none">
-		<H3>Crypt.UrlEncode</H3>
-		<H4>Syntax:-</H4>
-		<PRE><U>Text</U> = Crypt.UrlEncode(<I><U>Text</U></I>)</PRE>
-		<H4>Function Parameters:-</H4>
-		<PRE><U>Text</U> <I>(string)</I> = The URL string to encode.<BR></PRE>
-		<H4>Return Parameters:-</H4>
-		<PRE><U>Text</U> <I>(string)</I> = The URL encoded string.<BR></PRE>
-		<H4>Synopsis:-</H4>
-		<PRE>URL encodes the specified string&#x2e;<BR></PRE>
-		<H4><A href="#idx:Crypt">&#x25B2; Return to table of contents</A></H4>
 	</DIV>
 	<DIV id="Display.Attention" style="display:none">
 		<H3>Display.Attention</H3>
@@ -4364,16 +4237,6 @@
 		<PRE><U>Left</U> <I>(number)</I> = The destination left co-ordinate.<BR><U>Top</U> <I>(number)</I> = The destination top co-ordinate.<BR><U>Right</U> <I>(number)</I> = The destination right co-ordinate.<BR><U>Bottom</U> <I>(number)</I> = The destination bottom co-ordinate.<BR></PRE>
 		<H4>Synopsis:-</H4>
 		<PRE>Allows you to set basic vertex bounds when blitting the frame buffer object&#x2e;<BR></PRE>
-		<H4><A href="#idx:Fbo">&#x25B2; Return to table of contents</A></H4>
-	</DIV>
-	<DIV id="Fbo:SetVLTRBA" style="display:none">
-		<H3>Fbo:SetVLTRBA</H3>
-		<H4>Syntax:-</H4>
-		<PRE>Fbo:SetVLTRBA(<I><U>Left</U>, <U>Top</U>, <U>Right</U>, <U>Bottom</U>, <U>Angle</U></I>)</PRE>
-		<H4>Function Parameters:-</H4>
-		<PRE><U>Left</U> <I>(number)</I> = The destination left co-ordinate.<BR><U>Top</U> <I>(number)</I> = The destination top co-ordinate.<BR><U>Right</U> <I>(number)</I> = The destination right co-ordinate.<BR><U>Bottom</U> <I>(number)</I> = The destination bottom co-ordinate.<BR><U>Angle</U> <I>(number)</I> = The angle of the vertex.<BR></PRE>
-		<H4>Synopsis:-</H4>
-		<PRE>Allows you to set basic vertex co&#x2d;ordinates when blitting the fbo with angle calculations&#x2e;<BR></PRE>
 		<H4><A href="#idx:Fbo">&#x25B2; Return to table of contents</A></H4>
 	</DIV>
 	<DIV id="Fbo:SetVLTWH" style="display:none">
@@ -5783,316 +5646,6 @@
 		<H4>Synopsis:-</H4>
 		<PRE>Returns the texture formats supported&#x2e;<BR></PRE>
 		<H4><A href="#idx:Image">&#x25B2; Return to table of contents</A></H4>
-	</DIV>
-	<DIV id="Info.CPU" style="display:none">
-		<H3>Info.CPU</H3>
-		<H4>Syntax:-</H4>
-		<PRE><U>CPUid</U>, <U>Count</U>, <U>Speed</U>, <U>Family</U>, <U>Model</U>, <U>Stepping</U> = Info.CPU()</PRE>
-		<H4>Return Parameters:-</H4>
-		<PRE><U>CPUid</U> <I>(string)</I> = The CPUID string.<BR><U>Count</U> <I>(integer)</I> = Number of threads available to the engine.<BR><U>Speed</U> <I>(integer)</I> = Processor frequency in Hz.<BR><U>Family</U> <I>(integer)</I> = Processor family.<BR><U>Model</U> <I>(integer)</I> = Processor model.<BR><U>Stepping</U> <I>(integer)</I> = Processor stepping.<BR></PRE>
-		<H4>Synopsis:-</H4>
-		<PRE>Returns information about the installed Central Processing Unit&#x2e;<BR></PRE>
-		<H4><A href="#idx:Info">&#x25B2; Return to table of contents</A></H4>
-	</DIV>
-	<DIV id="Info.CPUFPS" style="display:none">
-		<H3>Info.CPUFPS</H3>
-		<H4>Syntax:-</H4>
-		<PRE><U>FPS</U> = Info.CPUFPS()</PRE>
-		<H4>Return Parameters:-</H4>
-		<PRE><U>FPS</U> <I>(number)</I> = Frames per second.<BR></PRE>
-		<H4>Synopsis:-</H4>
-		<PRE>Get CPU loops processed in the last second&#x2e; Should be the same as GPU for most people but at times may be different&#x2c; sometimes much higher&#x2e;<BR></PRE>
-		<H4><A href="#idx:Info">&#x25B2; Return to table of contents</A></H4>
-	</DIV>
-	<DIV id="Info.CPUProcUsage" style="display:none">
-		<H3>Info.CPUProcUsage</H3>
-		<H4>Syntax:-</H4>
-		<PRE><U>Percent</U> = Info.CPUProcUsage()</PRE>
-		<H4>Return Parameters:-</H4>
-		<PRE><U>Percent</U> <I>(number)</I> = Percentage process.<BR></PRE>
-		<H4>Synopsis:-</H4>
-		<PRE>Returns the engine CPU load&#x2e; It is hard&#x2d;coded to only update once a a second so constant calls won&#x27;t stress the kernel&#x2e;<BR></PRE>
-		<H4><A href="#idx:Info">&#x25B2; Return to table of contents</A></H4>
-	</DIV>
-	<DIV id="Info.CPUSysUsage" style="display:none">
-		<H3>Info.CPUSysUsage</H3>
-		<H4>Syntax:-</H4>
-		<PRE><U>Percent</U> = Info.CPUSysUsage()</PRE>
-		<H4>Return Parameters:-</H4>
-		<PRE><U>Percent</U> <I>(number)</I> = Percentage system.<BR></PRE>
-		<H4>Synopsis:-</H4>
-		<PRE>Returns the system CPU load&#x2e; It is hard&#x2d;coded to only update once a a second so constant calls won&#x27;t stress the kernel&#x2e;<BR></PRE>
-		<H4><A href="#idx:Info">&#x25B2; Return to table of contents</A></H4>
-	</DIV>
-	<DIV id="Info.CPUUsage" style="display:none">
-		<H3>Info.CPUUsage</H3>
-		<H4>Syntax:-</H4>
-		<PRE><U>Percent</U>, <U>Percent</U> = Info.CPUUsage()</PRE>
-		<H4>Return Parameters:-</H4>
-		<PRE><U>Percent</U> <I>(number)</I> = Percentage process.<BR><U>Percent</U> <I>(number)</I> = Percentage system.<BR></PRE>
-		<H4>Synopsis:-</H4>
-		<PRE>Returns the engine and system CPU load&#x2e; Use this instead of the other two cpu usage functions if you need both values&#x2e; This omits a second check to update cpu usage and very slightly more optimal than calling both cpu usage functions which are hard&#x2d;coded to only update once a a second so constant calls won&#x27;t stress the kernel&#x2e;<BR></PRE>
-		<H4><A href="#idx:Info">&#x25B2; Return to table of contents</A></H4>
-	</DIV>
-	<DIV id="Info.Catchup" style="display:none">
-		<H3>Info.Catchup</H3>
-		<H4>Syntax:-</H4>
-		<PRE>Info.Catchup()</PRE>
-		<H4>Synopsis:-</H4>
-		<PRE>Resets the high resolution timer and resets the accumulator&#x2e; Please be advised that the video system relies on this timer so videos will not play properly if this is constantly used&#x2e; Only use when doing loading screens&#x2e;<BR></PRE>
-		<H4><A href="#idx:Info">&#x25B2; Return to table of contents</A></H4>
-	</DIV>
-	<DIV id="Info.Delay" style="display:none">
-		<H3>Info.Delay</H3>
-		<H4>Syntax:-</H4>
-		<PRE><U>Time</U> = Info.Delay()</PRE>
-		<H4>Return Parameters:-</H4>
-		<PRE><U>Time</U> <I>(number)</I> = Delay time in seconds.<BR></PRE>
-		<H4>Synopsis:-</H4>
-		<PRE>Returns the current thread delay time in seconds without having to read the &#x27;vid_delay&#x27; variable&#x2e; This would be useful if you are actually using the delay and you want to offset a time point by the thread delay&#x2e;<BR></PRE>
-		<H4><A href="#idx:Info">&#x25B2; Return to table of contents</A></H4>
-	</DIV>
-	<DIV id="Info.Engine" style="display:none">
-		<H3>Info.Engine</H3>
-		<H4>Syntax:-</H4>
-		<PRE><U>Title</U>, <U>Vendor</U>, <U>Major</U>, <U>Minor</U>, <U>Build</U>, <U>Revision</U>, <U>Bits</U>, <U>Type</U>, <U>Target</U>, <U>Compiled</U>, <U>Compiler</U>, <U>CompVersion</U> = Info.Engine()</PRE>
-		<H4>Return Parameters:-</H4>
-		<PRE><U>Title</U> <I>(string)</I> = Title of engine (normally MS-Engine).<BR><U>Vendor</U> <I>(string)</I> = Author of engine (normally MS-Design).<BR><U>Major</U> <I>(integer)</I> = Major version number of engine.<BR><U>Minor</U> <I>(integer)</I> = Minor version number of engine.<BR><U>Build</U> <I>(integer)</I> = Build version number of engine.<BR><U>Revision</U> <I>(integer)</I> = Revision version number of engine.<BR><U>Bits</U> <I>(integer)</I> = Bits version number of engine (32 or 64).<BR><U>Type</U> <I>(string)</I> = Text representation of built type (Release,Alpha,Beta).<BR><U>Target</U> <I>(string)</I> = Text string of the type of executable file.<BR><U>Compiled</U> <I>(string)</I> = The timestamp of the executable compilation time.<BR><U>Compiler</U> <I>(string)</I> = The name of the compiler that built the executable.<BR><U>CompVersion</U> <I>(string)</I> = The version of the compiler that built the executable.<BR></PRE>
-		<H4>Synopsis:-</H4>
-		<PRE>Returns version information about the engine&#x2e;<BR></PRE>
-		<H4><A href="#idx:Info">&#x25B2; Return to table of contents</A></H4>
-	</DIV>
-	<DIV id="Info.Env" style="display:none">
-		<H3>Info.Env</H3>
-		<H4>Syntax:-</H4>
-		<PRE><U>Value</U> = Info.Env(<I><U>Value</U></I>)</PRE>
-		<H4>Function Parameters:-</H4>
-		<PRE><U>Value</U> <I>(string)</I> = The name of the variable to query.<BR></PRE>
-		<H4>Return Parameters:-</H4>
-		<PRE><U>Value</U> <I>(string)</I> = The value of the specified variable.<BR></PRE>
-		<H4>Synopsis:-</H4>
-		<PRE>Queries the specified environment variable&#x2e; Returns a blank string if empty&#x2e; All environment variables are converted to upper&#x2d;case at startup&#x2e;<BR>Type &#x27;env&#x27; in the console to see the current environment&#x2e;<BR></PRE>
-		<H4><A href="#idx:Info">&#x25B2; Return to table of contents</A></H4>
-	</DIV>
-	<DIV id="Info.IsOSLinux" style="display:none">
-		<H3>Info.IsOSLinux</H3>
-		<H4>Syntax:-</H4>
-		<PRE><U>Boolean</U> = Info.IsOSLinux()</PRE>
-		<H4>Return Parameters:-</H4>
-		<PRE><U>Boolean</U> <I>(boolean)</I> = True if using Linux, false if not.<BR></PRE>
-		<H4>Synopsis:-</H4>
-		<PRE>Returns true if executable was built for Linux&#x2c; false if not&#x2e;<BR></PRE>
-		<H4><A href="#idx:Info">&#x25B2; Return to table of contents</A></H4>
-	</DIV>
-	<DIV id="Info.IsOSMac" style="display:none">
-		<H3>Info.IsOSMac</H3>
-		<H4>Syntax:-</H4>
-		<PRE><U>Boolean</U> = Info.IsOSMac()</PRE>
-		<H4>Return Parameters:-</H4>
-		<PRE><U>Boolean</U> <I>(boolean)</I> = True if using MacOS, false if not.<BR></PRE>
-		<H4>Synopsis:-</H4>
-		<PRE>Returns true if executable was built for MacOS&#x2c; false if not&#x2e;<BR></PRE>
-		<H4><A href="#idx:Info">&#x25B2; Return to table of contents</A></H4>
-	</DIV>
-	<DIV id="Info.IsOSWindows" style="display:none">
-		<H3>Info.IsOSWindows</H3>
-		<H4>Syntax:-</H4>
-		<PRE><U>Boolean</U> = Info.IsOSWindows()</PRE>
-		<H4>Return Parameters:-</H4>
-		<PRE><U>Boolean</U> <I>(boolean)</I> = True if using Windows, false if not.<BR></PRE>
-		<H4>Synopsis:-</H4>
-		<PRE>Returns true if executable was built for Windows&#x2c; false if not&#x2e;<BR></PRE>
-		<H4><A href="#idx:Info">&#x25B2; Return to table of contents</A></H4>
-	</DIV>
-	<DIV id="Info.LUAMicroTime" style="display:none">
-		<H3>Info.LUAMicroTime</H3>
-		<H4>Syntax:-</H4>
-		<PRE><U>Time</U> = Info.LUAMicroTime()</PRE>
-		<H4>Return Parameters:-</H4>
-		<PRE><U>Time</U> <I>(integer)</I> = The time in microseconds.<BR></PRE>
-		<H4>Synopsis:-</H4>
-		<PRE>Returns the total time in the LUA sandbox in microseconds&#x2e;<BR></PRE>
-		<H4><A href="#idx:Info">&#x25B2; Return to table of contents</A></H4>
-	</DIV>
-	<DIV id="Info.LUAMilliTime" style="display:none">
-		<H3>Info.LUAMilliTime</H3>
-		<H4>Syntax:-</H4>
-		<PRE><U>Time</U> = Info.LUAMilliTime()</PRE>
-		<H4>Return Parameters:-</H4>
-		<PRE><U>Time</U> <I>(integer)</I> = The execution time in milliseconds.<BR></PRE>
-		<H4>Synopsis:-</H4>
-		<PRE>Returns the total time in the LUA sandbox in milliseconds&#x2e;<BR></PRE>
-		<H4><A href="#idx:Info">&#x25B2; Return to table of contents</A></H4>
-	</DIV>
-	<DIV id="Info.LUANanoTime" style="display:none">
-		<H3>Info.LUANanoTime</H3>
-		<H4>Syntax:-</H4>
-		<PRE><U>Time</U> = Info.LUANanoTime()</PRE>
-		<H4>Return Parameters:-</H4>
-		<PRE><U>Time</U> <I>(integer)</I> = The time in nanoseconds.<BR></PRE>
-		<H4>Synopsis:-</H4>
-		<PRE>Returns the total time in the LUA sandbox in nanoseconds&#x2e;<BR></PRE>
-		<H4><A href="#idx:Info">&#x25B2; Return to table of contents</A></H4>
-	</DIV>
-	<DIV id="Info.LUATime" style="display:none">
-		<H3>Info.LUATime</H3>
-		<H4>Syntax:-</H4>
-		<PRE><U>Timestamp</U> = Info.LUATime()</PRE>
-		<H4>Return Parameters:-</H4>
-		<PRE><U>Timestamp</U> <I>(number)</I> = The execution time as a number.<BR></PRE>
-		<H4>Synopsis:-</H4>
-		<PRE>Returns the total time in the LUA sandbox in seconds&#x2e;<BR></PRE>
-		<H4><A href="#idx:Info">&#x25B2; Return to table of contents</A></H4>
-	</DIV>
-	<DIV id="Info.LUAUsage" style="display:none">
-		<H3>Info.LUAUsage</H3>
-		<H4>Syntax:-</H4>
-		<PRE><U>Bytes</U> = Info.LUAUsage()</PRE>
-		<H4>Return Parameters:-</H4>
-		<PRE><U>Bytes</U> <I>(integer)</I> = Bytes of memory.<BR></PRE>
-		<H4>Synopsis:-</H4>
-		<PRE>Returns the amount of memory in use by Lua </PRE>
-		<H4><A href="#idx:Info">&#x25B2; Return to table of contents</A></H4>
-	</DIV>
-	<DIV id="Info.Locale" style="display:none">
-		<H3>Info.Locale</H3>
-		<H4>Syntax:-</H4>
-		<PRE><U>LocaleID</U> = Info.Locale()</PRE>
-		<H4>Return Parameters:-</H4>
-		<PRE><U>LocaleID</U> <I>(number)</I> = Locale id.<BR></PRE>
-		<H4>Synopsis:-</H4>
-		<PRE>Returns the system locale id&#x2e;<BR></PRE>
-		<H4><A href="#idx:Info">&#x25B2; Return to table of contents</A></H4>
-	</DIV>
-	<DIV id="Info.OS" style="display:none">
-		<H3>Info.OS</H3>
-		<H4>Syntax:-</H4>
-		<PRE><U>Name</U>, <U>Major</U>, <U>Minor</U>, <U>Build</U>, <U>Platform</U>, <U>SPack</U>, <U>Suite</U>, <U>ProdType</U>, <U>Bits</U>, <U>Extra</U> = Info.OS()</PRE>
-		<H4>Return Parameters:-</H4>
-		<PRE><U>Name</U> <I>(string)</I> = Operating system type (Windows,Linux,MacOS).<BR><U>Major</U> <I>(integer)</I> = Major version number of operating system.<BR><U>Minor</U> <I>(integer)</I> = Minor version number of operating system.<BR><U>Build</U> <I>(integer)</I> = Build version number of operating system.<BR><U>Platform</U> <I>(integer)</I> = Platform version number of operating system (Windows).<BR><U>SPack</U> <I>(integer)</I> = Service pack number of operating system (Windows).<BR><U>Suite</U> <I>(integer)</I> = Suite number of operating system (Windows).<BR><U>ProdType</U> <I>(integer)</I> = Product number of operating system (Windows).<BR><U>Bits</U> <I>(integer)</I> = Bits version of operating system.<BR><U>Extra</U> <I>(string)</I> = Extra operating system information (e.g. Wine/Kernel).<BR></PRE>
-		<H4>Synopsis:-</H4>
-		<PRE>Returns version information about the operating system&#x2e;<BR></PRE>
-		<H4><A href="#idx:Info">&#x25B2; Return to table of contents</A></H4>
-	</DIV>
-	<DIV id="Info.OSMicroTime" style="display:none">
-		<H3>Info.OSMicroTime</H3>
-		<H4>Syntax:-</H4>
-		<PRE><U>Time</U> = Info.OSMicroTime()</PRE>
-		<H4>Return Parameters:-</H4>
-		<PRE><U>Time</U> <I>(integer)</I> = The time in microseconds.<BR></PRE>
-		<H4>Synopsis:-</H4>
-		<PRE>Returns the time elapsed in microseconds since the OS started&#x2e; Precision will be lost over time&#x2e;<BR></PRE>
-		<H4><A href="#idx:Info">&#x25B2; Return to table of contents</A></H4>
-	</DIV>
-	<DIV id="Info.OSMilliTime" style="display:none">
-		<H3>Info.OSMilliTime</H3>
-		<H4>Syntax:-</H4>
-		<PRE><U>Time</U> = Info.OSMilliTime()</PRE>
-		<H4>Return Parameters:-</H4>
-		<PRE><U>Time</U> <I>(integer)</I> = The time in milliseconds.<BR></PRE>
-		<H4>Synopsis:-</H4>
-		<PRE>Returns the time elapsed in milliseconds since the OS started&#x2e; Precision will be lost over time&#x2e;<BR></PRE>
-		<H4><A href="#idx:Info">&#x25B2; Return to table of contents</A></H4>
-	</DIV>
-	<DIV id="Info.OSNanoTime" style="display:none">
-		<H3>Info.OSNanoTime</H3>
-		<H4>Syntax:-</H4>
-		<PRE><U>Time</U> = Info.OSNanoTime()</PRE>
-		<H4>Return Parameters:-</H4>
-		<PRE><U>Time</U> <I>(integer)</I> = The time in nanoseconds.<BR></PRE>
-		<H4>Synopsis:-</H4>
-		<PRE>Returns the time elapsed in nanoseconds since the OS started&#x2e; Precision will be lost over time&#x2e;<BR></PRE>
-		<H4><A href="#idx:Info">&#x25B2; Return to table of contents</A></H4>
-	</DIV>
-	<DIV id="Info.OSNumTime" style="display:none">
-		<H3>Info.OSNumTime</H3>
-		<H4>Syntax:-</H4>
-		<PRE><U>Timestamp</U> = Info.OSNumTime()</PRE>
-		<H4>Return Parameters:-</H4>
-		<PRE><U>Timestamp</U> <I>(number)</I> = The UNIX timestamp as a number.<BR></PRE>
-		<H4>Synopsis:-</H4>
-		<PRE>Returns a unix timestamp of the current time in seconds as a number&#x2e;<BR></PRE>
-		<H4><A href="#idx:Info">&#x25B2; Return to table of contents</A></H4>
-	</DIV>
-	<DIV id="Info.OSTime" style="display:none">
-		<H3>Info.OSTime</H3>
-		<H4>Syntax:-</H4>
-		<PRE><U>Timestamp</U> = Info.OSTime()</PRE>
-		<H4>Return Parameters:-</H4>
-		<PRE><U>Timestamp</U> <I>(integer)</I> = The UNIX timestamp.<BR></PRE>
-		<H4>Synopsis:-</H4>
-		<PRE>Returns a unix timestamp of the current time in seconds&#x2e;<BR></PRE>
-		<H4><A href="#idx:Info">&#x25B2; Return to table of contents</A></H4>
-	</DIV>
-	<DIV id="Info.RAM" style="display:none">
-		<H3>Info.RAM</H3>
-		<H4>Syntax:-</H4>
-		<PRE><U>Load</U>, <U>Total</U>, <U>Free</U>, <U>Used</U>, <U>ProcUse</U>, <U>ProcPeak</U> = Info.RAM()</PRE>
-		<H4>Return Parameters:-</H4>
-		<PRE><U>Load</U> <I>(number)</I> = % load of total physical memory.<BR><U>Total</U> <I>(integer)</I> = Total physical memory installed in system.<BR><U>Free</U> <I>(integer)</I> = Available physical memory to engine.<BR><U>Used</U> <I>(integer)</I> = Physical memory in use by the system and other apps.<BR><U>ProcUse</U> <I>(integer)</I> = The total memory in use by the engine (including Virtual).<BR><U>ProcPeak</U> <I>(integer)</I> = The peak memory usage of the engine.<BR></PRE>
-		<H4>Synopsis:-</H4>
-		<PRE>Returns information about physical memory in the computer&#x2e;<BR></PRE>
-		<H4><A href="#idx:Info">&#x25B2; Return to table of contents</A></H4>
-	</DIV>
-	<DIV id="Info.Ticks" style="display:none">
-		<H3>Info.Ticks</H3>
-		<H4>Syntax:-</H4>
-		<PRE><U>Ticks</U> = Info.Ticks()</PRE>
-		<H4>Return Parameters:-</H4>
-		<PRE><U>Ticks</U> <I>(integer)</I> = Number of ticks.<BR></PRE>
-		<H4>Synopsis:-</H4>
-		<PRE>Returns the total number of frames rendered since the engine started&#x2e;<BR></PRE>
-		<H4><A href="#idx:Info">&#x25B2; Return to table of contents</A></H4>
-	</DIV>
-	<DIV id="Info.Time" style="display:none">
-		<H3>Info.Time</H3>
-		<H4>Syntax:-</H4>
-		<PRE><U>Time</U> = Info.Time()</PRE>
-		<H4>Return Parameters:-</H4>
-		<PRE><U>Time</U> <I>(number)</I> = The time in seconds.<BR></PRE>
-		<H4>Synopsis:-</H4>
-		<PRE>Returns the time elapsed in seconds since the engine started&#x2e; This is a very high resolution timer&#x2e; Use it for time&#x2d;criticial timings&#x2e; This counter can be reset with Core&#x2e;Update&#x28;&#x29; as it will lose precision over time&#x2e;<BR></PRE>
-		<H4><A href="#idx:Info">&#x25B2; Return to table of contents</A></H4>
-	</DIV>
-	<DIV id="Info.UpMicroTime" style="display:none">
-		<H3>Info.UpMicroTime</H3>
-		<H4>Syntax:-</H4>
-		<PRE><U>Time</U> = Info.UpMicroTime()</PRE>
-		<H4>Return Parameters:-</H4>
-		<PRE><U>Time</U> <I>(integer)</I> = The engine uptime in microseconds.<BR></PRE>
-		<H4>Synopsis:-</H4>
-		<PRE>Returns the total time the engine has been running in microseconds&#x2e;<BR></PRE>
-		<H4><A href="#idx:Info">&#x25B2; Return to table of contents</A></H4>
-	</DIV>
-	<DIV id="Info.UpMilliTime" style="display:none">
-		<H3>Info.UpMilliTime</H3>
-		<H4>Syntax:-</H4>
-		<PRE><U>Time</U> = Info.UpMilliTime()</PRE>
-		<H4>Return Parameters:-</H4>
-		<PRE><U>Time</U> <I>(integer)</I> = The engine uptime in milliseconds.<BR></PRE>
-		<H4>Synopsis:-</H4>
-		<PRE>Returns the total time in the engine has been running in milliseconds&#x2e;<BR></PRE>
-		<H4><A href="#idx:Info">&#x25B2; Return to table of contents</A></H4>
-	</DIV>
-	<DIV id="Info.UpNanoTime" style="display:none">
-		<H3>Info.UpNanoTime</H3>
-		<H4>Syntax:-</H4>
-		<PRE><U>Time</U> = Info.UpNanoTime()</PRE>
-		<H4>Return Parameters:-</H4>
-		<PRE><U>Time</U> <I>(integer)</I> = The engine time in nanoseconds.<BR></PRE>
-		<H4>Synopsis:-</H4>
-		<PRE>Returns the total time in the engine has been running in nanoseconds&#x2e;<BR></PRE>
-		<H4><A href="#idx:Info">&#x25B2; Return to table of contents</A></H4>
-	</DIV>
-	<DIV id="Info.Uptime" style="display:none">
-		<H3>Info.Uptime</H3>
-		<H4>Syntax:-</H4>
-		<PRE><U>Ticks</U> = Info.Uptime()</PRE>
-		<H4>Return Parameters:-</H4>
-		<PRE><U>Ticks</U> <I>(number)</I> = Uptime in seconds<BR></PRE>
-		<H4>Synopsis:-</H4>
-		<PRE>Returns the total number of seconds elapsed since the start of the engine this call maybe a little more expensive than Glfw&#x2e;Time&#x28;&#x29; but you have no choice to use this if you are using terminal mode&#x2e; This uses std&#x3a;&#x3a;chrono to retrieve this value&#x2e;<BR></PRE>
-		<H4><A href="#idx:Info">&#x25B2; Return to table of contents</A></H4>
 	</DIV>
 	<DIV id="Input.ClearStates" style="display:none">
 		<H3>Input.ClearStates</H3>
@@ -8792,16 +8345,6 @@
 		<PRE>Blits tile 0 of texture &#x27;TexIndex&#x27; at the specified bounds&#x2e;<BR></PRE>
 		<H4><A href="#idx:Texture">&#x25B2; Return to table of contents</A></H4>
 	</DIV>
-	<DIV id="Texture:BlitILTRBA" style="display:none">
-		<H3>Texture:BlitILTRBA</H3>
-		<H4>Syntax:-</H4>
-		<PRE>Texture:BlitILTRBA(<I><U>TexIndex</U>, <U>Left</U>, <U>Top</U>, <U>Right</U>, <U>Bottom</U>, <U>Angle</U></I>)</PRE>
-		<H4>Function Parameters:-</H4>
-		<PRE><U>TexIndex</U> <I>(integer)</I> = The texture index to use.<BR><U>Left</U> <I>(number)</I> = The starting column to draw from.<BR><U>Top</U> <I>(number)</I> = The starting row to draw from.<BR><U>Right</U> <I>(number)</I> = The ending column pixel to draw to.<BR><U>Bottom</U> <I>(number)</I> = The ending row pixel to draw to.<BR><U>Angle</U> <I>(number)</I> = The angle in which to rotate from the centre point (-1 to 1).<BR></PRE>
-		<H4>Synopsis:-</H4>
-		<PRE>Blits tile 0 of texture &#x27;TexIndex&#x27; at the specified bounds&#x2e;<BR></PRE>
-		<H4><A href="#idx:Texture">&#x25B2; Return to table of contents</A></H4>
-	</DIV>
 	<DIV id="Texture:BlitILTWH" style="display:none">
 		<H3>Texture:BlitILTWH</H3>
 		<H4>Syntax:-</H4>
@@ -8848,16 +8391,6 @@
 		<PRE>Texture:BlitISLTRB(<I><U>TexIndex</U>, <U>TileIndex</U>, <U>Left</U>, <U>Top</U>, <U>Right</U>, <U>Bottom</U></I>)</PRE>
 		<H4>Function Parameters:-</H4>
 		<PRE><U>TexIndex</U> <I>(integer)</I> = The texture index to use.<BR><U>TileIndex</U> <I>(integer)</I> = The tile index to blit.<BR><U>Left</U> <I>(number)</I> = The starting column to draw from.<BR><U>Top</U> <I>(number)</I> = The starting row to draw from.<BR><U>Right</U> <I>(number)</I> = The ending column pixel to draw to.<BR><U>Bottom</U> <I>(number)</I> = The ending row pixel to draw to.<BR></PRE>
-		<H4>Synopsis:-</H4>
-		<PRE>Blits tile &#x27;TileIndex&#x27; of texture &#x27;TexIndex&#x27; at the specified screen bounds&#x2e;<BR></PRE>
-		<H4><A href="#idx:Texture">&#x25B2; Return to table of contents</A></H4>
-	</DIV>
-	<DIV id="Texture:BlitISLTRBA" style="display:none">
-		<H3>Texture:BlitISLTRBA</H3>
-		<H4>Syntax:-</H4>
-		<PRE>Texture:BlitISLTRBA(<I><U>TexIndex</U>, <U>TileIndex</U>, <U>Left</U>, <U>Top</U>, <U>Right</U>, <U>Bottom</U>, <U>Angle</U></I>)</PRE>
-		<H4>Function Parameters:-</H4>
-		<PRE><U>TexIndex</U> <I>(integer)</I> = The texture index to use.<BR><U>TileIndex</U> <I>(integer)</I> = The tile index to blit.<BR><U>Left</U> <I>(number)</I> = The starting column to draw from.<BR><U>Top</U> <I>(number)</I> = The starting row to draw from.<BR><U>Right</U> <I>(number)</I> = The ending column pixel to draw to.<BR><U>Bottom</U> <I>(number)</I> = The ending row pixel to draw to.<BR><U>Angle</U> <I>(number)</I> = The angle in which to rotate from the centre point (-1 to 1).<BR></PRE>
 		<H4>Synopsis:-</H4>
 		<PRE>Blits tile &#x27;TileIndex&#x27; of texture &#x27;TexIndex&#x27; at the specified screen bounds&#x2e;<BR></PRE>
 		<H4><A href="#idx:Texture">&#x25B2; Return to table of contents</A></H4>
@@ -8910,16 +8443,6 @@
 		<PRE><U>Left</U> <I>(number)</I> = The starting column to draw from.<BR><U>Top</U> <I>(number)</I> = The starting row to draw from.<BR><U>Right</U> <I>(number)</I> = The ending column pixel to draw to.<BR><U>Bottom</U> <I>(number)</I> = The ending row pixel to draw to.<BR></PRE>
 		<H4>Synopsis:-</H4>
 		<PRE>Blits tile 0 of texture 0 at the specified bounds&#x2e;<BR></PRE>
-		<H4><A href="#idx:Texture">&#x25B2; Return to table of contents</A></H4>
-	</DIV>
-	<DIV id="Texture:BlitLTRBA" style="display:none">
-		<H3>Texture:BlitLTRBA</H3>
-		<H4>Syntax:-</H4>
-		<PRE>Texture:BlitLTRBA(<I><U>Left</U>, <U>Top</U>, <U>Right</U>, <U>Bottom</U>, <U>Angle</U></I>)</PRE>
-		<H4>Function Parameters:-</H4>
-		<PRE><U>Left</U> <I>(number)</I> = The starting column to draw from.<BR><U>Top</U> <I>(number)</I> = The starting row to draw from.<BR><U>Right</U> <I>(number)</I> = The ending column pixel to draw to.<BR><U>Bottom</U> <I>(number)</I> = The ending row pixel to draw to.<BR><U>Angle</U> <I>(number)</I> = The angle in which to rotate from the centre point (-1 to 1).<BR></PRE>
-		<H4>Synopsis:-</H4>
-		<PRE>Blits tile 0 of texture 0 at the specified screen bounds and angle from the centre of the quad&#x2e;<BR></PRE>
 		<H4><A href="#idx:Texture">&#x25B2; Return to table of contents</A></H4>
 	</DIV>
 	<DIV id="Texture:BlitLTWH" style="display:none">
@@ -8980,16 +8503,6 @@
 		<PRE><U>TileIndex</U> <I>(integer)</I> = The tile index of the texture to blit.<BR><U>Left</U> <I>(number)</I> = The starting column to draw from.<BR><U>Top</U> <I>(number)</I> = The starting row to draw from.<BR><U>Right</U> <I>(number)</I> = The ending column pixel to draw to.<BR><U>Bottom</U> <I>(number)</I> = The ending row pixel to draw to.<BR></PRE>
 		<H4>Synopsis:-</H4>
 		<PRE>Blits tile &#x27;TileIndex&#x27; of texture 0 at the specified bounds&#x2e;<BR></PRE>
-		<H4><A href="#idx:Texture">&#x25B2; Return to table of contents</A></H4>
-	</DIV>
-	<DIV id="Texture:BlitSLTRBA" style="display:none">
-		<H3>Texture:BlitSLTRBA</H3>
-		<H4>Syntax:-</H4>
-		<PRE>Texture:BlitSLTRBA(<I><U>TileIndex</U>, <U>Left</U>, <U>Top</U>, <U>Right</U>, <U>Bottom</U>, <U>Angle</U></I>)</PRE>
-		<H4>Function Parameters:-</H4>
-		<PRE><U>TileIndex</U> <I>(integer)</I> = The tile index of the texture to blit.<BR><U>Left</U> <I>(number)</I> = The starting column to draw from.<BR><U>Top</U> <I>(number)</I> = The starting row to draw from.<BR><U>Right</U> <I>(number)</I> = The ending column pixel to draw to.<BR><U>Bottom</U> <I>(number)</I> = The ending row pixel to draw to.<BR><U>Angle</U> <I>(number)</I> = The angle in which to rotate from the centre point (-1 to 1).<BR></PRE>
-		<H4>Synopsis:-</H4>
-		<PRE>Blits tile &#x27;TileIndex&#x27; of texture 0 at the specified screenbounds and angle&#x2e;<BR></PRE>
 		<H4><A href="#idx:Texture">&#x25B2; Return to table of contents</A></H4>
 	</DIV>
 	<DIV id="Texture:BlitSLTWH" style="display:none">
@@ -9226,16 +8739,6 @@
 		<PRE>Presets these screen bounds for the next use of Texture&#x3a;BlitP&#x2a;&#x2e;<BR></PRE>
 		<H4><A href="#idx:Texture">&#x25B2; Return to table of contents</A></H4>
 	</DIV>
-	<DIV id="Texture:SetVLTRBA" style="display:none">
-		<H3>Texture:SetVLTRBA</H3>
-		<H4>Syntax:-</H4>
-		<PRE>Texture:SetVLTRBA(<I><U>Left</U>, <U>Top</U>, <U>Right</U>, <U>Bottom</U>, <U>Angle</U></I>)</PRE>
-		<H4>Function Parameters:-</H4>
-		<PRE><U>Left</U> <I>(number)</I> = The starting column to draw from.<BR><U>Top</U> <I>(number)</I> = The starting row to draw from.<BR><U>Right</U> <I>(number)</I> = The ending column pixel to draw to.<BR><U>Bottom</U> <I>(number)</I> = The ending row pixel to draw to.<BR><U>Angle</U> <I>(number)</I> = The angle in which to rotate from the centre point (-1 to 1).<BR></PRE>
-		<H4>Synopsis:-</H4>
-		<PRE>Presets the specified screen bounds and angle for the next use of Texture&#x3a;BlitP&#x2a;&#x2e;<BR></PRE>
-		<H4><A href="#idx:Texture">&#x25B2; Return to table of contents</A></H4>
-	</DIV>
 	<DIV id="Texture:SetVLTWH" style="display:none">
 		<H3>Texture:SetVLTWH</H3>
 		<H4>Syntax:-</H4>
@@ -9460,6 +8963,54 @@
 		<PRE>Converts the timestamp into the format &#x27;Www Mmm dd hh&#x3a;mm&#x3a;ss yyyy zzz&#x27;&#x2e;<BR>There maybe a slight differences across different operating systems&#x2e;<BR>Note that time will be in UTC time format&#x2e;<BR></PRE>
 		<H4><A href="#idx:Util">&#x25B2; Return to table of contents</A></H4>
 	</DIV>
+	<DIV id="Util.B64D" style="display:none">
+		<H3>Util.B64D</H3>
+		<H4>Syntax:-</H4>
+		<PRE><U>Text</U> = Util.B64D(<I><U>Text</U></I>)</PRE>
+		<H4>Function Parameters:-</H4>
+		<PRE><U>Text</U> <I>(string)</I> = The string to decode.<BR></PRE>
+		<H4>Return Parameters:-</H4>
+		<PRE><U>Text</U> <I>(string)</I> = The base64 decoded string.<BR></PRE>
+		<H4>Synopsis:-</H4>
+		<PRE>Decodes the specified string from base64&#x2e;<BR></PRE>
+		<H4><A href="#idx:Util">&#x25B2; Return to table of contents</A></H4>
+	</DIV>
+	<DIV id="Util.B64DA" style="display:none">
+		<H3>Util.B64DA</H3>
+		<H4>Syntax:-</H4>
+		<PRE><U>Data</U> = Util.B64DA(<I><U>Text</U></I>)</PRE>
+		<H4>Function Parameters:-</H4>
+		<PRE><U>Text</U> <I>(string)</I> = The string to decode.<BR></PRE>
+		<H4>Return Parameters:-</H4>
+		<PRE><U>Data</U> <I>(Asset)</I> = The base64 decoded data array.<BR></PRE>
+		<H4>Synopsis:-</H4>
+		<PRE>Decodes the specified string from base64 to a data array class&#x2e; Useful if you&#x27;re handling binary data and&#x2f;or not sure if the data is binary&#x2f;text and need to check&#x2e;<BR></PRE>
+		<H4><A href="#idx:Util">&#x25B2; Return to table of contents</A></H4>
+	</DIV>
+	<DIV id="Util.B64E" style="display:none">
+		<H3>Util.B64E</H3>
+		<H4>Syntax:-</H4>
+		<PRE><U>Hash</U> = Util.B64E(<I><U>Data</U></I>)</PRE>
+		<H4>Function Parameters:-</H4>
+		<PRE><U>Data</U> <I>(string)</I> = The string to encode.<BR></PRE>
+		<H4>Return Parameters:-</H4>
+		<PRE><U>Hash</U> <I>(string)</I> = The return string encoded to base64.<BR></PRE>
+		<H4>Synopsis:-</H4>
+		<PRE>Encodes the specified string to base64&#x2e;<BR></PRE>
+		<H4><A href="#idx:Util">&#x25B2; Return to table of contents</A></H4>
+	</DIV>
+	<DIV id="Util.B64EA" style="display:none">
+		<H3>Util.B64EA</H3>
+		<H4>Syntax:-</H4>
+		<PRE><U>Hash</U> = Util.B64EA(<I><U>Data</U></I>)</PRE>
+		<H4>Function Parameters:-</H4>
+		<PRE><U>Data</U> <I>(array)</I> = The data to encode.<BR></PRE>
+		<H4>Return Parameters:-</H4>
+		<PRE><U>Hash</U> <I>(string)</I> = The return string encoded to bas64.<BR></PRE>
+		<H4>Synopsis:-</H4>
+		<PRE>Encodes the specified data array to base64&#x2e;<BR></PRE>
+		<H4><A href="#idx:Util">&#x25B2; Return to table of contents</A></H4>
+	</DIV>
 	<DIV id="Util.Bits" style="display:none">
 		<H3>Util.Bits</H3>
 		<H4>Syntax:-</H4>
@@ -9477,7 +9028,7 @@
 		<H4>Syntax:-</H4>
 		<PRE>Util.Blank()</PRE>
 		<H4>Synopsis:-</H4>
-		<PRE>Just a blank function that does nothing </PRE>
+		<PRE>Just a blank function that does nothing&#x2e; Useful for passing to functions that require a callback&#x2e; The function is only available for convenience as performing &#x27;local function EmptyFunc&#x28;&#x29; end&#x27; is generally faster than this&#x2e;<BR></PRE>
 		<H4><A href="#idx:Util">&#x25B2; Return to table of contents</A></H4>
 	</DIV>
 	<DIV id="Util.Bytes" style="display:none">
@@ -9490,6 +9041,30 @@
 		<PRE><U>Result</U> <I>(string)</I> = The resulting string.<BR></PRE>
 		<H4>Synopsis:-</H4>
 		<PRE>Converts the specified number of bytes into a human readable string&#x2e;<BR></PRE>
+		<H4><A href="#idx:Util">&#x25B2; Return to table of contents</A></H4>
+	</DIV>
+	<DIV id="Util.CRC" style="display:none">
+		<H3>Util.CRC</H3>
+		<H4>Syntax:-</H4>
+		<PRE><U>Hash</U> = Util.CRC(<I><U>Data</U></I>)</PRE>
+		<H4>Function Parameters:-</H4>
+		<PRE><U>Data</U> <I>(string)</I> = The string to hash.<BR></PRE>
+		<H4>Return Parameters:-</H4>
+		<PRE><U>Hash</U> <I>(integer)</I> = The calculated CRC hash.<BR></PRE>
+		<H4>Synopsis:-</H4>
+		<PRE>Calculates a CRC32 hash from a string&#x2e; Insecure&#x2c; only use for super fast hashing of insignificant strings&#x2e; The benefit of CRC hashing though is that the function returns an integer&#x2e;<BR></PRE>
+		<H4><A href="#idx:Util">&#x25B2; Return to table of contents</A></H4>
+	</DIV>
+	<DIV id="Util.CRCA" style="display:none">
+		<H3>Util.CRCA</H3>
+		<H4>Syntax:-</H4>
+		<PRE><U>Hash</U> = Util.CRCA(<I><U>Data</U></I>)</PRE>
+		<H4>Function Parameters:-</H4>
+		<PRE><U>Data</U> <I>(array)</I> = The data to hash.<BR></PRE>
+		<H4>Return Parameters:-</H4>
+		<PRE><U>Hash</U> <I>(integer)</I> = The calculated CRC hash.<BR></PRE>
+		<H4>Synopsis:-</H4>
+		<PRE>Calculates a CRC32 hash from an array class&#x2e; Insecure&#x2c; only use for super fast hashing of insignificant strings&#x2e; The benefit of CRC hashing though is that the function returns an integer&#x2e;<BR></PRE>
 		<H4><A href="#idx:Util">&#x25B2; Return to table of contents</A></H4>
 	</DIV>
 	<DIV id="Util.Capitalise" style="display:none">
@@ -9586,6 +9161,30 @@
 		<PRE><U>High64</U> <I>(integer)</I> = The high-order 128-bit integer<BR><U>Low64</U> <I>(integer)</I> = The low-order 128-bit integer<BR></PRE>
 		<H4>Synopsis:-</H4>
 		<PRE>Encodes the specified UUID string to two 64&#x2d;bit integers&#x2e;<BR></PRE>
+		<H4><A href="#idx:Util">&#x25B2; Return to table of contents</A></H4>
+	</DIV>
+	<DIV id="Util.EntDecode" style="display:none">
+		<H3>Util.EntDecode</H3>
+		<H4>Syntax:-</H4>
+		<PRE><U>Text</U> = Util.EntDecode(<I><U>Text</U></I>)</PRE>
+		<H4>Function Parameters:-</H4>
+		<PRE><U>Text</U> <I>(string)</I> = The URL string to remove HTML entities from.<BR></PRE>
+		<H4>Return Parameters:-</H4>
+		<PRE><U>Text</U> <I>(string)</I> = The URL decoded string.<BR></PRE>
+		<H4>Synopsis:-</H4>
+		<PRE>Decodes HTML entities from the spcified string&#x2e;<BR></PRE>
+		<H4><A href="#idx:Util">&#x25B2; Return to table of contents</A></H4>
+	</DIV>
+	<DIV id="Util.EntEncode" style="display:none">
+		<H3>Util.EntEncode</H3>
+		<H4>Syntax:-</H4>
+		<PRE><U>Text</U> = Util.EntEncode(<I><U>Text</U></I>)</PRE>
+		<H4>Function Parameters:-</H4>
+		<PRE><U>Text</U> <I>(string)</I> = The URL string to insert HTML entities into.<BR></PRE>
+		<H4>Return Parameters:-</H4>
+		<PRE><U>Text</U> <I>(string)</I> = The URL encoded string.<BR></PRE>
+		<H4>Synopsis:-</H4>
+		<PRE>Encodes HTML entities into the spcified string&#x2e;<BR></PRE>
 		<H4><A href="#idx:Util">&#x25B2; Return to table of contents</A></H4>
 	</DIV>
 	<DIV id="Util.Explode" style="display:none">
@@ -9708,6 +9307,66 @@
 		<PRE>Converts the specified number into a human readable string&#x2e;<BR></PRE>
 		<H4><A href="#idx:Util">&#x25B2; Return to table of contents</A></H4>
 	</DIV>
+	<DIV id="Util.HMSHA1" style="display:none">
+		<H3>Util.HMSHA1</H3>
+		<H4>Syntax:-</H4>
+		<PRE><U>Hash</U> = Util.HMSHA1(<I><U>Key</U>, <U>Data</U></I>)</PRE>
+		<H4>Function Parameters:-</H4>
+		<PRE><U>Key</U> <I>(string)</I> = The entropy to use.<BR><U>Data</U> <I>(string)</I> = The string to hash.<BR></PRE>
+		<H4>Return Parameters:-</H4>
+		<PRE><U>Hash</U> <I>(string)</I> = The calculated SHA1 hash.<BR></PRE>
+		<H4>Synopsis:-</H4>
+		<PRE>Calculates a SHA1 hash from a string using the specifiy entropy&#x2e; Insecure&#x2c; only use for hashing of insignificant data&#x2e;<BR></PRE>
+		<H4><A href="#idx:Util">&#x25B2; Return to table of contents</A></H4>
+	</DIV>
+	<DIV id="Util.HMSHA224" style="display:none">
+		<H3>Util.HMSHA224</H3>
+		<H4>Syntax:-</H4>
+		<PRE><U>Hash</U> = Util.HMSHA224(<I><U>Key</U>, <U>Data</U></I>)</PRE>
+		<H4>Function Parameters:-</H4>
+		<PRE><U>Key</U> <I>(string)</I> = The entropy to use.<BR><U>Data</U> <I>(string)</I> = The string to hash.<BR></PRE>
+		<H4>Return Parameters:-</H4>
+		<PRE><U>Hash</U> <I>(string)</I> = The calculated SHA224 hash.<BR></PRE>
+		<H4>Synopsis:-</H4>
+		<PRE>Calculates a SHA224 hash from a string using the specifiy entropy&#x2e;<BR></PRE>
+		<H4><A href="#idx:Util">&#x25B2; Return to table of contents</A></H4>
+	</DIV>
+	<DIV id="Util.HMSHA256" style="display:none">
+		<H3>Util.HMSHA256</H3>
+		<H4>Syntax:-</H4>
+		<PRE><U>Hash</U> = Util.HMSHA256(<I><U>Key</U>, <U>Data</U></I>)</PRE>
+		<H4>Function Parameters:-</H4>
+		<PRE><U>Key</U> <I>(string)</I> = The entropy to use.<BR><U>Data</U> <I>(string)</I> = The string to hash.<BR></PRE>
+		<H4>Return Parameters:-</H4>
+		<PRE><U>Hash</U> <I>(string)</I> = The calculated SHA256 hash.<BR></PRE>
+		<H4>Synopsis:-</H4>
+		<PRE>Calculates a SHA256 hash from a string using the specifiy entropy&#x2e;<BR></PRE>
+		<H4><A href="#idx:Util">&#x25B2; Return to table of contents</A></H4>
+	</DIV>
+	<DIV id="Util.HMSHA384" style="display:none">
+		<H3>Util.HMSHA384</H3>
+		<H4>Syntax:-</H4>
+		<PRE><U>Hash</U> = Util.HMSHA384(<I><U>Key</U>, <U>Data</U></I>)</PRE>
+		<H4>Function Parameters:-</H4>
+		<PRE><U>Key</U> <I>(string)</I> = The entropy to use.<BR><U>Data</U> <I>(string)</I> = The string to hash.<BR></PRE>
+		<H4>Return Parameters:-</H4>
+		<PRE><U>Hash</U> <I>(string)</I> = The calculated SHA384 hash.<BR></PRE>
+		<H4>Synopsis:-</H4>
+		<PRE>Calculates a SHA384 hash from a string using the specifiy entropy&#x2e;<BR></PRE>
+		<H4><A href="#idx:Util">&#x25B2; Return to table of contents</A></H4>
+	</DIV>
+	<DIV id="Util.HMSHA512" style="display:none">
+		<H3>Util.HMSHA512</H3>
+		<H4>Syntax:-</H4>
+		<PRE><U>Hash</U> = Util.HMSHA512(<I><U>Key</U>, <U>Data</U></I>)</PRE>
+		<H4>Function Parameters:-</H4>
+		<PRE><U>Key</U> <I>(string)</I> = The entropy to use.<BR><U>Data</U> <I>(string)</I> = The string to hash.<BR></PRE>
+		<H4>Return Parameters:-</H4>
+		<PRE><U>Hash</U> <I>(string)</I> = The calculated SHA512 hash.<BR></PRE>
+		<H4>Synopsis:-</H4>
+		<PRE>Calculates a SHA512 hash from a string using the specifiy entropy&#x2e;<BR></PRE>
+		<H4><A href="#idx:Util">&#x25B2; Return to table of contents</A></H4>
+	</DIV>
 	<DIV id="Util.Hex" style="display:none">
 		<H3>Util.Hex</H3>
 		<H4>Syntax:-</H4>
@@ -9718,6 +9377,78 @@
 		<PRE><U>Value</U> <I>(string)</I> = Same number but in hexadecimal<BR></PRE>
 		<H4>Synopsis:-</H4>
 		<PRE>Convert integer to hexadecimal in uppercase </PRE>
+		<H4><A href="#idx:Util">&#x25B2; Return to table of contents</A></H4>
+	</DIV>
+	<DIV id="Util.HexDecode" style="display:none">
+		<H3>Util.HexDecode</H3>
+		<H4>Syntax:-</H4>
+		<PRE><U>Text</U> = Util.HexDecode(<I><U>Text</U></I>)</PRE>
+		<H4>Function Parameters:-</H4>
+		<PRE><U>Text</U> <I>(string)</I> = The hex encoded string to decode.<BR></PRE>
+		<H4>Return Parameters:-</H4>
+		<PRE><U>Text</U> <I>(Asset)</I> = The text decoded string.<BR></PRE>
+		<H4>Synopsis:-</H4>
+		<PRE>Encodes the specified text to uppercase hexadecimal&#x2e;<BR></PRE>
+		<H4><A href="#idx:Util">&#x25B2; Return to table of contents</A></H4>
+	</DIV>
+	<DIV id="Util.HexDecodeA" style="display:none">
+		<H3>Util.HexDecodeA</H3>
+		<H4>Syntax:-</H4>
+		<PRE><U>Data</U> = Util.HexDecodeA(<I><U>Text</U></I>)</PRE>
+		<H4>Function Parameters:-</H4>
+		<PRE><U>Text</U> <I>(string)</I> = The hex encoded string to decode.<BR></PRE>
+		<H4>Return Parameters:-</H4>
+		<PRE><U>Data</U> <I>(Asset)</I> = The decoded data array class.<BR></PRE>
+		<H4>Synopsis:-</H4>
+		<PRE>Decodes the specified hexadecimal string to binary data&#x2e;<BR></PRE>
+		<H4><A href="#idx:Util">&#x25B2; Return to table of contents</A></H4>
+	</DIV>
+	<DIV id="Util.HexEncode" style="display:none">
+		<H3>Util.HexEncode</H3>
+		<H4>Syntax:-</H4>
+		<PRE><U>Text</U> = Util.HexEncode(<I><U>Text</U></I>)</PRE>
+		<H4>Function Parameters:-</H4>
+		<PRE><U>Text</U> <I>(string)</I> = The string.<BR></PRE>
+		<H4>Return Parameters:-</H4>
+		<PRE><U>Text</U> <I>(string)</I> = The hex encoded string.<BR></PRE>
+		<H4>Synopsis:-</H4>
+		<PRE>Encodes the specified text to uppercase hexadecimal&#x2e;<BR></PRE>
+		<H4><A href="#idx:Util">&#x25B2; Return to table of contents</A></H4>
+	</DIV>
+	<DIV id="Util.HexEncodeA" style="display:none">
+		<H3>Util.HexEncodeA</H3>
+		<H4>Syntax:-</H4>
+		<PRE><U>Text</U> = Util.HexEncodeA(<I><U>Data</U></I>)</PRE>
+		<H4>Function Parameters:-</H4>
+		<PRE><U>Data</U> <I>(Asset)</I> = The data array class to encode.<BR></PRE>
+		<H4>Return Parameters:-</H4>
+		<PRE><U>Text</U> <I>(string)</I> = The hex encoded string.<BR></PRE>
+		<H4>Synopsis:-</H4>
+		<PRE>Encodes the specified data array to uppercase hexadecimal&#x2e;<BR></PRE>
+		<H4><A href="#idx:Util">&#x25B2; Return to table of contents</A></H4>
+	</DIV>
+	<DIV id="Util.HexEncodeL" style="display:none">
+		<H3>Util.HexEncodeL</H3>
+		<H4>Syntax:-</H4>
+		<PRE><U>Text</U> = Util.HexEncodeL(<I><U>Text</U></I>)</PRE>
+		<H4>Function Parameters:-</H4>
+		<PRE><U>Text</U> <I>(string)</I> = The string.<BR></PRE>
+		<H4>Return Parameters:-</H4>
+		<PRE><U>Text</U> <I>(string)</I> = The hex encoded string.<BR></PRE>
+		<H4>Synopsis:-</H4>
+		<PRE>Encodes the specified text to lowercase hexadecimal&#x2e;<BR></PRE>
+		<H4><A href="#idx:Util">&#x25B2; Return to table of contents</A></H4>
+	</DIV>
+	<DIV id="Util.HexEncodeLA" style="display:none">
+		<H3>Util.HexEncodeLA</H3>
+		<H4>Syntax:-</H4>
+		<PRE><U>Text</U> = Util.HexEncodeLA(<I><U>Data</U></I>)</PRE>
+		<H4>Function Parameters:-</H4>
+		<PRE><U>Data</U> <I>(Asset)</I> = The data array class to encode.<BR></PRE>
+		<H4>Return Parameters:-</H4>
+		<PRE><U>Text</U> <I>(string)</I> = The hex encoded string.<BR></PRE>
+		<H4>Synopsis:-</H4>
+		<PRE>Encodes the specified data array to lowercase hexadecimal&#x2e;<BR></PRE>
 		<H4><A href="#idx:Util">&#x25B2; Return to table of contents</A></H4>
 	</DIV>
 	<DIV id="Util.HexL" style="display:none">
@@ -10008,18 +9739,6 @@
 		<PRE>Joins two integers in the 8&#x2d;bit range to return one integer in the 16&#x2d;bit range&#x2e;<BR></PRE>
 		<H4><A href="#idx:Util">&#x25B2; Return to table of contents</A></H4>
 	</DIV>
-	<DIV id="Util.MkUTF8Char" style="display:none">
-		<H3>Util.MkUTF8Char</H3>
-		<H4>Syntax:-</H4>
-		<PRE><U>ByteCode</U> = Util.MkUTF8Char(<I><U>Value</U></I>)</PRE>
-		<H4>Function Parameters:-</H4>
-		<PRE><U>Value</U> <I>(integer)</I> = Value to cast to a string<BR></PRE>
-		<H4>Return Parameters:-</H4>
-		<PRE><U>ByteCode</U> <I>(string)</I> = The 'value' cast as a string.<BR></PRE>
-		<H4>Synopsis:-</H4>
-		<PRE>Casts the specified 24&#x2d;bit integer directly to a string&#x2e; This is useful as a quicker way to create unicode characters&#x2e; All bits above 24 are automatically stripped by a bitwise operation for safety&#x2e;<BR></PRE>
-		<H4><A href="#idx:Util">&#x25B2; Return to table of contents</A></H4>
-	</DIV>
 	<DIV id="Util.ParseArgs" style="display:none">
 		<H3>Util.ParseArgs</H3>
 		<H4>Syntax:-</H4>
@@ -10246,6 +9965,138 @@
 		<PRE>Rounds the specified integer up to the nearest power of two&#x2e;<BR></PRE>
 		<H4><A href="#idx:Util">&#x25B2; Return to table of contents</A></H4>
 	</DIV>
+	<DIV id="Util.SHA1" style="display:none">
+		<H3>Util.SHA1</H3>
+		<H4>Syntax:-</H4>
+		<PRE><U>Hash</U> = Util.SHA1(<I><U>Data</U></I>)</PRE>
+		<H4>Function Parameters:-</H4>
+		<PRE><U>Data</U> <I>(string)</I> = The string to hash.<BR></PRE>
+		<H4>Return Parameters:-</H4>
+		<PRE><U>Hash</U> <I>(string)</I> = The calculated SHA1 hash.<BR></PRE>
+		<H4>Synopsis:-</H4>
+		<PRE>Calculates a SHA1 hash from a string&#x2e; This hashing algorithm is obsolete and insecure and should no longer be used and is here only for compatibility reasons only&#x2e;<BR></PRE>
+		<H4><A href="#idx:Util">&#x25B2; Return to table of contents</A></H4>
+	</DIV>
+	<DIV id="Util.SHA1A" style="display:none">
+		<H3>Util.SHA1A</H3>
+		<H4>Syntax:-</H4>
+		<PRE><U>Hash</U> = Util.SHA1A(<I><U>Data</U></I>)</PRE>
+		<H4>Function Parameters:-</H4>
+		<PRE><U>Data</U> <I>(array)</I> = The data to hash.<BR></PRE>
+		<H4>Return Parameters:-</H4>
+		<PRE><U>Hash</U> <I>(string)</I> = The calculated SHA1 hash.<BR></PRE>
+		<H4>Synopsis:-</H4>
+		<PRE>Calculates a SHA1 hash from an array class&#x2e; Insecure&#x2c; only use for hashing of insignificant data&#x2e;<BR></PRE>
+		<H4><A href="#idx:Util">&#x25B2; Return to table of contents</A></H4>
+	</DIV>
+	<DIV id="Util.SHA224" style="display:none">
+		<H3>Util.SHA224</H3>
+		<H4>Syntax:-</H4>
+		<PRE><U>Hash</U> = Util.SHA224(<I><U>Data</U></I>)</PRE>
+		<H4>Function Parameters:-</H4>
+		<PRE><U>Data</U> <I>(string)</I> = The string to hash.<BR></PRE>
+		<H4>Return Parameters:-</H4>
+		<PRE><U>Hash</U> <I>(string)</I> = The calculated SHA256 hash.<BR></PRE>
+		<H4>Synopsis:-</H4>
+		<PRE>Calculates a SHA224 hash from a string&#x2e;<BR></PRE>
+		<H4><A href="#idx:Util">&#x25B2; Return to table of contents</A></H4>
+	</DIV>
+	<DIV id="Util.SHA224A" style="display:none">
+		<H3>Util.SHA224A</H3>
+		<H4>Syntax:-</H4>
+		<PRE><U>Hash</U> = Util.SHA224A(<I><U>Data</U></I>)</PRE>
+		<H4>Function Parameters:-</H4>
+		<PRE><U>Data</U> <I>(array)</I> = The data to hash.<BR></PRE>
+		<H4>Return Parameters:-</H4>
+		<PRE><U>Hash</U> <I>(string)</I> = The calculated SHA256 hash.<BR></PRE>
+		<H4>Synopsis:-</H4>
+		<PRE>Calculates a SHA224 hash from an array class&#x2e;<BR></PRE>
+		<H4><A href="#idx:Util">&#x25B2; Return to table of contents</A></H4>
+	</DIV>
+	<DIV id="Util.SHA256" style="display:none">
+		<H3>Util.SHA256</H3>
+		<H4>Syntax:-</H4>
+		<PRE><U>Hash</U> = Util.SHA256(<I><U>Data</U></I>)</PRE>
+		<H4>Function Parameters:-</H4>
+		<PRE><U>Data</U> <I>(string)</I> = The string to hash.<BR></PRE>
+		<H4>Return Parameters:-</H4>
+		<PRE><U>Hash</U> <I>(string)</I> = The calculated SHA256 hash.<BR></PRE>
+		<H4>Synopsis:-</H4>
+		<PRE>Calculates a SHA256 hash from a string&#x2e;<BR></PRE>
+		<H4><A href="#idx:Util">&#x25B2; Return to table of contents</A></H4>
+	</DIV>
+	<DIV id="Util.SHA256A" style="display:none">
+		<H3>Util.SHA256A</H3>
+		<H4>Syntax:-</H4>
+		<PRE><U>Hash</U> = Util.SHA256A(<I><U>Data</U></I>)</PRE>
+		<H4>Function Parameters:-</H4>
+		<PRE><U>Data</U> <I>(array)</I> = The data to hash.<BR></PRE>
+		<H4>Return Parameters:-</H4>
+		<PRE><U>Hash</U> <I>(string)</I> = The calculated SHA256 hash.<BR></PRE>
+		<H4>Synopsis:-</H4>
+		<PRE>Calculates a SHA256 hash from an array class&#x2e;<BR></PRE>
+		<H4><A href="#idx:Util">&#x25B2; Return to table of contents</A></H4>
+	</DIV>
+	<DIV id="Util.SHA384" style="display:none">
+		<H3>Util.SHA384</H3>
+		<H4>Syntax:-</H4>
+		<PRE><U>Hash</U> = Util.SHA384(<I><U>Data</U></I>)</PRE>
+		<H4>Function Parameters:-</H4>
+		<PRE><U>Data</U> <I>(string)</I> = The string to hash.<BR></PRE>
+		<H4>Return Parameters:-</H4>
+		<PRE><U>Hash</U> <I>(string)</I> = The calculated SHA384 hash.<BR></PRE>
+		<H4>Synopsis:-</H4>
+		<PRE>Calculates a SHA384 hash from a string&#x2e;<BR></PRE>
+		<H4><A href="#idx:Util">&#x25B2; Return to table of contents</A></H4>
+	</DIV>
+	<DIV id="Util.SHA384A" style="display:none">
+		<H3>Util.SHA384A</H3>
+		<H4>Syntax:-</H4>
+		<PRE><U>Hash</U> = Util.SHA384A(<I><U>Data</U></I>)</PRE>
+		<H4>Function Parameters:-</H4>
+		<PRE><U>Data</U> <I>(array)</I> = The data to hash.<BR></PRE>
+		<H4>Return Parameters:-</H4>
+		<PRE><U>Hash</U> <I>(string)</I> = The calculated SHA384 hash.<BR></PRE>
+		<H4>Synopsis:-</H4>
+		<PRE>Calculates a SHA384 hash from an array class&#x2e;<BR></PRE>
+		<H4><A href="#idx:Util">&#x25B2; Return to table of contents</A></H4>
+	</DIV>
+	<DIV id="Util.SHA512" style="display:none">
+		<H3>Util.SHA512</H3>
+		<H4>Syntax:-</H4>
+		<PRE><U>Hash</U> = Util.SHA512(<I><U>Data</U></I>)</PRE>
+		<H4>Function Parameters:-</H4>
+		<PRE><U>Data</U> <I>(string)</I> = The string to hash.<BR></PRE>
+		<H4>Return Parameters:-</H4>
+		<PRE><U>Hash</U> <I>(string)</I> = The calculated SHA512 hash.<BR></PRE>
+		<H4>Synopsis:-</H4>
+		<PRE>Calculates a SHA512 hash from a string&#x2e;<BR></PRE>
+		<H4><A href="#idx:Util">&#x25B2; Return to table of contents</A></H4>
+	</DIV>
+	<DIV id="Util.SHA512A" style="display:none">
+		<H3>Util.SHA512A</H3>
+		<H4>Syntax:-</H4>
+		<PRE><U>Hash</U> = Util.SHA512A(<I><U>Data</U></I>)</PRE>
+		<H4>Function Parameters:-</H4>
+		<PRE><U>Data</U> <I>(array)</I> = The data to hash.<BR></PRE>
+		<H4>Return Parameters:-</H4>
+		<PRE><U>Hash</U> <I>(string)</I> = The calculated SHA512 hash.<BR></PRE>
+		<H4>Synopsis:-</H4>
+		<PRE>Calculates a SHA384 hash from an array class&#x2e;<BR></PRE>
+		<H4><A href="#idx:Util">&#x25B2; Return to table of contents</A></H4>
+	</DIV>
+	<DIV id="Util.Sanitise" style="display:none">
+		<H3>Util.Sanitise</H3>
+		<H4>Syntax:-</H4>
+		<PRE><U>Text</U> = Util.Sanitise(<I><U>Text</U></I>)</PRE>
+		<H4>Function Parameters:-</H4>
+		<PRE><U>Text</U> <I>(string)</I> = The string to sanitise.<BR></PRE>
+		<H4>Return Parameters:-</H4>
+		<PRE><U>Text</U> <I>(string)</I> = The modified string.<BR></PRE>
+		<H4>Synopsis:-</H4>
+		<PRE>Tries to remove repetitions in the specified string&#x2e;<BR></PRE>
+		<H4><A href="#idx:Util">&#x25B2; Return to table of contents</A></H4>
+	</DIV>
 	<DIV id="Util.StretchInner" style="display:none">
 		<H3>Util.StretchInner</H3>
 		<H4>Syntax:-</H4>
@@ -10292,6 +10143,42 @@
 		<PRE><U>Result</U> <I>(string)</I> = The trimmed string<BR></PRE>
 		<H4>Synopsis:-</H4>
 		<PRE>Removes the specified character that are prefixed and suffixed to the specified string&#x2e;<BR></PRE>
+		<H4><A href="#idx:Util">&#x25B2; Return to table of contents</A></H4>
+	</DIV>
+	<DIV id="Util.UTF8Char" style="display:none">
+		<H3>Util.UTF8Char</H3>
+		<H4>Syntax:-</H4>
+		<PRE><U>ByteCode</U> = Util.UTF8Char(<I><U>Value</U></I>)</PRE>
+		<H4>Function Parameters:-</H4>
+		<PRE><U>Value</U> <I>(integer)</I> = Value to cast to a string<BR></PRE>
+		<H4>Return Parameters:-</H4>
+		<PRE><U>ByteCode</U> <I>(string)</I> = The 'value' cast as a string.<BR></PRE>
+		<H4>Synopsis:-</H4>
+		<PRE>Casts the specified 24&#x2d;bit integer directly to a string&#x2e; This is useful as a quicker way to create unicode characters&#x2e; All bits above 24 are automatically stripped by a bitwise operation for safety&#x2e;<BR></PRE>
+		<H4><A href="#idx:Util">&#x25B2; Return to table of contents</A></H4>
+	</DIV>
+	<DIV id="Util.UrlDecode" style="display:none">
+		<H3>Util.UrlDecode</H3>
+		<H4>Syntax:-</H4>
+		<PRE><U>Text</U> = Util.UrlDecode(<I><U>Text</U></I>)</PRE>
+		<H4>Function Parameters:-</H4>
+		<PRE><U>Text</U> <I>(string)</I> = The URL string to decode.<BR></PRE>
+		<H4>Return Parameters:-</H4>
+		<PRE><U>Text</U> <I>(string)</I> = The URL decoded string.<BR></PRE>
+		<H4>Synopsis:-</H4>
+		<PRE>URL decodes the specified string&#x2e;<BR></PRE>
+		<H4><A href="#idx:Util">&#x25B2; Return to table of contents</A></H4>
+	</DIV>
+	<DIV id="Util.UrlEncode" style="display:none">
+		<H3>Util.UrlEncode</H3>
+		<H4>Syntax:-</H4>
+		<PRE><U>Text</U> = Util.UrlEncode(<I><U>Text</U></I>)</PRE>
+		<H4>Function Parameters:-</H4>
+		<PRE><U>Text</U> <I>(string)</I> = The URL string to encode.<BR></PRE>
+		<H4>Return Parameters:-</H4>
+		<PRE><U>Text</U> <I>(string)</I> = The URL encoded string.<BR></PRE>
+		<H4>Synopsis:-</H4>
+		<PRE>URL encodes the specified string&#x2e;<BR></PRE>
 		<H4><A href="#idx:Util">&#x25B2; Return to table of contents</A></H4>
 	</DIV>
 	<DIV id="Util.WordWrap" style="display:none">
@@ -10832,16 +10719,6 @@
 		<PRE>Allows you to set basic vertex bounds when blitting the frame buffer object&#x2e;<BR></PRE>
 		<H4><A href="#idx:Video">&#x25B2; Return to table of contents</A></H4>
 	</DIV>
-	<DIV id="Video:SetVLTRBA" style="display:none">
-		<H3>Video:SetVLTRBA</H3>
-		<H4>Syntax:-</H4>
-		<PRE>Video:SetVLTRBA(<I><U>Left</U>, <U>Top</U>, <U>Right</U>, <U>Bottom</U>, <U>Angle</U></I>)</PRE>
-		<H4>Function Parameters:-</H4>
-		<PRE><U>Left</U> <I>(number)</I> = The destination left co-ordinate.<BR><U>Top</U> <I>(number)</I> = The destination top co-ordinate.<BR><U>Right</U> <I>(number)</I> = The destination right co-ordinate.<BR><U>Bottom</U> <I>(number)</I> = The destination bottom co-ordinate.<BR><U>Angle</U> <I>(number)</I> = The angle of the vertex<BR></PRE>
-		<H4>Synopsis:-</H4>
-		<PRE>Allows you to set basic vertex co&#x2d;ordinates when blitting the video&#x27;s frame buffer object&#x2e;<BR></PRE>
-		<H4><A href="#idx:Video">&#x25B2; Return to table of contents</A></H4>
-	</DIV>
 	<DIV id="Video:SetVLTWH" style="display:none">
 		<H3>Video:SetVLTWH</H3>
 		<H4>Syntax:-</H4>
@@ -11340,11 +11217,6 @@
 		<PRE>Shows the commandline sent to the application it cannot be changed at all&#x2e;<BR></PRE>
 		<H4><A href="#idx.cv">&#x25B2; Return to table of contents</A></H4>
 	</DIV>
-	<DIV id="cv.app_compatflags" style="display:none">
-		<H3>app_compatflags</H3>
-		<PRE>Specifies to test system for compatibility and override any settings depending on the system environment&#x2e;<BR></PRE>
-		<H4><A href="#idx.cv">&#x25B2; Return to table of contents</A></H4>
-	</DIV>
 	<DIV id="cv.app_config" style="display:none">
 		<H3>app_config</H3>
 		<PRE>Loads the configuration file with the specified extension &#x28;usually &#x27;app&#x27;&#x29;&#x2e;<BR>The suffix extension of &#x27;&#x2e;cfg&#x27; is always assumed for protection so the guest need never specify it&#x2e; This variable can only be set at the command&#x2d;line&#x2e;<BR></PRE>
@@ -11470,9 +11342,9 @@
 		<PRE>Specifies the number of buffers to use for Stream classes&#x2e; We need multiple buffers to make streamed audio playback consistent&#x2e; Four should always be enough&#x2e;<BR></PRE>
 		<H4><A href="#idx.cv">&#x25B2; Return to table of contents</A></H4>
 	</DIV>
-	<DIV id="cv.aud_strbufsiz" style="display:none">
-		<H3>aud_strbufsiz</H3>
-		<PRE>Specifies the size &#x28;in bytes&#x29; of each stream buffer for Stream classes&#x2e;<BR>We need sufficiently large enough buffers to make streamed audio playback consistent&#x2e;<BR></PRE>
+	<DIV id="cv.aud_strbuffer" style="display:none">
+		<H3>aud_strbuffer</H3>
+		<PRE>Specifies the size &#x28;in bytes&#x29; of memory to allocate for use with buffering data for the Stream class&#x2e; Stream classes try to load up as much data in this buffer as possible before dispatching it to the audio renderer&#x2e; The default is to allocate 32 kilobytes of RAM which should be enough and will need to be raised if any distortions occur in playback&#x2e;<BR></PRE>
 		<H4><A href="#idx.cv">&#x25B2; Return to table of contents</A></H4>
 	</DIV>
 	<DIV id="cv.aud_strvol" style="display:none">
@@ -11632,7 +11504,7 @@
 	</DIV>
 	<DIV id="cv.con_tmcnoclose" style="display:none">
 		<H3>con_tmcnoclose</H3>
-		<PRE>Disables the X button and close in the application context menu&#x2e; This does not prevent CONTROL&#x2b;C&#x2f;BREAK keys&#x2e;<BR></PRE>
+		<PRE>Disables the X button and close in the application context menu&#x2e; This does not prevent CONTROL&#x2b;C&#x2f;BREAK keys&#x2e; This only applies to the Windows operating system console only and a nullop on any other system&#x21; </PRE>
 		<H4><A href="#idx.cv">&#x25B2; Return to table of contents</A></H4>
 	</DIV>
 	<DIV id="cv.con_tmcrefresh" style="display:none">
@@ -11763,11 +11635,6 @@
 	<DIV id="cv.log_lines" style="display:none">
 		<H3>log_lines</H3>
 		<PRE>Specifies the maximum number of lines to keep in the backlog&#x2e; The log lines are always empty when logging to a file&#x2e;<BR></PRE>
-		<H4><A href="#idx.cv">&#x25B2; Return to table of contents</A></H4>
-	</DIV>
-	<DIV id="cv.lua_apiflags" style="display:none">
-		<H3>lua_apiflags</H3>
-		<PRE>Specifies to enable or disable certain Lua namespaces&#x2e;<BR></PRE>
 		<H4><A href="#idx.cv">&#x25B2; Return to table of contents</A></H4>
 	</DIV>
 	<DIV id="cv.lua_cache" style="display:none">
@@ -12340,11 +12207,6 @@
 		<PRE>Specify 1 if the window is allowed to be resized or 0 if not&#x2e; The default value is 1&#x2e;<BR></PRE>
 		<H4><A href="#idx.cv">&#x25B2; Return to table of contents</A></H4>
 	</DIV>
-	<DIV id="cv.win_thread" style="display:none">
-		<H3>win_thread</H3>
-		<PRE>Set to 1 to allow the window to be managed in it&#x27;s own thread for optimum performance&#x2e; Set to 0 to have it share with the engine main thread&#x2e; This variable is defaulted to 0 on anything but Windows due to what appears to be upstream issues on both Wayland and MacOS&#x2e; This can only be changed at the in the application configuration file and not saved to the persistence database&#x2e;<BR></PRE>
-		<H4><A href="#idx.cv">&#x25B2; Return to table of contents</A></H4>
-	</DIV>
 	<DIV id="cv.win_width" style="display:none">
 		<H3>win_width</H3>
 		<PRE>Sets the initial width of the window&#x2e; This value is saved to the persistence database when changed&#x2e;<BR></PRE>
@@ -12361,6 +12223,6 @@
 		<H4><A href="#idx.cv">&#x25B2; Return to table of contents</A></H4>
 	</DIV>
 	<ADDRESS>Copyright &copy; 2024 MS-Design, All Rights Reserved.<BR>
-	This document was generated at Thu Aug 01 14:29:36 2024 +0100</ADDRESS>
+	This document was generated at Tue Sep 17 00:08:28 2024 +0100</ADDRESS>
 </BODY>
 </HTML>

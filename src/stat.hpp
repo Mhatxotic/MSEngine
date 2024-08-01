@@ -12,9 +12,10 @@
 namespace IStat {                      // Start of private module namespace
 /* -- Dependencies --------------------------------------------------------- */
 using namespace ICollector::P;         using namespace IError::P;
-using namespace IIdent::P;             using namespace IStd::P;
-using namespace IString::P;            using namespace ISysUtil::P;
-using namespace IUtf;                  using namespace IUtil::P;
+using namespace IIdent::P;             using namespace ILuaLib::P;
+using namespace IStd::P;               using namespace IString::P;
+using namespace ISysUtil::P;           using namespace IUtf;
+using namespace IUtil::P;
 /* ------------------------------------------------------------------------- */
 namespace P {                          // Start of public module namespace
 /* -- Statistic class ------------------------------------------------------ */
@@ -372,9 +373,9 @@ CTOR_BEGIN_DUO(Stats, Stat, CLHelperUnsafe, ICHelperUnsafe),
     /* -- No code ---------------------------------------------------------- */
     { }                                // Do nothing else
   /* ----------------------------------------------------------------------- */
-  DELETECOPYCTORS(Stat)                // No copy constructors
+  DELETECOPYCTORS(Stat)                // Suppress default functions for safety
 };/* ----------------------------------------------------------------------- */
-CTOR_END_NOINITS(Stats, Stat)          // End of stat objects collector
+CTOR_END_NOINITS(Stats, Stat, STAT)    // End of stat objects collector
 /* ------------------------------------------------------------------------- */
 };                                     // End of private module namespace
 /* ------------------------------------------------------------------------- */

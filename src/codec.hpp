@@ -470,7 +470,7 @@ class CoDecoder :                      // Magic decoder derivative class
       default: XC("Invalid version!", "Version", uiVersionActual);
     }
   } /* --------------------------------------------------------------------- */
-  DELETECOPYCTORS(CoDecoder)           // Omit copy constructor for safety
+  DELETECOPYCTORS(CoDecoder)           // Suppress default functions for safety
 };/* == Encoder base class ================================================= */
 template<class EncPlugin>class CoEncoder :
   /* -- Base classes ------------------------------------------------------- */
@@ -508,7 +508,7 @@ template<class EncPlugin>class CoEncoder :
     /* -- Code ------------------------------------------------------------- */
     { InitHeader(); }
   /* ----------------------------------------------------------------------- */
-  DELETECOPYCTORS(CoEncoder)           // Omit copy constructor for safety
+  DELETECOPYCTORS(CoEncoder)           // Suppress default functions for safety
 };/* ======================================================================= **
 ** ######################################################################### **
 ** ## Encoder helpers                                                     ## **
@@ -564,7 +564,7 @@ template<class EncoderType>class Block final : public EncoderType
     /* -- No code ---------------------------------------------------------- */
     { }
   /* ----------------------------------------------------------------------- */
-  DELETECOPYCTORS(Block)               // Omit copy constructor for safety
+  DELETECOPYCTORS(Block)               // Suppress default functions for safety
 };/* ----------------------------------------------------------------------- */
 }                                      // End of public module namespace
 /* ------------------------------------------------------------------------- */

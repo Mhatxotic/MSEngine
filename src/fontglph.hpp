@@ -160,11 +160,12 @@ void GlyphToTexture(const IntPackRect &iprRef, const FT_Bitmap &ftbRef,
   const MemConst mcSrc{ stSrcWidth * stSrcHeight, ftbRef.buffer };
   // For each pixel row of glyph image
   for(size_t stPixPosY = 0; stPixPosY < stSrcHeight; ++stPixPosY)
-  { // For each pixel column of glyph image
+  { // Calculate Y position co-ordinate in buffer.
+    const size_t stPosY = stDstY + stPixPosY;
+    // For each pixel column of glyph image
     for(size_t stPixPosX = 0; stPixPosX < stSrcWidth; ++stPixPosX)
-    { // Calculate X and Y position co-ordinates in buffer...
-      const size_t stPosX = stDstX + stPixPosX,
-                   stPosY = stDstY + stPixPosY;
+    { // Calculate X position co-ordinate in buffer.
+      const size_t stPosX = stDstX + stPixPosX;
       // Set the character to write...
       // * Step 1: 0xNN   (8-bit colour pixel value) converts to...
       // * Step 2: 0x00NN (16-bit integer) shift eight bits left to become...
@@ -191,12 +192,12 @@ void GlyphToTexture(const IntPackRect &iprRef, const FT_Bitmap &ftbRef,
     fBW   = DimGetWidth<GLfloat>(),
     fBH   = DimGetHeight<GLfloat>();
   // Get reference to first and second triangles
-  TriPosData &tdT1 = cdRef[0], &tdT2 = cdRef[1];
+  TriCoordData &tcT1 = cdRef[0], &tcT2 = cdRef[1];
   // Push opengl tile coords (keep .fW/.fH to zero which is already zero)
-  tdT1[0] = tdT1[4] = tdT2[2] = fMinX / fBW; // Left
-  tdT1[1] = tdT1[3] = tdT2[5] = fMinY / fBH; // Top
-  tdT1[2] = tdT2[0] = tdT2[4] = fMaxX / fBW; // Right
-  tdT1[5] = tdT2[1] = tdT2[3] = fMaxY / fBH; // Bottom
+  tcT1[0] = tcT1[4] = tcT2[2] = fMinX / fBW; // Left
+  tcT1[1] = tcT1[3] = tcT2[5] = fMinY / fBH; // Top
+  tcT1[2] = tcT2[0] = tcT2[4] = fMaxX / fBW; // Right
+  tcT1[5] = tcT2[1] = tcT2[3] = fMaxY / fBH; // Bottom
 }
 /* -- Do load character function ------------------------------------------- */
 template<class StrokerFuncType>
@@ -211,8 +212,8 @@ template<class StrokerFuncType>
     function<decltype(FT_Done_Glyph)>> GlyphPtr;
   if(GlyphPtr gPtr{ gData, FT_Done_Glyph })
   { // Apply glyph border if requested
-    cFreeType->CheckError(StrokerFuncType{ gData,
-      ftfData.GetStroker() }.Result(),
+    cFreeType->CheckError(
+      StrokerFuncType{ gData, ftfData.GetStroker() }.Result(),
       "Failed to apply outline to glyph!",
       "Identifier", IdentGet(), "Glyph", stChar);
     // Convert The Glyph To A Image.
@@ -240,10 +241,10 @@ template<class StrokerFuncType>
                   static_cast<GLfloat>(bData.rows));
       // Set glyph bounds
       gRef.RectSet(static_cast<GLfloat>(bbData.xMin),
-        -static_cast<GLfloat>(static_cast<int>(bData.rows)+bbData.yMin)+
+        -static_cast<GLfloat>(static_cast<int>(bData.rows) + bbData.yMin) +
            dfFont.DimGetHeight(),
          static_cast<GLfloat>(bbData.xMax),
-        -static_cast<GLfloat>(bbData.yMin)+dfFont.DimGetHeight());
+        -static_cast<GLfloat>(bbData.yMin) + dfFont.DimGetHeight());
       // Calculate size plus padding and return if size not set
       const GLuint uiWidth = bData.width + uiPadding,
                    uiHeight = bData.rows + uiPadding;
@@ -285,7 +286,9 @@ template<class StrokerFuncType>
           GetMaxTexSizeFromBounds(ipData.DimGetWidth<GLuint>(),
             ipData.DimGetHeight<GLuint>(), uiWidth, uiHeight, 2);
         const GLuint uiMaximum = cOgl->MaxTexSize();
-        // Makle sure the size is supported by graphics
+        // Make sure the size is supported by graphics. !FIXME. Make a new
+        // OpenGL surface in a sub-texture slot here but this may require a bit
+        // of work.
         if(uiSize > uiMaximum)
           XC("Cannot grow font texture any further due to GPU limitation!",
              "BinWidth",     bData.width, "BinHeight",     bData.rows,
@@ -306,25 +309,39 @@ template<class StrokerFuncType>
         // THe result rect will include padding so remove it
         iprNew.DimDecWidth(static_cast<int>(uiPadding));
         iprNew.DimDecHeight(static_cast<int>(uiPadding));
+        // Convert new surface size to size_t
+        const size_t stBinWidth = ipData.DimGetWidth<size_t>(),
+                     stBinHeight = ipData.DimGetHeight<size_t>();
         // We need to make a new image because we need to modify the data in
         // the old obsolete image.
-        Memory mDst{ ipData.DimGetWidth<size_t>() *
-                     ipData.DimGetHeight<size_t>() * 2 };
-        // We need to fill it with transparent white pixels, since we can't
-        // use memset, we'll use fill instead. !FIXME: Don't need to write to
-        // 'all' pixels, just the new ones.
-        mDst.MemFill<uint16_t>(0x00FF);
-        // Copy scanlines from the old image
-        for(size_t stY = 0,
-                   stBWidthx2 = DimGetWidth() * 2,
-                   stBinWidth = ipData.DimGetWidth<size_t>();
-                   stY < DimGetHeight() ;
-                 ++stY)
-        { // Calculate source and destination position and copy the scanline
-          const size_t stSrcPos = (DimGetWidth() * stY) * 2,
-                       stDestPos = (stBinWidth * stY) * 2;
-          mDst.MemWrite(stDestPos, isRef.MemRead(stSrcPos, stBWidthx2),
-            stBWidthx2);
+        Memory mDst{ stBinWidth * stBinHeight * BY_GRAYALPHA };
+        // Optimal colour of the clear pixel for MemFillEx() which is a
+        // transparent white pixel (0x00, 0xFF) and repeated up to 64-bits for
+        // a more optimal fill with 64-bit integers. Note that the used
+        // function safely discards the extra values to protect from overrun.
+        const uint64_t uqClear = 0x00FF00FF00FF00FF;
+        // Size of a scan line from the old surface in bytes
+        const size_t stSrcScanSize = DimGetWidth() * BY_GRAYALPHA,
+        // Size of Extra width to clear on right
+        stDestExtra = (stBinWidth - DimGetWidth()) * BD_GRAYALPHA;
+        // Copy scan lines from the old image
+        for(size_t stY = 0; stY < DimGetHeight(); ++stY)
+        { // Calculate source position and get validated pointer to src memory
+          const size_t stSrcPos = (DimGetWidth() * stY) * BY_GRAYALPHA;
+          const char*const cpSrc = isRef.MemRead(stSrcPos, stSrcScanSize);
+          // Calculate the destination position and copy old scan line to new
+          const size_t stDestPos = (stBinWidth * stY) * BY_GRAYALPHA;
+          mDst.MemWrite(stDestPos, cpSrc, stSrcScanSize);
+          // Calculate clear position and set white transparent pixels
+          const size_t stClearPos = stDestPos + stSrcScanSize;
+          mDst.MemFillEx(stClearPos, uqClear, stDestExtra);
+        } // Calculate size of a scan line in the new surface
+        const size_t stDestScanSize = stBinWidth * BY_GRAYALPHA;
+        // Clear extra pixels on the bottom
+        for(size_t stY = DimGetHeight(); stY < stBinHeight; ++stY)
+        { // Calculate source and destination position and copy the scan line
+          const size_t stClearPos = (stBinWidth * stY) * BY_GRAYALPHA;
+          mDst.MemFillEx(stClearPos, uqClear, stDestScanSize);
         } // This is the new image and the old one will be destroyed
         const size_t stOldAlloc = isRef.MemSize();
         isRef.MemSwap(mDst);

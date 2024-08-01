@@ -164,24 +164,6 @@ LLFUNC(SetVLTWH, 0,
                   aHeight{lS, 5};
   aFbo().FboItemSetVertexWH(aLeft, aTop, aWidth, aHeight))
 /* ========================================================================= */
-// $ Fbo:SetVLTRBA
-// > Left:number=The destination left co-ordinate.
-// > Top:number=The destination top co-ordinate.
-// > Right:number=The destination right co-ordinate.
-// > Bottom:number=The destination bottom co-ordinate.
-// > Angle:number=The angle of the vertex.
-// ? Allows you to set basic vertex co-ordinates when blitting the fbo with
-// ? angle calculations.
-/* ------------------------------------------------------------------------- */
-LLFUNC(SetVLTRBA, 0,
-  const AgFbo aFbo{lS, 1};
-  const AgGLfloat aLeft{lS, 2},
-                  aTop{lS, 3},
-                  aRight{lS, 4},
-                  aBottom{lS, 5};
-  const AgAngle aAngle{lS, 6};
-  aFbo().FboItemSetVertex(aLeft, aTop, aRight, aBottom, aAngle))
-/* ========================================================================= */
 // $ Fbo:SetVLTWHA
 // > Left:number=The destination left co-ordinate.
 // > Top:number=The destination top co-ordinate.
@@ -413,8 +395,7 @@ LLRSMFBEGIN                            // Fbo:* member functions begin
   LLRSFUNC(SetCRGBA),     LLRSFUNC(SetCX),          LLRSFUNC(SetFilter),
   LLRSFUNC(SetMatrix),    LLRSFUNC(SetTCLTRB),      LLRSFUNC(SetTCLTWH),
   LLRSFUNC(SetTCX),       LLRSFUNC(SetVLTRB),       LLRSFUNC(SetVLTWH),
-  LLRSFUNC(SetVLTRBA),    LLRSFUNC(SetVLTWHA),      LLRSFUNC(SetVX),
-  LLRSFUNC(SetWireframe),
+  LLRSFUNC(SetVLTWHA),    LLRSFUNC(SetVX),          LLRSFUNC(SetWireframe),
 LLRSEND                                // Fbo:* member functions end
 /* ========================================================================= */
 // $ Fbo.Main

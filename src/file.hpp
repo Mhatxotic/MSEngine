@@ -11,9 +11,9 @@ namespace IFile {                      // Start of private module namespace
 /* -- Dependencies --------------------------------------------------------- */
 using namespace IAsset::P;             using namespace ICollector::P;
 using namespace IFStream::P;           using namespace IIdent::P;
-using namespace ILuaUtil::P;           using namespace IMemory::P;
-using namespace IStd::P;               using namespace IString::P;
-using namespace ISysUtil::P;
+using namespace ILuaLib::P;            using namespace ILuaUtil::P;
+using namespace IMemory::P;            using namespace IStd::P;
+using namespace IString::P;            using namespace ISysUtil::P;
 /* ------------------------------------------------------------------------- */
 namespace P {                          // Start of public module namespace
 /* -- File collector and member class -------------------------------------- */
@@ -29,9 +29,9 @@ CTOR_BEGIN_DUO(Files, File, CLHelperUnsafe, ICHelperUnsafe),
     /* --------------------------------------------------------------------- */
     { }
   /* ----------------------------------------------------------------------- */
-  DELETECOPYCTORS(File)                // Disable copy constructor and operator
+  DELETECOPYCTORS(File)                // Suppress default functions for safety
 };/* ----------------------------------------------------------------------- */
-CTOR_END_NOINITS(Files, File)          // Finish global Files collector
+CTOR_END_NOINITS(Files, File, FILE)    // Finish global Files collector
 /* -- Read string to file in one go ---------------------------------------- */
 static void FileReadString(lua_State*const lS)
 { // Open file in text mode with the specified mode and if successful?

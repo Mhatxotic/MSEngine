@@ -177,7 +177,7 @@ class CodecWAV final :
     /* -- No code ---------------------------------------------------------- */
     { }
   /* ----------------------------------------------------------------------- */
-  DELETECOPYCTORS(CodecWAV)            // Omit copy constructor for safety
+  DELETECOPYCTORS(CodecWAV)            // Suppress default functions for safety
 };/* -- End ---------------------------------------------------------------- */
 /* ========================================================================= **
 ** ######################################################################### **
@@ -347,7 +347,7 @@ class CodecCAF final :
     /* -- No code ---------------------------------------------------------- */
     { }
   /* ----------------------------------------------------------------------- */
-  DELETECOPYCTORS(CodecCAF)            // Omit copy constructor for safety
+  DELETECOPYCTORS(CodecCAF)            // Suppress default functions for safety
 };/* -- End ---------------------------------------------------------------- */
 /* ========================================================================= **
 ** ######################################################################### **
@@ -357,22 +357,7 @@ class CodecCAF final :
 class CodecOGG final :
   /* -- Base classes ------------------------------------------------------- */
   private PcmLib                       // Pcm format helper class
-{ /* -- Vorbis read callback ----------------------------------------------- */
-  static size_t VorbisRead(void*const vpP,
-    size_t stS, size_t stR, void*const vC)
-      { return reinterpret_cast<FileMap*>(vC)->
-          FileMapReadToAddr(vpP, stS * stR); }
-  /* -- Vorbis seek callback ----------------------------------------------- */
-  static int VorbisSeek(void*const vC, ogg_int64_t qOffset, int iLoc)
-    { return static_cast<int>(reinterpret_cast<FileMap*>(vC)->
-        FileMapSeek(static_cast<size_t>(qOffset), iLoc)); }
-  /* -- Vorbis close callback ---------------------------------------------- */
-  static int VorbisClose(void*const) { return 1; }
-  /* -- Vorbis tell callback ----------------------------------------------- */
-  static long VorbisTell(void*const vC)
-    { return static_cast<long>(reinterpret_cast<FileMap*>(vC)->
-        FileMapTell()); }
-  /* -- Loader for WAV files --------------------------------------- */ public:
+{ /* -- Loader for WAV files --------------------------------------- */ public:
   static bool Load(FileMap &fmData, PcmData &pdData)
   { // Check magic and that the file has the OggS string header
     if(fmData.MemSize() < 4 || fmData.FileMapReadVar32LE() != 0x5367674FUL)
@@ -383,7 +368,7 @@ class CodecOGG final :
     OggVorbis_File vorbisFile;
     // Open ogg file and pass callbacks and if failed? Throw error
     if(const int iR = ov_open_callbacks(&fmData, &vorbisFile, nullptr, 0,
-      { VorbisRead, VorbisSeek, VorbisClose, VorbisTell }))
+      PcmGetOggCallbacks()))
         XC("OGG init context failed!",
            "Code", iR, "Reason", cOal->GetOggErr(iR));
     // Put in a unique ptr
@@ -438,7 +423,7 @@ class CodecOGG final :
     /* -- No code ---------------------------------------------------------- */
     { }
   /* ----------------------------------------------------------------------- */
-  DELETECOPYCTORS(CodecOGG)            // Omit copy constructor for safety
+  DELETECOPYCTORS(CodecOGG)            // Suppress default functions for safety
 };/* -- End ---------------------------------------------------------------- */
 /* ========================================================================= **
 ** ######################################################################### **
@@ -515,7 +500,7 @@ class CodecMP3 final :
     /* -- No code ---------------------------------------------------------- */
     { }
   /* ----------------------------------------------------------------------- */
-  DELETECOPYCTORS(CodecMP3)            // Omit copy constructor for safety
+  DELETECOPYCTORS(CodecMP3)            // Suppress default functions for safety
 };/* ----------------------------------------------------------------------- */
 }                                      // End of public module namespace
 /* ------------------------------------------------------------------------- */

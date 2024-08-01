@@ -145,7 +145,7 @@ template<class ParserMapType>class ParserBase :
   /* -- Constructor -------------------------------------------------------- */
   ParserBase(void) { }
   /* ----------------------------------------------------------------------- */
-  DELETECOPYCTORS(ParserBase)          // Disable copy constructor/operator
+  DELETECOPYCTORS(ParserBase)          // Suppress default functions for safety
 }; /* -- A Parser class where the values can be modified ------------------- */
 template<class ParserBaseType = ParserBase<StrNCStrMap>>struct Parser :
   /* -- Base classes ------------------------------------------------------- */
@@ -210,7 +210,7 @@ template<class ParserBaseType = ParserBase<StrNCStrMap>>struct Parser :
     /* -- No code ---------------------------------------------------------- */
     { }
   /* ----------------------------------------------------------------------- */
-  DELETECOPYCTORS(Parser)              // Disable copy constructor/operator
+  DELETECOPYCTORS(Parser)              // Suppress default functions for safety
 };/* -- A Parser class thats values cannot be modified at all -------------- */
 template<class ParserBaseType = const ParserBase<const StrStrMap>>
   struct ParserConst :
@@ -235,7 +235,7 @@ template<class ParserBaseType = const ParserBase<const StrStrMap>>
     /* -- No code ---------------------------------------------------------- */
     { }
   /* ----------------------------------------------------------------------- */
-  DELETECOPYCTORS(ParserConst)         // Disable copy constructor/operator
+  DELETECOPYCTORS(ParserConst)         // Suppress default functions for safety
 };/* ----------------------------------------------------------------------- */
 }                                      // End of public module namespace
 /* ------------------------------------------------------------------------- */

@@ -71,7 +71,7 @@ static class Ogl final :               // OGL class for OpenGL use simplicity
                       idFormatModes,   // Pixel format modes (log detail)
                       idOGLCodes;      // OpenGL codes
   /* -- Macros ------------------------------------------------------------- */
-  DELETECOPYCTORS(Ogl)                 // Do not need defaults
+  DELETECOPYCTORS(Ogl)                 // Suppress default functions for safety
   /* -- Defines ------------------------------------------------------------ */
 #define IGLL(F,M,...) GLEX(CheckLogError, F, M, ## __VA_ARGS__)
 #define IGL(F,M,...)  GLEX(CheckExceptError, F, M, ## __VA_ARGS__)
@@ -908,9 +908,9 @@ static class Ogl final :               // OGL class for OpenGL use simplicity
       StrUIntMap mExts;
       for(GLuint uiI = 0; uiI < uiExts; ++uiI)
         mExts.insert({ GetExtension(uiI), uiI });
-      for(const auto &mI : mExts)
+      for(const StrUIntMapPair &suimpPair : mExts)
         cLog->LogNLCDebugExSafe("- Have extension '$' (#$).",
-          mI.first, mI.second);
+          suimpPair.first, suimpPair.second);
     } // Show warning if not enough texture units
     if(uiTexUnits < 3)
       cLog->LogWarningSafe("Ogl detected only $ of the three texture units "

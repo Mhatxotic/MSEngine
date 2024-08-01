@@ -17,35 +17,54 @@ namespace P {                          // Start of public module namespace
 constexpr static const size_t
   /* -- Defines to describe a simple triangle  ----------------------------- */
   stVertexPerTriangle = 3,             // Vertices used in a triangle (3 ofc!)
-  stTwoTriangles      = (stVertexPerTriangle * 2),
+  stTwoTriangles      = stVertexPerTriangle * 2,
   stTrisPerQuad       = 2,             // Triangles needed to make a quad
   /* -- Defines for triangle texture co-ordinates data --------------------- */
+  // [0]X: The left 2D pixel co-ordinate. Shader converts it to 3D for us.
+  // [1]Y: The top 2D pixel co-ordinate. Shader converts it to 3D for us.
+  // [2]Z: Not being used so that co-ordinate is ignored and assumed 0.0f.
+  // [3]W: Not being used so that co-ordinate is ignored and assumed 1.0f.
   stCompsPerCoord  = 2,                // Floats used to define texcoord (XY)
-  stFloatsPerCoord = (stVertexPerTriangle * stCompsPerCoord),
+  stFloatsPerCoord = stVertexPerTriangle * stCompsPerCoord,
+  // Note: If we need to increase this value in the future, it is important
+  // that the arrays in 'FboItem.hpp' and 'Fbo.hpp' are updated to reflect the
+  // change.
   /* -- Defines for triangle position co-ordinates data--------------------- */
+  // [0]X: The left 2D pixel co-ordinate. Shader converts it to 3D for us.
+  // [1]Y: The top 2D pixel co-ordinate. Shader converts it to 3D for us.
+  // [2]Z: Not being used so that co-ordinate is ignored and assumed 0.0f.
+  // [3]W: Not being used so that co-ordinate is ignored and assumed 0.0f.
   stCompsPerPos  = 2,                  // Floats used to define position (XY)
-  stFloatsPerPos = (stVertexPerTriangle * stCompsPerPos),
+  stFloatsPerPos = stVertexPerTriangle * stCompsPerPos,
+  // Note: If we need to increase this value in the future, it is important
+  // that the arrays in 'FboItem.hpp', 'Font.hpp', 'Texture.hpp" and 'Fbo.hpp'
+  // are updated to reflect the change.
   /* -- Defines for colour intensity data ---------------------------------- */
+  // [0]R: The RED intensity of the vertice.
+  // [1]G: The GREEN intensity of the vertice.
+  // [2]B: The BLUE intensity of the vertice.
+  // [3]A: The ALPHA intensity of the vertice.
   stCompsPerColour  = 4,               // Floats used to define colour (RGBA)
-  stFloatsPerColour = (stVertexPerTriangle * stCompsPerColour),
+  stFloatsPerColour = stVertexPerTriangle * stCompsPerColour,
   /* -- Totals ------------------------------------------------------------- */
-  stFloatsPerTri  = (stFloatsPerCoord + stFloatsPerPos + stFloatsPerColour),
-  stFloatsPerQuad = (stFloatsPerTri * stTrisPerQuad),
+  stFloatsPerTri  = stFloatsPerCoord + stFloatsPerPos + stFloatsPerColour,
+  stFloatsPerQuad = stFloatsPerTri * stTrisPerQuad,
   /* -- OpenGL buffer structure -------------------------------------------- */
-  stFloatsPerVertex = (stCompsPerCoord + stCompsPerPos + stCompsPerColour),
-  stBytesPerVertex  = (sizeof(GLfloat) * stFloatsPerVertex),
+  stSizeOfGLfloat   = sizeof(GLfloat),
+  stFloatsPerVertex = stCompsPerCoord + stCompsPerPos + stCompsPerColour,
+  stBytesPerVertex  = stFloatsPerVertex * stSizeOfGLfloat,
   stOffsetTxcData   = 0,
-  stOffsetPosData   = (sizeof(GLfloat) * stCompsPerCoord),
-  stOffsetColData   = (sizeof(GLfloat) * (stCompsPerCoord + stCompsPerPos));
+  stOffsetPosData   = stCompsPerCoord * stSizeOfGLfloat,
+  stOffsetColData   = (stCompsPerCoord + stCompsPerPos) * stSizeOfGLfloat;
 /* -- Render command item -------------------------------------------------- */
 struct FboCmd                          // Render command structure
 { /* ----------------------------------------------------------------------- */
-  const GLuint       uiTUId;           // - Texture unit id
-  const GLuint       uiTexId;          // - Texture id
-  const GLuint       uiPrgId;          // - Shader program id
-  const GLvoid*const vpTCOffset;       // - Texcoord buffer offset
-  const GLvoid*const vpVOffset;        // - vector buffer offset
-  const GLvoid*const vpCOffset;        // - Colour buffer offset
+  const GLuint       uiTUId,           // - Texture unit id
+                     uiTexId,          // - Texture id
+                     uiPrgId;          // - Shader program id
+  const GLvoid*const vpTCOffset,       // - Texcoord buffer offset
+              *const vpVOffset,        // - vector buffer offset
+              *const vpCOffset;        // - Colour buffer offset
   const GLsizei      uiVertices;       // Total vertices to draw
 };/* -- Commands ----------------------------------------------------------- */
 typedef vector<FboCmd>            FboCmdVec;         // Render command list
@@ -112,30 +131,29 @@ class FboColour                        // Members initially private
     SetColourAlpha(UtilNormaliseEx<GLfloat,24>(uiValue));
   }
   /* ----------------------------------------------------------------------- */
-  void SetColourRed(const FboColour &fbValue)
-    { SetColourRed(fbValue.GetColourRed()); }
-  void SetColourGreen(const FboColour &fbValue)
-    { SetColourGreen(fbValue.GetColourGreen()); }
-  void SetColourBlue(const FboColour &fbValue)
-    { SetColourBlue(fbValue.GetColourBlue()); }
-  void SetColourAlpha(const FboColour &fbValue)
-    { SetColourAlpha(fbValue.GetColourAlpha()); }
+  void SetColourRed(const FboColour &fcValue)
+    { SetColourRed(fcValue.GetColourRed()); }
+  void SetColourGreen(const FboColour &fcValue)
+    { SetColourGreen(fcValue.GetColourGreen()); }
+  void SetColourBlue(const FboColour &fcValue)
+    { SetColourBlue(fcValue.GetColourBlue()); }
+  void SetColourAlpha(const FboColour &fcValue)
+    { SetColourAlpha(fcValue.GetColourAlpha()); }
   /* ----------------------------------------------------------------------- */
   void ResetColour(void) { GetColour().fill(-1.0f); }
   /* ----------------------------------------------------------------------- */
-  bool RedColourNotEqual(const FboColour &fbValue) const
-    { return UtilIsFloatNotEqual(GetColourRed(), fbValue.GetColourRed()); }
-  bool GreenColourNotEqual(const FboColour &fbValue) const
-    { return UtilIsFloatNotEqual(GetColourGreen(), fbValue.GetColourGreen()); }
-  bool BlueColourNotEqual(const FboColour &fbValue) const
-    { return UtilIsFloatNotEqual(GetColourBlue(), fbValue.GetColourBlue()); }
-  bool AlphaColourNotEqual(const FboColour &fbValue) const
-    { return UtilIsFloatNotEqual(GetColourAlpha(), fbValue.GetColourAlpha()); }
+  bool RedColourNotEqual(const FboColour &fcValue) const
+    { return UtilIsFloatNotEqual(GetColourRed(), fcValue.GetColourRed()); }
+  bool GreenColourNotEqual(const FboColour &fcValue) const
+    { return UtilIsFloatNotEqual(GetColourGreen(), fcValue.GetColourGreen()); }
+  bool BlueColourNotEqual(const FboColour &fcValue) const
+    { return UtilIsFloatNotEqual(GetColourBlue(), fcValue.GetColourBlue()); }
+  bool AlphaColourNotEqual(const FboColour &fcValue) const
+    { return UtilIsFloatNotEqual(GetColourAlpha(), fcValue.GetColourAlpha()); }
   /* ----------------------------------------------------------------------- */
   template<typename IntType,
-    class ArrayType=array<IntType,
-      sizeof(FboRGBA)/sizeof(GLfloat)>>
-    const ArrayType Cast(void) const
+    class ArrayType=array<IntType, sizeof(FboRGBA)/sizeof(GLfloat)>>
+      const ArrayType Cast(void) const
   { return { UtilDenormalise<IntType>(GetColourRed()),
              UtilDenormalise<IntType>(GetColourGreen()),
              UtilDenormalise<IntType>(GetColourBlue()),
@@ -227,45 +245,45 @@ class FboBlend
   void SetSrcAlpha(const GLenum eSrcAlpha) { aBlend[2] = eSrcAlpha; }
   void SetDstAlpha(const GLenum eDstAlpha) { aBlend[3] = eDstAlpha; }
   /* ----------------------------------------------------------------------- */
-  void SetSrcRGB(const FboBlend &fbValue)
-    { SetSrcRGB(fbValue.GetSrcRGB()); }
-  void SetDstRGB(const FboBlend &fbValue)
-    { SetDstRGB(fbValue.GetDstRGB()); }
-  void SetSrcAlpha(const FboBlend &fbValue)
-    { SetSrcAlpha(fbValue.GetSrcAlpha()); }
-  void SetDstAlpha(const FboBlend &fbValue)
-    { SetDstAlpha(fbValue.GetDstAlpha()); }
+  void SetSrcRGB(const FboBlend &fcValue)
+    { SetSrcRGB(fcValue.GetSrcRGB()); }
+  void SetDstRGB(const FboBlend &fcValue)
+    { SetDstRGB(fcValue.GetDstRGB()); }
+  void SetSrcAlpha(const FboBlend &fcValue)
+    { SetSrcAlpha(fcValue.GetSrcAlpha()); }
+  void SetDstAlpha(const FboBlend &fcValue)
+    { SetDstAlpha(fcValue.GetDstAlpha()); }
   /* ----------------------------------------------------------------------- */
-  bool IsSrcRGBNotEqual(const FboBlend &fbValue) const
-    { return GetSrcRGB() != fbValue.GetSrcRGB(); }
-  bool IsDstRGBNotEqual(const FboBlend &fbValue) const
-    { return GetDstRGB() != fbValue.GetDstRGB(); }
-  bool IsSrcAlphaNotEqual(const FboBlend &fbValue) const
-    { return GetSrcAlpha() != fbValue.GetSrcAlpha(); }
-  bool IsDstAlphaNotEqual(const FboBlend &fbValue) const
-    { return GetDstAlpha() != fbValue.GetDstAlpha(); }
+  bool IsSrcRGBNotEqual(const FboBlend &fcValue) const
+    { return GetSrcRGB() != fcValue.GetSrcRGB(); }
+  bool IsDstRGBNotEqual(const FboBlend &fcValue) const
+    { return GetDstRGB() != fcValue.GetDstRGB(); }
+  bool IsSrcAlphaNotEqual(const FboBlend &fcValue) const
+    { return GetSrcAlpha() != fcValue.GetSrcAlpha(); }
+  bool IsDstAlphaNotEqual(const FboBlend &fcValue) const
+    { return GetDstAlpha() != fcValue.GetDstAlpha(); }
   /* -- Set blending algorithms -------------------------------------------- */
-  bool SetBlend(const FboBlend &fbValue)
+  bool SetBlend(const FboBlend &fcValue)
   {  // Source RGB changed change?
-    if(IsSrcRGBNotEqual(fbValue))
+    if(IsSrcRGBNotEqual(fcValue))
     { // Update source RGB blend value and other values if changed
-      SetSrcRGB(fbValue);
-      if(IsDstRGBNotEqual(fbValue)) SetDstRGB(fbValue);
-      if(IsSrcAlphaNotEqual(fbValue)) SetSrcAlpha(fbValue);
-      if(IsDstAlphaNotEqual(fbValue)) SetDstAlpha(fbValue);
+      SetSrcRGB(fcValue);
+      if(IsDstRGBNotEqual(fcValue)) SetDstRGB(fcValue);
+      if(IsSrcAlphaNotEqual(fcValue)) SetSrcAlpha(fcValue);
+      if(IsDstAlphaNotEqual(fcValue)) SetDstAlpha(fcValue);
     } // Destination RGB blend changed?
-    else if(IsDstRGBNotEqual(fbValue))
+    else if(IsDstRGBNotEqual(fcValue))
     { // Update destination RGB blend value and other values if changed
-      SetDstRGB(fbValue);
-      if(IsSrcAlphaNotEqual(fbValue)) SetSrcAlpha(fbValue);
-      if(IsDstAlphaNotEqual(fbValue)) SetDstAlpha(fbValue);
+      SetDstRGB(fcValue);
+      if(IsSrcAlphaNotEqual(fcValue)) SetSrcAlpha(fcValue);
+      if(IsDstAlphaNotEqual(fcValue)) SetDstAlpha(fcValue);
     } // Source alpha changed?
-    else if(IsSrcAlphaNotEqual(fbValue))
+    else if(IsSrcAlphaNotEqual(fcValue))
     { // Update source alpha blend value and other values if changed
-      SetSrcAlpha(fbValue);
-      if(IsDstAlphaNotEqual(fbValue)) SetDstAlpha(fbValue);
+      SetSrcAlpha(fcValue);
+      if(IsDstAlphaNotEqual(fcValue)) SetDstAlpha(fcValue);
     } // Destination alpha changed?
-    else if(IsDstAlphaNotEqual(fbValue)) SetDstAlpha(fbValue);
+    else if(IsDstAlphaNotEqual(fcValue)) SetDstAlpha(fcValue);
     // No value was changed so return
     else return false;
     // Commit the new viewport

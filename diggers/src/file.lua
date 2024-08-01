@@ -12,11 +12,11 @@
 -- Core function aliases --------------------------------------------------- --
 local tonumber<const>, format<const>, pairs<const>, floor<const>
       = -- ----------------------------------------------------------------- --
-      tonumber,string.format, pairs, math.floor;
+      tonumber, string.format, pairs, math.floor;
 -- M-Engine function aliases ----------------------------------------------- --
-local UtilFormatTime<const>, InfoOSTime<const>, VariableSave<const>
+local UtilFormatTime<const>, CoreOSTime<const>, VariableSave<const>
       = -- ----------------------------------------------------------------- --
-      Util.FormatTime,       Info.OSTime,       Variable.Save;
+      Util.FormatTime,       Core.OSTime,       Variable.Save;
 -- Diggers function and data aliases --------------------------------------- --
 local Fade, InitCon, IsButtonReleased, IsMouseInBounds,IsMouseNotInBounds,
   LoadResources, PlayStaticSound, RenderShadow, SetBottomRightTipAndShadow,
@@ -269,7 +269,7 @@ local function InitFile()
           -- Write data
           aSaveSlot[iSelected]:Set(
             format("%u,%u,%u,%d,%d,%u,%u,%u,%u,%u,%u,%u,%u,%u,%u,%u,%s",
-              InfoOSTime(), aGlobalData.gTotalTimeTaken,
+              CoreOSTime(), aGlobalData.gTotalTimeTaken,
               aGlobalData.gSelectedRace, aGlobalData.gBankBalance,
               aGlobalData.gCapitalCarried, aGlobalData.gTotalSalaryPaid,
               aGlobalData.gTotalCapital, aGlobalData.gTotalDeathExp,

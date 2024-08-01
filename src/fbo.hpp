@@ -15,11 +15,12 @@ namespace IFbo {                       // Start of private module namespace
 using namespace ICollector::P;         using namespace ICVarDef::P;
 using namespace IError::P;             using namespace IFboDef::P;
 using namespace IFboItem::P;           using namespace IIdent::P;
-using namespace ILog::P;               using namespace IOgl::P;
-using namespace IShader::P;            using namespace IShaders::P;
-using namespace IStd::P;               using namespace IString::P;
-using namespace ISysUtil::P;           using namespace ITimer::P;
-using namespace IUtil::P;              using namespace Lib::OS::GlFW;
+using namespace ILog::P;               using namespace ILuaLib::P;
+using namespace IOgl::P;               using namespace IShader::P;
+using namespace IShaders::P;           using namespace IStd::P;
+using namespace IString::P;            using namespace ISysUtil::P;
+using namespace ITimer::P;             using namespace IUtil::P;
+using namespace Lib::OS::GlFW;
 /* ------------------------------------------------------------------------- */
 namespace P {                          // Start of public module namespace
 /* == Fbo collector class for collector data and custom variables ========== */
@@ -97,7 +98,7 @@ class FboBase :                        // Fbo base class
     /* --------------------------------------------------------------------- */
     { }
   /* ----------------------------------------------------------------------- */
-  DELETECOPYCTORS(FboBase)             // No copy constructors
+  DELETECOPYCTORS(FboBase)             // Suppress default functions for safety
 };/* ----------------------------------------------------------------------- */
 /* == Fbo object class ===================================================== */
 CTOR_MEM_BEGIN_CSLAVE(Fbos, Fbo, ICHelperUnsafe),
@@ -526,9 +527,9 @@ CTOR_MEM_BEGIN_CSLAVE(Fbos, Fbo, ICHelperUnsafe),
   /* -- Destructor --------------------------------------------------------- */
   ~Fbo(void) { FboDeInit(); }
   /* ----------------------------------------------------------------------- */
-  DELETECOPYCTORS(Fbo)                 // Disable copy constructor and operator
+  DELETECOPYCTORS(Fbo)                 // Suppress default functions for safety
 };/* ----------------------------------------------------------------------- */
-CTOR_END(Fbos, Fbo,,,, fboActive(nullptr), fboMain(nullptr))
+CTOR_END(Fbos, Fbo, FBO,,,, fboActive(nullptr), fboMain(nullptr))
 /* ========================================================================= */
 static void FboRender(void)
 { // If there are fbo's in the queue?

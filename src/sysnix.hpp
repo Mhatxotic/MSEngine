@@ -66,7 +66,7 @@ class SysProcess                       // Need this before of System init order
     /* -- No code ---------------------------------------------------------- */
     { }
   /* ----------------------------------------------------------------------- */
-  DELETECOPYCTORS(SysProcess);         // Supress copy constructor for safety
+  DELETECOPYCTORS(SysProcess)          // Suppress default functions for safety
 };/* == Class ============================================================== */
 class SysCore :
   /* -- Base classes ------------------------------------------------------- */
@@ -479,7 +479,7 @@ class SysCore :
     /* -- No code ---------------------------------------------------------- */
     { }
   /* ----------------------------------------------------------------------- */
-  DELETECOPYCTORS(SysCore);            // Supress copy constructor for safety
+  DELETECOPYCTORS(SysCore)             // Suppress default functions for safety
 }; /* ---------------------------------------------------------------------- */
 }                                      // End of module namespace
 /* == EoF =========================================================== EoF == */

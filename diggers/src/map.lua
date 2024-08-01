@@ -12,7 +12,7 @@
 -- Core function aliases --------------------------------------------------- --
 local pairs<const> = pairs;
 -- M-Engine function aliases ----------------------------------------------- --
-local UtilClamp<const>, InfoTicks<const> = Util.Clamp, Info.Ticks;
+local UtilClamp<const>, CoreTicks<const> = Util.Clamp, Core.Ticks;
 -- Diggers function and data aliases --------------------------------------- --
 local Fade, GetMouseX, GetMouseY, InitCon, InitLobby, IsButtonPressed,
   IsButtonReleased, IsMouseInBounds, IsMouseNotInBounds,
@@ -146,7 +146,7 @@ local function InitMap()
             -- Get information about selected zone
             local aLevel<const> = aLevelsData[iZone];
             -- Get current time (rotated every 60 frames/1 second)
-            local iTicks<const> = InfoTicks() % 180;
+            local iTicks<const> = CoreTicks() % 180;
             -- Show name of zone at 0 to 1 seconds
             if     iTicks <  60 then sTip = aLevel.n;
             -- Show terrain type at 1 to 2 seconds

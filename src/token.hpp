@@ -60,11 +60,11 @@ struct TokenListNC :
   /* -- MOVE assignment constructor ---------------------------------------- */
   TokenListNC(TokenListNC &&tlOther) :
     /* -- Initialisers ----------------------------------------------------- */
-    CStrVector{ StdMove(tlOther) }         // Move vector of C-Strings over
+    CStrVector{ StdMove(tlOther) }     // Move vector of C-Strings over
     /* -- No code ---------------------------------------------------------- */
     { }
   /* ----------------------------------------------------------------------- */
-  DELETECOPYCTORS(TokenListNC)         // Disable copy constructor/operator
+  DELETECOPYCTORS(TokenListNC)         // Suppress default functions for safety
 };/* ----------------------------------------------------------------------- */
 /* -- Token class with line limit ------------------------------------------ */
 struct TokenList :
@@ -115,7 +115,7 @@ struct TokenList :
     /* -- No code ---------------------------------------------------------- */
     { }
   /* ----------------------------------------------------------------------- */
-  DELETECOPYCTORS(TokenList)           // Disable copy constructor/operator
+  DELETECOPYCTORS(TokenList)           // Suppress default functions for safety
 }; /* ---------------------------------------------------------------------- */
 /* == Token class ========================================================== */
 struct Token :
@@ -178,7 +178,7 @@ struct Token :
     /* -- No code ---------------------------------------------------------- */
     { }
   /* ----------------------------------------------------------------------- */
-  DELETECOPYCTORS(Token)               // Disable copy constructor/operator
+  DELETECOPYCTORS(Token)               // Suppress default functions for safety
 };/* ----------------------------------------------------------------------- */
 }                                      // End of public module namespace
 /* ------------------------------------------------------------------------- */

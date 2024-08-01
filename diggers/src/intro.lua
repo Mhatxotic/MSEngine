@@ -12,8 +12,8 @@
 -- Core function aliases --------------------------------------------------- --
 local error<const> = error;
 -- M-Engine function aliases ----------------------------------------------- --
-local UtilBlank<const>, InfoTime<const>, UtilIsInteger<const> =
-  Util.Blank, Info.Time, Util.IsInteger;
+local UtilBlank<const>, CoreTime<const>, UtilIsInteger<const> =
+  Util.Blank, Core.Time, Util.IsInteger;
 -- Diggers function and data aliases --------------------------------------- --
 local Fade, GetCallbacks, InitSetup, InitTitle, IsButtonPressed, LoadResources,
   RegisterFBUCallback, RenderFade,  RenderShadow, SetCallbacks, VideoPlay,
@@ -159,14 +159,16 @@ local function InitIntro(bAndSetup)
     end
     -- Not playing procedure
     local function NotPlayingProc()
-      -- Draw sidebar scrolling logo's
+      -- Draw background
       tTitle:SetCRGBA(1, 1, 1, 1);
       tTitle:BlitLT(-96, 0);
-      if iStageL == 0 then return end;
+      -- Don't draw anything if in 4:3 mode
+      if iStageL >= 0 then return end;
+      -- Draw sidebar scrolling logo's
       local iWidth<const> = -iStageL - 4;
       local nAspect<const> = 208 / 58;
       local nHeight<const> = iWidth * nAspect;
-      local iLX = (InfoTime() * 100) % 240;
+      local iLX = (CoreTime() * 100) % 240;
       local iLY = -iLX;
       local iX<const> = iStageL + 4;
       local iXpWidth<const> = iX + iWidth;

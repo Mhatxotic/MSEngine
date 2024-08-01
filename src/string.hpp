@@ -34,7 +34,7 @@ static const class Common final        // Members initially private
                    strNull,            // C++ string as "<NullPtr>"
                    strPeriod,          // C++ string as "."
                    strTwoPeriod,       // C++ string as ".."
-                   strLuaDTor;         // C++ string as "__dtor"
+                   strLuaName;         // C++ string as "__name"
   const char*const cpBlank;            // Blank C-String
   const locale     lLocaleCurrent;     // Current locale
   /* --------------------------------------------------------------- */ public:
@@ -79,7 +79,7 @@ static const class Common final        // Members initially private
   /* ----------------------------------------------------------------------- */
   const string &TwoPeriod(void) const { return strTwoPeriod; }
   /* ----------------------------------------------------------------------- */
-  const string &LuaDTor(void) const { return strLuaDTor; }
+  const string &LuaName(void) const { return strLuaName; }
   /* -- Default Constructor ------------------------------------------------ */
   Common(void) :                       // No parameters
     /* -- Initialisers ----------------------------------------------------- */
@@ -92,7 +92,7 @@ static const class Common final        // Members initially private
     strLfCr{ strLf + strCr },          strFSlash{ "/" },
     strUnspec{ "<Unspecified>" },      strNull{ "<NullPtr>" },
     strPeriod{ "." },                  strTwoPeriod{ ".." },
-    strLuaDTor{ "__dtor" },            cpBlank(strBlank.c_str()),
+    strLuaName{ "__name" },            cpBlank(strBlank.c_str()),
     lLocaleCurrent{ strBlank }
     /* -- No code ---------------------------------------------------------- */
     { }
@@ -371,15 +371,17 @@ template<class ListType=StrPairList>
   size_t stPos = 0;
   // Repeat...
   do
-  { // Enumerate each occurence to find...
-    for(const auto &spItem : ltList)
+  { // Container type
+    typedef typename ListType::value_type ListTypeItem;
+    // Enumerate each occurence to find...
+    for(const ListTypeItem &ltiItem : ltList)
     { // Get string to find
-      const string &strWhat = spItem.first;
+      const string &strWhat = ltiItem.first;
       // Last cut position and current character index
       if(strncmp(strDest.c_str()+stPos, strWhat.data(), strWhat.length()))
         continue;
       // Get string to replace with
-      const string &strWith = spItem.second;
+      const string &strWith = ltiItem.second;
       // Replace the occurence with the specified text
       strDest.replace(stPos, strWhat.length(), strWith);
       // Go forward so we can search for the next occurence
@@ -537,13 +539,19 @@ static const string StrCapitalise(const string &strStr)
   return strNew;
 }
 /* -- Evaluate a list of booleans and return a character value ------------- */
-static const string
-  StrFromEvalTokens(const vector<pair<const bool,const char>> &etData)
-    { return etData.empty() ? cCommon->Blank() :
-      accumulate(etData.cbegin(), etData.cend(), cCommon->Blank(),
-        [](const string &strOut, const auto &bcpPair)
-          { return bcpPair.first ? StrAppend(strOut,
-            bcpPair.second) : strOut; }); }
+namespace StrFromEvalTokensPrivateData
+{ // The private pair and vector types used in the function
+  typedef pair<const bool, const char> BoolCharPair;
+  typedef vector<BoolCharPair> BoolCharPairVector;
+  // The actual function
+  static const string StrFromEvalTokens(const BoolCharPairVector &bcpvList)
+    { return bcpvList.empty() ? cCommon->Blank() :
+        accumulate(bcpvList.cbegin(), bcpvList.cend(), cCommon->Blank(),
+          [](const string &strOut, const BoolCharPair &bcpPair)
+            { return bcpPair.first ? StrAppend(strOut,
+              bcpPair.second) : strOut; }); }
+} // Invoke the function in the IUtil namespace
+using StrFromEvalTokensPrivateData::StrFromEvalTokens;
 /* -- Convert time to short duration --------------------------------------- */
 static const string StrShortFromDuration(const double dDuration,
   const int iPrecision=6)
@@ -658,9 +666,9 @@ static const string ImplodeMap(const StrNCStrMap &ssmSrc,
   // Insert each value in the map with the appropriate seperators.
   StrVector svRet; svRet.reserve(ssmSrc.size());
   transform(ssmSrc.cbegin(), ssmSrc.cend(), back_inserter(svRet),
-    [&strKeyValSep, &strValEncaps](const auto &vIter)
-      { return StdMove(StrAppend(vIter.first, strKeyValSep,
-          strValEncaps, vIter.second, strValEncaps)); });
+    [&strKeyValSep, &strValEncaps](const StrNCStrMapPair &sncsmpPair)
+      { return StdMove(StrAppend(sncsmpPair.first, strKeyValSep,
+          strValEncaps, sncsmpPair.second, strValEncaps)); });
   // Return vector imploded into a string
   return StrImplode(svRet, 0, strLineSep);
 }
@@ -684,18 +692,19 @@ template<typename OutType, typename InType, class SuffixClass>
 { // Check types
   static_assert(is_floating_point_v<OutType>, "OutType not floating point!");
   static_assert(is_integral_v<InType>, "InType not integral!");
+  static_assert(is_class_v<SuffixClass>, "Class invalid!");
   // Value to return
   OutType otReturn;
   // Discover the best measurement to show by testing each unit from the
-  // lookup table to see if it is divisible and if it is not?
+  // lookup table to see if it is divisible and if it is not then try the next
+  // one. The 'auto' is required because 'SuffixClass' is different array type.
   if(!any_of(scLookup.cbegin(), scLookup.cend(),
     [&otReturn, itValue, &cpSuffix](const auto &aItem)
   { // Calculate best measurement to show
     if(itValue < aItem.vValue) return false;
-    // Set suffix that was sent
+    // Set suffix that was sent and return success
     *cpSuffix = aItem.cpSuf;
     otReturn = static_cast<OutType>(itValue) / aItem.vValue;
-    // Success
     return true;
   }))
   { // Not found any matches so precision will now be zero
@@ -1010,8 +1019,9 @@ template<typename FloatType>
     ceil(dConsequent / dDivisor));
 }
 /* -- Convert list to exploded string -------------------------------------- */
-template<class ListType>string StrExplodeEx(const ListType &lType,
-  const string &strSep, const string &strLast)
+template<class ListType>
+  string StrExplodeEx(const ListType &lType, const string &strSep,
+    const string &strLast)
 { // String to return
   ostringstream ossOut;
   // What is the size of this string
@@ -1024,10 +1034,12 @@ template<class ListType>string StrExplodeEx(const ListType &lType,
     case 2: ossOut << *lType.cbegin() << strLast << *lType.crbegin(); break;
     // More than two? Write the first item first
     default: ossOut << *lType.cbegin();
+             // Container type
+             typedef typename ListType::value_type ListTypeValue;
              // Write the rest but one prefixed with the separator
              StdForEach(seq,
                next(lType.cbegin(), 1), next(lType.crbegin(), 1).base(),
-                 [&ossOut, &strSep](const auto &strStr)
+                 [&ossOut, &strSep](const ListTypeValue &strStr)
                    { ossOut << strSep << strStr; });
              // and now append the last separator and string from list
              ossOut << strLast << *lType.crbegin();
@@ -1049,23 +1061,24 @@ static const string StrToLowCase[[maybe_unused]](const string &strSrc)
 static const string StrToUpCase[[maybe_unused]](const string &strSrc)
 { // Create memory for destination string and copy the string over
   string strDst; strDst.resize(strSrc.length());
-  for(size_t stI = 0; stI < strSrc.size(); ++stI)
-    strDst[stI] = static_cast<char>(toupper(static_cast<int>(strSrc[stI])));
+  for(size_t stIndex = 0; stIndex < strSrc.size(); ++stIndex)
+    strDst[stIndex] =
+      static_cast<char>(toupper(static_cast<int>(strSrc[stIndex])));
   // Return copied string
   return strDst;
 }
 /* -- Compact a string removing leading, trailing and duplicate spaces ----- */
 static string &StrCompactRef(string &strStr, const char cToken=' ')
 { // Enumerate every whitespace character until end-of-string
-  for(auto itC{ strStr.begin() }; itC != strStr.end(); )
+  for(string::iterator siCharIt{ strStr.begin() }; siCharIt != strStr.end(); )
   { // Not a whitespace?
-    if(*itC != cToken)
+    if(*siCharIt != cToken)
     { // Skip non-whitespace characters until end of string
-      while(++itC != strStr.end())
+      while(++siCharIt != strStr.end())
         // If is a whitespace go forward again and go back to for loop
-        if(*itC == cToken) { ++itC; break; }
+        if(*siCharIt == cToken) { ++siCharIt; break; }
     } // Erase whitespace
-    else itC = strStr.erase(itC);
+    else siCharIt = strStr.erase(siCharIt);
   } // Remove trailing whitespace if there is one
   if(!strStr.empty() && strStr.back() == cToken) strStr.pop_back();
   // Return string

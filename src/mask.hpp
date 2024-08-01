@@ -13,9 +13,9 @@ using namespace ICollector::P;         using namespace IDim;
 using namespace IDir::P;               using namespace IError::P;
 using namespace IIdent::P;             using namespace IImage::P;
 using namespace IImageDef::P;          using namespace ILog::P;
-using namespace IMemory::P;            using namespace IStd::P;
-using namespace ISysUtil::P;           using namespace ITexDef::P;
-using namespace IUtil::P;
+using namespace ILuaLib::P;            using namespace IMemory::P;
+using namespace IStd::P;               using namespace ISysUtil::P;
+using namespace ITexDef::P;            using namespace IUtil::P;
 /* ------------------------------------------------------------------------- */
 namespace P {                          // Start of public module namespace
 /* == Mask collector and member class ====================================== */
@@ -391,9 +391,9 @@ CTOR_BEGIN_DUO(Masks, Mask, CLHelperUnsafe, ICHelperUnsafe),
     /* -- No code ---------------------------------------------------------- */
     { }
   /* ----------------------------------------------------------------------- */
-  DELETECOPYCTORS(Mask)                // Omit copy constructor for safety
+  DELETECOPYCTORS(Mask)                // Suppress default functions for safety
 };/* ----------------------------------------------------------------------- */
-CTOR_END_NOINITS(Masks, Mask)          // Finish collector class
+CTOR_END_NOINITS(Masks, Mask, MASK)    // Finish collector class
 /* ------------------------------------------------------------------------- */
 }                                      // End of public module namespace
 /* ------------------------------------------------------------------------- */

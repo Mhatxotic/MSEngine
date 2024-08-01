@@ -40,10 +40,10 @@ using ::std::setfill;                  using ::std::setprecision;
 using ::std::setw;                     using ::std::showpos;
 using ::std::uppercase;
 /* -- Constexpr functions -------------------------------------------------- */
-using ::std::is_floating_point_v;      using ::std::is_integral_v;
-using ::std::is_pointer_v;             using ::std::is_signed_v;
-using ::std::is_enum_v;                using ::std::is_same_v;
-using ::std::underlying_type_t;
+using ::std::is_class_v;               using ::std::is_floating_point_v;
+using ::std::is_integral_v;            using ::std::is_pointer_v;
+using ::std::is_signed_v;              using ::std::is_enum_v;
+using ::std::is_same_v;                using ::std::underlying_type_t;
 /* -- Namespaces ----------------------------------------------------------- */
 using ::std::placeholders::_1;
 /* -- Times ---------------------------------------------------------------- */

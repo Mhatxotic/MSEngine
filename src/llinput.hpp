@@ -38,9 +38,9 @@ struct AgJoystickAxis : public AgSizeTLGE {
     const JoyInfo &jiData) :
       AgSizeTLGE{ lS, iArg, 0, jiData.GetAxisCount() }{} };
 /* -- Get DeadZone argument ------------------------------------------------ */
-struct AgDeadZone : public AgIntegerLGE<float> {
+struct AgDeadZone : public AgNumberLGE<float> {
   explicit AgDeadZone(lua_State*const lS, const int iArg) :
-    AgIntegerLGE{ lS, iArg, 0.0f, 1.0f }{} };
+    AgNumberLGE{ lS, iArg, 0.0f, 1.0f }{} };
 /* ========================================================================= **
 ** ######################################################################### **
 ** ## Input.* namespace functions                                         ## **

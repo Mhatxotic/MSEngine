@@ -131,31 +131,6 @@ static class Console final :           // Members initially private
     } // ...Until we have cleared enough lines
     while(size() > stRemove);
   }
-  /* -- Delete lines at back of console log to make way for new entries ---- */
-  void ReserveLines(const size_t stLines)
-  { // Calculate total liens
-    const size_t stTotal = size() + stLines;
-    // If writing this many lines would fit in the log, then the log does not
-    // need pruning.
-    if(stTotal <= GetOutputMaximum()) return;
-    // If too many lines would be written?
-    if(stLines >= GetOutputMaximum()) return DoFlush();
-    // Iterator to find
-    const ConLinesConstIt clciIt{ clriPosition.base() };
-    // Lines to prune to
-    const size_t stRemove = size() - stLines;
-    // Repeat...
-    do
-    { // If this item is not selected in the output history? Erase and next
-      if(cbegin() != clciIt) { pop_front(); continue; }
-      // Get items remaining to remove
-      clriPosition = ConLinesConstRevIt{ erase(cbegin(),
-        next(cbegin(), static_cast<ssize_t>(size() - stRemove))) };
-      // Done
-      break;
-    } // ...Until we have cleared enough lines
-    while(size() > stRemove);
-  }
   /* -- Clear console line ------------------------------------------------- */
   void DoClearInput(void) { strConsoleBegin.clear(); strConsoleEnd.clear(); }
   /* -- Return commands list --------------------------------------- */ public:
@@ -624,10 +599,38 @@ static class Console final :           // Members initially private
     // Stagger the queue to the output buffer but enough so it completes fast
     // and compensates for a growing queue. At minimum the number of elements
     // or the most of half of the number of elements or five.
-    size_t stLines = UtilMinimum(clqOutput.size(),
-      UtilMaximum(5, clqOutput.size()/4));
-    ReserveLines(stLines);
-    // Get if we're at the bottom of the log
+    size_t stLines =
+      UtilMinimum(clqOutput.size(), UtilMaximum(5, clqOutput.size()/4));
+    // Calculate total lines
+    const size_t stTotal = size() + stLines;
+    // If writing this many lines wouldn't fit in the log, then the log needs
+    // pruning.
+    if(stTotal > GetOutputMaximum())
+    { // If not too many lines would be written?
+      if(stLines < GetOutputMaximum())
+      { // Iterator to find
+        const ConLinesConstIt clciIt{ clriPosition.base() };
+        // Lines to prune to
+        const size_t stRemove = size() - stLines;
+        // Repeat...
+        do
+        { // If this item is not selected in the output history? Erase and next
+          if(cbegin() != clciIt) { pop_front(); continue; }
+          // Get items remaining to remove
+          clriPosition = ConLinesConstRevIt{ erase(cbegin(),
+            next(cbegin(), static_cast<ssize_t>(size() - stRemove))) };
+          // Done
+          break;
+        } // ...Until we have cleared enough lines
+        while(size() > stRemove);
+      } // Too many lines would be written
+      else
+      { // Clear all lines
+        clear();
+        // Reset scroll position
+        clriPosition = rbegin();
+      }
+    } // Get if we're at the bottom of the log
     const bool bAtBottom = clriPosition == rbegin();
     // Repeat...
     do
@@ -901,7 +904,7 @@ static class Console final :           // Members initially private
   /* -- Destructor --------------------------------------------------------- */
   DTORHELPER(~Console, DeInit())
   /* ----------------------------------------------------------------------- */
-  DELETECOPYCTORS(Console)             // Disable copy constructor and operator
+  DELETECOPYCTORS(Console)             // Suppress default functions for safety
   /* -- Set page move count ------------------------------------------------ */
   CVarReturn SetPageMoveCount(const ssize_t sstAmount)
   { // Deny if invalid value

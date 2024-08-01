@@ -14,11 +14,12 @@ using namespace ICVarDef::P;           using namespace IFbo::P;
 using namespace IFboCore::P;           using namespace IIdent::P;
 using namespace IImage::P;             using namespace IImageDef::P;
 using namespace IImageFormat::P;       using namespace IImageLib::P;
-using namespace ILog::P;               using namespace IMemory::P;
-using namespace IOgl::P;               using namespace IStd::P;
-using namespace IString::P;            using namespace ISystem::P;
-using namespace ISysUtil::P;           using namespace ITexDef::P;
-using namespace IThread::P;            using namespace Lib::OS::GlFW;
+using namespace ILog::P;               using namespace ILuaLib::P;
+using namespace IMemory::P;            using namespace IOgl::P;
+using namespace IStd::P;               using namespace IString::P;
+using namespace ISystem::P;            using namespace ISysUtil::P;
+using namespace ITexDef::P;            using namespace IThread::P;
+using namespace Lib::OS::GlFW;
 /* ------------------------------------------------------------------------- */
 namespace P {                          // Start of public module namespace
 /* -- Begin collector class ------------------------------------------------ */
@@ -110,9 +111,9 @@ CTOR_MEM_BEGIN(SShots, SShot, ICHelperUnsafe, /* n/a */),
     /* -- No code ---------------------------------------------------------- */
     { }
   /* ----------------------------------------------------------------------- */
-  DELETECOPYCTORS(SShot)               // Supress copy constructor for safety
+  DELETECOPYCTORS(SShot)               // Suppress default functions for safety
 };/* ----------------------------------------------------------------------- */
-CTOR_END(SShots, SShot,,,, ifFormatId(IFMT_MAX)) // Initialised by cvars
+CTOR_END(SShots, SShot, SSHOT,,,, ifFormatId(IFMT_MAX)) // Initialised by cvars
 /* -- Set screenshot format flags ------------------------------------------ */
 static CVarReturn SShotsSetType(const ImageFormat ifNFormatId)
   { return CVarSimpleSetIntNGE(cSShots->ifFormatId, ifNFormatId, IFMT_MAX); }

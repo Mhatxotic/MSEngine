@@ -425,8 +425,11 @@ static class Input final :             // Handles keyboard, mouse & controllers
     const EvtMainArgs &emaArgs = emeEvent.aArgs;
     // Get movements
     const double dX = emaArgs[1].d, dY = emaArgs[2].d;
-    // If console is enabled, send it to console instead
-    if(cConsole->IsVisible()) return cConGraphics->OnMouseWheel(dX, dY);
+    // If console is enabled and ctrl not pressed? Send it to console instead
+    if(cConsole->IsVisible() &&
+       cGlFW->WinGetKey(GLFW_KEY_LEFT_CONTROL) == GLFW_RELEASE &&
+       cGlFW->WinGetKey(GLFW_KEY_RIGHT_CONTROL) == GLFW_RELEASE)
+      return cConGraphics->OnMouseWheel(dX, dY);
     // Set event to lua callbacks
     lfOnMouseScroll.LuaFuncDispatch(dX, dY);
   }
@@ -798,7 +801,7 @@ static class Input final :             // Handles keyboard, mouse & controllers
   /* -- Destructor --------------------------------------------------------- */
   DTORHELPER(~Input, DeInit())
   /* ----------------------------------------------------------------------- */
-  DELETECOPYCTORS(Input)               // Do not need defaults
+  DELETECOPYCTORS(Input)               // Suppress default functions for safety
   /* -- Handle a deadzone change ------------------------------------------- */
   CVarReturn SetDefaultJoyDZ(const float fDZ,
     const function<void(JoyInfo&)> &fcbCallBack)

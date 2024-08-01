@@ -123,11 +123,11 @@ class Core final :                     // Members initially private
     // Clear any lingering engine events
     cEvtMain->Flush();
     // Log that we've reset the environment
-    cLog->LogDebugExSafe("Core environment $!",
+    cLog->LogDebugExSafe("Core environment $.",
       bLeaving ? "reset" : "prepared");
   }
   /* -- Graphical core window thread tick ---------------------------------- */
-  void CoreWinThreadTick(void)
+  void CoreTick(void)
   { // Is it time to execute a game tick?
     if(cTimer->TimerShouldTick())
     { // Render the console fbo (if update requested)
@@ -137,40 +137,6 @@ class Core final :                     // Members initially private
       // Loop point incase we need to catchup game ticks
       for(;;)
       { // Set main fbo by default on each frame
-        cFboCore->ActivateMain();
-        // Poll joysticks
-        cInput->PollJoysticks();
-        // Execute a tick for each frame missed
-        cLua->ExecuteMain();
-        // Break if we've caught up
-        if(cTimer->TimerShouldNotTick()) break;
-        // Flush the main fbo as we're not drawing it yet
-        cFboCore->RenderFbosAndFlushMain();
-        // Render again until we've caught up
-      } // Add console fbo to render list
-      cConGraphics->RenderToMain();
-      // Render all fbos and copy the main fbo to screen
-      cFboCore->Render();
-      // Update timer
-      cTimer->TimerUpdateInteractive();
-    } // Update interim timer without storing entire duration
-    else cTimer->TimerUpdateInteractiveInterim();
-  }
-  /* -- Graphical core main thread tick ------------------------------------ */
-  void CoreMainThreadTick(void)
-  { // Process window event manager commands from other threads
-    cEvtWin->ManageUnsafe();
-    // Is it time to execute a game tick?
-    if(cTimer->TimerShouldTick())
-    { // Render the console fbo (if update requested)
-      cConGraphics->Render();
-      // Render video textures (if any)
-      VideoRender();
-      // Loop point incase we need to catchup game ticks
-      for(;;)
-      { // Process window events
-        GlFWPollEvents();
-        // Set main fbo by default on each frame
         cFboCore->ActivateMain();
         // Poll joysticks
         cInput->PollJoysticks();
@@ -245,19 +211,10 @@ class Core final :                     // Members initially private
         if(cSystem->IsGraphicalMode())
         { // Initialise accumulator for first time
           cTimer->TimerUpdateInteractive();
-          // Threading not enabled?
-          if(cDisplay->FlagIsClear(DF_WINTHREADED))
-          { // Loop until event manager says we should break
-            while(cEvtMain->HandleSafe() && cGlFW->WinShouldNotClose())
-            { // Execute threaded tick
-              CoreMainThreadTick();
-              // Process bot console
-              cConsole->FlushToLog();
-            }
-          } // Loop until event manager says we should break
-          else while(cEvtMain->HandleSafe())
+          // Loop until event manager says we should break
+          while(cEvtMain->HandleSafe())
           { // Execute unthreaded tick
-            CoreWinThreadTick();
+            CoreTick();
             // Process bot console
             cConsole->FlushToLog();
           }
@@ -274,12 +231,8 @@ class Core final :                     // Members initially private
       else if(cSystem->IsGraphicalMode())
       { // Initialise accumulator for first time
         cTimer->TimerUpdateInteractive();
-        // Threading not enabled? Loop until event manager says we should break
-        if(cDisplay->FlagIsClear(DF_WINTHREADED))
-          while(cEvtMain->HandleSafe() && cGlFW->WinShouldNotClose())
-            CoreMainThreadTick();
-        // Else loop until event manager says we should break
-        else while(cEvtMain->HandleSafe()) CoreWinThreadTick();
+        // Loop until event manager says we should break
+        while(cEvtMain->HandleSafe()) CoreTick();
       }
     } // exception occured so throw LUA stackdump and leave the sandbox
     catch(const exception &E)
@@ -629,28 +582,21 @@ class Core final :                     // Members initially private
     INITHELPER(GlFWIH, cGlFW->Init(), cGlFW->DeInit());
     // Until engine should terminate.
     while(CoreShouldEngineContinue()) try
-    { // Tell display class if window threading is enabled
-      cDisplay->FlagSetOrClear(DF_WINTHREADED,
-        cCVars->GetInternal<bool>(WIN_THREAD));
-      // Init window and de-init lua envifonment and window on scope exit
+    { // Init window and de-init lua envifonment and window on scope exit
       INITHELPER(DIH, cDisplay->Init(),
         cEvtMain->ThreadDeInit();
         cDisplay->DeInit());
       // Full window events
       cEvtWin->Flush();
-      // If window threading enabled
-      if(cDisplay->FlagIsSet(DF_WINTHREADED))
-      { // Setup main thread and start it
-        cEvtMain->ThreadInit(bind(&Core::CoreThreadMain, this, _1), nullptr);
-        // Loop until window should close
-        while(cGlFW->WinShouldNotClose())
-        { // Process window event manager commands from other threads
-          cEvtWin->ManageSafe();
-          // Wait for more window events
-          GlFWWaitEvents();
-        }
-      } // Window threading disabled? Enter sandbox and process scripts
-      else CoreThreadMain(*cEvtMain);
+      // Setup main thread and start it
+      cEvtMain->ThreadInit(bind(&Core::CoreThreadMain, this, _1), nullptr);
+      // Loop until window should close
+      while(cGlFW->WinShouldNotClose())
+      { // Process window event manager commands from other threads
+        cEvtWin->ManageSafe();
+        // Wait for more window events
+        GlFWWaitEvents();
+      }
     } // Error occured
     catch(const exception &E)
     { // Send to log and show error message to user
@@ -885,7 +831,7 @@ class Core final :                     // Members initially private
   /* -- Destructor that clears the core pointer ---------------------------- */
   DTORHELPER(~Core, cCore = nullptr)
   /* ----------------------------------------------------------------------- */
-  DELETECOPYCTORS(Core)                // Disable copy constructor and operator
+  DELETECOPYCTORS(Core)                // Suppress default functions for safety
   /* -- Set lua error mode behaviour --------------------------------------- */
   CVarReturn CoreErrorBehaviourModified(const CoreErrorFlags cefNMode)
     { return CVarSimpleSetIntNGE(cefMode, cefNMode, CEF_MAX); }

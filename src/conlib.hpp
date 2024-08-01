@@ -1025,7 +1025,7 @@ if(svciIt != aArgs.cend())
   if(strRoot.empty()) return cConsole->AddLine("Empty table name!");
   // Push variable specified on command line and if it's not a table?
   // Tell user the table is invalid and return
-  lua_getglobal(lS, strRoot.c_str());
+  LuaUtilGetGlobal(lS, strRoot.c_str());
   if(!LuaUtilIsTable(lS, -1))
     return cConsole->AddLineF("Table '$' $!", strRoot,
       LuaUtilIsNil(lS, -1) ? "does not exist" : "is not valid");
@@ -1043,7 +1043,7 @@ if(svciIt != aArgs.cend())
       // Restore where we were in the stack
       LuaUtilPruneStack(lS, iIndex);
     } // Find subtable. It must be a table
-    lua_getfield(lS, -1, strParam.c_str());
+    LuaUtilGetField(lS, -1, strParam.c_str());
     if(LuaUtilIsTable(lS, -1)) continue;
     // Tell user the table is invalid and return
     return cConsole->AddLineF("Sub-table '$' $!", strParam,
@@ -1060,7 +1060,7 @@ StrStrPairMap ssmpmMap;
 for(LuaUtilPushNil(lS); lua_next(lS, -2); LuaUtilRmStack(lS))
 { // Index is an integer? Create item info struct and add to list
   if(LuaUtilIsInteger(lS, -2))
-    ssmpmMap.insert({ StrFromNum(lua_tointeger(lS, -2)),
+    ssmpmMap.insert({ StrFromNum(LuaUtilToInt(lS, -2)),
       { LuaUtilGetStackType(lS, -1), LuaUtilGetStackTokens(lS, -1) } });
   // For everything else. Create item info struct and add to list
   else ssmpmMap.insert({ lua_tostring(lS, -2),

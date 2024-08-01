@@ -112,7 +112,11 @@
 #  elif defined(__arm64__)             // 64-bit ARM architecture?
 #   define RISC                        // Using ARM instruction set
 #   define X64                         // Using 64-bit architechture
-#   define BUILD_TARGET                "MacOS-ARM64"
+#   if __ARM_NEON__ == 1               // Neon instructions enabled?
+#    define BUILD_TARGET               "MacOS-ARM64"
+#   else                               // Neon extensions not enabled?
+#    define BUILD_TARGET               "MacOS-ARM64-XNEON"
+#   endif                              // Neon extensions check
 #  else                                // Unknown target?
 #   error This MacOS architechture being compiled with is not supported!
 #  endif                               // Done checking architechture
@@ -438,6 +442,18 @@ namespace Lib                          // LIBRARY OF EXTERNAL API FUNCTIONS
 #define GLFW_INCLUDE_GLCOREARB         // Include arbitrary OpenGL API
 #include <glfw/glfw3.h>                // Main header
 #include <glfw/glfw3native.h>          // Operating system includes
+      /* ------------------------------------------------------------------- */
+#if defined(MACOS)                     // MacOS defined?
+      /* ------------------------------------------------------------------- */
+      // This namespace is required to workaround a major crash bug in MacOS
+      // See https://github.com/glfw/glfw/issues/1997 for more information
+      /* ------------------------------------------------------------------- */
+      namespace NSGL                   // Begin MacOS NSGL namespace
+      { /* ----------------------------------------------------------------- */
+#  include <OpenGL/OpenGL.h>           // Include MacOS NSOpenGL functions
+      } /* ----------------------------------------------------------------- */
+#endif                                 // End MacOS NSGL namespace
+      /* ------------------------------------------------------------------- */
 #undef GLFW_INCLUDE_GLCOREARB          // Done with this macro
     };/* ------------------------------------------------------------------- */
 #undef GLFW_EXPOSE_NATIVE_WIN32        // Done with this macro

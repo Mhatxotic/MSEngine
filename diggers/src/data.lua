@@ -2486,79 +2486,79 @@ local aEndingData<const> = {
 -- Credits data ------------------------------------------------------------ --
 local aCreditsData<const> = {
   { "Diggers by",                      "Toby Simpson" },
-  { "Designed & programmed by",        "Mike Froggatt\n"..
-                                       "Toby Simpson" },
+  { "Designed & programmed by",        "Mike Froggatt\n\z
+                                        Toby Simpson" },
   { "Additional DOS Programming",      "Keith Hook" },
   { "Graphics",                        "Jason Wilson" },
-  { "Music and Effects",               "Richard Joseph\n"..
-                                       "Graham King" },
-  { "Additional graphics",             "Tony Heap\n"..
-                                       "Jason Riley" },
+  { "Music and Effects",               "Richard Joseph\n\z
+                                        Graham King" },
+  { "Additional graphics",             "Tony Heap\n\z
+                                        Jason Riley" },
   { "Narrative text",                  "Martin Oliver" },
-  { "Additional Design",               "Michael Hayward\n"..
-                                       "Ian Saunter\n"..
-                                       "Tony Fagelman" },
-  { "Level Design",                    "Toby Simpson\n"..
-                                       "Tony Fagelman" },
-  { "Quality Assurance",               "Steve Murphy\n"..
-                                       "Paul Dobson\n"..
-                                       "Kelly Thomas" },
-  { "Introduction Sequence",           "Mike Ball\n"..
-                                       "Mike Froggatt" },
-  { "E-Book Production",               "Alan Brand\n"..
-                                       "Steve Loughran\n"..
-                                       "Martin Oliver\n"..
-                                       "Tony Fagelman" },
-  { "Thanks to",                       "Chris Ludwig\n"..
-                                       "Wayne Lutz\n"..
-                                       "Dave Pocock\n"..
-                                       "Sharon McGuffie\n"..
-                                       "Ben Simpson" },
-  { "Produced by",                     "Tony Fagelman\n"..
-                                       "Millennium Interactive" }
+  { "Additional Design",               "Michael Hayward\n\z
+                                        Ian Saunter\n\z
+                                        Tony Fagelman" },
+  { "Level Design",                    "Toby Simpson\n\z
+                                        Tony Fagelman" },
+  { "Quality Assurance",               "Steve Murphy\n\z
+                                        Paul Dobson\n\z
+                                        Kelly Thomas" },
+  { "Introduction Sequence",           "Mike Ball\n\z
+                                        Mike Froggatt" },
+  { "E-Book Production",               "Alan Brand\n\z
+                                        Steve Loughran\n\z
+                                        Martin Oliver\n\z
+                                        Tony Fagelman" },
+  { "Thanks to",                       "Chris Ludwig\n\z
+                                        Wayne Lutz\n\z
+                                        Dave Pocock\n\z
+                                        Sharon McGuffie\n\z
+                                        Ben Simpson" },
+  { "Produced by",                     "Tony Fagelman\n\z
+                                        Millennium Interactive" }
 
 };
 -- Extra credits ----------------------------------------------------------- --
 local aCreditsXData<const> = {
   { "Complete conversion",             "MS-Design" },
-  { "Setup music loop",                "S.S. Secret Mission 1\n"..
-                                       "By PowerTrace\n"..
-                                       "Edited by MS-Design\n"..
-                                       "AmigaRemix.com" },
-  { "Credits music loop",              "4U 07:00 V2001\n"..
-                                       "By Enuo\n"..
-                                       "Edited by MS-Design\n"..
-                                       "ModArchive.org" },
-  { "Gameover music loop",             "1000 Years Of Funk\n"..
-                                       "By Dimitri D. L.\n"..
-                                       "Edited by MS-Design\n"..
-                                       "ModArchive.Org" },
+  { "Setup music loop",                "S.S. Secret Mission 1\n\z
+                                        By PowerTrace\n\z
+                                        Edited by MS-Design\n\z
+                                        AmigaRemix.com" },
+  { "Credits music loop",              "4U 07:00 V2001\n\z
+                                        By Enuo\n\z
+                                        Edited by MS-Design\n\z
+                                        ModArchive.org" },
+  { "Gameover music loop",             "1000 Years Of Funk\n\z
+                                        By Dimitri D. L.\n\z
+                                        Edited by MS-Design\n\z
+                                        ModArchive.Org" },
   { "Conversion powered by",           "MS-Engine" },
-  { "GLFW OpenGL front-end",           "Marcus Geelnard\n"..
-                                       "Camilla Lowy" },
+  { "GLFW OpenGL front-end",           "Marcus Geelnard\n\z
+                                        Camilla Lowy" },
   { "LUA scripting engine",            "Lua.org, PUC-Rio" },
-  { "OpenALSoft audio manager",        "Chris Robinson\n"..
-                                       "Creative Technology" },
+  { "OpenALSoft audio manager",        "Chris Robinson\n\z
+                                        Creative Technology" },
   { "Ogg, Vorbis & Theora A/V codec",  "Xiph.Org" },
   { "FreeType font rendering",         "The FreeType Project" },
   { "SQLite database engine",          "SQLite Consortium" },
-  { "LibJPEG-Turbo image codec",       "Contributing authors\n"..
-                                       "IJG" },
-  { "LibNSGif image decoder",          "NetSurf Developers\n"..
-                                       "Richard Wilson\n"..
-                                       "Sean Fox" },
+  { "LibJPEG-Turbo image codec",       "Contributing authors\n\z
+                                        IJG" },
+  { "LibNSGif image decoder",          "NetSurf Developers\n\z
+                                        Richard Wilson\n\z
+                                        Sean Fox" },
   { "LibPNG image codec",              "Contributing authors" },
   { "LZMA general codec",              "Igor Pavlov" },
-  { "Z-Lib general codec",             "Jean-loup Gailly\n"..
-                                       "Mark Adler" },
+  { "Z-Lib general codec",             "Jean-loup Gailly\n\z
+                                        Mark Adler" },
   { "OpenSSL crypto & socket engine",  "OpenSSL SW Foundation" },
-  { "RapidJSON parsing engine",        "THL A29 Ltd.\n"..
-                                       "Tencent co.\n"..
-                                       "Milo Yip" },
-  { "Special thanks",                  "ModArchive.Org\n"..
-                                       "AmigaRemix.Com\n"..
-                                       "Toby Simpson\n"..
-                                       "You!" },
+  { "RapidJSON parsing engine",        "THL A29 Ltd.\n\z
+                                        Tencent co.\n\z
+                                        Milo Yip" },
+  { "Special thanks",                  "ModArchive.Org\n\z
+                                        AmigaRemix.Com\n\z
+                                        Toby Simpson\n\z
+                                        You!" },
   { "Thank you for playing!",          "The End!" },
 };
 -- Setup buttons data ------------------------------------------------------ --
@@ -2566,45 +2566,45 @@ local aSetupButtonData<const> = { -- nil's are filled in 'setup.lua' init
   APPLY = {   4, 193,  82, 212, CID.OK,   nil, 101,
     "CLICK TO APPLY ANY SYSTEM AFFECTING SETTINGS YOU HAVE CHANGED" },
   DONE  = {  82, 193, 160, 212, CID.EXIT, nil, 102,
-    "CLICK TO EXIT THIS SETUP WINDOW AND RETURN TO YOUR GAME. ANY "..
-    "CHANGED SETTINGS THAT NEED TO BE APPLIED WILL BE CANCELLED" },
+    "CLICK TO EXIT THIS SETUP WINDOW AND RETURN TO YOUR GAME. ANY CHANGED \z
+     SETTINGS THAT NEED TO BE APPLIED WILL BE CANCELLED" },
   RESET = { 160, 193, 238, 212, CID.OK,   nil, 103,
-    "CLICK TO RESET ALL VALUES TO DEFAULTS AND AUTOMATICALLY APPLY THE "..
-    "SETTINGS" },
+    "CLICK TO RESET ALL VALUES TO DEFAULTS AND AUTOMATICALLY APPLY THE \z
+     SETTINGS" },
   ABOUT = { 238, 193, 316, 212, CID.OK,   nil, 104,
     "CLICK TO VIEW THE ACKNOWLEDGEMENTS FOR THIS GAME" }
 };-- Setup options data ---------------------------------------------------- --
 local aSetupOptionData<const> = { -- nil's are filled in 'setup.lua' init
   -- Option name -- Value -- UpdateFunc --- DownFunc --- UpFunc ------------ --
   { "Monitor",         "", nil,           nil,         nil,
-    "CHANGES THE MONITOR THE GAME WILL APPEAR ON BY DEFAULT. PRESS "..
-    "APPLY WHEN YOU ARE HAPPY WITH THE SELECTION TO ACTIVATE IT", },
+    "CHANGES THE MONITOR THE GAME WILL APPEAR ON BY DEFAULT. PRESS \z
+     APPLY WHEN YOU ARE HAPPY WITH THE SELECTION TO ACTIVATE IT", },
   { "Display State",   "", nil,           nil,         nil,
-    "CHANGES THE DEFAULT WINDOW STYLE OF THE GAME. PRESS APPLY WHEN YOU "..
-    "ARE HAPPY WITH THE SELECTION TO ACTIVATE IT" },
+    "CHANGES THE DEFAULT WINDOW STYLE OF THE GAME. PRESS APPLY WHEN YOU \z
+     ARE HAPPY WITH THE SELECTION TO ACTIVATE IT" },
   { "Full-Resolution", "", nil,           nil,         nil,
-    "ALLOWS YOU TO SET A CUSTOM DESKTOP RESOLUTION FOR EXCLUSIVE "..
-    "FULL-SCREEN MODE. PRESS APPLY WHEN YOU ARE HAPPY WITH THE SELECTION "..
-    "TO ACTIVATE IT" },
+    "ALLOWS YOU TO SET A CUSTOM DESKTOP RESOLUTION FOR EXCLUSIVE \z
+     FULL-SCREEN MODE. PRESS APPLY WHEN YOU ARE HAPPY WITH THE SELECTION \z
+     TO ACTIVATE IT" },
   { "Window Size",     "", nil,           nil,         nil,
-    "ALLOWS YOU TO SET A CUSTOM WINDOW SIZE FOR DECORATED WINDOW ONLY "..
-    "MODE. PRESS APPLY WHEN YOU ARE HAPPY WITH THE SELECTION TO ACTIVATE "..
-    "IT" },
+    "ALLOWS YOU TO SET A CUSTOM WINDOW SIZE FOR DECORATED WINDOW ONLY \z
+     MODE. PRESS APPLY WHEN YOU ARE HAPPY WITH THE SELECTION TO ACTIVATE \z
+     IT" },
   { "Frame Limiter",   "", nil,           nil,         nil,
-    "ALLOWS YOU TO CHOOSE FROM A RANGE OF FRAME-LIMITING OPTIONS TO "..
-    "BALANCE THE PERFORMANCE VERSUS POWER USAGE OF RENDERING. SOME VALUES "..
-    "MAY BE INEFFECTIVE WHEN THE VSYNC VALUE IS BEING OVERRIDDEN IN YOUR "..
-    "VIDEO ADAPTER SETTINGS OR WHEN YOUR SYSTEM IS UNDERPERFORMING. THE "..
-    "CHANGE IS INSTANTLY APPLIED" },
+    "ALLOWS YOU TO CHOOSE FROM A RANGE OF FRAME-LIMITING OPTIONS TO \z
+     BALANCE THE PERFORMANCE VERSUS POWER USAGE OF RENDERING. SOME VALUES \z
+     MAY BE INEFFECTIVE WHEN THE VSYNC VALUE IS BEING OVERRIDDEN IN YOUR \z
+     VIDEO ADAPTER SETTINGS OR WHEN YOUR SYSTEM IS UNDERPERFORMING. THE \z
+     CHANGE IS INSTANTLY APPLIED" },
   { "Texture Filter",  "", nil,           nil,         nil,
-    "APPLY A BILINEAR UPSCALE FILTER TO THE MAIN FRAMEBUFFER. THE GAME IS "..
-    "RENDERED IN 320x240. THE CHANGE OF OPTION IS INSTANTLY APPLIED" },
+    "APPLY A BILINEAR UPSCALE FILTER TO THE MAIN FRAMEBUFFER. THE GAME IS \z
+     RENDERED IN 320x240. THE CHANGE OF OPTION IS INSTANTLY APPLIED" },
   { "Audio Device",    "", nil,           nil,         nil,
-    "ALLOWS YOU TO SET THE DEFAULT AUDIO DEVICE TO USE FOR THE GAME. "..
-    "PRESS APPLY WHEN YOU ARE HAPPY WITH THE SELECTION TO ACTIVATE IT" },
+    "ALLOWS YOU TO SET THE DEFAULT AUDIO DEVICE TO USE FOR THE GAME. \z
+     PRESS APPLY WHEN YOU ARE HAPPY WITH THE SELECTION TO ACTIVATE IT" },
   { "Master Volume",   "", nil,           nil,         nil,
-    "CHANGES THE FINAL OUTPUT VOLUME OF ALL MUSIC, SOUND EFFECTS AND FMV "..
-    "MIXED TOGETHER. THE CHANGE OF OPTION IS INSTANTLY APPLIED" },
+    "CHANGES THE FINAL OUTPUT VOLUME OF ALL MUSIC, SOUND EFFECTS AND FMV \z
+     MIXED TOGETHER. THE CHANGE OF OPTION IS INSTANTLY APPLIED" },
   { "Music Volume",    "", nil,           nil,         nil,
     "CHANGES THE MUSIC VOLUME. THE CHANGE OF OPTION IS INSTANTLY APPLIED" },
   { "Effect Volume",   "", nil,           nil,         nil,

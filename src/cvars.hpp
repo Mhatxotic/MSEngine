@@ -245,23 +245,23 @@ static struct CVars final :            // Start of vars class
       cLog->LogErrorSafe("CVars failed to detect config file type!");
       return false;
     } // Initialise it and log and return failed if there are no lines
-    const ParserConst<> pConfig{ strBuffer, strSplit, '=' };
-    if(pConfig.empty())
+    const ParserConst<> pcConfig{ strBuffer, strSplit, '=' };
+    if(pcConfig.empty())
     { // Log the issue and return failure
       cLog->LogWarningSafe("CVars detected no readable variables!");
       return false;
     } // Total variables parsed, good vars and bad vars.
     size_t stGood = 0, stBad = 0;
     // For each item. Set variable or save for future reference.
-    for(const auto &vI : pConfig)
+    for(const StrPair &spPair : pcConfig)
     { // If first string is not empty then check first character
-      if(!vI.first.empty()) switch(vI.first.front())
+      if(!spPair.first.empty()) switch(spPair.first.front())
       { // Comment?
         case '#': break;
         // No key was parsed?
         case '\255':
         { // Test value
-          if(!vI.second.empty()) switch(vI.second.front())
+          if(!spPair.second.empty()) switch(spPair.second.front())
           { // Comment?
             case '#': break;
             // Include?
@@ -270,10 +270,13 @@ static struct CVars final :            // Start of vars class
               const unsigned int uiNewLevel = uiLevel + 1;
               if(uiNewLevel >= stCVarConfigMaxLevel)
                 XC("CVar include nest level too deep!",
-                   "File", vI.second, "Limit", stCVarConfigMaxLevel);
+                   "File", spPair.second, "Limit", stCVarConfigMaxLevel);
               // Log the include and parse it
-              if(ParseBuffer(AssetExtract(StrTrim(vI.second.substr(1), ' ')).
-                MemToString(), cvfcFlags, uiNewLevel)) ++stGood; else ++stBad;
+              if(ParseBuffer(
+                   AssetExtract(StrTrim(spPair.second.substr(1), ' ')).
+                     MemToString(), cvfcFlags, uiNewLevel))
+                ++stGood;
+              else ++stBad;
               // Done
               break;
             } // Something else?
@@ -283,7 +286,7 @@ static struct CVars final :            // Start of vars class
         } // Something else?
         default:
         { // Set the variable and if succeeded increment good counter else bad
-          if(SetVarOrInitial(vI.first, vI.second, cvfcFlags,
+          if(SetVarOrInitial(spPair.first, spPair.second, cvfcFlags,
             CCF_IGNOREIFMISSING|CCF_THROWONERROR|CCF_NOMARKCOMMIT))
               ++stGood;
           else ++stBad;
@@ -293,9 +296,9 @@ static struct CVars final :            // Start of vars class
       }
     } // Set total cvars processed and log the result
     const size_t stParsed = stGood + stBad,
-                 stIgnored = pConfig.size() - stParsed;
+                 stIgnored = pcConfig.size() - stParsed;
     cLog->LogInfoExSafe("CVars parsed $ lines with $ vars (G:$;B:$;I:$).",
-      pConfig.size(), stParsed, stGood, stBad, stIgnored);
+      pcConfig.size(), stParsed, stGood, stBad, stIgnored);
     // Done
     return true;
   }
@@ -732,7 +735,7 @@ static struct CVars final :            // Start of vars class
   /* -- Destructor --------------------------------------------------------- */
   DTORHELPER(~CVars, DeInit())         // Save and clean-up all variables
   /* ----------------------------------------------------------------------- */
-  DELETECOPYCTORS(CVars)               // Disable copy constructor and operator
+  DELETECOPYCTORS(CVars)               // Suppress default functions for safety
   /* ----------------------------------------------------------------------- */
   CVarReturn SetDefaults(const CVarDefaults cvdVal)
   { // Compare defaults setting
@@ -775,18 +778,6 @@ static struct CVars final :            // Start of vars class
     // We are manually updating the value with the correct filename
     strVal = StdMove(strCfgFile);
     return ACCEPT_HANDLED;
-  }
-  /* ----------------------------------------------------------------------- */
-  CVarReturn SetCompatFlags(const bool bEnabled)
-  { // Compatibility flags are enabled?
-    if(bEnabled)
-    { // If only using one cpu and log if we can disable window threading
-      if(cSystem->CPUCount() == 1 &&
-        SetInternal<bool>(WIN_THREAD, false) == CVS_OK)
-          cLog->LogWarningSafe("CVars force disabled window threading due "
-            "to only having one thread!");
-    } // CVar is accepted
-    return ACCEPT;
   }
   /* ----------------------------------------------------------------------- */
 } *cCVars = nullptr;                   // Pointer to static class

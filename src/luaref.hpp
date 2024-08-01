@@ -14,29 +14,29 @@ using namespace ILuaUtil::P;
 namespace P {                          // Start of public module namespace
 /* ------------------------------------------------------------------------- */
 template<size_t Refs=1>class LuaRef    // Lua easy reference class
-{ /* -- Private variables --------------------------------------- */ protected:
+{ /* -- Private typedefs ---------------------------------------- */ protected:
+  typedef array<int, Refs> References; // Type for LUA references list
+  typedef References::const_reverse_iterator ReferencesConstRevIt;
+  typedef References::reverse_iterator       ReferencesRevIt;
+  /* -- Protected variables ------------------------------------- */ protected:
   lua_State       *lsState;            // State that owns the reference.
-  array<int, Refs> iReferences;        // Reference that the state refers to.
-  /* -- Initialise a specific reference --------------------------- */ private:
-  bool LuaRefDoInitEx(const size_t stId)
-  { // Initialise the new reference and return failure if failed
-    const int iReference = LuaUtilRefInitUnsafe(LuaRefGetState());
-    if(iReference == LUA_REFNIL) return false;
-    // Success to assign
-    iReferences[stId] = iReference;
-    // Success
+  References       aReferences;        // Reference that the state refers to.
+  /* -- Release a specific reference ------------------------------ */ private:
+  bool LuaRefDoDeInit(const int iReference) const
+  { // Return failure if not valid else remove it and return success
+    if(LuaUtilIsNotRefValid(iReference)) return false;
+    LuaUtilRmRef(LuaRefGetState(), iReference);
     return true;
   }
-  /* -- DeInitialise a specific reference ---------------------------------- */
-  bool LuaRefDoDeInitEx(const size_t stId)
-  { // Get reference to reference ;) and ignore if reference not set
-    int &iReference = iReferences[stId];
-    if(iReference == LUA_REFNIL) return false;
-    // Clear the reference
-    LuaUtilRmRefUnsafe(LuaRefGetState(), iReference);
-    // Reference no longer valid
-    iReference = LUA_REFNIL;
-    // Success
+  /* -- Release and reset specific reference ------------------------------- */
+  void LuaRefDoDeInitReset(int &iReference)
+    { if(LuaRefDoDeInit(iReference)) iReference = LUA_REFNIL; }
+  /* -- Initialise a specific reference ------------------------------------ */
+  bool LuaRefDoInitEx(const size_t stIndex)
+  { // Init the ref and return on failure else assign to the specifide ref ndx
+    const int iReference = LuaUtilRefInit(LuaRefGetState());
+    if(LuaUtilIsNotRefValid(iReference)) return false;
+    aReferences[stIndex] = iReference;
     return true;
   }
   /* -- Set new state ------------------------------------------------------ */
@@ -44,16 +44,17 @@ template<size_t Refs=1>class LuaRef    // Lua easy reference class
   /* -- Get the state ---------------------------------------------- */ public:
   lua_State *LuaRefGetState(void) const { return lsState; }
   /* -- Returns the reference at the specified index ----------------------- */
-  int LuaRefGetId(const size_t stId=0) const { return iReferences[stId]; }
+  int LuaRefGetId(const size_t stIndex=0) const
+    { return aReferences[stIndex]; }
   /* -- Returns the function at the specified index ------------------------ */
-  bool LuaRefGetFunc(const size_t stId=0) const
-    { return LuaUtilGetRefFunc(LuaRefGetState(), LuaRefGetId(stId)); }
+  bool LuaRefGetFunc(const size_t stIndex=0) const
+    { return LuaUtilGetRefFunc(LuaRefGetState(), LuaRefGetId(stIndex)); }
   /* -- Returns the userdata at the specified index ------------------------ */
-  bool LuaRefGetUData(const size_t stId=0) const
-    { return LuaUtilGetRefUsrData(LuaRefGetState(), LuaRefGetId(stId)); }
+  bool LuaRefGetUData(const size_t stIndex=0) const
+    { return LuaUtilGetRefUsrData(LuaRefGetState(), LuaRefGetId(stIndex)); }
   /* -- Returns the reference at the specified index ----------------------- */
-  void LuaRefGet(const size_t stId=0) const
-    { return LuaUtilGetRef(LuaRefGetState(), LuaRefGetId(stId)); }
+  void LuaRefGet(const size_t stIndex=0) const
+    { return LuaUtilGetRef(LuaRefGetState(), LuaRefGetId(stIndex)); }
   /* -- Returns if the state is equal to the specified state --------------- */
   bool LuaRefStateIsEqual(const lua_State*const lS) const
     { return LuaRefGetState() == lS; }
@@ -65,34 +66,30 @@ template<size_t Refs=1>class LuaRef    // Lua easy reference class
   /* -- Returns if the state is NOT set ------------------------------------ */
   bool LuaRefStateIsNotSet(void) const { return !LuaRefStateIsSet(); }
   /* -- Returns if the specified reference is set -------------------------- */
-  bool LuaRefIsSet(const size_t stId=0) const
-    { return LuaRefStateIsSet() && LuaRefGetId(stId) != LUA_REFNIL; }
+  bool LuaRefIsSet(const size_t stIndex=0) const
+    { return LuaRefStateIsSet() && LuaUtilIsRefValid(LuaRefGetId(stIndex)); }
   /* -- De-initialise the reference ---------------------------------------- */
   bool LuaRefDeInit(void)
   { // Return if theres a state?
     if(LuaRefStateIsNotSet()) return false;
     // Unload and clear references from back to front
-    for(auto itRef{iReferences.rbegin()}; itRef != iReferences.rend(); ++itRef)
-    { // Get reference to reference in iterator and goto next if not set
-      int &iReference = *itRef;
-      if(iReference == LUA_REFNIL) continue;
-      // Clear the reference
-      LuaUtilRmRefUnsafe(LuaRefGetState(), iReference);
-      // Reference no longer valid
-      iReference = LUA_REFNIL;
-    } // Clear the state
+    for(ReferencesRevIt rriIt{ aReferences.rbegin() };
+                        rriIt != aReferences.rend();
+                      ++rriIt)
+      LuaRefDoDeInitReset(*rriIt);
+    // Clear the state
     LuaRefSetState();
     // Success
     return true;
   }
   /* -- Initialise the reference ------------------------------------------- */
-  bool LuaRefInitEx(const size_t stId)
+  bool LuaRefInitEx(const size_t stIndex)
   { // Failed if no state
     if(LuaRefStateIsNotSet()) return false;
     // Deinit existing reference
-    LuaRefDoDeInitEx(stId);
+    LuaRefDoDeInitReset(aReferences[stIndex]);
     // Reference the specified state
-    return LuaRefDoInitEx(stId);
+    return LuaRefDoInitEx(stIndex);
   }
   /* -- Initialise the reference ------------------------------------------- */
   bool LuaRefInit(lua_State*const lS, const size_t stMax = Refs)
@@ -113,24 +110,18 @@ template<size_t Refs=1>class LuaRef    // Lua easy reference class
     /* -- Initialisers ----------------------------------------------------- */
     lsState(nullptr)                   // State not initialised yet
     /* -- Uninitialised lua reverences ------------------------------------- */
-    { iReferences.fill(LUA_REFNIL); }
+    { aReferences.fill(LUA_REFNIL); }
   /* -- Destructor, delete the reference if set----------------------------- */
   ~LuaRef(void)
-  { // Done if no state
-    if(LuaRefStateIsNotSet()) return;
-    // Delete references back to front
-    for(auto itRef{ iReferences.rbegin() };
-             itRef != iReferences.rend();
-           ++itRef)
-    { // Get reference and ignore if reference not set
-      const int iReference = *itRef;
-      if(iReference == LUA_REFNIL) continue;
-      // Clear the reference
-      LuaUtilRmRefUnsafe(LuaRefGetState(), iReference);
-    }
+  { // If theres a state? Delete references back to front
+    if(LuaRefStateIsSet())
+      for(ReferencesConstRevIt rcriIt{ aReferences.rbegin() };
+                               rcriIt != aReferences.rend();
+                             ++rcriIt)
+        LuaRefDoDeInit(*rcriIt);
   }
   /* ----------------------------------------------------------------------- */
-  DELETECOPYCTORS(LuaRef)              // Omit copy constructor for safety
+  DELETECOPYCTORS(LuaRef)              // Suppress default functions for safety
 };/* ----------------------------------------------------------------------- */
 }                                      // End of public module namespace
 /* ------------------------------------------------------------------------- */

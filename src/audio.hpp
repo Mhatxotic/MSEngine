@@ -426,7 +426,7 @@ static class Audio final :             // Audio manager class
   /* -- Destructor --------------------------------------------------------- */
   DTORHELPER(~Audio, DeInit())         // Destructor helper
   /* ----------------------------------------------------------------------- */
-  DELETECOPYCTORS(Audio)               // Omit copy constructor for safety
+  DELETECOPYCTORS(Audio)               // Suppress default functions for safety
   /* ----------------------------------------------------------------------- */
   CVarReturn SetAudCheckRate(const unsigned int uiTime)
     { return CVarSimpleSetIntNLG(cdCheckRate,

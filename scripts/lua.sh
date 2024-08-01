@@ -45,9 +45,9 @@ fi
 if [ ! -f src/linit.c.patched ]; then
   mv -fv src/linit.c src/linit.c.patch 2>/dev/null
   cat src/linit.c.patch | \
-    sed 's|{LUA_IOLIBNAME, luaopen_io},||g' | \
-    sed 's|{LUA_OSLIBNAME, luaopen_os},||g' | \
-    sed 's|{LUA_LOADLIBNAME, luaopen_package},||g' > src/linit.c
+    sed 's/{LUA_IOLIBNAME, luaopen_io},//g' | \
+    sed 's/{LUA_OSLIBNAME, luaopen_os},//g' | \
+    sed 's/{LUA_LOADLIBNAME, luaopen_package},//g' > src/linit.c
   if [ ! $? -eq 0 ]; then
     exit 7
   fi
@@ -60,10 +60,10 @@ fi
 if [ ! -f src/ldo.c.patched ]; then
   mv -fv src/ldo.c src/ldo.c.patch 2>/dev/null
   cat src/ldo.c.patch | \
-    sed 's|throw(c)|throw(c)\n\
+    sed 's/throw(c)/throw(c)\n\
 #include <stdexcept>\n\
-#include "lauxlib.h"\n|g' | \
-    sed 's|L->errorJmp = &lj;|L->errorJmp = \&lj;\
+#include "lauxlib.h"\n/g' | \
+    sed 's/L->errorJmp = &lj;/L->errorJmp = \&lj;\
 #if defined(__cplusplus)\
 \ttry{\
 \t(*f)(L, ud);\
@@ -82,10 +82,10 @@ if [ ! -f src/ldo.c.patched ]; then
 \t\t\tif(!lj->status) lj->status=-1;\
 \t\t}\
 \t}\
-#else\n|g' | \
-    sed 's|L->errorJmp = lj.previous;|\
+#else\n/g' | \
+    sed 's/L->errorJmp = lj.previous;/\
 #endif\n\
-\tL->errorJmp = lj.previous;|g' \
+\tL->errorJmp = lj.previous;/g' \
       > src/ldo.c
   if [ ! $? -eq 0 ]; then
     exit 9
@@ -99,12 +99,12 @@ fi
 if [ ! -f src/lbaselib.c.patched ]; then
   mv -fv src/lbaselib.c src/lbaselib.c.patch 2>/dev/null
   cat src/lbaselib.c.patch | \
-   sed 's|{"dofile", luaB_dofile},||g' | \
-   sed 's|{"loadfile", luaB_loadfile},||g' | \
-   sed 's|{"load", luaB_load},||g' | \
-   sed 's|{"print\", luaB_print},||g' | \
-   sed 's|{"_VERSION", nullptr},||g' | \
-   sed 's|{"_G", nullptr},||g' \
+   sed 's/{"dofile", luaB_dofile},//g' | \
+   sed 's/{"loadfile", luaB_loadfile},//g' | \
+   sed 's/{"load", luaB_load},//g' | \
+   sed 's/{"print\", luaB_print},//g' | \
+   sed 's/{"_VERSION", nullptr},//g' | \
+   sed 's/{"_G", nullptr},//g' \
      > src/lbaselib.c
   if [ ! $? -eq 0 ]; then
     exit 11
@@ -118,7 +118,7 @@ fi
 if [ ! -f src/lparser.c.patched ]; then
   mv -fv src/lparser.c src/lparser.c.patch 2>/dev/null
   cat src/lparser.c.patch | sed \
-    "s|MAXVARS\t\t200|MAXVARS\t\t253|g" > src/lparser.c
+    's/MAXVARS\t\t200/MAXVARS\t\t253/g' > src/lparser.c
   if [ ! $? -eq 0 ]; then
     exit 13
   fi
@@ -131,7 +131,7 @@ fi
 # if [ ! -f src/lua.h.patched ]; then
 #   mv -fv src/lua.h src/lua.h.patch 2>/dev/null
 #   cat src/lua.h.patch | sed \
-#     "s|LUA_MINSTACK\t20|LUA_MINSTACK\t20|g" > src/lua.h
+#     "s/LUA_MINSTACK\t20|LUA_MINSTACK\t20/g" > src/lua.h
 #   if [ ! $? -eq 0 ]; then
 #     exit 15
 #   fi
@@ -144,7 +144,7 @@ fi
 # if [ ! -f src/luaconf.h.patched ]; then
 #   mv -fv src/luaconf.h src/luaconf.h.patch 2>/dev/null
 #   cat src/luaconf.h.patch | sed \
-#     "s|MAXSTACK\t\t1000000|MAXSTACK\t\t1000000|g" > src/luaconf.h
+#     "s/MAXSTACK\t\t1000000|MAXSTACK\t\t1000000/g" > src/luaconf.h
 #   if [ ! $? -eq 0 ]; then
 #     exit 15
 #   fi
