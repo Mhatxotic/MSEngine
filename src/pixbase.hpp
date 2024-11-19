@@ -9,19 +9,9 @@
 ** ######################################################################### **
 ** ========================================================================= */
 #pragma once                           // Only one incursion allowed
-/* -- Signals to support --------------------------------------------------- */
-typedef pair<const int, void(*)(int)> SignalPair;
-typedef array<SignalPair, 14> SignalList;
-static SignalList slSignals{ {
-  { SIGABRT, nullptr }, { SIGBUS,  nullptr },
-  { SIGFPE,  nullptr }, { SIGHUP,  nullptr }, { SIGILL,  nullptr },
-  { SIGINT,  nullptr }, { SIGPIPE, nullptr }, { SIGQUIT, nullptr },
-  { SIGSEGV, nullptr }, { SIGSYS,  nullptr }, { SIGTERM, nullptr },
-  { SIGTRAP, nullptr }, { SIGXCPU, nullptr }, { SIGXFSZ, nullptr },
-} };
-/* -- SIGSEGV workaround when still in System() constructor ---------------- */
-static bool bSysBaseDataReady = false; // Is the data ready?
-/* -- We'll put all these calls in a namespace ----------------------------- */
+/* ------------------------------------------------------------------------- */
+using namespace IThread::P;            // Using thread namespace
+/* ------------------------------------------------------------------------- */
 class SysBase :                        // Safe exception handler namespace
   /* -- Base classes ------------------------------------------------------- */
   public SysVersion,                   // Version information class
@@ -31,6 +21,101 @@ class SysBase :                        // Safe exception handler namespace
   ResourceLimitMap rlmLimits;          // Resource limits database
   /* ----------------------------------------------------------------------- */
   enum ExitState { ES_SAFE, ES_UNSAFE, ES_CRITICAL }; // Signal exit types
+  /* -- Signals to support ------------------------------------------------- */
+  typedef pair<const int, void(*)(int)> SignalPair;
+  typedef array<SignalPair, 14> SignalList;
+  SignalList       slSignals;          // Signal list
+  /* -- SIGSEGV workaround when still in System() constructor -------------- */
+  bool             bSysBaseDataReady;  // Is the data ready?
+  /* -- Class to rebuffer system generated output to log ------------------- */
+  class Redirect
+  { /* --------------------------------------------------------------------- */
+    const int      iRequested,         // Requested handle
+                   iSaved;             // Saved handle
+    Memory         mBuffer;            // Buffer for output datat
+    array<int,2>   iaPipes;            // Pipes
+    Thread         tThread;            // Monitor thread
+    /* -- Async off-main thread function ----------------------------------- */
+    int ThreadMain(Thread&)
+    { // Until thread should exit or end of file
+      while(tThread.ThreadShouldNotExit())
+      { // Read some data and if we got some? Return how much we read
+        switch(const size_t stRead = static_cast<size_t>
+          (read(iaPipes[0], mBuffer.MemPtr(), mBuffer.MemSize())))
+        { // Success?
+          default:
+            // Report read
+            cLog->LogDebugExSafe("[$>$] $", stRead, tThread.IdentGet(),
+              mBuffer.MemToString());
+            // Fallthrough to break
+            [[fallthrough]];
+          // Handle was closed? Terminate the thread
+          case 0: break;
+          // Error?
+          case StdMaxSizeT:
+            // Ignore it if we're quitting
+            if(tThread.ThreadShouldNotExit()) break;
+            // Else throw error
+            XCS("Error reading system output from pipe!",
+              "Output", tThread.IdentGet(), "Bytes", mBuffer.MemSize());
+        } // Don't get here
+      } // Return success to thread manager
+      return 1;
+    }
+    /* --------------------------------------------------------------------- */
+    void Reset(void)
+    { // Close second pipe handle if opened
+      if(iaPipes[1] != -1) close(iaPipes[1]);
+      // Return if first pipe handle not opened
+      if(iaPipes[0] == -1) return;
+      // Signal the exit
+      tThread.ThreadSetExit();
+      // Close the pipe so the thread can exit
+      close(iaPipes[0]);
+      // Stop the thread and wait for it to exit
+      tThread.ThreadDeInit();
+      // Restore original handle allocated by system
+      dup2(iSaved, iRequested);
+    }
+    /* ------------------------------------------------------------- */ public:
+    void ResetSafe(void)
+    { // Do the reset
+      Reset();
+      // Reset the handles so shutdown doesn't trigger on destruction
+      iaPipes.fill(-1);
+    }
+    /* --------------------------------------------------------------------- */
+    Redirect(const int iHandle, const string &strNName) :
+      /* ------------------------------------------------------------------- */
+      iRequested(iHandle),             // Store requested handle
+      iSaved(dup(iHandle)),            // Duplicate requested handle
+      mBuffer{ 4096 },                 // Initialise buffer
+      iaPipes{ -1, -1 },               // Initialise pipe handles
+      tThread{ strNName, STP_LOW }     // Initialise low priority thread
+      /* ------------------------------------------------------------------- */
+    { // Return if handle not copied
+      if(iSaved == -1)
+        XCL("Failed to copy specified output handle!",
+            "Name", tThread.IdentGet());
+      // Create pipe handles and show error on failure
+      if(pipe(iaPipes.data()))
+        XCL("Failed to redirect specified output to buffer!",
+            "Name", tThread.IdentGet());
+      // Redirect requested output handle to the pipe
+      if(dup2(iaPipes[1], iHandle) == -1)
+        XCL("Failed to redirect output handle to the pipe!",
+            "Name", tThread.IdentGet());
+      // Close the other handle
+      if(close(iaPipes[1]) == -1)
+        XCL("Failed to close second pipe handle!",
+            "Name", tThread.IdentGet());
+      // Start the monitoring thread
+      tThread.ThreadInit(bind(&Redirect::ThreadMain, this, _1), this);
+    }
+    /* --------------------------------------------------------------------- */
+    ~Redirect(void) { Reset(); }
+    /* --------------------------------------------------------------------- */
+  } rStdErr;                  // Capture stdout and stderr
   /* --------------------------------------------------------------- */ public:
   int DoDeleteGlobalMutex(const char*const cpName)
     { return shm_unlink(cpName); }
@@ -150,14 +235,16 @@ class SysBase :                        // Safe exception handler namespace
   /* ----------------------------------------------------------------------- */
   void DumpStack(ostringstream &osS) const
   { // Create array to hold stack pointers
-    array<void*, 256> vaArray;
+    typedef array<void*, 256> StackArray;
+    StackArray saArray;
     // Get the number of stack frames that can fit in the array and if can?
-    if(const int iSize = backtrace(vaArray.data(),
-      sizeof(vaArray) / sizeof(vaArray[0])))
+    void**const vplArPtr = saArray.data();
+    constexpr size_t stArLen = saArray.size() / sizeof(StackArray::value_type);
+    if(const int iSize = backtrace(vplArPtr, stArLen))
     { // Get stack trace. For some reason, GCC on Linux doesn't like
       // decltype(free) but void(void*) works.
-      if(unique_ptr<char*, function<void(void*)>> uStack{
-        backtrace_symbols(vaArray.data(), iSize), free })
+      typedef unique_ptr<char*, function<void(void*)>> StrStack;
+      if(const StrStack ssStack{ backtrace_symbols(vplArPtr, iSize), free })
       { // Convert entries to size_t
         const size_t stSize = static_cast<size_t>(iSize);
         // Setup table formatter
@@ -177,7 +264,7 @@ class SysBase :                        // Safe exception handler namespace
         { // Add ID
           staData.DataN(stI);
           // Add others
-          DebugFunction(staData, uStack.get()[stI], vaArray[stI]);
+          DebugFunction(staData, ssStack.get()[stI], saArray[stI]);
         } // We got a stack trace
         osS << ", stack trace:-\n";
         // Build output into string stream
@@ -287,7 +374,9 @@ class SysBase :                        // Safe exception handler namespace
   }
   /* ----------------------------------------------------------------------- */
   ExitState HandleSignalSafe(const int iSignal)
-  { // Which signal
+  { // Shut down the stderr monitoring thread
+    rStdErr.ResetSafe();
+    // Which signal
     switch(iSignal)
     { // The signal is usually initiated by the process itself when it calls
       // abort function of the C Standard Library, but it can be sent to the
@@ -421,30 +510,26 @@ class SysBase :                        // Safe exception handler namespace
     return pTerminal != pParent;
   }
   /* ----------------------------------------------------------------------- */
-  SysBase(SysModMap &&smmMap, const size_t stI) :
-    /* -- Initialisers ----------------------------------------------------- */
-    SysVersion{                        // Initialise version info class
-      StdMove(smmMap), stI },          // Move sent mod list into ours
-    rlmLimits{{                        // Limits data
-#if !defined(MACOS)                    // Not all resources supported
-      { RLIMIT_LOCKS,  { 0, 0 } },     { RLIMIT_MSGQUEUE,   { 0, 0 } },
-      { RLIMIT_NICE,   { 0, 0 } },     { RLIMIT_RTPRIO,     { 0, 0 } },
-      { RLIMIT_RTTIME, { 0, 0 } },     { RLIMIT_SIGPENDING, { 0, 0 } },
-#endif                                 // Mac check
-      { RLIMIT_AS,     { 0, 0 } },     { RLIMIT_CORE,       { 0, 0 } },
-      { RLIMIT_CPU,    { 0, 0 } },     { RLIMIT_DATA,       { 0, 0 } },
-      { RLIMIT_FSIZE,  { 0, 0 } },     { RLIMIT_MEMLOCK,    { 0, 0 } },
-      { RLIMIT_NOFILE, { 0, 0 } },     { RLIMIT_NPROC,      { 0, 0 } },
-      { RLIMIT_RSS,    { 0, 0 } },     { RLIMIT_STACK,      { 0, 0 } }
-    }}
-    /* -- ------------------------------------------------------------------ */
+  void RestoreSignals(void)
+  { // Uninstall safe signals
+    for(SignalPair &spPair : slSignals)
+      if(signal(spPair.first, spPair.second) == SIG_ERR && cLog)
+        cLog->LogWarningExSafe("Failed to restore signal $ handler! $.",
+          spPair.first, StrFromErrNo());
+  }
+  /* ----------------------------------------------------------------------- */
+  void SetupSignals(void)
   { // Now install all those signal handlers
     for(SignalPair &spPair : slSignals)
     { // Set the signal and check for error
       spPair.second = signal(spPair.first, HandleSignalStatic);
       if(spPair.second == SIG_ERR)
         XCL("Failed to install signal handler!", "Id", spPair.first);
-    } // Increase resource limits we can change so the engine can do more
+    }
+  }
+  /* ----------------------------------------------------------------------- */
+  void IncreaseResourceLimits(void)
+  { // Increase resource limits we can change so the engine can do more
     for(ResourceLimitMapPair &rlmpPair : rlmLimits)
     { // Get the limit for this resource
       if(!getrlimit(rlmpPair.first, &rlmpPair.second))
@@ -471,12 +556,41 @@ class SysBase :                        // Safe exception handler namespace
     }
   }
   /* ----------------------------------------------------------------------- */
+  SysBase(SysModMap &&smmMap, const size_t stI) :
+    /* -- Initialisers ----------------------------------------------------- */
+    SysVersion{                        // Initialise version info class
+      StdMove(smmMap), stI },          // Move sent mod list into ours
+    rlmLimits{{                        // Limits data
+#if !defined(MACOS)                    // Not all resources supported
+      { RLIMIT_LOCKS,  { 0, 0 } },     { RLIMIT_MSGQUEUE,   { 0, 0 } },
+      { RLIMIT_NICE,   { 0, 0 } },     { RLIMIT_RTPRIO,     { 0, 0 } },
+      { RLIMIT_RTTIME, { 0, 0 } },     { RLIMIT_SIGPENDING, { 0, 0 } },
+#endif                                 // Mac check
+      { RLIMIT_AS,     { 0, 0 } },     { RLIMIT_CORE,       { 0, 0 } },
+      { RLIMIT_CPU,    { 0, 0 } },     { RLIMIT_DATA,       { 0, 0 } },
+      { RLIMIT_FSIZE,  { 0, 0 } },     { RLIMIT_MEMLOCK,    { 0, 0 } },
+      { RLIMIT_NOFILE, { 0, 0 } },     { RLIMIT_NPROC,      { 0, 0 } },
+      { RLIMIT_RSS,    { 0, 0 } },     { RLIMIT_STACK,      { 0, 0 } }
+    }},
+    slSignals{{                        // Init signals list
+      { SIGABRT, nullptr }, { SIGBUS,  nullptr },
+      { SIGFPE,  nullptr }, { SIGHUP,  nullptr }, { SIGILL,  nullptr },
+      { SIGINT,  nullptr }, { SIGPIPE, nullptr }, { SIGQUIT, nullptr },
+      { SIGSEGV, nullptr }, { SIGSYS,  nullptr }, { SIGTERM, nullptr },
+      { SIGTRAP, nullptr }, { SIGXCPU, nullptr }, { SIGXFSZ, nullptr },
+    }},
+    bSysBaseDataReady(false),          // Initially not ready
+    rStdErr{ STDERR_FILENO, "stderr" } // Initialise stderr redirect
+    /* --------------------------------------------------------------------- */
+  { // Setup signals
+    SetupSignals();
+    // Increase resource limits we can change so the engine can do more
+    IncreaseResourceLimits();
+  }
+  /* ----------------------------------------------------------------------- */
   ~SysBase(void) noexcept(true)
   { // Uninstall safe signals
-    for(SignalPair &spPair : slSignals)
-      if(signal(spPair.first, spPair.second) == SIG_ERR && cLog)
-        cLog->LogWarningExSafe("Failed to restore signal $ handler! $.",
-          spPair.first, StrFromErrNo());
+    RestoreSignals();
     // Delete global mutex
     DeleteGlobalMutex();
   }
