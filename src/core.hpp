@@ -1,6 +1,6 @@
 /* == CORE.HPP ============================================================= **
 ** ######################################################################### **
-** ## MS-ENGINE              Copyright (c) MS-Design, All Rights Reserved ## **
+** ## Mhatxotic Engine          (c) Mhatxotic Design, All Rights Reserved ## **
 ** ######################################################################### **
 ** ## This module is the core class which is created by main/WinMain on   ## **
 ** ## startup. It is pretty much the game-engine main routines.           ## **

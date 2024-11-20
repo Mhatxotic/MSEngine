@@ -1,6 +1,6 @@
 /* == WINCON.HPP =========================================================== **
 ** ######################################################################### **
-** ## MS-ENGINE              Copyright (c) MS-Design, All Rights Reserved ## **
+** ## Mhatxotic Engine          (c) Mhatxotic Design, All Rights Reserved ## **
 ** ######################################################################### **
 ** ## This is a Windows specific module that handles text only mode       ## **
 ** ## output which is needed by the engines bot-mode.                     ## **
@@ -862,7 +862,7 @@ class SysCon :                         // Members initially private
     return ACCEPT;
   }
 };/* ----------------------------------------------------------------------- */
-#define MSENGINE_SYSCON_CALLBACKS() \
+#define ENGINE_SYSCON_CALLBACKS() \
   BOOL WINAPI SysBase::SysCon::CtrlHandlerStatic(DWORD dwCtrlType) \
     { return cSystem->CtrlHandler(dwCtrlType); }
 /* == EoF =========================================================== EoF == */

@@ -1,6 +1,6 @@
 /* == FBO.HPP ============================================================== **
 ** ######################################################################### **
-** ## MS-ENGINE              Copyright (c) MS-Design, All Rights Reserved ## **
+** ## Mhatxotic Engine          (c) Mhatxotic Design, All Rights Reserved ## **
 ** ######################################################################### **
 ** ## This the file handles rendering of 2d fbos and triangles in opengl  ## **
 ** ##                                                                     ## **

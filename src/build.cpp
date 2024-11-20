@@ -1,17 +1,14 @@
 /* == BUILD.CPP ============================================================ **
 ** ######################################################################### **
-** ## XX----XX-------XXXXXX--XX----XX--XXXXXX--XXXXXXXX-XX----XX--XXXXXX- ## **
-** ## XXXXXXXX------XX----XX-XXXX--XX-XX----------XX----XXXX--XX-XX----XX ## **
-** ## XX-XX-XX-XXXX-XXXXX----XX-XX-XX-XX-XXXX-----XX----XX-XX-XX-XXXXX--- ## **
-** ## XX----XX------XX----XX-XX--XXXX-XX----XX----XX----XX--XXXX-XX----XX ## **
-** ## XX----XX-------XXXXXX--XX----XX--XXXXXX--XXXXXXXX-XX---XXX--XXXXXX- ## **
+** ## Mhatxotic Engine          (c) Mhatxotic Design, All Rights Reserved ## **
 ** ######################################################################### **
-** ## MS-ENGINE              Copyright (c) MS-Design, All Rights Reserved ## **
-** ######################################################################### **
-** ## This is the MS-Design Project Management utility which helps build  ## **
-** ## and maintain the components of the MS-Engine multimedia engine.     ## **
+** ## This is the Mhatxotic Design Project Management utility which helps ## **
+** ## build and maintain the components of the Mhatxotic multimedia       ## **
+** ## engine.                                                             ## **
 ** ######################################################################### **
 ** ------------------------------------------------------------------------- */
+#define BUILD                          // Indicates command-line tool compile
+/* ------------------------------------------------------------------------- */
 #include "setup.hpp"                   // Environment configuration
 /* ------------------------------------------------------------------------- */
 #include <iostream>                    // Using cout to print to con
@@ -21,7 +18,7 @@ using std::endl;                       // " End of line for std::cout
 /* ------------------------------------------------------------------------- */
 namespace Engine {                     // Put everything in engine namespace
 /* ------------------------------------------------------------------------- */
-#include "msengine.hpp"                // Build version numbers
+#include "engine.hpp"                  // Build version numbers
 #include "stdtypes.hpp"                // Global types
 #include "flags.hpp"                   // Flags class
 #include "utf.hpp"                     // Utf string utilities
@@ -73,7 +70,7 @@ using namespace IUtf;                  using namespace IUtil::P;
 using namespace IUuId::P;              using namespace IParser::P;
 /* ========================================================================= */
 #define STANDARD   "c++20"             // Current compilation standard used
-#define ENGINENAME "msengine"          // Name of engine 'msengine'
+#define ENGINENAME "engine"            // Name of engine 'engine'
 #define SRCEXT     ".hpp"              // Extension of source files
 #define ARCDIR     "archive"           // Archives directory
 #define BINDIR     "bin"               // Binaries directory
@@ -324,7 +321,7 @@ envMacOSLLVM =                         // XCode/LLVM on MacOS
   /* COMPRESS   */ "",
   /* DEBUGGER   */ "/usr/bin/lldb -- \"$/$$$\" app_basedir=\"$\" "
                    "sql_db=\"$/$\"",
-  /* 7Z         */ "7z",
+  /* 7Z         */ "7zz",
   /* AC4        */ "nasm",
   /* AC8        */ "nasm",
   /* ACM        */ "",
@@ -1184,7 +1181,7 @@ int GenDoc(void)
       "content=\"https://repository-images.githubusercontent.com/"
                 "611875607/ee7aa468-9797-4763-9a2d-ea3d782ef413\">\n"
     "\t<META name=\"og:title\" content=\"$ $.$.$.$ API reference\">\n"
-    "\t<META name=\"og:url\" content=\"https://xmhat.github.io/MSEngine/\">\n"
+    "\t<META name=\"og:url\" content=\"https://mhatxotic.github.io/Engine/\">\n"
     "\t<META name=\"robots\" content=\"index,follow\">\n"
     "\t<META name=\"viewport\" "
             "content=\"width=device-width, initial-scale=1\">\n"
@@ -1995,7 +1992,7 @@ int CertFunc(const string strOut)
     return 0;
   } // Create a strong random password
   const string
-    strInPass{ CryptMBtoB64(CryptRandomBlock(1024)) },
+    strInPass{ CryptMBtoB64(CryptRandomBlock(256)) }, // Must be <= 1023 bytes
     strCrypt{ "-algorithm RSA "
               "-pkeyopt rsa_keygen_bits:4096" },
     strRootPrv{ StrFormat("$/$-r-pr.pem", DBGDIR, ENGINENAME) },
@@ -2602,8 +2599,8 @@ const string BuildHPPHeader(const string &strFileName, const string &strDesc)
   string strLines{ StrFormat(
     "/* == $ $ **\n"
     "** $ **\n"
-    "** ## MS-ENGINE"
-    "              Copyright (c) $, All Rights Reserved ## **\n"
+    "** ## Mhatxotic Engine"
+    "          (c) $, All Rights Reserved ## **\n"
     "** $ **\n", StrToUpCase(strFileName),
     string(69 - strFileName.length(), '='),
     strHashLine, strEAuthor, strHashLine) };

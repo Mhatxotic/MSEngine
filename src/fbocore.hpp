@@ -1,6 +1,6 @@
 /* == FBOCORE.HPP ========================================================== **
 ** ######################################################################### **
-** ## MS-ENGINE              Copyright (c) MS-Design, All Rights Reserved ## **
+** ## Mhatxotic Engine          (c) Mhatxotic Design, All Rights Reserved ## **
 ** ######################################################################### **
 ** ## Contains the main drawing fbo's and commands. It would be nice to   ## **
 ** ## have this in the FBOs collector but we can't due to C++ limitations ## **

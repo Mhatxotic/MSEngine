@@ -1,6 +1,6 @@
 /* == STAT.HPP ============================================================= **
 ** ######################################################################### **
-** ## MS-ENGINE              Copyright (c) MS-Design, All Rights Reserved ## **
+** ## Mhatxotic Engine          (c) Mhatxotic Design, All Rights Reserved ## **
 ** ######################################################################### **
 ** ## A class that arranges data into a table and neatly provides a       ## **
 ** ## cleanly, human-readable, easy to read formatted output. Mainly used ## **

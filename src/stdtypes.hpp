@@ -1,6 +1,6 @@
 /* == STDTYPES.HPP ========================================================= **
 ** ######################################################################### **
-** ## MS-ENGINE              Copyright (c) MS-Design, All Rights Reserved ## **
+** ## Mhatxotic Engine          (c) Mhatxotic Design, All Rights Reserved ## **
 ** ######################################################################### **
 ** ## This module sets up all the types we use from the STL. All these    ## **
 ** ## types should sit in the Engine namespace so only the engine has     ## **

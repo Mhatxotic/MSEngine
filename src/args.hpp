@@ -1,6 +1,6 @@
 /* == ARGS.HPP ============================================================= **
 ** ######################################################################### **
-** ## MS-ENGINE              Copyright (c) MS-Design, All Rights Reserved ## **
+** ## Mhatxotic Engine          (c) Mhatxotic Design, All Rights Reserved ## **
 ** ######################################################################### **
 ** ## This module defines a arguments parsing class you can use to parse  ## **
 ** ## a plain string of command-line into a array indexed vector.         ## **

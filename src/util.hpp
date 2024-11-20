@@ -1,6 +1,6 @@
 /* == UTIL.HPP ============================================================= **
 ** ######################################################################### **
-** ## MS-ENGINE              Copyright (c) MS-Design, All Rights Reserved ## **
+** ## Mhatxotic Engine          (c) Mhatxotic Design, All Rights Reserved ## **
 ** ######################################################################### **
 ** ## Miscellaneous utility classes and functions too small or            ## **
 ** ## insignificant (i.e. not a core engine sub-system) to be worth       ## **

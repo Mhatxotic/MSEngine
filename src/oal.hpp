@@ -1,6 +1,6 @@
 /* == OAL.HPP ============================================================== **
 ** ######################################################################### **
-** ## MS-ENGINE              Copyright (c) MS-Design, All Rights Reserved ## **
+** ## Mhatxotic Engine          (c) Mhatxotic Design, All Rights Reserved ## **
 ** ######################################################################### **
 ** ## Because OpenAL is LGPL, we're not really allowed to statically link ## **
 ** ## OpenAL libraries, however, there is a technical workaround that we  ## **

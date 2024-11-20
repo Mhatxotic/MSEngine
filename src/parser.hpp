@@ -1,6 +1,6 @@
 /* == PARSER.HPP =========================================================== **
 ** ######################################################################### **
-** ## MS-ENGINE              Copyright (c) MS-Design, All Rights Reserved ## **
+** ## Mhatxotic Engine          (c) Mhatxotic Design, All Rights Reserved ## **
 ** ######################################################################### **
 ** ## This class will take a string and split it into tokens seperated by ## **
 ** ## the specified delimiter and split again into sorted key/value pairs ## **

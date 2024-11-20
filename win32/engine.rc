@@ -1,10 +1,10 @@
-/* == MSENGINE.RC ========================================================== */
+/* == ENGINE.RC ============================================================ */
 
 /* ========================================================================= */
 #ifdef RC_INVOKED
 /* ------------------------------------------------------------------------- */
 #  include <Windows.H>                 // Contains basic defines
-#  include <MSEngine.HPP>              // Our version defines
+#  include <Engine.HPP>                // Our version defines
 /* ------------------------------------------------------------------------- */
 #  ifdef RELEASE
 #    define FFLAGS 0
@@ -21,16 +21,16 @@
 #  endif
 #  ifdef X86
 #    define BITS  " 32-Bit"
-#    define EXE   "MSENGINE32.EXE"
-#    define ICO   "WIN32\MSENGINE32.ICO"
+#    define EXE   "ENGINE32.EXE"
+#    define ICO   "WIN32\ENGINE32.ICO"
 #  elif X64
 #    define BITS  " 64-Bit"
-#    define EXE   "MSENGINE64.EXE"
-#    define ICO   "WIN32\MSENGINE64.ICO"
+#    define EXE   "ENGINE64.EXE"
+#    define ICO   "WIN32\ENGINE64.ICO"
 #  else
 #    define BITS  " ??-Bit"
-#    define EXE   "MSENGINE.EXE"
-#    define ICO   "WIN32\MSENGINE32.ICO"
+#    define EXE   "ENGINE.EXE"
+#    define ICO   "WIN32\ENGINE32.ICO"
 #  endif
 /* ------------------------------------------------------------------------- */
 LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_UK
@@ -49,13 +49,13 @@ FILETYPE           VFT_APP
   {
     BLOCK "08091252"
     {
-      VALUE "CompanyName",      "MS-Design"
-      VALUE "FileDescription",  "MS-Engine"
+      VALUE "CompanyName",      "Mhatxotic Design"
+      VALUE "FileDescription",  "Mhatxotic Engine"
       VALUE "FileVersion",      VER_STR
-      VALUE "LegalCopyright",   "© MS-Design. All Rights Reserved."
+      VALUE "LegalCopyright",   "© Mhatxotic Design. All Rights Reserved."
       VALUE "OriginalFilename", EXE
       VALUE "InternalName",     EXE
-      VALUE "ProductName",      "MS-Engine"
+      VALUE "ProductName",      "Mhatxotic Engine"
       VALUE "ProductVersion",   VER_STR STATE BITS
       VALUE "LegalTrademarks",  "©, ® and ™ of MS-Design."
       VALUE "Comments",         VER_DATE
@@ -67,7 +67,7 @@ FILETYPE           VFT_APP
   }
 }
 /* ------------------------------------------------------------------------- */
-CREATEPROCESS_MANIFEST_RESOURCE_ID RT_MANIFEST "WIN32\MSENGINE.XML"
+CREATEPROCESS_MANIFEST_RESOURCE_ID RT_MANIFEST "WIN32\ENGINE.XML"
 /* ------------------------------------------------------------------------- */
 #endif                                 // RC_INVOKED
 /* == End-of-File ========================================================== */

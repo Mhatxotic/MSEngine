@@ -1,7 +1,7 @@
 #!/bin/sh
 
-# *** MS-Engine Shell Helper Script.
-# *** Copyright © 2006-present, MS-Design.
+# *** Mhatxotic Engine Shell Helper Script.
+# *** Copyright © 2006-present, Mhatxotic Design.
 # *** All Rights Reserved Worldwide.
 
 # Binary locations
@@ -71,7 +71,7 @@ fi
 
 # Check calling name
 BASE=`$USRBINBASENAME "$0" | $USRBINTR '[:upper:]' '[:lower:]'`
-if [ $BASE = "msengine.sh" ]; then
+if [ $BASE = "engine.sh" ]; then
   $BINECHO "This script is not meant to be run directly."
   exit 2
 elif [ $BASE = "build" ]; then
@@ -80,9 +80,9 @@ elif [ $BASE = "build" ]; then
 else
   SUFFIX=`echo $BASE | tail -c 3`
   if [ $SUFFIX = "32" ]; then
-    EXE=../bin/msengine32.$EXT
+    EXE=../bin/engine32.$EXT
   else
-    EXE=../bin/msengine64.$EXT
+    EXE=../bin/engine64.$EXT
   fi
   EXEPARAMS=" app_basedir=$PWD sql_db=$BASE"
 fi

@@ -1,6 +1,6 @@
 /* == SOCKET.HPP =========================================================== **
 ** ######################################################################### **
-** ## MS-ENGINE              Copyright (c) MS-Design, All Rights Reserved ## **
+** ## Mhatxotic Engine          (c) Mhatxotic Design, All Rights Reserved ## **
 ** ######################################################################### **
 ** ## Allows multi-threaded network communications using OpenSSL.         ## **
 ** ######################################################################### **

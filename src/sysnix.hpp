@@ -1,6 +1,6 @@
 /* == SYSNIX.HPP =========================================================== **
 ** ######################################################################### **
-** ## MS-ENGINE              Copyright (c) MS-Design, All Rights Reserved ## **
+** ## Mhatxotic Engine          (c) Mhatxotic Design, All Rights Reserved ## **
 ** ######################################################################### **
 ** ## This is a Linux specific module that allows the engine to talk      ## **
 ** ## to, and manipulate operating system procedures and funtions.        ## **

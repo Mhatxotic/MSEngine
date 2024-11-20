@@ -1,6 +1,6 @@
 /* == WINREG.HPP =========================================================== **
 ** ######################################################################### **
-** ## MS-ENGINE              Copyright (c) MS-Design, All Rights Reserved ## **
+** ## Mhatxotic Engine          (c) Mhatxotic Design, All Rights Reserved ## **
 ** ######################################################################### **
 ** ## This is a Windows specific module that handles reading data from    ## **
 ** ## the Windows Registry. We don't ever want to write to this piece of  ## **

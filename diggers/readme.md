@@ -24,7 +24,7 @@
 ![Screenshots](/docs/diggers.webp?raw=true "Screenshots")
 
 ## [Status](#status)…
-This Diggers fan remake was started in 2006 as a basic Win32 C application using DirectDraw, DirectSound and DirectMedia then rewritten from scratch in C++ from the ground up with a new fully customisable engine called *Mhat's Engine* (_MS-Engine_) to utilise open source, cross-platform technologies and conformed to ISO coding standards.
+This Diggers fan remake was started in 2006 as a basic Win32 C application using DirectDraw, DirectSound and DirectMedia then rewritten from scratch in C++ from the ground up with a new fully customisable engine called *Mhatxotic Engine* to utilise open source, cross-platform technologies and conformed to ISO coding standards.
 
 Diggers will always be a work-in-progress since it is difficult and incredibly time consuming to work on a game single-handedly and there are always issues with upstream code due to the balancing of modernisation and compatibility. However, the following information is the current estimated status of the game…
 
@@ -71,7 +71,7 @@ Diggers will always be a work-in-progress since it is difficult and incredibly t
 | **Network** | None | None | Unused. |
 
 ## [Downloading](#downloading)…
-You can always get the latest version of this project [here](https://github.com/XMhat/MSEngine/releases).
+You can always get the latest version of this project [here](https://github.com/Mhatxotic/Engine/releases).
 
 ## [Running](#running)…
 ### Windows version…
@@ -371,7 +371,7 @@ You can change cvars by opening up the console with the `GRAVE` key (key under `
 
 ### Diggers fan remake for Windows, MacOS and Linux…
 * **Complete conversion…**
-  - By *Mhat* of *MS-Design*.
+  - By *Mhat* of *Mhatxotic Design*.
 * **Setup music…**
   - *Super Stardust - Special Mission 1* by *PowerTrace*.
 * **Credits music…**
@@ -385,7 +385,7 @@ You can change cvars by opening up the console with the `GRAVE` key (key under `
 Please read [this document](/readme.md) on the third party software used in this game.
 
 ## [Disclaimer](#disclaimer)…
-Diggers is *© Millennium Interactive Ltd. 1994* to which the company was [closed](https://www.mobygames.com/company/298/guerrilla-cambridge/) a long time ago. This game is *not* endorsed nor supported by any aforementioned persons and entities, nor anyone in the third-party engine credits either so please *do not* contact any of them for support. Any and all queries should *only* be directed to the dedicated [issues](https://github.com/XMhat/MSEngine/issues) and [discussions](https://github.com/XMhat/MSEngine/discussions) pages on GitHub.
+Diggers is *© Millennium Interactive Ltd. 1994* to which the company was [closed](https://www.mobygames.com/company/298/guerrilla-cambridge/) a long time ago. This game is *not* endorsed nor supported by any aforementioned persons and entities, nor anyone in the third-party engine credits either so please *do not* contact any of them for support. Any and all queries should *only* be directed to the dedicated [issues](https://github.com/Mhatxotic/Engine/issues) and [discussions](https://github.com/Mhatxotic/Engine/discussions) pages on GitHub.
 
 ## [Contributing](#contributing)…
 See [this document](/contributing.md) for details on contributing to this project.
@@ -393,4 +393,4 @@ See [this document](/contributing.md) for details on contributing to this projec
 ## [License](#license)…
 Please read [this document](/license.md) for the license and disclaimer for use of this software.
 
-## Copyright © 2006-2024 MS-Design. All Rights Reserved.
+## Copyright © 2006-2024 Mhatxotic Design. All Rights Reserved.

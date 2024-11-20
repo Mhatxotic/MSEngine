@@ -1,6 +1,6 @@
 /* == IMAGE.HPP ============================================================ **
 ** ######################################################################### **
-** ## MS-ENGINE              Copyright (c) MS-Design, All Rights Reserved ## **
+** ## Mhatxotic Engine          (c) Mhatxotic Design, All Rights Reserved ## **
 ** ######################################################################### **
 ** ## This module defines a class that can load and save image files and  ## **
 ** ## then can optionally be sent to opengl for viewing.                  ## **

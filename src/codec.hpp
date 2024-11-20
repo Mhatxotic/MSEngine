@@ -1,6 +1,6 @@
 /* == CODEC.HPP ============================================================ **
 ** ######################################################################### **
-** ## MS-ENGINE              Copyright (c) MS-Design, All Rights Reserved ## **
+** ## Mhatxotic Engine          (c) Mhatxotic Design, All Rights Reserved ## **
 ** ######################################################################### **
 ** ## This file provides a class structure that can unify many codecs     ## **
 ** ## into a simple magic block for use with Lua.                         ## **

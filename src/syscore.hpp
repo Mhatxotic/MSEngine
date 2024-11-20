@@ -1,6 +1,6 @@
 /* == SYSCORE.HPP ========================================================== **
 ** ######################################################################### **
-** ## MS-ENGINE              Copyright (c) MS-Design, All Rights Reserved ## **
+** ## Mhatxotic Engine          (c) Mhatxotic Design, All Rights Reserved ## **
 ** ######################################################################### **
 ** ## This is the header to the system class which allows the engine to   ## **
 ** ## interface with the operating system. Since all operating systems    ## **
@@ -711,11 +711,11 @@ void System::TerminateHandler(void)
   _exit(-1);
 }
 /* -- Pre-defined SysBase callbacks that require access to cSystem global -- */
-MSENGINE_SYSBASE_CALLBACKS();          // Parse requested SysBase callbacks
-#undef MSENGINE_SYSBASE_CALLBACKS      // Done with this
+ENGINE_SYSBASE_CALLBACKS();            // Parse requested SysBase callbacks
+#undef ENGINE_SYSBASE_CALLBACKS        // Done with this
 /* -- Pre-defined SysCon callbacks that require access to cSystem global --- */
-MSENGINE_SYSCON_CALLBACKS();           // Parse requested SysCon callbacks
-#undef MSENGINE_SYSCON_CALLBACKS       // Done with this
+ENGINE_SYSCON_CALLBACKS();             // Parse requested SysCon callbacks
+#undef ENGINE_SYSCON_CALLBACKS         // Done with this
 /* ------------------------------------------------------------------------- */
 }                                      // End of public module namespace
 /* ------------------------------------------------------------------------- */

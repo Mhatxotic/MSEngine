@@ -1,6 +1,6 @@
 /* == LUAREF.HPP =========================================================== **
 ** ######################################################################### **
-** ## MS-ENGINE              Copyright (c) MS-Design, All Rights Reserved ## **
+** ## Mhatxotic Engine          (c) Mhatxotic Design, All Rights Reserved ## **
 ** ######################################################################### **
 ** ## This class manages function callbacks for certain core engine       ## **
 ** ## events which should only be used witrh the main Lua thread only.    ## **

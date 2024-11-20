@@ -1,6 +1,6 @@
 /* == FILEMAP.HPP ========================================================== **
 ** ######################################################################### **
-** ## MS-ENGINE              Copyright (c) MS-Design, All Rights Reserved ## **
+** ## Mhatxotic Engine          (c) Mhatxotic Design, All Rights Reserved ## **
 ** ######################################################################### **
 ** ## This module closely emulates a FILE* stream but instead maps a file ## **
 ** ## on disk into memory. This interface is used only by the 'Assets'    ## **

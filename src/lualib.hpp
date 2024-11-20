@@ -1,6 +1,6 @@
 /* == LUALIB.HPP =========================================================== **
 ** ######################################################################### **
-** ## MS-ENGINE              Copyright (c) MS-Design, All Rights Reserved ## **
+** ## Mhatxotic Engine          (c) Mhatxotic Design, All Rights Reserved ## **
 ** ######################################################################### **
 ** ## This file defines the complete LUA API that interfaces with the     ## **
 ** ## game engine. The guest will be able to use this functions when      ## **
@@ -120,7 +120,7 @@ template<typename IntType=int, typename AnyType, IntType itSize>
 #define LLSMX(n,l,t)    LLITEM(t, n, l, LLMETHODS(n), LLNOCONSTS())
 #define LLSXC(n,l)      LLITEM(CLASSES, n, l, LLNOMETHODS(), LLCONSTS(n))
 #define LLSMC(n,l,t)    LLITEM(t, n, l, LLMETHODS(n), LLCONSTS(n))
-/* -- Define the ms-engine api list loaded at startup ---------------------- */
+/* -- Define the engine api list loaded at startup ------------------------- */
 const LuaLibStaticArray llsaAPI{
 { /* -- Use the above macros to define namespaces -------------------------- **
   ** WARNING: Make sure to update 'LuaLibStaticArray' count in luadef.hpp if **

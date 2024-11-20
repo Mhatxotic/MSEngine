@@ -1,6 +1,6 @@
 /* == EVTWIN.HPP =========================================================== **
 ** ######################################################################### **
-** ## MS-ENGINE              Copyright (c) MS-Design, All Rights Reserved ## **
+** ## Mhatxotic Engine          (c) Mhatxotic Design, All Rights Reserved ## **
 ** ######################################################################### **
 ** ## This is the engine events class where the engine can queue messages ## **
 ** ## to be executed in the engine thread.                                ## **

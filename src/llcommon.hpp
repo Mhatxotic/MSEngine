@@ -1,6 +1,6 @@
 /* == LLCOMMON.HPP ========================================================= **
 ** ######################################################################### **
-** ## MS-ENGINE              Copyright (c) MS-Design, All Rights Reserved ## **
+** ## Mhatxotic Engine          (c) Mhatxotic Design, All Rights Reserved ## **
 ** ######################################################################### **
 ** ## Defines common helper classes used for querying user parameters in  ## **
 ** ## Lua. This file is invoked by 'lualib.hpp'.                          ## **

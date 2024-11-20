@@ -1,6 +1,6 @@
 /* == SOURCE.HPP =========================================================== **
 ** ######################################################################### **
-** ## MS-ENGINE              Copyright (c) MS-Design, All Rights Reserved ## **
+** ## Mhatxotic Engine          (c) Mhatxotic Design, All Rights Reserved ## **
 ** ######################################################################### **
 ** ## This module defines a class that can be used to play and manage     ## **
 ** ## buffers in OpenAL. All sources are managed here too so we will      ## **

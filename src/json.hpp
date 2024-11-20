@@ -1,6 +1,6 @@
 /* == JSON.HPP ============================================================= **
 ** ######################################################################### **
-** ## MS-ENGINE              Copyright (c) MS-Design, All Rights Reserved ## **
+** ## Mhatxotic Engine          (c) Mhatxotic Design, All Rights Reserved ## **
 ** ######################################################################### **
 ** ## This module defines a class that allows JSON encoding or decoding   ## **
 ** ## to performed.                                                       ## **

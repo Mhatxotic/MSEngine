@@ -1,6 +1,6 @@
 /* == FLAGS.HPP ============================================================ **
 ** ######################################################################### **
-** ## MS-ENGINE              Copyright (c) MS-Design, All Rights Reserved ## **
+** ## Mhatxotic Engine          (c) Mhatxotic Design, All Rights Reserved ## **
 ** ######################################################################### **
 ** ## This class helps with managing flags (a collection of booleans) or  ## **
 ** ## many bits in a byte. The compiler should hopefully optimise all of  ## **

@@ -1,8 +1,8 @@
 #!/bin/sh
 
-# This file is part of the MS-Engine source repository.
-# @ https://github.com/XMhat/MSEngine
-# Copyright (c) MS-Design, 2006-present. All Rights Reserved.
+# This file is part of the Mhatxotic Engine source repository.
+# @ https://github.com/Mhatxotic/Engine
+# Copyright (c) Mhatxotic Design, 2006-present. All Rights Reserved.
 
 # Set ALPHA, BETA or RELEASE type
 TYPE=BETA
@@ -68,7 +68,7 @@ compile()
 # Clear the screen
 printf '\33c\e[3J'
 # Set the project directory incase we're not in it
-cd ~/Assets/MSEngine
+cd ~/Assets/Engine
 if [ $? -ne 0 ]; then exit 2; fi
 # Compile X86-64 version
 compile $TYPE x86_64-apple-macos10.12 32

@@ -1,6 +1,6 @@
 /* == EVTCORE.HPP ========================================================== **
 ** ######################################################################### **
-** ## MS-ENGINE              Copyright (c) MS-Design, All Rights Reserved ## **
+** ## Mhatxotic Engine          (c) Mhatxotic Design, All Rights Reserved ## **
 ** ######################################################################### **
 ** ## This class allows threads to communicate with each other safely.    ## **
 ** ######################################################################### **

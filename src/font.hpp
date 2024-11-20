@@ -1,6 +1,6 @@
 /* == FONT.HPP ============================================================= **
 ** ######################################################################### **
-** ## MS-ENGINE              Copyright (c) MS-Design, All Rights Reserved ## **
+** ## Mhatxotic Engine          (c) Mhatxotic Design, All Rights Reserved ## **
 ** ######################################################################### **
 ** ## This module allows loading and drawing of beautifully rendered      ## **
 ** ## fonts using the FreeType library. There is a lot of code in this    ## **

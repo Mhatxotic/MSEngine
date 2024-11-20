@@ -7,7 +7,7 @@
 -- 888---d88'--888--`88.---.88'-`88.---.88'-888-----o--888-`88b.--oo----.d8P --
 -- 888bd8P'--oo888oo-`Y8bod8P'---`Y8bod8P'-o888ooood8-o888o-o888o-8""8888P'- --
 -- ========================================================================= --
--- Copyr. (c) MS-Design, 2024   Copyr. (c) Millennium Interactive Ltd., 1994 --
+-- (c) Mhatxotic Design, 2024          (c) Millennium Interactive Ltd., 1994 --
 -- ========================================================================= --
 -- Menu data types array --------------------------------------------------- --
 local MNU<const> = {                   -- Menu ids
@@ -2520,20 +2520,20 @@ local aCreditsData<const> = {
 };
 -- Extra credits ----------------------------------------------------------- --
 local aCreditsXData<const> = {
-  { "Complete conversion",             "MS-Design" },
+  { "Complete conversion",             "Mhatxotic Design" },
   { "Setup music loop",                "S.S. Secret Mission 1\n\z
                                         By PowerTrace\n\z
-                                        Edited by MS-Design\n\z
+                                        Edited by Mhatxotic Design\n\z
                                         AmigaRemix.com" },
   { "Credits music loop",              "4U 07:00 V2001\n\z
                                         By Enuo\n\z
-                                        Edited by MS-Design\n\z
+                                        Edited by Mhatxotic Design\n\z
                                         ModArchive.org" },
   { "Gameover music loop",             "1000 Years Of Funk\n\z
                                         By Dimitri D. L.\n\z
-                                        Edited by MS-Design\n\z
+                                        Edited by Mhatxotic Design\n\z
                                         ModArchive.Org" },
-  { "Conversion powered by",           "MS-Engine" },
+  { "Conversion powered by",           "Mhatxotic Engine" },
   { "GLFW OpenGL front-end",           "Marcus Geelnard\n\z
                                         Camilla Lowy" },
   { "LUA scripting engine",            "Lua.org, PUC-Rio" },

@@ -1,6 +1,6 @@
 /* == CONLIB.HPP =========================================================== **
 ** ######################################################################### **
-** ## MS-ENGINE              Copyright (c) MS-Design, All Rights Reserved ## **
+** ## Mhatxotic Engine          (c) Mhatxotic Design, All Rights Reserved ## **
 ** ######################################################################### **
 ** ## This module is included inside the main procedure in 'core.cpp' and ## **
 ** ## handles all the default console cvars. Make sure to update the      ## **

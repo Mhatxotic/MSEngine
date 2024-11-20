@@ -1,6 +1,6 @@
 /* == STREAM.HPP =========================================================== **
 ** ######################################################################### **
-** ## MS-ENGINE              Copyright (c) MS-Design, All Rights Reserved ## **
+** ## Mhatxotic Engine          (c) Mhatxotic Design, All Rights Reserved ## **
 ** ######################################################################### **
 ** ## This file handles streaming from .OGG files and playing to OpenAL.  ## **
 ** ## Note on OggVorbis thread safety: Documentation states that all ov_* ## **

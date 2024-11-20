@@ -1,6 +1,6 @@
 /* == FONTGLPH.HPP ========================================================= **
 ** ######################################################################### **
-** ## MS-ENGINE              Copyright (c) MS-Design, All Rights Reserved ## **
+** ## Mhatxotic Engine          (c) Mhatxotic Design, All Rights Reserved ## **
 ** ######################################################################### **
 ** ## This file is included as part of the Font class from font.hpp and   ## **
 ** ## cotains functions related to glyph loading.                         ## **

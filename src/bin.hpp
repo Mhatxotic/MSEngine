@@ -1,6 +1,6 @@
 /* == BIN.HPP ============================================================== **
 ** ######################################################################### **
-** ## MS-ENGINE              Copyright (c) MS-Design, All Rights Reserved ## **
+** ## Mhatxotic Engine          (c) Mhatxotic Design, All Rights Reserved ## **
 ** ######################################################################### **
 ** ## This module handles packing of 2D rectangles into a limited         ## **
 ** ## rectangular space.                                                  ## **

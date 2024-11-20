@@ -1,6 +1,6 @@
 /* == ASYNC.HPP ============================================================ **
 ** ######################################################################### **
-** ## MS-ENGINE              Copyright (c) MS-Design, All Rights Reserved ## **
+** ## Mhatxotic Engine          (c) Mhatxotic Design, All Rights Reserved ## **
 ** ######################################################################### **
 ** ## Helps with loading data asynchronously and handle parallelisation.  ## **
 ** ## Do not use class directly. It must be derived with another class.   ## **
@@ -169,7 +169,7 @@ template<class MemberType, class ColType>class AsyncLoader :
   bool AsyncThreadIsCurrent(void) const
     { return tAsyncThread.ThreadIsCurrent(); }
   /* -- Prepend message to the full stack message -------------------------- */
-  void AsyncDoAddStackMessage(const char*const *cpMsg)
+  void AsyncDoAddStackMessage(const char*const cpMsg)
     { strAsyncError.insert(0, cpMsg); }
   void AsyncDoAddStackMessage(const string &strMsg)
     { strAsyncError.insert(0, strMsg); }

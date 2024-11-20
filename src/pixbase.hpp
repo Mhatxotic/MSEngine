@@ -1,6 +1,6 @@
 /* == PIXBASE.HPP ========================================================== **
 ** ######################################################################### **
-** ## MS-ENGINE              Copyright (c) MS-Design, All Rights Reserved ## **
+** ## Mhatxotic Engine          (c) Mhatxotic Design, All Rights Reserved ## **
 ** ######################################################################### **
 ** ## This is a POSIX specific module that handles unhandled exceptions   ## **
 ** ## and writes debugging information to disk to help resolve bugs.      ## **
@@ -16,24 +16,18 @@ class SysBase :                        // Safe exception handler namespace
   /* -- Base classes ------------------------------------------------------- */
   public SysVersion,                   // Version information class
   public Ident                         // Mutex name
-{ /* ----------------------------------------------------------------------- */
-  MAPPACK_BUILD(ResourceLimit, const int, struct rlimit)
-  ResourceLimitMap rlmLimits;          // Resource limits database
-  /* ----------------------------------------------------------------------- */
-  enum ExitState { ES_SAFE, ES_UNSAFE, ES_CRITICAL }; // Signal exit types
-  /* -- Signals to support ------------------------------------------------- */
-  typedef pair<const int, void(*)(int)> SignalPair;
-  typedef array<SignalPair, 14> SignalList;
-  SignalList       slSignals;          // Signal list
-  /* -- SIGSEGV workaround when still in System() constructor -------------- */
-  bool             bSysBaseDataReady;  // Is the data ready?
-  /* -- Class to rebuffer system generated output to log ------------------- */
-  class Redirect
+{ /* -- Class to rebuffer system generated output to log ------------------- */
+#if !defined(BUILD) && defined(MACOS)  // Not applicable on build or not MacOS
+  class Redirect                       // Linux: close() doesn't unblock read()
   { /* --------------------------------------------------------------------- */
+    static constexpr int iInvalid=-1;  // Handle is invalid value
+    /* --------------------------------------------------------------------- */
     const int      iRequested,         // Requested handle
                    iSaved;             // Saved handle
     Memory         mBuffer;            // Buffer for output datat
     array<int,2>   iaPipes;            // Pipes
+    int           &iRead;              // Read end of the pipe
+    int           &iWrite;             // Write end of the pipe
     Thread         tThread;            // Monitor thread
     /* -- Async off-main thread function ----------------------------------- */
     int ThreadMain(Thread&)
@@ -41,7 +35,7 @@ class SysBase :                        // Safe exception handler namespace
       while(tThread.ThreadShouldNotExit())
       { // Read some data and if we got some? Return how much we read
         switch(const size_t stRead = static_cast<size_t>
-          (read(iaPipes[0], mBuffer.MemPtr(), mBuffer.MemSize())))
+          (read(iRead, mBuffer.MemPtr(), mBuffer.MemSize())))
         { // Success?
           default:
             // Report read
@@ -64,14 +58,14 @@ class SysBase :                        // Safe exception handler namespace
     }
     /* --------------------------------------------------------------------- */
     void Reset(void)
-    { // Close second pipe handle if opened
-      if(iaPipes[1] != -1) close(iaPipes[1]);
-      // Return if first pipe handle not opened
-      if(iaPipes[0] == -1) return;
+    { // Close write pipe handle if opened
+      if(iWrite != iInvalid) close(iWrite);
+      // Return if the read pipe handle not opened
+      if(iRead == iInvalid) return;
       // Signal the exit
       tThread.ThreadSetExit();
-      // Close the pipe so the thread can exit
-      close(iaPipes[0]);
+      // Close the read pipe so the thread can exit
+      close(iRead);
       // Stop the thread and wait for it to exit
       tThread.ThreadDeInit();
       // Restore original handle allocated by system
@@ -82,7 +76,7 @@ class SysBase :                        // Safe exception handler namespace
     { // Do the reset
       Reset();
       // Reset the handles so shutdown doesn't trigger on destruction
-      iaPipes.fill(-1);
+      iaPipes.fill(iInvalid);
     }
     /* --------------------------------------------------------------------- */
     Redirect(const int iHandle, const string &strNName) :
@@ -90,7 +84,9 @@ class SysBase :                        // Safe exception handler namespace
       iRequested(iHandle),             // Store requested handle
       iSaved(dup(iHandle)),            // Duplicate requested handle
       mBuffer{ 4096 },                 // Initialise buffer
-      iaPipes{ -1, -1 },               // Initialise pipe handles
+      iaPipes{ iInvalid, iInvalid },   // Initialise pipe handles
+      iRead(iaPipes[0]),               // Init reference to read pipe
+      iWrite(iaPipes[1]),              // Init reference to write pipe
       tThread{ strNName, STP_LOW }     // Initialise low priority thread
       /* ------------------------------------------------------------------- */
     { // Return if handle not copied
@@ -102,20 +98,33 @@ class SysBase :                        // Safe exception handler namespace
         XCL("Failed to redirect specified output to buffer!",
             "Name", tThread.IdentGet());
       // Redirect requested output handle to the pipe
-      if(dup2(iaPipes[1], iHandle) == -1)
+      if(dup2(iWrite, iHandle) == -1)
         XCL("Failed to redirect output handle to the pipe!",
             "Name", tThread.IdentGet());
       // Close the other handle
-      if(close(iaPipes[1]) == -1)
+      if(close(iWrite) == -1)
         XCL("Failed to close second pipe handle!",
             "Name", tThread.IdentGet());
-      // Start the monitoring thread
-      tThread.ThreadInit(bind(&Redirect::ThreadMain, this, _1), this);
+      // Start the monitoring thread if it is open
+      if(iRead != -1)
+        tThread.ThreadInit(bind(&Redirect::ThreadMain, this, _1), this);
     }
     /* --------------------------------------------------------------------- */
     ~Redirect(void) { Reset(); }
     /* --------------------------------------------------------------------- */
   } rStdErr;                  // Capture stdout and stderr
+#endif
+  /* ----------------------------------------------------------------------- */
+  MAPPACK_BUILD(ResourceLimit, const int, struct rlimit)
+  ResourceLimitMap rlmLimits;          // Resource limits database
+  /* ----------------------------------------------------------------------- */
+  enum ExitState { ES_SAFE, ES_UNSAFE, ES_CRITICAL }; // Signal exit types
+  /* -- Signals to support ------------------------------------------------- */
+  typedef pair<const int, void(*)(int)> SignalPair;
+  typedef array<SignalPair, 14> SignalList;
+  SignalList       slSignals;          // Signal list
+  /* -- SIGSEGV workaround when still in System() constructor -------------- */
+  bool             bSysBaseDataReady;  // Is the data ready?
   /* --------------------------------------------------------------- */ public:
   int DoDeleteGlobalMutex(const char*const cpName)
     { return shm_unlink(cpName); }
@@ -302,7 +311,7 @@ class SysBase :                        // Safe exception handler namespace
   ExitState DebugMessage(const char*const cpSignal, const char*const cpExtra)
   { // Build filename
     const string strFileName{ cCmdLine ?
-      StrAppend(cCmdLine->GetCArgs()[0], ".dbg") : "/tmp/msengine-crash.txt" };
+      StrAppend(cCmdLine->GetCArgs()[0], ".dbg") : "/tmp/engine-crash.txt" };
     // Begin message
     ostringstream osS;
     osS << "Received signal 'SIG" << cpSignal << "' at "
@@ -374,8 +383,11 @@ class SysBase :                        // Safe exception handler namespace
   }
   /* ----------------------------------------------------------------------- */
   ExitState HandleSignalSafe(const int iSignal)
-  { // Shut down the stderr monitoring thread
+  { // Not building the command line too?
+#if !defined(BUILD) && defined(MACOS)
+    // Shut down the stderr monitoring thread
     rStdErr.ResetSafe();
+#endif
     // Which signal
     switch(iSignal)
     { // The signal is usually initiated by the process itself when it calls
@@ -560,6 +572,9 @@ class SysBase :                        // Safe exception handler namespace
     /* -- Initialisers ----------------------------------------------------- */
     SysVersion{                        // Initialise version info class
       StdMove(smmMap), stI },          // Move sent mod list into ours
+#if !defined(BUILD) && defined(MACOS)  // Not applicable on command-line tool
+    rStdErr{ STDERR_FILENO, "stderr" },// Initialise stderr redirect
+#endif                                 // BUILD check complete
     rlmLimits{{                        // Limits data
 #if !defined(MACOS)                    // Not all resources supported
       { RLIMIT_LOCKS,  { 0, 0 } },     { RLIMIT_MSGQUEUE,   { 0, 0 } },
@@ -579,8 +594,7 @@ class SysBase :                        // Safe exception handler namespace
       { SIGSEGV, nullptr }, { SIGSYS,  nullptr }, { SIGTERM, nullptr },
       { SIGTRAP, nullptr }, { SIGXCPU, nullptr }, { SIGXFSZ, nullptr },
     }},
-    bSysBaseDataReady(false),          // Initially not ready
-    rStdErr{ STDERR_FILENO, "stderr" } // Initialise stderr redirect
+    bSysBaseDataReady(false)           // Initially not ready
     /* --------------------------------------------------------------------- */
   { // Setup signals
     SetupSignals();
@@ -597,7 +611,7 @@ class SysBase :                        // Safe exception handler namespace
   /* ----------------------------------------------------------------------- */
   DELETECOPYCTORS(SysBase)             // Suppress default functions for safety
 };/* ----------------------------------------------------------------------- */
-#define MSENGINE_SYSBASE_CALLBACKS() \
+#define ENGINE_SYSBASE_CALLBACKS() \
   void SysBase::SysBase::HandleSignalStatic(int iSignal) \
     { cSystem->HandleSignal(iSignal); }
 /* == EoF =========================================================== EoF == */

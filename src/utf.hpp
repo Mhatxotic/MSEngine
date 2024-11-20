@@ -1,6 +1,6 @@
 /* == UTF.HPP ============================================================== **
 ** ######################################################################### **
-** ## MS-ENGINE              Copyright (c) MS-Design, All Rights Reserved ## **
+** ## Mhatxotic Engine          (c) Mhatxotic Design, All Rights Reserved ## **
 ** ######################################################################### **
 ** ## This module defines a class that allows whole text buffers to be    ## **
 ** ## parsed for key/value pairs (i.e. k1=v1\nk2=v2) and places them      ## **

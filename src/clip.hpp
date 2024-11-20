@@ -1,6 +1,6 @@
 /* == CLIP.HPP ============================================================= **
 ** ######################################################################### **
-** ## MS-ENGINE              Copyright (c) MS-Design, All Rights Reserved ## **
+** ## Mhatxotic Engine          (c) Mhatxotic Design, All Rights Reserved ## **
 ** ######################################################################### **
 ** ## This module handles interfacing Lua and the engine with GLFW's      ## **
 ** ## clipboard functions. Since GLFW requires that the clipboard funcs   ## **

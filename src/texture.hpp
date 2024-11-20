@@ -1,6 +1,6 @@
 /* == TEXTURE.HPP ========================================================== **
 ** ######################################################################### **
-** ## MS-ENGINE              Copyright (c) MS-Design, All Rights Reserved ## **
+** ## Mhatxotic Engine          (c) Mhatxotic Design, All Rights Reserved ## **
 ** ######################################################################### **
 ** ## This module handles the loading and uploading of textures into      ## **
 ** ## OpenGL. It will also handle some core drawing procedures inside the ## **

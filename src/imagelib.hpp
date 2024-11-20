@@ -1,6 +1,6 @@
 /* == IMAGELIB.HPP ========================================================= **
 ** ######################################################################### **
-** ## MS-ENGINE              Copyright (c) MS-Design, All Rights Reserved ## **
+** ## Mhatxotic Engine          (c) Mhatxotic Design, All Rights Reserved ## **
 ** ######################################################################### **
 ** ## This file manages all the different image types we support in the   ## **
 ** ## engine. The actual image class will query this manager to test      ## **

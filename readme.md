@@ -1,4 +1,4 @@
-# MS-Engine
+# Mhatxotic Engine
 
 ## Contents…
 1. [About](#about)…
@@ -11,7 +11,7 @@
 8. [License and disclaimer](#license-and-disclaimer)…
 
 ## About…
-MS-Engine (*Mhat'S Engine*) attempts to be a safe, simple and fast [cross-platform](https://en.wikipedia.org/wiki/Cross-platform_software) [2-D](https://en.wikipedia.org/wiki/2D_computer_graphics) [multimedia](https://en.wikipedia.org/wiki/Multimedia) [engine](https://en.wikipedia.org/wiki/Game_engine) written in [C++20](https://en.wikipedia.org/wiki/C%2B%2B20) for [Visual C++](https://en.wikipedia.org/wiki/Microsoft_Visual_C%2B%2B), [Clang](https://en.wikipedia.org/wiki/Clang) and [GNU C++](https://en.wikipedia.org/wiki/GNU_Compiler_Collection) Compilers. MS-Engine brings together many [open-source](https://en.wikipedia.org/wiki/Open_source) [libraries](https://en.wikipedia.org/wiki/Library_(computing)) into one easy-to-use environment controlled by the [LUA interpreter](https://en.wikipedia.org/wiki/Lua_(programming_language)). Right now MS-Engine aims to operate on [Windows XP](https://en.wikipedia.org/wiki/Windows_XP) and [better](https://en.wikipedia.org/wiki/List_of_Microsoft_Windows_versions) (x86 plus [x86-64](https://en.wikipedia.org/wiki/Windows_XP_Professional_x64_Edition)), [MacOS](https://en.wikipedia.org/wiki/MacOS) ([x86-64](https://en.wikipedia.org/wiki/OS_X_Mountain_Lion) plus [Arm64](https://en.wikipedia.org/wiki/MacOS_Big_Sur)) and [Linux](https://en.wikipedia.org/wiki/Linux) ([Ubuntu](https://en.wikipedia.org/wiki/Ubuntu) [x86-64](https://en.wikipedia.org/wiki/X86-64)).
+Mhatxotic Engine attempts to be a safe, simple and fast [cross-platform](https://en.wikipedia.org/wiki/Cross-platform_software) [2-D](https://en.wikipedia.org/wiki/2D_computer_graphics) [multimedia](https://en.wikipedia.org/wiki/Multimedia) [engine](https://en.wikipedia.org/wiki/Game_engine) written in [C++20](https://en.wikipedia.org/wiki/C%2B%2B20) for [Visual C++](https://en.wikipedia.org/wiki/Microsoft_Visual_C%2B%2B), [Clang](https://en.wikipedia.org/wiki/Clang) and [GNU C++](https://en.wikipedia.org/wiki/GNU_Compiler_Collection) Compilers. This engine brings together many [open-source](https://en.wikipedia.org/wiki/Open_source) [libraries](https://en.wikipedia.org/wiki/Library_(computing)) into one easy-to-use environment controlled by the [LUA interpreter](https://en.wikipedia.org/wiki/Lua_(programming_language)). Right now the engine aims to operate on [Windows XP](https://en.wikipedia.org/wiki/Windows_XP) and [better](https://en.wikipedia.org/wiki/List_of_Microsoft_Windows_versions) (x86 plus [x86-64](https://en.wikipedia.org/wiki/Windows_XP_Professional_x64_Edition)), [MacOS](https://en.wikipedia.org/wiki/MacOS) ([x86-64](https://en.wikipedia.org/wiki/OS_X_Mountain_Lion) plus [Arm64](https://en.wikipedia.org/wiki/MacOS_Big_Sur)) and [Linux](https://en.wikipedia.org/wiki/Linux) ([Ubuntu](https://en.wikipedia.org/wiki/Ubuntu) [x86-64](https://en.wikipedia.org/wiki/X86-64)).
 
 ## Features…
 * Scaleable to the limits of your hardware and operating system.
@@ -34,7 +34,7 @@ MS-Engine (*Mhat'S Engine*) attempts to be a safe, simple and fast [cross-platfo
 * Less than half-a-second startup time to usable on a modern device.
 
 ## Using…
-All MS-Engine needs to run is an `app.cfg` file in the directory, a non-solid 7-zip archive (ending in `.adb` not `.7z`) in the directory or a `.7z` archive appended to the engine executable. This text file contains a list of CVars that configure the engine the way you want. It can be formatted as Windows, MacOS or Unix so it does not matter about the line ending format, but it does have to be UTF-8 (No BoM) formatted which is what all files, filenames and all strings are handled as in the engine. On Windows, Unicode filenames are automatically converted to and from UTF-8.
+All the engine needs to run is an `app.cfg` file in the directory, a non-solid 7-zip archive (ending in `.adb` not `.7z`) in the directory or a `.7z` archive appended to the engine executable. This text file contains a list of CVars that configure the engine the way you want. It can be formatted as Windows, MacOS or Unix so it does not matter about the line ending format, but it does have to be UTF-8 (No BoM) formatted which is what all files, filenames and all strings are handled as in the engine. On Windows, Unicode filenames are automatically converted to and from UTF-8.
 
 You also need to set the `app_cflags` cvar properly in the `app.cfg` to specify which subsystems you want to enable. The default value is `0` which means show an error to say you did not set a front-end value. The possible combination of flags you can specify are as follows…
 
@@ -60,9 +60,9 @@ The engine looks for the specified file named via the `lua_script` variable whic
 | MacOS | `/Users/<UserName>/Library/Application Support/<AuthorName>/<AppShortName>` |
 | Linux | `/home/<UserName>/.local/<AuthorName>/<AppShortName>` |
 
-MS-Engine does not allow the use of `..` (*parent*), the use of a `/` (*root*) directory nor `X:/` (*Windows drive*) prefix for the accessing of any out of scope assets to maintain a sandbox-like safe environment. The only exception is the start-up database name `sql_db` and the working directory `app_basedir` which can only be set on the command-line. In Windows, all backslashes (`\`) in pathnames are automatically replaced with forward-slashes (`/`) for cross-platform compatibility as MSVC's standard C library file and Windows API functions support unix forward-slashes natively.
+The engine does not allow the use of `..` (*parent*), the use of a `/` (*root*) directory nor `X:/` (*Windows drive*) prefix for the accessing of any out of scope assets to maintain a sandbox-like safe environment. The only exception is the start-up database name `sql_db` and the working directory `app_basedir` which can only be set on the command-line. In Windows, all backslashes (`\`) in pathnames are automatically replaced with forward-slashes (`/`) for cross-platform compatibility as MSVC's standard C library file and Windows API functions support unix forward-slashes natively.
 
-See this [automatically generated document](https://xmhat.github.io/MSEngine) for a complete rundown of all configuration variables and scripting functions. LUA core reference manual is [here](https://www.lua.org/manual/5.4/).
+See this [automatically generated document](https://Mhatxotic.github.io/Engine) for a complete rundown of all configuration variables and scripting functions. LUA core reference manual is [here](https://www.lua.org/manual/5.4/).
 
 ## Examples…
 A remake of the classic [Amiga](https://en.wikipedia.org/wiki/Amiga) and [DOS](https://en.wikipedia.org/wiki/DOS) game [Diggers](diggers) was made with this engine and available to play. The contents of the self-contained and portable executable are available in the [diggers](diggers) sub-directory.
@@ -80,7 +80,7 @@ This engine makes use of the following [open-source](https://en.wikipedia.org/wi
 | [LibJPEGTurbo](https://github.com/libjpeg-turbo/libjpeg-turbo) | 3.0 | [© IJG](https://www.ijg.org/)/[Contributing authors](https://libjpeg-turbo.org/) | [Codec](https://en.wikipedia.org/wiki/Codec)/[container](https://en.wikipedia.org/wiki/JPEG) for [YCbCr](https://en.wikipedia.org/wiki/YCbCr) still [DV](https://en.wikipedia.org/wiki/Digital_video) data. |
 | [LibNSGif](https://github.com/netsurf-browser/libnsgif) | 1.0 | [© Richard Wilson & Sean Fox](https://www.netsurf-browser.org/projects/libnsgif/) | [Codec](https://en.wikipedia.org/wiki/Codec)/[container](https://en.wikipedia.org/wiki/GIF) for motion paletted [RGB](https://en.wikipedia.org/wiki/RGB_color_model) pixel data. |
 | [LibPNG](https://github.com/glennrp/libpng) | 1.6 | [© Contributing authors](https://www.libpng.org/pub/png/libpng.html) | [Codec](https://en.wikipedia.org/wiki/Codec)/[container](https://en.wikipedia.org/wiki/PNG) for [RGB](https://en.wikipedia.org/wiki/RGB_color_model) pixel data. |
-| [LUA](https://github.com/lua/lua) ([modded](https://github.com/XMhat/Lua)) | 5.4 | © [Lua.org](https://lua.org), [PUC-Rio](http://www.puc-rio.br/english/) | User command [interpreter](https://en.wikipedia.org/wiki/Interpreter_(computing)). |
+| [LUA](https://github.com/lua/lua) ([modded](https://github.com/Mhatxotic/Lua)) | 5.4 | © [Lua.org](https://lua.org), [PUC-Rio](http://www.puc-rio.br/english/) | User command [interpreter](https://en.wikipedia.org/wiki/Interpreter_(computing)). |
 | [MiniMP3](https://keyj.emphy.de/minimp3/) | 1.0 | Martin Fiedler | [Codec](https://en.wikipedia.org/wiki/Codec)/[Container](https://en.wikipedia.org/wiki/MP3) for legacy [PCM](https://en.wikipedia.org/wiki/Pulse-code_modulation) audio data. |
 | [NCurses](https://linux.die.net/man/3/ncurses) | 6.4 | [© Free Software Foundation](https://en.wikipedia.org/wiki/Free_Software_Foundation) | [Linux](https://en.wikipedia.org/wiki/Linux) and [MacOS](https://en.wikipedia.org/wiki/MacOS) [text mode](https://en.wikipedia.org/wiki/Computer_terminal) support. |
 | [Ogg](https://github.com/xiph/ogg) | 1.3 | [Xiph.Org](https://xiph.org/ogg/) | [Container](https://en.wikipedia.org/wiki/Ogg) for [Vorbis](https://en.wikipedia.org/wiki/Vorbis) and [Theora](https://en.wikipedia.org/wiki/Theora) data. |
@@ -102,4 +102,4 @@ Please read [this document](license.md) for the license and disclaimer for use o
 
 ### [Back to contents](#contents)…
 
-## Copyright © 2006-2024 MS-Design. All Rights Reserved.
+## Copyright © 2006-2024 Mhatxotic Design. All Rights Reserved.

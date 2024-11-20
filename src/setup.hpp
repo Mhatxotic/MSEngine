@@ -1,6 +1,6 @@
 /* == SETUP.HPP ============================================================ **
 ** ######################################################################### **
-** ## MS-ENGINE              Copyright (c) MS-Design, All Rights Reserved ## **
+** ## Mhatxotic Engine          (c) Mhatxotic Design, All Rights Reserved ## **
 ** ######################################################################### **
 ** ## This module sets up the environment for the game engine. For        ## **
 ** ## example. Making the build process compatible with different         ## **
@@ -526,7 +526,7 @@ namespace Lib                          // LIBRARY OF EXTERNAL API FUNCTIONS
 #include <ft/ftmodapi.h>               // Modification header
   };/* --------------------------------------------------------------------- */
 };/* ----------------------------------------------------------------------- */
-/* == Main() configuration. So msengine.cpp's main() declaration is tidy === */
+/* == Main() configuration. So engine.cpp's main() declaration is tidy ===== */
 #if defined(WINDOWS)                   // Targeting Windows?
 typedef Lib::OS::TCHAR ArgType;        // Set main argument type
 # define ENTRYFUNC WINAPI _tWinMain(Lib::OS::HINSTANCE, Lib::OS::HINSTANCE, \

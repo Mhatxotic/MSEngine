@@ -1,6 +1,6 @@
 /* == DIM.HPP ============================================================== **
 ** ######################################################################### **
-** ## MS-ENGINE              Copyright (c) MS-Design, All Rights Reserved ## **
+** ## Mhatxotic Engine          (c) Mhatxotic Design, All Rights Reserved ## **
 ** ######################################################################### **
 ** ## Sets up some basic dimension and coordinate classes to use          ## **
 ** ## throughout the engine.                                              ## **

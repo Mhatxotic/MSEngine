@@ -1,6 +1,6 @@
 /* == SQL.HPP ============================================================== **
 ** ######################################################################### **
-** ## MS-ENGINE              Copyright (c) MS-Design, All Rights Reserved ## **
+** ## Mhatxotic Engine          (c) Mhatxotic Design, All Rights Reserved ## **
 ** ######################################################################### **
 ** ## This module handles writing and reading of persistant data to a     ## **
 ** ## database on disk.                                                   ## **

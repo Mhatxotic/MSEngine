@@ -1,13 +1,13 @@
 /* == CVARLIB.HPP ========================================================== **
 ** ######################################################################### **
-** ## MS-ENGINE              Copyright (c) MS-Design, All Rights Reserved ## **
+** ## Mhatxotic Engine          (c) Mhatxotic Design, All Rights Reserved ## **
 ** ######################################################################### **
 ** ## This module is parsed at the main procedure in 'core.cpp' and       ## **
 ** ## defines the default cvars and their callbacks. Make sure to use the ## **
 ** ## helper CB(STR) macros to help define your callbacks. If you add,    ## **
 ** ## remove or change the order of these cvars, you must update the      ## **
 ** ## 'CVarEnums' in 'cvardef.hpp' to match the order in this list. This  ## **
-** ## This file is also parsed by the MS-Engine project management        ## **
+** ## This file is also parsed by the engine project management           ## **
 ** ## utility to help create html documentation. New cvar descriptions    ## **
 ** ## start with '// !' with the cvar name and continues on each          ## **
 ** ## subsequent line with '// ?' to describe the cvar.                   ## **

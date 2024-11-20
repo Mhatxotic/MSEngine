@@ -1,6 +1,6 @@
 /* == SYSUTIL.HPP ========================================================== **
 ** ######################################################################### **
-** ## MS-ENGINE              Copyright (c) MS-Design, All Rights Reserved ## **
+** ## Mhatxotic Engine          (c) Mhatxotic Design, All Rights Reserved ## **
 ** ######################################################################### **
 ** ## This is the header to define operating system level critical        ## **
 ** ## utility functions.                                                  ## **

@@ -1,6 +1,6 @@
 /* == CLOCK.HPP ============================================================ **
 ** ######################################################################### **
-** ## MS-ENGINE              Copyright (c) MS-Design, All Rights Reserved ## **
+** ## Mhatxotic Engine          (c) Mhatxotic Design, All Rights Reserved ## **
 ** ######################################################################### **
 ** ## This class helps with processing of TimePoint variables into basic  ## **
 ** ## types. Also provides a simple class boolean wether the specified    ## **

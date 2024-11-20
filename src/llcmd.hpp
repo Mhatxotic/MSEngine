@@ -1,6 +1,6 @@
 /* == LLCMD.HPP ============================================================ **
 ** ######################################################################### **
-** ## MS-ENGINE              Copyright (c) MS-Design, All Rights Reserved ## **
+** ## Mhatxotic Engine          (c) Mhatxotic Design, All Rights Reserved ## **
 ** ######################################################################### **
 ** ## Defines the 'Command' namespace and methods for the guest to use in ## **
 ** ## registering their own console commands. This file is invoked by     ## **

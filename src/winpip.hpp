@@ -1,6 +1,6 @@
 /* == WINPIP.HPP =========================================================== **
 ** ######################################################################### **
-** ## MS-ENGINE              Copyright (c) MS-Design, All Rights Reserved ## **
+** ## Mhatxotic Engine          (c) Mhatxotic Design, All Rights Reserved ## **
 ** ######################################################################### **
 ** ## This is a Windows specific module that will assist in executing     ## **
 ** ## a new process and capturing it's output into a buffer.              ## **

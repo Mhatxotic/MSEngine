@@ -1,6 +1,6 @@
 /* == MEMORY.HPP =========================================================== **
 ** ######################################################################### **
-** ## MS-ENGINE              Copyright (c) MS-Design, All Rights Reserved ## **
+** ## Mhatxotic Engine          (c) Mhatxotic Design, All Rights Reserved ## **
 ** ######################################################################### **
 ** ## These classes allow allocation and manipulation of memory. Always   ## **
 ** ## use the 'Memory' class as statically allocated so the memory will   ## **

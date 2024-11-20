@@ -1,6 +1,6 @@
 /* == LOG.HPP ============================================================== **
 ** ######################################################################### **
-** ## MS-ENGINE              Copyright (c) MS-Design, All Rights Reserved ## **
+** ## Mhatxotic Engine          (c) Mhatxotic Design, All Rights Reserved ## **
 ** ######################################################################### **
 ** ## This module handles logging of engine events which the user and     ## **
 ** ## developer can read to help resolve issues.                          ## **

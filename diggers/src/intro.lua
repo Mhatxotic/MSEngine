@@ -7,7 +7,7 @@
 -- 888---d88'--888--`88.---.88'-`88.---.88'-888-----o--888-`88b.--oo----.d8P --
 -- 888bd8P'--oo888oo-`Y8bod8P'---`Y8bod8P'-o888ooood8-o888o-o888o-8""8888P'- --
 -- ========================================================================= --
--- Copyr. (c) MS-Design, 2024   Copyr. (c) Millennium Interactive Ltd., 1994 --
+-- (c) Mhatxotic Design, 2024          (c) Millennium Interactive Ltd., 1994 --
 -- ========================================================================= --
 -- Core function aliases --------------------------------------------------- --
 local error<const> = error;
@@ -257,7 +257,8 @@ local function InitIntro(bAndSetup)
     -- Fade in
     Fade(1, 0, 0.025, Render, OnFadeIn);
   end
-  -- Load resources asynchronously
+  -- Load resources asynchronously. Note: use 'ffmpeg2theora' and not 'ffmpeg'
+  -- to encode proper quality videos.
   LoadResources("Intro", aAssets, OnLoaded);
 end
 -- Exports and imports ----------------------------------------------------- --

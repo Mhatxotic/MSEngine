@@ -1,6 +1,6 @@
 /* == WINBASE.HPP ========================================================== **
 ** ######################################################################### **
-** ## MS-ENGINE              Copyright (c) MS-Design, All Rights Reserved ## **
+** ## Mhatxotic Engine          (c) Mhatxotic Design, All Rights Reserved ## **
 ** ######################################################################### **
 ** ## This is a Windows specific module that handles unhandled exceptions ## **
 ** ## and writes debugging information to disk to help resolve bugs.      ## **
@@ -847,7 +847,7 @@ class SysBase :                        // Members initially private
   /* ----------------------------------------------------------------------- */
   DELETECOPYCTORS(SysBase)             // Suppress default functions for safety
 };/* ======================================================================= */
-#define MSENGINE_SYSBASE_CALLBACKS() \
+#define ENGINE_SYSBASE_CALLBACKS() \
   LONG WINAPI SysBase::SysBase::HandleExceptionStatic(LPEXCEPTION_POINTERS \
     epData) { return cSystem->HandleException(*epData); }
 /* == EoF =========================================================== EoF == */

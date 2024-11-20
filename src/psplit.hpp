@@ -1,6 +1,6 @@
 /* == PSPLIT.HPP =========================================================== **
 ** ######################################################################### **
-** ## MS-ENGINE              Copyright (c) MS-Design, All Rights Reserved ## **
+** ## Mhatxotic Engine          (c) Mhatxotic Design, All Rights Reserved ## **
 ** ######################################################################### **
 ** ## This is a simple C++ wrapper for splitting components of a path     ## **
 ** ## name.                                                               ## **

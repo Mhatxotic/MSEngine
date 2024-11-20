@@ -1,6 +1,6 @@
 /* == ERROR.HPP ============================================================ **
 ** ######################################################################### **
-** ## MS-ENGINE              Copyright (c) MS-Design, All Rights Reserved ## **
+** ## Mhatxotic Engine          (c) Mhatxotic Design, All Rights Reserved ## **
 ** ######################################################################### **
 ** ## This is a very useful class to handle errors and display useful     ## **
 ** ## data to help debug the error. It uses the C++11 variadic templates  ## **

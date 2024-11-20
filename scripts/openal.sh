@@ -1,15 +1,15 @@
 #!/bin/sh
 
-# This file is part of the MS-Engine source repository.
-# @ https://github.com/XMhat/MSEngine
-# Copyright (c) MS-Design, 2006-present. All Rights Reserved.
+# This file is part of the Mhatxotic Engine source repository.
+# @ https://github.com/Mhatxotic/Engine
+# Copyright (c) Mhatxotic Design, 2006-present. All Rights Reserved.
 
 if [ -z $1 ]; then
   echo Usage: $0 [version]
   exit 1
 fi
 
-BASE=~/Assets/MSEngine
+BASE=~/Assets/Engine
 ARCHIVE=$BASE/archive
 LIB=$BASE/lib
 FILEPREFIX=openal-soft-

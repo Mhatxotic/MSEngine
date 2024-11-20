@@ -1,6 +1,6 @@
 /* == FTF.HPP ============================================================== **
 ** ######################################################################### **
-** ## MS-ENGINE              Copyright (c) MS-Design, All Rights Reserved ## **
+** ## Mhatxotic Engine          (c) Mhatxotic Design, All Rights Reserved ## **
 ** ######################################################################### **
 ** ## This module defines a class that can load true-type fonts using     ## **
 ** ## freetype. As of writing, Freetype supports the following fonts.     ## **

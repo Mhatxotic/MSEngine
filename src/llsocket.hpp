@@ -1,6 +1,6 @@
 /* == LLSOCKET.HPP ========================================================= **
 ** ######################################################################### **
-** ## MS-ENGINE              Copyright (c) MS-Design, All Rights Reserved ## **
+** ## Mhatxotic Engine          (c) Mhatxotic Design, All Rights Reserved ## **
 ** ######################################################################### **
 ** ## Defines the 'Socket' namespace and methods for the guest to use in  ## **
 ** ## Lua. This file is invoked by 'lualib.hpp'.                          ## **

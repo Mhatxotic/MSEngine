@@ -1,6 +1,6 @@
 /* == CVARDEF.HPP ========================================================== **
 ** ######################################################################### **
-** ## MS-ENGINE              Copyright (c) MS-Design, All Rights Reserved ## **
+** ## Mhatxotic Engine          (c) Mhatxotic Design, All Rights Reserved ## **
 ** ######################################################################### **
 ** ## This module defines cvar names, default values and flags. Theres no ## **
 ** ## actual code, just definitions!                                      ## **

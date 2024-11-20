@@ -7,7 +7,7 @@
 -- 888---d88'--888--`88.---.88'-`88.---.88'-888-----o--888-`88b.--oo----.d8P --
 -- 888bd8P'--oo888oo-`Y8bod8P'---`Y8bod8P'-o888ooood8-o888o-o888o-8""8888P'- --
 -- ========================================================================= --
--- Copyr. (c) MS-Design, 2024   Copyr. (c) Millennium Interactive Ltd., 1994 --
+-- (c) Mhatxotic Design, 2024          (c) Millennium Interactive Ltd., 1994 --
 -- ========================================================================= --
 -- Core function aliases --------------------------------------------------- --
 local pairs<const>, random<const> = pairs, math.random;
@@ -47,8 +47,9 @@ local function InitTitle()
     local strCredits<const> =
       "ORIGINAL VERSIONS BY TOBY SIMPSON AND MIKE FROGGATT\n\z
        (C) 1994 MILLENNIUM INTERACTIVE LTD. ALL RIGHTS RESERVED\n\rcffffff4f\z
-       POWERED BY MS-ENGINE (C) 2024 MS-DESIGN. ALL RIGHTS RESERVED\n\z
-       PRESS F1 TO SETUP MS-ENGINE OR F2 FOR ACKNOWLEDGEMENTS AT ANY TIME";
+       POWERED BY MHATXOTIC ENGINE (C) 2024 MHATXOTIC DESIGN.\z
+         ALL RIGHTS RESERVED\n\z
+       PRESS F1 TO SETUP THE ENGINE OR F2 FOR ACKNOWLEDGEMENTS AT ANY TIME";
     -- Main demo level loader
     local function LoadDemoLevel(strMusic);
       -- Setup frame buffer updated callback

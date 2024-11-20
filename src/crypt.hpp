@@ -1,6 +1,6 @@
 /* == CRYPT.HPP ============================================================ **
 ** ######################################################################### **
-** ## MS-ENGINE              Copyright (c) MS-Design, All Rights Reserved ## **
+** ## Mhatxotic Engine          (c) Mhatxotic Design, All Rights Reserved ## **
 ** ######################################################################### **
 ** ## This file handles all the cryptographic and co/decompression        ## **
 ** ## routines and sets up the environment for OpenSSL library.           ## **

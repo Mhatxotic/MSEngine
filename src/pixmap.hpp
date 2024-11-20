@@ -1,6 +1,6 @@
 /* == PIXMAP.HPP =========================================================== **
 ** ######################################################################### **
-** ## MS-ENGINE              Copyright (c) MS-Design, All Rights Reserved ## **
+** ## Mhatxotic Engine          (c) Mhatxotic Design, All Rights Reserved ## **
 ** ######################################################################### **
 ** ## This is a POSIX specific module that handles mapping files in       ## **
 ** ## memory. It will be derived by the FileMap class. Since we support   ## **

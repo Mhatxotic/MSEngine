@@ -1,6 +1,6 @@
 /* == LLCORE.hPP =========================================================== **
 ** ######################################################################### **
-** ## MS-ENGINE              Copyright (c) MS-Design, All Rights Reserved ## **
+** ## Mhatxotic Engine          (c) Mhatxotic Design, All Rights Reserved ## **
 ** ######################################################################### **
 ** ## Defines the 'Core' namespace and methods for the guest to use in    ## **
 ** ## Lua. This file is invoked by 'lualib.hpp'.                          ## **
@@ -119,8 +119,8 @@ LLFUNC(Done, 0, cEvtMain->ConfirmExit())
 LLFUNC(End, 0, cEvtMain->Add(EMC_LUA_END))
 /* ========================================================================= */
 // $ Core.Engine
-// < Title:string=Title of engine (normally MS-Engine).
-// < Vendor:string=Author of engine (normally MS-Design).
+// < Title:string=Title of engine (normally Mhatxotic Engine).
+// < Vendor:string=Author of engine (normally Mhatxotic Design).
 // < Major:integer=Major version number of engine.
 // < Minor:integer=Minor version number of engine.
 // < Build:integer=Build version number of engine.

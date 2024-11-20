@@ -1,11 +1,11 @@
 @echo off
 
-rem This file is part of the MS-Engine source repository.
-rem @ https://github.com/XMhat/MSEngine
-rem Copyright (c) MS-Design, 2006-present. All Rights Reserved.
+rem This file is part of the Mhatxotic Engine source repository.
+rem @ https://github.com/Mhatxotic/Engine
+rem Copyright (c) Mhatxotic Design, 2006-present. All Rights Reserved.
 
 set dir=%cd%
-cd \assets\msengine
+cd \assets\engine
 if %errorlevel% neq 0 exit /b
 
 if "%1"=="clang" goto clang
@@ -17,19 +17,19 @@ echo Usage: %0 [ms32/ms64/ms64d/clang/res]
 goto end
 
 :res
-rc -nologo -Isrc -fodebug/msengine.res win32/msengine.rc
+rc -nologo -Isrc -fodebug/engine.res win32/engine.rc
 goto end
 
 :ms32
-cl -nologo -std:c++20 -Z7 -GF -GL -GS- -O2 -Gy -EHsc -DRELEASE -Iinclude -Iinclude/ft -Fodebug/build.obj -Fddebug/build.pdb -Febin/build.exe src/build.cpp lib/glfw32.lib lib/ssl32.lib lib/lzma32.lib lib/zlib32.lib kernel32.lib user32.lib gdi32.lib ole32.lib version.lib imagehlp.lib dbghelp.lib advapi32.lib psapi.lib winmm.lib comctl32.lib shell32.lib ws2_32.lib crypt32.lib debug/msengine.res -link -stack:2097152,1048576 -pdb:debug/build.pdb
+cl -nologo -std:c++20 -Z7 -GF -GL -GS- -O2 -Gy -EHsc -DRELEASE -Iinclude -Iinclude/ft -Fodebug/build.obj -Fddebug/build.pdb -Febin/build.exe src/build.cpp lib/glfw32.lib lib/ssl32.lib lib/lzma32.lib lib/zlib32.lib kernel32.lib user32.lib gdi32.lib ole32.lib version.lib imagehlp.lib dbghelp.lib advapi32.lib psapi.lib winmm.lib comctl32.lib shell32.lib ws2_32.lib crypt32.lib debug/engine.res -link -stack:2097152,1048576 -pdb:debug/build.pdb
 goto end
 
 :ms64d
-cl -nologo -std:c++20 -GF -MTd -Od -GS -Gs0 -RTCsu -bigobj -Gy -EHsc -DALPHA -Iinclude -Iinclude/ft -Fodebug/build.obj -Fddebug/build.pdb -Febin/build.exe src/build.cpp lib/glfw64d.lib lib/ssl64d.lib lib/lzma64d.lib lib/zlib64d.lib kernel32.lib user32.lib gdi32.lib ole32.lib version.lib imagehlp.lib dbghelp.lib advapi32.lib psapi.lib winmm.lib comctl32.lib shell32.lib ws2_32.lib crypt32.lib debug/msengine.res -link -stack:2097152,1048576 -pdb:debug/build.pdb
+cl -nologo -std:c++20 -GF -MTd -Od -GS -Gs0 -RTCsu -bigobj -Gy -EHsc -DALPHA -Iinclude -Iinclude/ft -Fodebug/build.obj -Fddebug/build.pdb -Febin/build.exe src/build.cpp lib/glfw64d.lib lib/ssl64d.lib lib/lzma64d.lib lib/zlib64d.lib kernel32.lib user32.lib gdi32.lib ole32.lib version.lib imagehlp.lib dbghelp.lib advapi32.lib psapi.lib winmm.lib comctl32.lib shell32.lib ws2_32.lib crypt32.lib debug/engine.res -link -stack:2097152,1048576 -pdb:debug/build.pdb
 goto end
 
 :ms64
-cl -nologo -std:c++20 -Z7 -GF -GL -GS- -O2 -Gy -EHsc -DRELEASE -Iinclude -Iinclude/ft -Fodebug/build.obj -Fddebug/build.pdb -Febin/build.exe src/build.cpp lib/glfw64.lib lib/ssl64.lib lib/lzma64.lib lib/zlib64.lib kernel32.lib user32.lib gdi32.lib ole32.lib version.lib imagehlp.lib dbghelp.lib advapi32.lib psapi.lib winmm.lib comctl32.lib shell32.lib ws2_32.lib crypt32.lib debug/msengine.res -link -stack:2097152,1048576 -pdb:debug/build.pdb
+cl -nologo -std:c++20 -Z7 -GF -GL -GS- -O2 -Gy -EHsc -DRELEASE -Iinclude -Iinclude/ft -Fodebug/build.obj -Fddebug/build.pdb -Febin/build.exe src/build.cpp lib/glfw64.lib lib/ssl64.lib lib/lzma64.lib lib/zlib64.lib kernel32.lib user32.lib gdi32.lib ole32.lib version.lib imagehlp.lib dbghelp.lib advapi32.lib psapi.lib winmm.lib comctl32.lib shell32.lib ws2_32.lib crypt32.lib debug/engine.res -link -stack:2097152,1048576 -pdb:debug/build.pdb
 goto end
 
 :clang

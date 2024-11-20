@@ -1,6 +1,6 @@
 /* == CMDLINE.HPP ========================================================== **
 ** ######################################################################### **
-** ## MS-ENGINE              Copyright (c) MS-Design, All Rights Reserved ## **
+** ## Mhatxotic Engine          (c) Mhatxotic Design, All Rights Reserved ## **
 ** ######################################################################### **
 ** ## This static class stores command line arguments and assists in      ## **
 ** ## restarting the engine when needed.                                  ## **

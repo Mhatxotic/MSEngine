@@ -1,6 +1,6 @@
 /* == COLLECT.HPP ========================================================== **
 ** ######################################################################### **
-** ## MS-ENGINE              Copyright (c) MS-Design, All Rights Reserved ## **
+** ## Mhatxotic Engine          (c) Mhatxotic Design, All Rights Reserved ## **
 ** ######################################################################### **
 ** ## This module contains routines in helping keeping a record of each   ## **
 ** ## allocated member pointers in a collector list and keeping a limit   ## **

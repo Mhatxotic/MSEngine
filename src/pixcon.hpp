@@ -1,6 +1,6 @@
 /* == PIXCON.HPP =========================================================== **
 ** ######################################################################### **
-** ## MS-ENGINE              Copyright (c) MS-Design, All Rights Reserved ## **
+** ## Mhatxotic Engine          (c) Mhatxotic Design, All Rights Reserved ## **
 ** ######################################################################### **
 ** ## This is a POSIX specific module that handles text only mode output  ## **
 ** ## which is needed by the engines bot mode and uses ncurses. Since we  ## **
@@ -838,5 +838,5 @@ class SysCon :                         // All members initially private
     return ACCEPT;
   }
 };/* ----------------------------------------------------------------------- */
-#define MSENGINE_SYSCON_CALLBACKS()    // Not required
+#define ENGINE_SYSCON_CALLBACKS()    // Not required
 /* == EoF =========================================================== EoF == */

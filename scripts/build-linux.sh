@@ -1,15 +1,15 @@
 #!/bin/sh
 
-# This file is part of the MS-Engine source repository.
-# @ https://github.com/XMhat/MSEngine
-# Copyright (c) MS-Design, 2006-present. All Rights Reserved.
+# This file is part of the Mhatxotic Engine source repository.
+# @ https://github.com/Mhatxotic/Engine
+# Copyright (c) Mhatxotic Design, 2006-present. All Rights Reserved.
 
 # Required components
 # sudo apt-get install mesa-common-dev libxrandr-dev cmake nasm libjpegturbo0-dev libncurses-dev zlib1g-dev libsqlite3-dev libogg-dev libvorbis-dev libtheora-dev libfreetype-dev libpng-dev libssl-dev libopenal-dev libglfw3-dev
 
 clear
 
-cd ~/Assets/MSEngine
+cd ~/Assets/Engine
 
 # do -v to see command line or -### to print it and not compile
 

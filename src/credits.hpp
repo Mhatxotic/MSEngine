@@ -1,6 +1,6 @@
 /* == CREDITS.HPP ========================================================== **
 ** ######################################################################### **
-** ## MS-ENGINE              Copyright (c) MS-Design, All Rights Reserved ## **
+** ## Mhatxotic Engine          (c) Mhatxotic Design, All Rights Reserved ## **
 ** ######################################################################### **
 ** ## This file is a consolidation of libraries information used in the   ## **
 ** ## engine which is logged at startup and can be read by the guest and  ## **
@@ -54,7 +54,7 @@ enum CreditEnums : size_t              // Credit ids
 { /* ----------------------------------------------------------------------- */
   CL_FIRST,                            // The first item (see llcredit.hpp)
   /* ----------------------------------------------------------------------- */
-  CL_MSE=CL_FIRST,                     // Id for MS-Engine data (always first)
+  CL_MSE=CL_FIRST,                     // Id for engine data (always first)
   CL_FT,                               // Id for FreeType credit data
   CL_GLFW,                             // Id for GLFW credit data
   CL_JPEG,                             // Id for LibJPEGTurbo credit data
@@ -128,9 +128,9 @@ static const class Credits final :     // Members initially private
       // n = license variable name       c = is dependency copyrighted?
       // a = Author of dependency
 #define LD(t,v,c,a,n) { t, v, c, a, l ## n.data(), l ## n.size() }
-      // The credits data structure (Keep MS-Engine as the first)
+      // The credits data structure (Keep the engine credit as the first)
       LD(cSystem->ENGName(), cSystem->ENGVersion(), cSystem->ENGAuthor(), true,
-        MSENGINE),
+        ENGINE),
       LD("FreeType", STR(FREETYPE_MAJOR) "." STR(FREETYPE_MINOR) "."
         STR(FREETYPE_PATCH), "The FreeType Project", true, FREETYPE),
       LD("GLFW", cGlFW->GetInternalVersion(),

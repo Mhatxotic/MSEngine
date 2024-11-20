@@ -1,6 +1,6 @@
 /* == LUAEVENT.HPP ========================================================= **
 ** ######################################################################### **
-** ## MS-ENGINE              Copyright (c) MS-Design, All Rights Reserved ## **
+** ## Mhatxotic Engine          (c) Mhatxotic Design, All Rights Reserved ## **
 ** ######################################################################### **
 ** ## This helps classes have an event system which can fire events off   ## **
 ** ## to the event system from another thread and passed back to a lua    ## **

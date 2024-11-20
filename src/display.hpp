@@ -1,6 +1,6 @@
 /* == DISPLAY.HPP ========================================================== **
 ** ######################################################################### **
-** ## MS-ENGINE              Copyright (c) MS-Design, All Rights Reserved ## **
+** ## Mhatxotic Engine          (c) Mhatxotic Design, All Rights Reserved ## **
 ** ######################################################################### **
 ** ## This module handles window creation and manipulation via the GLFW   ## **
 ** ## library.                                                            ## **

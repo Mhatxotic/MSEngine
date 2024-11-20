@@ -1,6 +1,6 @@
 /* == SHADER.HPP =========================================================== **
 ** ######################################################################### **
-** ## MS-ENGINE              Copyright (c) MS-Design, All Rights Reserved ## **
+** ## Mhatxotic Engine          (c) Mhatxotic Design, All Rights Reserved ## **
 ** ######################################################################### **
 ** ## This allows programs and shaders to be easily compiled, linked and  ## **
 ** ## used.                                                               ## **

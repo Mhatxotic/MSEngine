@@ -1,6 +1,6 @@
 /* == CONGRAPH.HPP ========================================================= **
 ** ######################################################################### **
-** ## MS-ENGINE              Copyright (c) MS-Design, All Rights Reserved ## **
+** ## Mhatxotic Engine          (c) Mhatxotic Design, All Rights Reserved ## **
 ** ######################################################################### **
 ** ## This module handles the OpenGL graphical rendering side for the     ## **
 ** ## console.                                                            ## **

@@ -1,6 +1,6 @@
 /* == LUA.HPP ============================================================== **
 ** ######################################################################### **
-** ## MS-ENGINE              Copyright (c) MS-Design, All Rights Reserved ## **
+** ## Mhatxotic Engine          (c) Mhatxotic Design, All Rights Reserved ## **
 ** ######################################################################### **
 ** ## The lua instance is the core scripting module that glues all the    ## **
 ** ## engine components together. Note that this class does not handle    ## **

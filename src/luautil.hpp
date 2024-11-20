@@ -1,6 +1,6 @@
 /* == LUAUTIL.HPP ========================================================== **
 ** ######################################################################### **
-** ## MS-ENGINE              Copyright (c) MS-Design, All Rights Reserved ## **
+** ## Mhatxotic Engine          (c) Mhatxotic Design, All Rights Reserved ## **
 ** ######################################################################### **
 ** ## Lua utility functions. They normally need a state to work.          ## **
 ** ######################################################################### **

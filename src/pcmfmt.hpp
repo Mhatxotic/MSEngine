@@ -1,6 +1,6 @@
 /* == PCMFMT.HPP =========================================================== **
 ** ######################################################################### **
-** ## MS-ENGINE              Copyright (c) MS-Design, All Rights Reserved ## **
+** ## Mhatxotic Engine          (c) Mhatxotic Design, All Rights Reserved ## **
 ** ######################################################################### **
 ** ## These classes are plugins for the PcmLib manager to allow loading   ## **
 ** ## of certain formatted audio files.                                   ## **

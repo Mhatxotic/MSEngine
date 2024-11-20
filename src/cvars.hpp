@@ -1,6 +1,6 @@
 /* == CVARS.HPP ============================================================ **
 ** ######################################################################### **
-** ## MS-ENGINE              Copyright (c) MS-Design, All Rights Reserved ## **
+** ## Mhatxotic Engine          (c) Mhatxotic Design, All Rights Reserved ## **
 ** ######################################################################### **
 ** ## This module handles the logic behind CVars which are settings that  ## **
 ** ## the user can change to manipulate the engine's functionality. Add   ## **
