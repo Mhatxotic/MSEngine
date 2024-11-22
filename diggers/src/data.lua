@@ -2563,16 +2563,16 @@ local aCreditsXData<const> = {
 };
 -- Setup buttons data ------------------------------------------------------ --
 local aSetupButtonData<const> = { -- nil's are filled in 'setup.lua' init
-  APPLY = {   4, 193,  82, 212, CID.OK,   nil, 101,
+  APPLY = { nil, nil, nil, nil, CID.OK,   nil, 101, nil, nil,
     "CLICK TO APPLY ANY SYSTEM AFFECTING SETTINGS YOU HAVE CHANGED" },
-  DONE  = {  82, 193, 160, 212, CID.EXIT, nil, 102,
+  DONE  = { nil, nil, nil, nil, CID.EXIT, nil, 102, nil, nil,
     "CLICK TO EXIT THIS SETUP WINDOW AND RETURN TO YOUR GAME. ANY CHANGED \z
      SETTINGS THAT NEED TO BE APPLIED WILL BE CANCELLED" },
-  RESET = { 160, 193, 238, 212, CID.OK,   nil, 103,
+  RESET = { nil, nil, nil, nil, CID.OK,   nil, 103, nil, nil,
     "CLICK TO RESET ALL VALUES TO DEFAULTS AND AUTOMATICALLY APPLY THE \z
      SETTINGS" },
-  ABOUT = { 238, 193, 316, 212, CID.OK,   nil, 104,
-    "CLICK TO VIEW THE ACKNOWLEDGEMENTS FOR THIS GAME" }
+  ABOUT = { nil, nil, nil, nil, CID.OK,   nil, 104, nil, nil,
+    "CLICK TO VIEW THE ACKNOWLEDGEMENTS FOR THIS GAME" },
 };-- Setup options data ---------------------------------------------------- --
 local aSetupOptionData<const> = { -- nil's are filled in 'setup.lua' init
   -- Option name -- Value -- UpdateFunc --- DownFunc --- UpFunc ------------ --

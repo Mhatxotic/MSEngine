@@ -376,10 +376,10 @@ local function SetGlobalKeys(bState)
     -- Callback
     local function Callback()
       -- F1 key pressed?
-      if IsKeyPressed(iKeyF1) then InitSetup(false);
+      if IsKeyPressed(iKeyF1) then InitSetup(1);
       -- F2 key pressed?
       elseif IsKeyPressed(iKeyF2) or (IsJoyPressed(8) and IsJoyPressed(9))
-        then InitSetup(true);
+        then InitSetup(2);
       -- F11 key pressed?
       elseif IsKeyPressed(iKeyF11) then DisplayReset();
       -- F12 key pressed?

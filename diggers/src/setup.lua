@@ -28,11 +28,10 @@ local CoreMonitor<const>, CoreMonitorData<const>, CoreMonitors<const>,
     Display.Monitor, Display.MonitorData, Display.Monitors,
     Display.VidModeData, Display.VidModes, Core.Time, Core.CPUUsage, Core.RAM,
     Display.GPUFPS, Core.Engine, Display.GetSize, Util.GetRatio, Util.ClampInt,
-    Util.Clamp,
-    Util.Explode, Audio.GetNumPBDevices, Audio.GetPBDeviceName, Audio.Reset,
-    Variable.GetInt, Variable.SetInt, Display.VReset, Display.Reset,
-    Core.Library, Core.License, Variable.ResetInt, Util.WordWrap,
-    Display.FSType;
+    Util.Clamp, Util.Explode, Audio.GetNumPBDevices, Audio.GetPBDeviceName,
+    Audio.Reset, Variable.GetInt, Variable.SetInt, Display.VReset,
+    Display.Reset, Core.Library, Core.License, Variable.ResetInt,
+    Util.WordWrap, Display.FSType;
 -- Constants --------------------------------------------------------------- --
 local iCredits<const> = Core.Libraries.MAX;
 local aCVars<const> = Variable.Internal;
@@ -44,10 +43,10 @@ local iKeyEscape<const>, iKeyPageUp<const>, iKeyPageDown<const>,
   aKeys.UP, aKeys.DOWN;
 local iNativeMode<const> = Display.FSTypes.NATIVE;
 -- Read and prepare engine version information ----------------------------- --
-local sAppTitle, sAppVersion<const>, iAppMajor<const>, iAppMinor<const>,
-  iAppBuild<const>, iAppRevision<const>, _, _, sAppExeType =
-    CoreEngine();
-sAppTitle, sAppExeType = sAppTitle:upper(), sAppExeType:upper();
+local sAppTitle, sAppVendor, iAppMajor<const>, iAppMinor<const>,
+  iAppBuild<const>, iAppRevision<const>, _, _, sAppExeType = CoreEngine();
+sAppTitle, sAppVendor, sAppExeType =
+  sAppTitle:upper(), sAppVendor:upper(), sAppExeType:upper();
 -- Read game version information ------------------------------------------- --
 local sGameVersion<const>, sGameName<const>, sGameCopyr<const>,
       sGameDescription<const>, sGameWebsite<const>
@@ -679,7 +678,7 @@ local function ProcReadmeInput()
   elseif IsKeyRepeating(iKeyUp) or IsScrollingUp() then ScrollReadme(-1);
   elseif IsKeyRepeating(iKeyDown) or IsScrollingDown() then ScrollReadme(1);
   -- Cancel button pressed? Cancel readme
-  elseif IsButtonPressed(1) then InitSetup(false);
+  elseif IsButtonPressed(1) then InitSetup(1);
   -- Select button pressed? Scroll!
   elseif IsButtonHeld(0) then
     -- On bottom section of screen? Scroll down
@@ -690,11 +689,6 @@ local function ProcReadmeInput()
 end
 -- ------------------------------------------------------------------------- --
 local function InitReadme()
-  -- Waiting cursor
-  SetCursor(aCursorIdData.WAIT);
-  -- Change render procedures but no input so load doesn't finish after the
-  -- user has left the screen.
-  SetCallbacks(ProcReadme, RenderReadme, nil);
   -- Init text colours
   aReadmeColourData = { };
   for I = 1, iReadmeRows do
@@ -703,12 +697,12 @@ local function InitReadme()
   sTitle = "ABOUT";
   -- Set readme lines
   aReadmeData = aCreditLines;
+  -- Initialise readme lines
+  UpdateReadmeLines();
   -- At least one tick
   ProcReadme();
   -- Arrow cursor
   SetCursor(aCursorIdData.ARROW);
-  -- Update displayed readme lines
-  UpdateReadmeLines();
   -- Allow input
   SetCallbacks(ProcReadme, RenderReadme, ProcReadmeInput);
 end
@@ -753,9 +747,8 @@ local function RenderSetup()
   -- Draw selected item
   if iSelectedOption > 0 then
     texSpr:SetCRGB(0, 0, 0);
-    RenderFade(nButtonIntensity, 4,
-       28 + ((iSelectedOption-1) * iCatSize),
-     316, 28 + iCatSize + ((iSelectedOption-1) * iCatSize), 1022);
+    local iY<const> = 28 + (iSelectedOption - 1) * iCatSize;
+    RenderFade(nButtonIntensity, 4, iY, 316, iY + iCatSize, 1022);
     texSpr:SetCRGB(1, 1, 1);
     -- Set tip
     SetTip(iSelectedOption, aOptionData[iSelectedOption][6]);
@@ -785,7 +778,7 @@ local function RenderSetup()
     -- Mouse in bounds?
     if IsMouseInBounds(D[1], D[2], D[3], D[4]) then
       -- Set tip
-      SetTip(D[7], D[8]);
+      SetTip(D[7], D[10]);
       -- Set button
       iSelectedButton = D[7];
       -- Set glowing colour
@@ -796,7 +789,7 @@ local function RenderSetup()
     else RenderFade(0.5, D[1], D[2], D[3], D[4], 1023) end;
     -- Set button text colour and print the text
     fontLittle:SetCRGB(1, 1, 1);
-    fontLittle:PrintC(D[1]+39, D[2]+6, N);
+    fontLittle:PrintC(D[8], D[9], N);
   end
   -- Remove tip if an option isn't selected
   if iSelectedButton == 0 and iSelectedOption == 0 then
@@ -892,15 +885,15 @@ local function InitConfig()
   -- Initialise status bars
   sStatusLine1 = format("%s (%s) %s.%u.%u.%u.%u - %s", sGameName, sAppExeType,
     sGameVersion, iAppMajor, iAppMinor, iAppBuild, iAppRevision, sGameWebsite);
-  sStatusLine2 = "MS-DESIGN PROUDLY PRESENTS DIGGERS! A REMAKE FOR MODERN \z
-    OPERATING SYSTEMS AND HARDWARE FROM THE CLASSIC CD32 AND DOS DAYS. \z
-    THIS IS THE CONFIGURATION SCREEN. PRESS ESCAPE OR THE 'DONE' BUTTON \z
-    TO RETURN TO THE GAME OR MOVE YOUR MOUSE OVER AN OPTION TO HAVE MORE \z
-    EXPLAINED ABOUT IT HERE. USE YOUR MOUSE OR JOYSTICK TO MOVE THE CURSOR \z
-    AND THE BUTTONS TO CHANGE OPTIONS. PRESS F1 AT ANY TIME TO SEE THIS \z
-    SCREEN OR F2 FOR DOCUMENTATION. PRESS ALT+ENTER AT ANY TIME TO TOGGLE \z
-    FULL-SCREEN AND WINDOW. PRESS F11 TO RESET THE WINDOW SIZE AND F12 TO \z
-    TAKE A SCREENSHOT";
+  sStatusLine2 = sAppVendor.." PROUDLY PRESENTS "..sGameName.."! A REMAKE \z
+    FOR MODERN OPERATING SYSTEMS AND HARDWARE FROM THE CLASSIC CD32 AND DOS \z
+    DAYS. THIS IS THE CONFIGURATION SCREEN. PRESS ESCAPE OR THE 'DONE' \z
+    BUTTON TO RETURN TO THE GAME OR MOVE YOUR MOUSE OVER AN OPTION TO HAVE \z
+    MORE EXPLAINED ABOUT IT HERE. USE YOUR MOUSE OR JOYSTICK TO MOVE THE \z
+    CURSOR AND THE BUTTONS TO CHANGE OPTIONS. PRESS F1 AT ANY TIME TO SEE \z
+    THIS SCREEN, F2 FOR DOCUMENTATION OR F3 TO CONFIGURE THE INPUT BINDS. \z
+    PRESS ALT+ENTER AT ANY TIME TO TOGGLE FULL-SCREEN AND WINDOW. PRESS F11 \z
+    TO RESET THE WINDOW SIZE AND F12 TO TAKE A SCREENSHOT";
   sStatusLineSave = sStatusLine2;
   SetTip(0, sStatusLineSave);
   -- Refresh all settings
@@ -947,7 +940,7 @@ local function InitThirdPartyCredits()
       local sName2<const>, sVersion2<const> = CoreLibrary(iIndex);
       -- Insert both credits
       aCreditLines[1 + #aCreditLines] =
-        format("%2d: %-15s %17s  %2d: %-17s %15s",
+        format("%2d: %-16s %16s  %2d: %-16s %16s",
         iIndex, sName:upper(), "(v"..sVersion:upper()..")",
         iIndex+1, sName2:upper(), "(v"..sVersion2:upper()..")");
     -- Only one left so write last
@@ -989,23 +982,27 @@ local function InitThirdPartyCredits()
 end
 InitThirdPartyCredits();
 -- ------------------------------------------------------------------------- --
-local function DoInitSetup(bDoReadMe)
+local function DoInitSetup(iMode)
   -- Ignore if fading
   if IsFading() then return end;
   -- Get current callbacks
   local CBProc, CBRender, CBInput = GetCallbacks();
-  -- Do readme?
-  if bDoReadMe == true then
-    -- Deny if already in readme
-    if CBRender == RenderReadme then return end;
-    -- If not in readme
-    if CBRender == RenderSetup then return InitReadme() end;
-  -- Do setup
-  else
-    -- Deny if already in setup
-    if CBRender == RenderSetup then return end;
-    -- If not in readme
-    if CBRender == RenderReadme then return InitConfig() end;
+  -- Available modes
+  local aModes<const> = {
+    { InitConfig, RenderSetup  },
+    { InitReadme, RenderReadme },
+  };
+  -- Set and check requested mode/
+  local aMode<const> = aModes[iMode];
+  if not aMode then error("Invalid mode: "..iMode) end;
+  -- Return if function already set
+  if CBRender == aMode[2] then return end;
+  -- Remove the mode and go through available modes
+  remove(aModes, iMode);
+  for iIndex = 1, #aModes do
+    -- Get mode data and just call init function if we're still in setup
+    local aAltMode<const> = aModes[iIndex];
+    if CBRender == aAltMode[2] then return aMode[1]() end;
   end
   -- Required setup assets finished loading
   local function OnLoaded(aResource)
@@ -1023,8 +1020,8 @@ local function DoInitSetup(bDoReadMe)
     nTime = CoreTime();
     -- Calculate bottom of categories
     iCatBottom = 28 + (#aOptionData * iCatSize);
-    -- Do readme or do setup?
-    if bDoReadMe then InitReadme() else InitConfig() end;
+    -- Call the mode init function
+    aMode[1]();
   end
   -- Load bank texture
   LoadResources("Setup", aAssets, OnLoaded);
@@ -1058,9 +1055,33 @@ return { A = { InitSetup = InitSetup }, F = function(GetAPI)
     "RenderFade", "RenderShadow", "SetCallbacks", "SetCursor", "StopMusic",
     "aSetupButtonData", "aCursorIdData", "aSetupOptionData", "aSfxData",
     "fontLarge", "fontLittle", "fontTiny", "texSpr");
-  -- Apply functions to static button table -------------------------------- --
-  for sK, fCb in pairs({ APPLY = ApplySettings, DONE = Finish,
-    RESET = SetDefaults, ABOUT = InitReadme }) do aButtonData[sK][6] = fCb end;
+  -- Apply button data ----------------------------------------------------- --
+  local aButtons<const> = { { "APPLY", ApplySettings },
+                            { "DONE",  Finish },
+                            { "RESET", SetDefaults },
+                            { "ABOUT", InitReadme },
+                          };
+  -- Start and end vertical position
+  local iY1<const>, iY2<const> = 193, 212;
+  -- Start drawing buttons from the left and the size of each button. We set
+  -- the shader to round off any sub-pixelling so fractions are handled safely.
+  local nX, nSize<const> = 4, 312 / #aButtons;
+  -- Text position
+  local nSizeD2<const>, iYText<const> = nSize / 2, iY1 + 6;
+  -- For each button
+  for iIndex = 1, #aButtons do
+    -- Get the button data
+    local aCb<const> = aButtons[iIndex];
+    local aButton<const> = aButtonData[aCb[1]];
+    -- Set button co-ordinates
+    aButton[1], aButton[2], aButton[3], aButton[4] = nX, iY1, nX + nSize, iY2;
+    -- Click function
+    aButton[6] = aCb[2];
+    -- Text position
+    aButton[8], aButton[9] = nX + nSizeD2, iYText;
+    -- Next button position
+    nX = nX + nSize;
+  end;
   -- Apply functions to static option table -------------------------------- --
   for iI, aF in ipairs({
     { MonitorUpdate, MonitorDown, MonitorUp  }, -- [01]
