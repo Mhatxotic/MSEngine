@@ -50,8 +50,7 @@ local aCache              = { };       -- File cache
 local aModules            = { };       -- Modules data
 local aKeyState           = { };       -- Formatted keyboard state
 local aMouseState         = { };       -- Formatted mouse state
-local aJoyState
-local aSounds             = { };       -- Sound effects
+local aJoyState                        -- Joystick state
 local bTestMode           = false;     -- Test mode enabled
 local fcbFading           = false;     -- Fading callback
 local iCursorX, iCursorY  = 0, 0;      -- Cursor position
@@ -60,10 +59,6 @@ local nJoyAX, nJoyAY      = 0, 0;      -- Joystick axis values
 local fcbMouse            = UtilBlank; -- Joystick to mouse conversion function
 local aJoy                = { };       -- Joysticks connected data
 local iJoyActive;                      -- Currently active joystick
-local vidHandle;                       -- FMV playback handle
-local nMusicPosition;                  -- Saved music position
-local strmMusic;                       -- Currently playing music handle
-local iMusicLoops;                     -- Saved music loops count
 local texSpr;                          -- Sprites texture
 local fontLarge;                       -- Large font (16px)
 local fontLittle;                      -- Little font (8px)
@@ -76,7 +71,7 @@ local iStageRight, iStageBottom;       -- Bottom right corner
 -- Library functions loaded later ------------------------------------------ --
 local InitSetup, InitScene, InitCredits, InitEnding, LoadLevel,
   InitIntro, InitFail, InitScore, InitTitle, InitNewGame, aObjectTypes,
-  aLevelsData, aRacesData, CheckGlobalKeys, InitDebugPlay;
+  aLevelsData, aRacesData, CheckGlobalKeys, InitDebugPlay, MusicVolume;
 -- Constants for loader ---------------------------------------------------- --
 local aBFlags<const> = Image.Flags;    -- Get bitmap loading flags
 local iPNG<const> = aBFlags.FCE_PNG;   -- Get forced PNG format flag
@@ -156,7 +151,7 @@ local function GetMouseState(iButton) return aMouseState[iButton] or 0 end;
 -- Clears the specified mouse button state --------------------------------- --
 local function ClearMouseState(iButton) aMouseState[iButton] = nil end;
 -- Returns true if the specified mouse button is held down ----------------- --
-local function IsMouseHeld(iButton) return GetMouseState(iButton) > 0 end
+local function IsMouseHeld(iButton) return GetMouseState(iButton) > 0 end;
 -- Returns true if the specified mouse button was pressed ------------------ --
 local function IsMousePressed(iButton)
   if GetMouseState(iButton) == 0 then return false end;
@@ -562,85 +557,6 @@ local function LoadResources(sProcedure, aResources, fComplete)
   -- Return progress function
   return GetProgress;
 end
--- ------------------------------------------------------------------------- --
-local function VideoStop()
-  if vidHandle then vidHandle = vidHandle:Destroy() end;
-end
--- ------------------------------------------------------------------------- --
-local function VideoPlay(Handle)
-  VideoStop();
-  vidHandle = Handle;
-  vidHandle:SetVLTRB(0, 0, 320, 240);
-  vidHandle:SetTCLTRB(0, 0, 1, 1);
-  vidHandle:SetFilter(true);
-  vidHandle:Play();
-  return vidHandle;
-end
--- Return music handle ----------------------------------------------------- --
-local function GetMusic() return strmMusic end;
--- Set music and video volume ---------------------------------------------- --
-local function MusicVolume(Volume)
-  if strmMusic then strmMusic:SetVolume(Volume) end;
-  if vidHandle then vidHandle:SetVolume(Volume) end;
-end
--- Pause if there is a music handle----------------------------------------- --
-local function PauseMusic() if strmMusic then strmMusic:Stop() end end;
--- Resume music if there is a music handle---------------------------------- --
-local function ResumeMusic() if strmMusic then strmMusic:Play(-1,1,0) end end
--- Stop music -------------------------------------------------------------- --
-local function StopMusic(PosCmd)
-  -- No current track? No problem
-  if not strmMusic then return end;
-  -- Save position?
-  if 1 == PosCmd then
-    -- Save position
-    nMusicPosition = strmMusic:GetPosition();
-    -- Save loop count
-    iMusicLoops = strmMusic:GetLoop();
-  end
-  -- Resume video if there is one
-  if vidHandle then vidHandle:Play() end;
-  -- Stop music
-  strmMusic = strmMusic:Stop();
-end
--- ------------------------------------------------------------------------- --
-local function PlayMusic(musicHandle, Volume, PosCmd, Loop, Start)
-  -- Set default parameters that aren't specified
-  if not UtilIsNumber(Volume) then Volume = 1 end;
-  if not UtilIsInteger(PosCmd) then PosCmd = 0 end;
-  if not UtilIsInteger(Loop) then Loop = -1 end;
-  if not UtilIsInteger(Start) then Start = 0 end;
-  -- Stop music
-  StopMusic(PosCmd);
-  -- Handle specified?
-  if musicHandle then
-    -- Set loop
-    if Start then musicHandle:SetLoopBegin(Start) end;
-    -- Pause video if there is one
-    if vidHandle then vidHandle:Pause() end;
-    -- Asked to restore position?
-    if 2 == PosCmd and nMusicPosition and nMusicPosition > 0 then
-      -- Restore position
-      musicHandle:SetPosition(nMusicPosition);
-      -- Play music
-      musicHandle:SetLoop(iMusicLoops);
-      -- Delete position and loop variable
-      nMusicPosition, iMusicLoops = nil, nil;
-    -- No restore position?
-    else
-      -- Play music from start
-      musicHandle:SetPosition(0);
-      -- Loop forever
-      musicHandle:SetLoop(-1);
-    end
-    -- Set volume
-    musicHandle:SetVolume(Volume);
-    -- Play music
-    musicHandle:Play();
-    -- Set current track
-    strmMusic = musicHandle;
-  end
-end
 -- Render fade ------------------------------------------------------------- --
 local function RenderFade(Amount, L, T, R, B, S)
   texSpr:SetCA(Amount);
@@ -793,24 +709,6 @@ local function Fade(S, E, C, D, A, M, L, T, R, B, Z)
 end
 -- Get cursor -------------------------------------------------------------- --
 local function GetCursor() return CId end;
--- Function to play sound at the specified pan ----------------------------- --
-local function PlaySound(iSfxId, nPan, nPitch)
-  aSounds[iSfxId]:Play(1, nPan, nPitch or 1, false);
-end
--- Function to play sound with no panning ---------------------------------- --
-local function PlayStaticSound(iSfxId, nGain, nPitch)
-  aSounds[iSfxId]:Play(nGain or 1, 0, nPitch or 1, false);
-end
--- Function to loop the specified sound at the specified pan --------------- --
-local function LoopSound(iSfxId, nPan, nPitch)
-  aSounds[iSfxId]:Play(1, nPan, nPitch or 1, true);
-end
--- Function to loop the specified sound with no panning -------------------- --
-local function LoopStaticSound(iSfxId, nGain, nPitch)
-  aSounds[iSfxId]:Play(nGain or 1, 0, nPitch or 1, true);
-end
--- Function to stop specified sound ---------------------------------------- --
-local function StopSound(iSfxId) aSounds[iSfxId]:Stop() end;
 -- Refresh viewport info --------------------------------------------------- --
 local function RefreshViewportInfo()
   -- Refresh matrix parameters
@@ -890,15 +788,9 @@ local function fcbTick()
     IsKeyRepeating = IsKeyRepeating, IsKeyHeld = IsKeyHeld,
     SetCursor = SetCursor, SetGlobalKeys = SetGlobalKeys,
     GetCallbacks = GetCallbacks, SetCallbacks = SetCallbacks,
-    LoadResources = LoadResources, VideoStop = VideoStop,
-    VideoPlay = VideoPlay, GetMusic = GetMusic,
-    MusicVolume = MusicVolume, PauseMusic = PauseMusic,
-    ResumeMusic = ResumeMusic, StopMusic = StopMusic, PlayMusic = PlayMusic,
-    TimeIt = TimeIt, RenderFade = RenderFade, BCBlit = BCBlit,
-    ClearStates = ClearStates, Fade = Fade, GetCursor = GetCursor,
-    RefreshViewportInfo = RefreshViewportInfo, PlaySound = PlaySound,
-    PlayStaticSound = PlayStaticSound, LoopSound = LoopSound,
-    LoopStaticSound = LoopStaticSound, StopSound = StopSound,
+    LoadResources = LoadResources, TimeIt = TimeIt, RenderFade = RenderFade,
+    BCBlit = BCBlit, ClearStates = ClearStates, Fade = Fade,
+    GetCursor = GetCursor, RefreshViewportInfo = RefreshViewportInfo,
     IsFading = IsFading, SetBottomRightTip = SetBottomRightTip,
     RegisterFBUCallback = RegisterFrameBufferUpdateCallback,
     GetTestMode = GetTestMode, RenderShadow = RenderShadow,
@@ -921,14 +813,15 @@ local function fcbTick()
   end;
   -- Base code scripts that are to be loaded
   local aBaseScripts<const> = {
-    {T=9,F="bank",   P={}}, {T=9,F="book",  P={}}, {T=9,F="cntrl", P={}},
-    {T=9,F="credits",P={}}, {T=9,F="data",  P={},A=DataLoaded },
-    {T=9,F="debug",  P={}}, {T=9,F="end",   P={}}, {T=9,F="ending",P={}},
-    {T=9,F="fail",   P={}}, {T=9,F="file",  P={}}, {T=9,F="game",  P={}},
-    {T=9,F="intro",  P={}}, {T=9,F="lobby", P={}}, {T=9,F="map",   P={}},
-    {T=9,F="post",   P={}}, {T=9,F="race",  P={}}, {T=9,F="scene", P={}},
-    {T=9,F="score",  P={}}, {T=9,F="setup", P={}}, {T=9,F="shop",  P={}},
-    {T=9,F="title",  P={}}, {T=9,F="tntmap",P={}},
+    {T=9,F="audio",  P={}}, {T=9,F="bank",   P={}}, {T=9,F="book",  P={}},
+    {T=9,F="cntrl",  P={}}, {T=9,F="credits",P={}},
+    {T=9,F="data",   P={},A=DataLoaded },           {T=9,F="debug", P={}},
+    {T=9,F="end",    P={}}, {T=9,F="ending", P={}}, {T=9,F="fail",  P={}},
+    {T=9,F="file",   P={}}, {T=9,F="game",   P={}}, {T=9,F="intro", P={}},
+    {T=9,F="lobby",  P={}}, {T=9,F="map",    P={}}, {T=9,F="post",  P={}},
+    {T=9,F="race",   P={}}, {T=9,F="scene",  P={}}, {T=9,F="score", P={}},
+    {T=9,F="setup",  P={}}, {T=9,F="shop",   P={}}, {T=9,F="title", P={}},
+    {T=9,F="tntmap", P={}},
   };
   -- Base fonts that are to be loaded
   local aBaseFonts<const> = {
@@ -1029,11 +922,10 @@ local function fcbTick()
       local aModData<const> = aModules[iI];
       aModData.F(GetAPI, aModData);
     end
-    -- Assign and check sound effects
-    for iSHIndex = iBaseSounds, iBaseSounds + #aBaseSounds - 1 do
-      aSounds[1 + #aSounds] = aData[iSHIndex].H end
-    if #aBaseSounds ~= #aSounds then
-      error("Only "..#aBaseSounds.." of "..aSounds.." sound effects!") end;
+    -- Set music volume function for transition function
+    MusicVolume = aAPI.MusicVolume;
+    -- Assign loaded sound effects
+    aAPI.RegisterSounds(aData, iBaseSounds, #aBaseSounds);
     -- Main procedure callback
     local function MainCallback()
       -- Update mouse position
