@@ -203,6 +203,7 @@ local OFL<const> = {          -- Max 64-bits
   DEVICE       = 0x040000000, -- Object is a device
   HEALNEARBY   = 0x080000000, -- Object heals nearby Diggers
   CONSUME      = 0x100000000, -- Object consumes another object
+  NOHOME       = 0x200000000, -- Object cannot enter home
 };
 OFL.JUMPMASK = OFL.JUMPRISE|OFL.JUMPFALL;
 -- Jumping ----------------------------------------------------------------- --
@@ -459,47 +460,88 @@ local aZoneData<const> = {
   -- Legend --------------------------------------------------------------- --
   -- L = Left bound on zone map.       T = Top bound on zone map.
   -- R = Right bound on zone map.      B = Bottom bound on zone map.
-  -- FPX = Completed flag X pos.       FPY = Completed flag Y pos.
   -- DEPENDENCY = Table of zone ids that unlock when any are completed.
-  -- L -- T -- R -- B - FPX  FPY - DEPENDENCY --------------- ZONE ----- (1-10)
-  { 188,  50, 245,  78, 221,  56, {                   } }, -- Azerg        [01]
-  { 106,  63, 172,  90, 127,  54, {                   } }, -- Dhobbs       [02]
-  {  48, 137,  92, 167,  48, 140, {  2, 4, 5          } }, -- Eleevate     [03]
-  {  47, 192,  95, 245,  80, 210, {  3, 5, 9          } }, -- Deena        [04]
-  {  96, 154, 138, 185, 110, 129, {  2, 3, 4, 6, 8, 9 } }, -- Justyn       [05]
-  { 145, 133, 221, 148, 174, 123, {  5, 7, 8,11       } }, -- Fujale       [06]
-  { 157,  96, 230, 118, 211,  90, {  1, 2, 6,12       } }, -- Haeward      [07]
-  { 148, 167, 208, 189, 182, 167, {  5, 6, 9,10,11,   } }, -- Sairruhr     [08]
-  { 110, 194, 155, 238, 121, 214, {  4, 5, 8          } }, -- Traaghe      [09]
-  { 200, 206, 251, 236, 214, 204, {  8, 9,11,16,17,18 } }, -- Kurvelynn    [10]
-  -- L -- T -- R -- B - FPX  FPY - DEPENDENCY --------------- ZONE ---- (11-20)
-  { 225, 137, 264, 171, 225, 137, {  6, 8,10,12,16    } }, -- Squeek       [11]
-  { 247, 110, 315, 132, 266, 102, {  7,11,13,15,16    } }, -- Mykeborl     [12]
-  { 286,  75, 336, 104, 298,  68, { 12,14,15          } }, -- Zorlyack     [13]
-  { 348,  63, 397,  93, 348,  63, { 13,15,23,24       } }, -- Ftargus      [14]
-  { 329, 118, 371, 157, 329, 118, { 12,13,14,21,22,23 } }, -- Traisa       [15]
-  { 271, 152, 306, 196, 271, 152, { 10,11,12,13,17,21 } }, -- Klindyke     [16]
-  { 259, 210, 319, 236, 259, 210, { 10,16,19,21       } }, -- Eeanzone     [17]
-  { 197, 250, 248, 283, 197, 250, { 10,19             } }, -- Chysshir     [18]
-  { 255, 251, 320, 279, 255, 251, { 17,18,20          } }, -- Djennee      [19]
-  { 337, 236, 391, 290, 355, 236, { 19,21,22,28       } }, -- Dwindera     [20]
-  -- L -- T -- R -- B - FPX  FPY - DEPENDENCY --------------- ZONE ---- (21-30)
-  { 317, 165, 355, 200, 317, 165, { 15,16,17,20,22    } }, -- Twang        [21]
-  { 362, 168, 396, 216, 362, 168, { 15,21,20,23,27    } }, -- Habbard      [22]
-  { 381, 105, 419, 153, 381, 105, { 14,15,22,24,26    } }, -- Benjarr      [23]
-  { 412,  57, 467,  94, 412,  57, { 14,23,25,26       } }, -- Shrubree     [24]
-  { 478,  56, 553,  94, 478,  56, { 24,26,33          } }, -- Barok        [25]
-  { 431, 129, 491, 163, 480, 108, { 23,24,25,27,32,33 } }, -- Muhlahrd     [26]
-  { 414, 175, 459, 206, 414, 175, { 22,26,28,31,32    } }, -- Chonskee     [27]
-  { 406, 218, 453, 259, 406, 218, { 20,27,29,31       } }, -- Purth        [28]
-  { 440, 266, 509, 286, 480, 256, { 28,30,31          } }, -- Ankh         [29]
-  { 518, 256, 578, 297, 544, 266, { 29,31             } }, -- Zelios       [30]
-  -- L -- T -- R -- B - FPX  FPY - DEPENDENCY --------------- ZONE -----(31-40)
-  { 465, 214, 550, 243, 465, 214, { 27,28,29,30,32    } }, -- Fruer        [31]
-  { 491, 176, 549, 200, 491, 176, { 27,31,33          } }, -- Klarsh       [32]
-  { 516, 109, 569, 163, 516, 109, { 25,26,32          } }, -- Suhmner      [33]
-  { 564,  43, 589,  65, 559,  28, { 25                } }, -- Simtob       [34]
-};-- L -- T -- R -- B - FPX  FPY - DEPENDENCY --------------- ZONE --------- --
+  -- L -- T -- R -- B -- DEPENDENCY -------------------- ZONE ------- (1-10) --
+  { 188,  50, 245,  78, {                        } }, -- [01] Azerg
+  { 106,  63, 172,  90, {                        } }, -- [02] Dhobbs
+  {  48, 137,  92, 167, {  2,  4,  5             } }, -- [03] Eleevate
+  {  47, 192,  95, 245, {  3,  5,  9             } }, -- [04] Deena
+  {  96, 154, 138, 185, {  2,  3,  4,  6,  8,  9 } }, -- [05] Justyn
+  { 145, 133, 221, 148, {  5,  7,  8, 11         } }, -- [06] Fujale
+  { 164,  88, 230, 112, {  1,  2,  6, 12         } }, -- [07] Haeward
+  { 148, 167, 208, 189, {  5,  6,  9, 10, 11,    } }, -- [08] Sairruhr
+  { 110, 194, 155, 238, {  4,  5,  8             } }, -- [09] Traaghe
+  { 200, 206, 251, 236, {  8,  9, 11, 16, 17, 18 } }, -- [10] Kurvelynn
+  -- L -- T -- R -- B -- DEPENDENCY -------------------- ZONE ------ (11-20) --
+  { 225, 137, 264, 171, {  6,  8, 10, 12, 16     } }, -- [11] Squeek
+  { 247, 110, 315, 132, {  7, 11, 13, 15, 16     } }, -- [12] Mykeborl
+  { 286,  75, 336, 104, { 12, 14, 15             } }, -- [13] Zorlyack
+  { 348,  63, 397,  93, { 13, 15, 23, 24         } }, -- [14] Ftargus
+  { 329, 118, 371, 157, { 12, 13, 14, 21, 22, 23 } }, -- [15] Traisa
+  { 271, 152, 306, 196, { 10, 11, 12, 13, 17, 21 } }, -- [16] Klindyke
+  { 259, 210, 319, 236, { 10, 16, 19, 21         } }, -- [17] Eeanzone
+  { 197, 250, 248, 283, { 10, 19                 } }, -- [18] Chysshir
+  { 255, 251, 320, 279, { 17, 18, 20             } }, -- [19] Djennee
+  { 337, 236, 391, 290, { 19, 21, 22, 28         } }, -- [20] Dwindera
+  -- L -- T -- R -- B -- DEPENDENCY -------------------- ZONE ------ (21-30) --
+  { 317, 165, 355, 200, { 15, 16, 17, 20, 22     } }, -- [21] Twang
+  { 362, 168, 396, 216, { 15, 21, 20, 23, 27     } }, -- [22] Habbard
+  { 381, 105, 419, 153, { 14, 15, 22, 24, 26     } }, -- [23] Benjarr
+  { 412,  57, 467,  94, { 14, 23, 25, 26         } }, -- [24] Shrubree
+  { 478,  56, 553,  94, { 24, 26, 33             } }, -- [25] Barok
+  { 431, 129, 491, 163, { 23, 24, 25, 27, 32, 33 } }, -- [26] Muhlahrd
+  { 414, 175, 459, 206, { 22, 26, 28, 31, 32     } }, -- [27] Chonskee
+  { 406, 218, 453, 259, { 20, 27, 29, 31         } }, -- [28] Purth
+  { 440, 266, 509, 286, { 28, 30, 31             } }, -- [29] Ankh
+  { 518, 256, 578, 297, { 29, 31                 } }, -- [30] Zelios
+  -- L -- T -- R -- B -- DEPENDENCY -------------------- ZONE ------ (31-40) --
+  { 465, 214, 550, 243, { 27, 28, 29, 30, 32     } }, -- [31] Fruer
+  { 491, 176, 549, 200, { 27, 31, 33             } }, -- [32] Klarsh
+  { 516, 109, 569, 163, { 25, 26, 32             } }, -- [33] Suhmner
+  { 564,  43, 589,  65, { 25                     } }, -- [34] Simtob
+};-- L -- T -- R -- B -- DEPENDENCY -------------------- ZONE -------------- --
+-- ------------------------------------------------------------------------- --
+-- The following tables are used in the 'aObjectData' table below and specify
+-- that these actions, jobs and directions are accepted for that particular
+-- object when pressing certain keyboard keys.
+-- Left and right direction key supported ---------------------------------- --
+local aObjectLeftRight<const> = { [DIR.L] = true, [DIR.R] = true };
+-- No job but moving left and right key supported -------------------------- --
+local aObjectMove<const> = { [JOB.NONE] = aObjectLeftRight };
+-- No job an no direction key supported ------------------------------------ --
+local aObjectStop<const> = { [JOB.NONE] = { [DIR.NONE] = true } };
+-- Keep job and direction keys supported ----------------------------------- --
+local aObjectJobDirKeep<const> = { [JOB.KEEP] = { [DIR.KEEP] = true } };
+-- Search for treasure keys supported -------------------------------------- --
+local aObjectSearch<const> = { [DIR.LR] = true };
+-- Digger walk or run movement keys supported ------------------------------ --
+local aDiggerMovement<const> = {
+  [JOB.NONE]    = aObjectLeftRight,
+  [JOB.DIG]     = { [DIR.UL] = true, [DIR.UR] = true, [DIR.L] = true,
+                    [DIR.R] = true, [DIR.DL] = true, [DIR.DR] = true },
+  [JOB.HOME]    = { [DIR.HOME] = true },
+  [JOB.SEARCH]  = aObjectSearch,
+  [JOB.DIGDOWN] = { [DIR.TCTR] = true }
+};
+-- Digger keep job and direction key operations supported ----------------- --
+local aDiggerKeys<const> = {
+  [ACT.DROP]  = aObjectJobDirKeep,
+  [ACT.GRAB]  = aObjectJobDirKeep,
+  [ACT.JUMP]  = aObjectJobDirKeep,
+  [ACT.PHASE] = { [JOB.PHASE] = { [DIR.U] = true } };
+  [ACT.RUN]   = aDiggerMovement,
+  [ACT.STOP]  = aObjectStop,
+  [ACT.WALK]  = aDiggerMovement,
+}
+-- Small and large tuneller accepted keys ---------------------------------- --
+local aTunnellerKeys<const> = {
+  [ACT.STOP] = aObjectStop;
+  [ACT.WALK] = { [JOB.NONE] = aObjectLeftRight,
+                 [JOB.DIG] = aObjectLeftRight }
+};
+-- Deploy device ----------------------------------------------------------- --
+local aDeployDevice<const> = { [ACT.DEPLOY] = aObjectStop };
+-- ------------------------------------------------------------------------- --
 local aObjectData<const> = {           -- Objects data
 -- ------------------------------------------------------------------------- --
 -- [TYP.*] = {                         Object ID (see above)
@@ -524,6 +566,13 @@ local aObjectData<const> = {           -- Objects data
 --   FLAGS        = OFL.*[|OFL.*],     XOR'd object flags always active.
 --   INTELLIGENCE = <0.0-1.0>,         Chance to not ignore dangerous drops.
 --   JOB          = JOB.*,             Initial job ID (see above).
+--   KEYS = {                          Actions, jobs and dirs allowed for keys.
+--     [ACT.*] = {                     Actions allowed for keyboard press
+--       [JOB.*] = {                   Jobs allowed for keyboard press
+--         [DIR.*] = true,             Directions allowed for keyboard press
+--       },                            End of allowed directions list
+--     },                              End of allowed jobs list
+--   },                                End of actions, jobs and dirs allowed.
 --   LONGNAME     = "<string>",        Name of object for shop/post mortem.
 --   LUNGS        = <integer>,         Frame delay before reducing HP in water.
 --   MENU         = MNU.*,             Right click menu to use (see above).
@@ -588,11 +637,12 @@ local aObjectData<const> = {           -- Objects data
  ANIMTIMER    = aTimerData.ANIMNORMAL, DIGDELAY     = 60,
  DIRECTION    = DIR.NONE,              FLAGS        = OFL.DIGGER|OFL.DELICATE,
  INTELLIGENCE = 0.7,                   JOB          = JOB.NONE,
- LONGNAME     = "F'TARG",              LUNGS        = 4,
- MENU         = MNU.MAIN,              NAME         = "FTARG",
- PATIENCE     = 9600,                  STAMINA      = 60,
- STRENGTH     = 3,                     TELEDELAY    = 120,
- VALUE        = 1000,                  WEIGHT       = 0
+ KEYS         = aDiggerKeys,           LONGNAME     = "F'TARG",
+ LUNGS        = 4,                     MENU         = MNU.MAIN,
+ NAME         = "FTARG",               PATIENCE     = 9600,
+ STAMINA      = 60,                    STRENGTH     = 3,
+ TELEDELAY    = 120,                   VALUE        = 1000,
+ WEIGHT       = 0
 -- ------------------------------------------------------------------------- --
 }, [TYP.HABBISH] = {
  [ACT.HIDE] = {
@@ -650,11 +700,12 @@ local aObjectData<const> = {           -- Objects data
  DIRECTION    = DIR.NONE,
  FLAGS        = OFL.DIGGER|OFL.DELICATE|OFL.TPMASTER,
  INTELLIGENCE = 0.9,                   JOB          = JOB.NONE,
- LONGNAME     = "HABBISH",             LUNGS        = 12,
- MENU         = MNU.MAIN,              NAME         = "HABBISH",
- PATIENCE     = 7500,                  STAMINA      = 120,
- STRENGTH     = 5,                     TELEDELAY    = 60,
- VALUE        = 1000,                  WEIGHT       = 0
+ KEYS         = aDiggerKeys,           LONGNAME     = "HABBISH",
+ LUNGS        = 12,                    MENU         = MNU.MAIN,
+ NAME         = "HABBISH",             PATIENCE     = 7500,
+ STAMINA      = 120,                   STRENGTH     = 5,
+ TELEDELAY    = 60,                    VALUE        = 1000,
+ WEIGHT       = 0
 -- ------------------------------------------------------------------------- --
 }, [TYP.GRABLIN] = {
  [ACT.HIDE] = {
@@ -708,11 +759,12 @@ local aObjectData<const> = {           -- Objects data
  ANIMTIMER    = aTimerData.ANIMNORMAL, DIGDELAY     = 50,
  DIRECTION    = DIR.NONE,              FLAGS        = OFL.DIGGER|OFL.DELICATE,
  INTELLIGENCE = 0.8,                   JOB          = JOB.NONE,
- LONGNAME     = "GRABLIN",             LUNGS        = 8,
- MENU         = MNU.MAIN,              NAME         = "GRABLIN",
- PATIENCE     = 10500,                 STAMINA      = 120,
- STRENGTH     = 4,                     TELEDELAY    = 120,
- VALUE        = 1000,                  WEIGHT       = 0,
+ KEYS         = aDiggerKeys,           LONGNAME     = "GRABLIN",
+ LUNGS        = 8,                     MENU         = MNU.MAIN,
+ NAME         = "GRABLIN",             PATIENCE     = 10500,
+ STAMINA      = 120,                   STRENGTH     = 4,
+ TELEDELAY    = 120,                   VALUE        = 1000,
+ WEIGHT       = 0,
 -- ------------------------------------------------------------------------- --
 }, [TYP.QUARRIOR] = {
  [ACT.HIDE] = {
@@ -766,11 +818,12 @@ local aObjectData<const> = {           -- Objects data
  ANIMTIMER    = aTimerData.ANIMNORMAL, DIGDELAY     = 80,
  DIRECTION    = DIR.NONE,              FLAGS        = OFL.DIGGER,
  INTELLIGENCE = 0.6,                   JOB          = JOB.NONE,
- LONGNAME     = "QUARRIOR",            LUNGS        = 16,
- MENU         = MNU.MAIN,              NAME         = "QUARRIOR",
- PATIENCE     = 15000,                 STAMINA      = 120,
- STRENGTH     = 6,                     TELEDELAY    = 180,
- VALUE        = 1000,                  WEIGHT       = 0
+ KEYS         = aDiggerKeys,           LONGNAME     = "QUARRIOR",
+ LUNGS        = 16,                    MENU         = MNU.MAIN,
+ NAME         = "QUARRIOR",            PATIENCE     = 15000,
+ STAMINA      = 120,                   STRENGTH     = 6,
+ TELEDELAY    = 180,                   VALUE        = 1000,
+ WEIGHT       = 0
 -- ------------------------------------------------------------------------- --
 }, [TYP.JENNITE] = {
  [ACT.STOP] = {
@@ -1202,11 +1255,12 @@ local aObjectData<const> = {           -- Objects data
  DESC      = "A MECHANICAL DIGGER\nTHAT DIGS HORIZONTALLY",
  DIGDELAY  = 30,                       DIRECTION = DIR.NONE,
  FLAGS     = OFL.SELLABLE|OFL.DEVICE|OFL.EXPLODE,
- JOB       = JOB.NONE,                 LONGNAME  = "SMALL TUNNELER",
- LUNGS     = 1,                        MENU      = MNU.TUNNEL,
- NAME      = "SMALLTUN",               STAMINA   = -1,
- STRENGTH  = 0,                        TELEDELAY = 200,
- VALUE     = 150,                      WEIGHT    = 2,
+ KEYS      = aTunnellerKeys,           JOB       = JOB.NONE,
+ LONGNAME  = "SMALL TUNNELER",         LUNGS     = 1,
+ MENU      = MNU.TUNNEL,               NAME      = "SMALLTUN",
+ STAMINA   = -1,                       STRENGTH  = 0,
+ TELEDELAY = 200,                      VALUE     = 150,
+ WEIGHT    = 2,
 -- ------------------------------------------------------------------------- --
 }, [TYP.LTUNNEL] = {
  [ACT.STOP] = {
@@ -1228,11 +1282,12 @@ local aObjectData<const> = {           -- Objects data
  DESC       = "A FAST MECHANICAL DIGGER\nTHAT DIGS HORIZONTALLY",
  DIGDELAY   = 10,                      DIRECTION  = DIR.NONE,
  FLAGS      = OFL.SELLABLE|OFL.DEVICE|OFL.EXPLODE,
- JOB        = JOB.NONE,                LONGNAME   = "LARGE TUNNELER",
- LUNGS      = 1,                       MENU       = MNU.TUNNEL,
- NAME       = "LARGETUN",              STAMINA    = -1,
- STRENGTH   = 0,                       TELEDELAY  = 200,
- VALUE      = 230,                     WEIGHT     = 3
+ JOB        = JOB.NONE,                KEYS       = aTunnellerKeys,
+ LONGNAME   = "LARGE TUNNELER",        LUNGS      = 1,
+ MENU       = MNU.TUNNEL,              NAME       = "LARGETUN",
+ STAMINA    = -1,                      STRENGTH   = 0,
+ TELEDELAY  = 200,                     VALUE      = 230,
+ WEIGHT     = 3
 -- ------------------------------------------------------------------------- --
 }, [TYP.LTUNNELB] = {
  [ACT.STOP] = {
@@ -1254,9 +1309,6 @@ local aObjectData<const> = {           -- Objects data
   [DIR.L] = { 288, 288 }, [DIR.NONE] = { 288, 288 }, [DIR.R] = { 288, 288 },
   [DIR.D] = { 288, 288 },
   FLAGS   = OFL.FALL|OFL.PICKUP|OFL.PHASETARGET
- }, [ACT.WALK] = {
-  [DIR.D] = { 288, 290 },
-  FLAGS   = OFL.FALL|OFL.PICKUP|OFL.PHASETARGET
  }, [ACT.CREEP] = {
   [DIR.L] = { 288, 290 }, [DIR.R] = { 288, 290 },
   FLAGS   = OFL.FALL|OFL.PICKUP|OFL.PHASETARGET
@@ -1267,6 +1319,12 @@ local aObjectData<const> = {           -- Objects data
  }, [ACT.DEATH] = {
   [DIR.NONE] = { 451, 454 },
   FLAGS      = OFL.BUSY
+ }, KEYS = {
+  [ACT.STOP] = aObjectStop,
+  [ACT.CREEP] = {
+   [JOB.NONE]    = aObjectLeftRight,
+   [JOB.DIGDOWN] = { [DIR.TCTR] = true }
+  }
  },
  ACTION    = ACT.STOP,                 AITYPE    = AI.CORKSCREW,
  ANIMTIMER = aTimerData.ANIMNORMAL,
@@ -1315,11 +1373,12 @@ local aObjectData<const> = {           -- Objects data
  DESC      = "QUICK DESTRUCTION\nOF TERRAIN",
  DIRECTION = DIR.NONE,
  FLAGS     = OFL.SELLABLE|OFL.DEVICE|OFL.AQUALUNG|OFL.EXPLODE,
- JOB       = JOB.NONE,                 LONGNAME  = "EXPLOSIVES",
- MENU      = MNU.TNT,                  NAME      = "TNT",
- STAMINA   = -1,                       STRENGTH  = 0,
- TELEDELAY = 600,                      VALUE     = 20,
- WEIGHT    = 1
+ JOB       = JOB.NONE,
+ KEYS      = { [ACT.DYING] = aObjectStop },
+ LONGNAME  = "EXPLOSIVES",             MENU      = MNU.TNT,
+ NAME      = "TNT",                    STAMINA   = -1,
+ STRENGTH  = 0,                        TELEDELAY = 600,
+ VALUE     = 20,                       WEIGHT    = 1
 -- ------------------------------------------------------------------------- --
 }, [TYP.FIRSTAID] = {
  [ACT.STOP] = {
@@ -1351,6 +1410,7 @@ local aObjectData<const> = {           -- Objects data
  ANIMTIMER = aTimerData.ANIMNORMAL,
  DESC      = "VIEW THE ENTIRE ZONE\nLAYOUT WITH THIS MAP",
  DIRECTION = DIR.NONE,                 FLAGS     = OFL.SELLABLE|OFL.DEVICE,
+ KEYS      = { [ACT.MAP] = aObjectStop },
  JOB       = JOB.NONE,                 LONGNAME  = "TNT MAP",
  LUNGS     = 32,                       MENU      = MNU.MAP,
  NAME      = "MAP",                    STAMINA   = -1,
@@ -1370,11 +1430,11 @@ local aObjectData<const> = {           -- Objects data
  DESC      = "CARRYS A TRAIN\nWITH VALUABLE CARGO",
  DIRECTION = DIR.NONE,
  FLAGS     = OFL.SELLABLE|OFL.DEVICE|OFL.AQUALUNG,
- JOB       = JOB.NONE,                 LONGNAME  = "TRACK FOR TRAIN",
- MENU      = MNU.DEPLOY,               NAME      = "TRACK",
- STAMINA   = -1,                       STRENGTH  = 0,
- TELEDELAY = 200,                      VALUE     = 10,
- WEIGHT    = 1,
+ JOB       = JOB.NONE,                 KEYS      = aDeployDevice,
+ LONGNAME  = "TRACK FOR TRAIN",        MENU      = MNU.DEPLOY,
+ NAME      = "TRACK",                  STAMINA   = -1,
+ STRENGTH  = 0,                        TELEDELAY = 200,
+ VALUE     = 10,                       WEIGHT    = 1,
 -- ------------------------------------------------------------------------- --
 }, [TYP.TRAIN] = {
  [ACT.STOP] = {
@@ -1386,6 +1446,14 @@ local aObjectData<const> = {           -- Objects data
  }, [ACT.DEATH] = {
   [DIR.NONE] = { 451, 454 },
   FLAGS      = OFL.BUSY
+ }, KEYS = {
+  [ACT.STOP] = aObjectStop,
+  [ACT.WALK] = {
+    [JOB.SEARCH] = aObjectSearch,
+    [JOB.NONE] = aObjectLeftRight,
+  },
+  [ACT.DROP] = aObjectJobDirKeep,
+  [ACT.GRAB] = aObjectJobDirKeep,
  },
  ACTION    = ACT.STOP,                 AITYPE    = AI.TRAIN,
  ANIMTIMER = aTimerData.ANIMNORMAL,
@@ -1426,6 +1494,9 @@ local aObjectData<const> = {           -- Objects data
  }, [ACT.DEATH] = {
   [DIR.NONE] = { 451, 454},
   FLAGS      = OFL.BUSY
+ }, KEYS = {
+  [ACT.STOP] = aObjectStop,
+  [ACT.CREEP] = aObjectMove,
  },
  ACTION    = ACT.STOP,                 AITYPE    = AI.BOAT,
  ANIMTIMER = aTimerData.ANIMNORMAL,
@@ -1451,11 +1522,11 @@ local aObjectData<const> = {           -- Objects data
  DESC      = "PROTECT FROM DANGERS\nAND FLOODING",
  DIRECTION = DIR.NONE,
  FLAGS     = OFL.SELLABLE|OFL.DEVICE|OFL.AQUALUNG,
- JOB       = JOB.NONE,                 LONGNAME  = "FLOOD GATE",
- MENU      = MNU.DEPLOY,               NAME      = "GATE",
- STAMINA   = -1,                       STRENGTH  = 0,
- TELEDELAY = 200,                      VALUE     = 80,
- WEIGHT    = 2
+ JOB       = JOB.NONE,                 KEYS      = aDeployDevice,
+ LONGNAME  = "FLOOD GATE",             MENU      = MNU.DEPLOY,
+ NAME      = "GATE",                   STAMINA   = -1,
+ STRENGTH  = 0,                        TELEDELAY = 200,
+ VALUE     = 80,                       WEIGHT    = 2
 -- ------------------------------------------------------------------------- --
 }, [TYP.GATEB] = {
  [ACT.STOP] = {
@@ -1463,6 +1534,9 @@ local aObjectData<const> = {           -- Objects data
  }, [ACT.DEATH] = {
   [DIR.NONE] = { 451, 454 },
   FLAGS      = OFL.BUSY
+ }, KEYS = {
+  [ACT.OPEN]  = aObjectStop,
+  [ACT.CLOSE] = aObjectStop,
  },
  ACTION    = ACT.STOP,                 AITYPE    = AI.GATE,
  ANIMTIMER = aTimerData.ANIMNORMAL,    DIRECTION = DIR.NONE,
@@ -1485,11 +1559,11 @@ local aObjectData<const> = {           -- Objects data
  DESC      = "A VERTICAL MOVING PLATFORM\nCARRIES YOUR DIGGERS",
  DIRECTION = DIR.NONE,
  FLAGS     = OFL.SELLABLE|OFL.DEVICE|OFL.EXPLODE|OFL.AQUALUNG,
- JOB       = JOB.NONE,                 LONGNAME  = "LIFT",
- MENU      = MNU.DEPLOY,               NAME      = "LIFT",
- STAMINA   = -1,                       STRENGTH  = 0,
- TELEDELAY = 200,                      VALUE     = 220,
- WEIGHT    = 3
+ JOB       = JOB.NONE,                 KEYS      = aDeployDevice,
+ LONGNAME  = "LIFT",                   MENU      = MNU.DEPLOY,
+ NAME      = "LIFT",                   STAMINA   = -1,
+ STRENGTH  = 0,                        TELEDELAY = 200,
+ VALUE     = 220,                      WEIGHT    = 3
 -- ------------------------------------------------------------------------- --
 }, [TYP.LIFTB] = {
  [ACT.STOP] = {
@@ -1501,6 +1575,8 @@ local aObjectData<const> = {           -- Objects data
  }, [ACT.DEATH] = {
   [DIR.NONE] = { 451, 454 },
   FLAGS      = OFL.BUSY
+ }, KEYS = {
+   [ACT.CREEP] = { [JOB.NONE] = { [DIR.U] = true, [DIR.D] = true } };
  },
  ACTION     = ACT.STOP,                AITYPE     = AI.LIFT,
  ANIMTIMER  = aTimerData.ANIMNORMAL,   ATTACHMENT = TYP.LIFTC,
@@ -2338,7 +2414,7 @@ local aFloodGateData<const> = {
   [439]={{439,true },{439,true }}, -- Gate is open and wet
   -- TID  FFR  CON   FFL   CON
 };
--- Menu data -------------------------------------------------------------- --
+-- Menu data --------------------------------------------------------------- --
 local aMenuData<const> = {
   --  ID         W H
   [MNU.MAIN]  = {8,1,{
@@ -2523,15 +2599,15 @@ local aCreditsXData<const> = {
   { "Complete conversion",             "Mhatxotic Design" },
   { "Setup music loop",                "S.S. Secret Mission 1\n\z
                                         By PowerTrace\n\z
-                                        Edited by Mhatxotic Design\n\z
+                                        Edited by Mhat\n\z
                                         AmigaRemix.com" },
   { "Credits music loop",              "4U 07:00 V2001\n\z
                                         By Enuo\n\z
-                                        Edited by Mhatxotic Design\n\z
+                                        Edited by Mhat\n\z
                                         ModArchive.org" },
   { "Gameover music loop",             "1000 Years Of Funk\n\z
                                         By Dimitri D. L.\n\z
-                                        Edited by Mhatxotic Design\n\z
+                                        Edited by Mhat\n\z
                                         ModArchive.Org" },
   { "Conversion powered by",           "Mhatxotic Engine" },
   { "GLFW OpenGL front-end",           "Marcus Geelnard\n\z
@@ -2563,45 +2639,45 @@ local aCreditsXData<const> = {
 };
 -- Setup buttons data ------------------------------------------------------ --
 local aSetupButtonData<const> = { -- nil's are filled in 'setup.lua' init
-  APPLY = {   4, 193,  82, 212, CID.OK,   nil, 101,
+  APPLY = { nil, nil, nil, nil, CID.OK,   nil, 101, nil, nil,
     "CLICK TO APPLY ANY SYSTEM AFFECTING SETTINGS YOU HAVE CHANGED" },
-  DONE  = {  82, 193, 160, 212, CID.EXIT, nil, 102,
+  DONE  = { nil, nil, nil, nil, CID.EXIT, nil, 102, nil, nil,
     "CLICK TO EXIT THIS SETUP WINDOW AND RETURN TO YOUR GAME. ANY CHANGED \z
      SETTINGS THAT NEED TO BE APPLIED WILL BE CANCELLED" },
-  RESET = { 160, 193, 238, 212, CID.OK,   nil, 103,
+  RESET = { nil, nil, nil, nil, CID.OK,   nil, 103, nil, nil,
     "CLICK TO RESET ALL VALUES TO DEFAULTS AND AUTOMATICALLY APPLY THE \z
      SETTINGS" },
-  ABOUT = { 238, 193, 316, 212, CID.OK,   nil, 104,
-    "CLICK TO VIEW THE ACKNOWLEDGEMENTS FOR THIS GAME" }
+  BINDS = { nil, nil, nil, nil, CID.OK,   nil, 104, nil, nil,
+    "CLICK TO CHANGE KEYBINDS FOR THIS GAME" },
+  ABOUT = { nil, nil, nil, nil, CID.OK,   nil, 105, nil, nil,
+    "CLICK TO VIEW THE ACKNOWLEDGEMENTS FOR THIS GAME" },
 };-- Setup options data ---------------------------------------------------- --
 local aSetupOptionData<const> = { -- nil's are filled in 'setup.lua' init
   -- Option name -- Value -- UpdateFunc --- DownFunc --- UpFunc ------------ --
   { "Monitor",         "", nil,           nil,         nil,
-    "CHANGES THE MONITOR THE GAME WILL APPEAR ON BY DEFAULT. PRESS \z
-     APPLY WHEN YOU ARE HAPPY WITH THE SELECTION TO ACTIVATE IT", },
+    "CHANGES THE MONITOR THE GAME WILL APPEAR ON BY DEFAULT. PRESS APPLY \z
+     WHEN YOU ARE HAPPY WITH THE SELECTION TO ACTIVATE IT", },
   { "Display State",   "", nil,           nil,         nil,
-    "CHANGES THE DEFAULT WINDOW STYLE OF THE GAME. PRESS APPLY WHEN YOU \z
-     ARE HAPPY WITH THE SELECTION TO ACTIVATE IT" },
+    "CHANGES THE DEFAULT WINDOW STYLE OF THE GAME. PRESS APPLY WHEN YOU ARE \z
+     HAPPY WITH THE SELECTION TO ACTIVATE IT" },
   { "Full-Resolution", "", nil,           nil,         nil,
-    "ALLOWS YOU TO SET A CUSTOM DESKTOP RESOLUTION FOR EXCLUSIVE \z
-     FULL-SCREEN MODE. PRESS APPLY WHEN YOU ARE HAPPY WITH THE SELECTION \z
-     TO ACTIVATE IT" },
+    "ALLOWS YOU TO SET A CUSTOM DESKTOP RESOLUTION FOR EXCLUSIVE FULL-SCREEN \z
+     MODE. PRESS APPLY WHEN YOU ARE HAPPY WITH THE SELECTION TO ACTIVATE IT" },
   { "Window Size",     "", nil,           nil,         nil,
-    "ALLOWS YOU TO SET A CUSTOM WINDOW SIZE FOR DECORATED WINDOW ONLY \z
-     MODE. PRESS APPLY WHEN YOU ARE HAPPY WITH THE SELECTION TO ACTIVATE \z
-     IT" },
+    "ALLOWS YOU TO SET A CUSTOM WINDOW SIZE FOR DECORATED WINDOW ONLY MODE. \z
+     PRESS APPLY WHEN YOU ARE HAPPY WITH THE SELECTION TO ACTIVATE IT" },
   { "Frame Limiter",   "", nil,           nil,         nil,
-    "ALLOWS YOU TO CHOOSE FROM A RANGE OF FRAME-LIMITING OPTIONS TO \z
-     BALANCE THE PERFORMANCE VERSUS POWER USAGE OF RENDERING. SOME VALUES \z
-     MAY BE INEFFECTIVE WHEN THE VSYNC VALUE IS BEING OVERRIDDEN IN YOUR \z
-     VIDEO ADAPTER SETTINGS OR WHEN YOUR SYSTEM IS UNDERPERFORMING. THE \z
-     CHANGE IS INSTANTLY APPLIED" },
+    "ALLOWS YOU TO CHOOSE FROM A RANGE OF FRAME-LIMITING OPTIONS TO BALANCE \z
+     THE PERFORMANCE VERSUS POWER USAGE OF RENDERING. SOME VALUES MAY BE \z
+     INEFFECTIVE WHEN THE VSYNC VALUE IS BEING OVERRIDDEN IN YOUR VIDEO \z
+     ADAPTER SETTINGS OR WHEN YOUR SYSTEM IS UNDERPERFORMING. THE CHANGE IS \z
+     INSTANTLY APPLIED" },
   { "Texture Filter",  "", nil,           nil,         nil,
     "APPLY A BILINEAR UPSCALE FILTER TO THE MAIN FRAMEBUFFER. THE GAME IS \z
      RENDERED IN 320x240. THE CHANGE OF OPTION IS INSTANTLY APPLIED" },
   { "Audio Device",    "", nil,           nil,         nil,
-    "ALLOWS YOU TO SET THE DEFAULT AUDIO DEVICE TO USE FOR THE GAME. \z
-     PRESS APPLY WHEN YOU ARE HAPPY WITH THE SELECTION TO ACTIVATE IT" },
+    "ALLOWS YOU TO SET THE DEFAULT AUDIO DEVICE TO USE FOR THE GAME. PRESS \z
+     APPLY WHEN YOU ARE HAPPY WITH THE SELECTION TO ACTIVATE IT" },
   { "Master Volume",   "", nil,           nil,         nil,
     "CHANGES THE FINAL OUTPUT VOLUME OF ALL MUSIC, SOUND EFFECTS AND FMV \z
      MIXED TOGETHER. THE CHANGE OF OPTION IS INSTANTLY APPLIED" },
@@ -2636,14 +2712,86 @@ local aIntroSubTitles<const> = {
                   "heads towards the trading centre." } },
   { 2050, 2180, { "For him, the ultimate test. The greatest",
                   "challenge of his life lies ahead." } },
-  { 2200, 2290, { "The rewards for success,",
+  { 2200, 2290, { "The reward for success,",
                   "will be wealth unlimited." } },
   { 2310, 2440, { "The results of failure,",
                   "are unthinkable!" } },
 };-- SHO - HID - LINES ----------------------------------------------------- --
+-- Convert key index to literal string ------------------------------------- --
+local aKeys<const> = Input.KeyCodes;
+local aKeyToLiteral<const> = {
+  [0]                   = "UNBOUND",   [aKeys.APOSTROPHE]    = "APOSTROPHE",
+  [aKeys.A]             = "A",         [aKeys.BACKSLASH]     = "BACKSLASH",
+  [aKeys.BACKSPACE]     = "BACKSPACE", [aKeys.B]             = "B",
+  [aKeys.CAPS_LOCK]     = "CAPS LOCK", [aKeys.COMMA]         = "COMMA",
+  [aKeys.C]             = "C",         [aKeys.DELETE]        = "DELETE",
+  [aKeys.DOWN]          = "DOWN",      [aKeys.D]             = "D",
+  [aKeys.END]           = "END",       [aKeys.ENTER]         = "ENTER",
+  [aKeys.EQUAL]         = "EQUALS",    [aKeys.ESCAPE]        = "ESCAPE",
+  [aKeys.E]             = "E",         [aKeys.F10]           = "F10",
+  [aKeys.F11]           = "F11",       [aKeys.F12]           = "F12",
+  [aKeys.F13]           = "F13",       [aKeys.F14]           = "F14",
+  [aKeys.F15]           = "F15",       [aKeys.F16]           = "F16",
+  [aKeys.F17]           = "F17",       [aKeys.F18]           = "F18",
+  [aKeys.F19]           = "F19",       [aKeys.F1]            = "F1",
+  [aKeys.F20]           = "F20",       [aKeys.F21]           = "F21",
+  [aKeys.F22]           = "F22",       [aKeys.F23]           = "F23",
+  [aKeys.F24]           = "F24",       [aKeys.F25]           = "F25",
+  [aKeys.F2]            = "F2",        [aKeys.F3]            = "F3",
+  [aKeys.F4]            = "F4",        [aKeys.F5]            = "F5",
+  [aKeys.F6]            = "F6",        [aKeys.F7]            = "F7",
+  [aKeys.F8]            = "F8",        [aKeys.F9]            = "F9",
+  [aKeys.F]             = "F",         [aKeys.GRAVE_ACCENT]  = "GRAVE ACCENT",
+  [aKeys.G]             = "G",         [aKeys.HOME]          = "HOME",
+  [aKeys.H]             = "H",         [aKeys.INSERT]        = "INSERT",
+  [aKeys.I]             = "I",         [aKeys.J]             = "J",
+  [aKeys.KP_0]          = "KEYPAD 0",  [aKeys.KP_1]          = "KEYPAD 1",
+  [aKeys.KP_2]          = "KEYPAD 2",  [aKeys.KP_3]          = "KEYPAD 3",
+  [aKeys.KP_4]          = "KEYPAD 4",  [aKeys.KP_5]          = "KEYPAD 5",
+  [aKeys.KP_6]          = "KEYPAD 6",  [aKeys.KP_7]          = "KEYPAD 7",
+  [aKeys.KP_8]          = "KEYPAD 8",  [aKeys.KP_9]          = "KEYPAD 9",
+  [aKeys.KP_ADD]        = "KEYPAD ADD",
+  [aKeys.KP_DECIMAL]    = "KEYPAD DECIMAL",
+  [aKeys.KP_DIVIDE]     = "KEYPAD DIVIDE",
+  [aKeys.KP_ENTER]      = "KEYPAD ENTER",
+  [aKeys.KP_EQUAL]      = "KEYPAD EQUAL",
+  [aKeys.KP_MULTIPLY]   = "KEYPAD MULTIPLY",
+  [aKeys.KP_SUBTRACT]   = "KEYPAD SUBTRACT",
+  [aKeys.K]             = "K",         [aKeys.LEFT]          = "LEFT",
+  [aKeys.LEFT_ALT]      = "LEFT ALT",  [aKeys.LEFT_BRACKET]  = "LEFT BRACKET",
+  [aKeys.LEFT_CONTROL]  = "LEFT CONTROL",
+  [aKeys.LEFT_SHIFT]    = "LEFT SHIFT",
+  [aKeys.LEFT_SUPER]    = "LEFT SUPER",
+  [aKeys.L]             = "L",         [aKeys.MENU]          = "MENU",
+  [aKeys.MINUS]         = "MINUS",     [aKeys.M]             = "M",
+  [aKeys.N0]            = "0",         [aKeys.N1]            = "1",
+  [aKeys.N2]            = "2",         [aKeys.N3]            = "3",
+  [aKeys.N4]            = "4",         [aKeys.N5]            = "5",
+  [aKeys.N6]            = "6",         [aKeys.N7]            = "7",
+  [aKeys.N8]            = "8",         [aKeys.N9]            = "9",
+  [aKeys.NUM_LOCK]      = "NUM LOCK",  [aKeys.N]             = "N",
+  [aKeys.O]             = "O",         [aKeys.PAGE_DOWN]     = "PAGE DOWN",
+  [aKeys.PAGE_UP]       = "PAGE UP",   [aKeys.PAUSE]         = "PAUSE",
+  [aKeys.PERIOD]        = "PERIOD",    [aKeys.PRINT_SCREEN]  = "PRINT SCREEN",
+  [aKeys.P]             = "P",         [aKeys.Q]             = "Q",
+  [aKeys.RIGHT]         = "RIGHT",     [aKeys.RIGHT_ALT]     = "RIGHT ALT",
+  [aKeys.RIGHT_BRACKET] = "RIGHT BRACKET",
+  [aKeys.RIGHT_CONTROL] = "RIGHT CONTROL",
+  [aKeys.RIGHT_SHIFT]   = "RIGHT SHIFT",
+  [aKeys.RIGHT_SUPER]   = "RIGHT SUPER",
+  [aKeys.R]             = "R",         [aKeys.SCROLL_LOCK]   = "SCROLL LOCK",
+  [aKeys.SEMICOLON]     = "SEMICOLON", [aKeys.SLASH]         = "SLASH",
+  [aKeys.SPACE]         = "SPACE",     [aKeys.S]             = "S",
+  [aKeys.TAB]           = "TAB",       [aKeys.T]             = "T",
+  [aKeys.UNKNOWN]       = "UNKNOWN",   [aKeys.UP]            = "UP",
+  [aKeys.U]             = "U",         [aKeys.V]             = "V",
+  [aKeys.WORLD_1]       = "WORLD 1",   [aKeys.WORLD_2]       = "WORLD 2",
+  [aKeys.W]             = "W",         [aKeys.X]             = "X",
+  [aKeys.Y]             = "Y",         [aKeys.Z]             = "Z"
+};
 -- Imports and exports ----------------------------------------------------- --
 return { F = Util.Blank, A = {         -- Sending API to main loader
--- Exports ----------------------------------------------------------------- --
+  -- Exports --------------------------------------------------------------- --
   aAIChoicesData = aAIChoicesData, aAITypesData = AI,
   aCreditsData = aCreditsData, aCreditsXData = aCreditsXData,
   aCursorData = aCursorData, aCursorIdData = CID,
@@ -2652,17 +2800,18 @@ return { F = Util.Blank, A = {         -- Sending API to main loader
   aDugRandShaftData = aDugRandShaftData, aEndingData = aEndingData,
   aExplodeAboveData = aExplodeAboveData, aExplodeDirData = aExplodeDirData,
   aFloodGateData = aFloodGateData, aIntroSubTitles = aIntroSubTitles,
-  aJumpFallData = aJumpFallData, aJumpRiseData = aJumpRiseData,
-  aLevelTypesData = aLevelTypesData, aLevelsData = aLevelsData,
-  aMenuData = aMenuData, aMenuFlags = MFL, aMenuIds = MNU,
-  aObjToUIData = aObjToUIData, aObjectActions = ACT, aObjectData = aObjectData,
-  aObjectDirections = DIR, aObjectFlags = OFL, aObjectJobs = JOB,
-  aObjectTypes = TYP, aRaceStatData = aRaceStatData, aRacesData = aRacesData,
-  aSetupButtonData = aSetupButtonData, aSetupOptionData = aSetupOptionData,
-  aSfxData = aSfxData, aShopData = aShopData, aShroudCircle = aShroudCircle,
+  aKeyToLiteral = aKeyToLiteral, aJumpFallData = aJumpFallData,
+  aJumpRiseData = aJumpRiseData, aLevelTypesData = aLevelTypesData,
+  aLevelsData = aLevelsData, aMenuData = aMenuData, aMenuFlags = MFL,
+  aMenuIds = MNU, aObjToUIData = aObjToUIData, aObjectActions = ACT,
+  aObjectData = aObjectData, aObjectDirections = DIR, aObjectFlags = OFL,
+  aObjectJobs = JOB, aObjectTypes = TYP, aRaceStatData = aRaceStatData,
+  aRacesData = aRacesData, aSetupButtonData = aSetupButtonData,
+  aSetupOptionData = aSetupOptionData, aSfxData = aSfxData,
+  aShopData = aShopData, aShroudCircle = aShroudCircle,
   aShroudTileLookup = aShroudTileLookup, aTileData = aTileData,
   aTileFlags = TF, aTimerData = aTimerData, aTrainTrackData = aTrainTrackData,
   aZoneData = aZoneData
--- ------------------------------------------------------------------------- --
+  -- ----------------------------------------------------------------------- --
 } };                                   -- End of definitions to send to loader
 -- End-of-File ============================================================= --

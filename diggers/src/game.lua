@@ -17,38 +17,39 @@ local abs<const>, ceil<const>, error<const>, floor<const>, format<const>,
     math.maxinteger, math.min, math.random, table.remove, tostring;
 -- M-Engine function aliases ----------------------------------------------- --
 local CoreLog<const>, CoreQuit<const>, CoreWrite<const>, CoreTicks<const>,
-  CoreTime<const>, MaskCreateZero<const>, UtilBlank<const>, UtilClamp<const>,
-  UtilClampInt<const>, UtilFormatNTime<const>, UtilIsBoolean<const>,
-  UtilIsFunction<const>, UtilIsInteger<const>, UtilIsString<const>,
-  UtilIsTable<const>, UtilRound<const> =
-    Core.Log, Core.Quit, Core.WriteEx, Core.Ticks, Core.Time, Mask.CreateZero,
-    Util.Blank, Util.Clamp, Util.ClampInt, Util.FormatNTime, Util.IsBoolean,
-    Util.IsFunction, Util.IsInteger, Util.IsString, Util.IsTable, Util.Round;
+  CoreTime<const>, InputSetCursorPos<const>, MaskCreateZero<const>,
+  UtilBlank<const>, UtilClamp<const>, UtilClampInt<const>,
+  UtilIsBoolean<const>, UtilIsFunction<const>, UtilIsInteger<const>,
+  UtilIsString<const>, UtilIsTable<const>, UtilRound<const> =
+    Core.Log, Core.Quit, Core.WriteEx, Core.Ticks, Core.Time,
+    Input.SetCursorPos, Mask.CreateZero, Util.Blank, Util.Clamp, Util.ClampInt,
+    Util.IsBoolean, Util.IsFunction, Util.IsInteger, Util.IsString,
+    Util.IsTable, Util.Round;
 -- Assets required --------------------------------------------------------- --
-local aLvlTerrainAsset<const> = { T = 5, F = false, P = { } };
-local aLvlObjectAsset<const>  = { T = 5, F = false, P = { } };
+local aLvlTerrainAsset<const> = { T = 5, F = false };
+local aLvlObjectAsset<const>  = { T = 5, F = false };
 local aLvlTextureAsset<const> = { T = 1, F = false, P = { 16, 16, 0, 0, 0 } };
 local aAssetsMusic<const>     = { aLvlTerrainAsset, aLvlObjectAsset,
-    aLvlTextureAsset,           { T = 7, F = false, P = { } } };
+        aLvlTextureAsset,       { T = 7, F = false } };
 local aAssetsNoMusic<const>   = { aLvlTerrainAsset, aLvlObjectAsset,
-    aLvlTextureAsset };
-local aContAssets<const>      = { { T = 7, F = "game", P = { } } };
+        aLvlTextureAsset };
+local aContAssets<const>      = { { T = 7, F = "game" } };
 -- Medium priority variables (because of MAXVARS limit) -------------------- --
 local function MediumPriorityVars()
 -- Diggers shared functions and data --------------------------------------- --
 local ACT, AI, BCBlit, DF, DIR, Fade, GetCallbacks, GetMouseX, GetMouseY,
-  GetMusic, GetTestMode, InitBook, InitLobby, InitLose, InitLoseDead,
+  GetTestMode, InitBook, InitLobby, InitLose, InitLoseDead, InitPause,
   InitTNTMap, InitWin, InitWinDead, IsButtonHeld, IsButtonPressed,
-  IsButtonPressedNoRelease, IsJoyPressed, IsKeyHeld, IsKeyPressed,
-  IsMouseInBounds, IsMouseXLessThan, IsScrollingDown, IsScrollingUp, JOB,
-  LoadResources, MFL, MNU, OFL, PlayMusic, PlaySound, PlayStaticSound,
-  RegisterFBUCallback, RenderFade, RenderShadow, SetBottomRightTip,
-  SetCallbacks, SetCursor, StopMusic, TYP, aAIChoicesData, aCursorIdData,
+  IsButtonPressedNoRelease, IsMouseInBounds, IsMouseXLessThan,
+  IsScrollingDown, IsScrollingUp, JOB, LoadResources, MFL, MNU, OFL, PlayMusic,
+  PlaySound, PlayStaticSound, RegisterFBUCallback, RenderFade, RenderShadow,
+  SetBottomRightTip, SetCallbacks, SetCursor, SetKeys, TYP, aAIChoicesData,
   aDigBlockData, aDigData, aDigTileData, aDugRandShaftData, aExplodeAboveData,
   aExplodeDirData, aFloodGateData, aGlobalData, aJumpFallData, aJumpRiseData,
   aLevelsData, aMenuData, aObjToUIData, aObjectData, aSfxData, aShopData,
   aShroudCircle, aShroudTileLookup, aTileData, aTileFlags, aTimerData,
-  aTrainTrackData, fontLarge, fontLittle, fontTiny, iPosX, iPosY, texSpr;
+  aTrainTrackData, fontLarge, fontLittle, fontTiny, iCArrow, iPosX, iPosY,
+  texSpr;
 -- High priority variables (because of MAXVARS limit) ---------------------- --
 local function HighPriorityVars()
 -- Prototype functions (assigned later) ------------------------------------ --
@@ -57,10 +58,10 @@ local CreateObject, MoveOtherObjects, PlaySoundAtObject, SetAction;
 local aActiveMenu, aActiveObject, aActivePlayer, aFloodData, aGemsAvailable,
   aLevelData, aObjects, aOpponentPlayer, aPlayers, aRacesData, aRacesAvailable,
   aShroudColour, aShroudData, bAIvsAI, fcbPause, iAbsCenPosX, iAbsCenPosY,
-  iAnimMoney, iGameTicks, iInfoScreen, iLevelId, iLLAbsHmVP, iLLAbsWmVP,
-  iLLPixHmVP, iLLPixWmVP, iMenuBottom, iMenuLeft, iMenuRight,
-  iMenuTop, iPixCenPosX, iPixCenPosY, iPixPosTargetX, iPixPosTargetY,
-  iPixPosX, iPixPosY, iScrTilesH, iScrTilesHd2, iScrTilesHd2p1, iScrTilesHm1,
+  iAnimMoney, iGameTicks, iInfoScreen, iKeyBankId, iLevelId, iLLAbsHmVP,
+  iLLAbsWmVP, iLLPixHmVP, iLLPixWmVP, iMenuBottom, iMenuLeft, iMenuRight,
+  iMenuTop, iPixCenPosX, iPixCenPosY, iPixPosTargetX, iPixPosTargetY, iPixPosX,
+  iPixPosY, iScrTilesH, iScrTilesHd2, iScrTilesHd2p1, iScrTilesHm1,
   iScrTilesHmVPS, iScrTilesW, iScrTilesWd2, iScrTilesWd2p1, iScrTilesWm1,
   iScrTilesWmVPS, iScrollRate, iStageB, iStageH, iStageL, iStageR,
   iStageT, iStageW, iTilesHeight, iTilesWidth, iUniqueId, iViewportH,
@@ -70,7 +71,7 @@ local aActiveMenu, aActiveObject, aActivePlayer, aFloodData, aGemsAvailable,
     nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil,
     nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil,
     nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil,
-    nil, nil, nil, nil, nil, nil, nil;
+    nil, nil, nil, nil, nil, nil, nil, nil;
 -- Level limits ------------------------------------------------------------ --
 local iLLAbsW<const>   = 128;                -- Total # of horizontal tiles
 local iLLAbsH<const>   = 128;                -- Total # of vertical tiles
@@ -205,15 +206,23 @@ local function ObjectFocus(aObj)
   end
 end
 -- SelectObject ------------------------------------------------------------ --
-local function SelectObject(aObj, bNow)
+local function SelectObject(aObj, bNow, bCursor)
   -- Save active object
   local aObjActive<const> = aActiveObject;
   -- Set active object
   aActiveObject = aObj;
   -- Remove menu if different object
   if aActiveObject ~= aObjActive then aActiveMenu = nil end;
+  -- Return if no object to focus on
+  if not aObj then return end;
   -- Focus on object
-  if aObj then ObjectFocus(aObj) if bNow then ForceViewport() end end;
+  ObjectFocus(aObj)
+  -- Do it now instead of animated?
+  if bNow then ForceViewport() end;
+  -- Also set the cursor?
+  if bCursor then
+    InputSetCursorPos(aObj.X - (iPixPosX - iStageL) + aObj.OFX + 8,
+                      aObj.Y - (iPixPosY - iStageT) + aObj.OFY + 8) end;
 end
 -- Return game ticks ------------------------------------------------------- --
 local function GetGameTicks() return iGameTicks end;
@@ -979,6 +988,15 @@ local function CycleObjInventory(aObject, iDirection)
   -- Failure
   return false;
 end
+-- Prevent all diggers entering trade centre ------------------------------- --
+local function SetAllDiggersNoHome(aDiggers)
+  -- Get player data and enumerate their diggers
+  for iDiggerId = 1, #aDiggers do
+    -- Get digger object and stop it from going home
+    local aDigger<const> = aDiggers[iDiggerId];
+    aDigger.F = aDigger.F | OFL.NOHOME;
+  end
+end
 -- Set object action ------------------------------------------------------- --
 local function InitSetAction()
   -- Deployment of train track
@@ -1236,14 +1254,20 @@ local function InitSetAction()
   end
   -- Move towards trade centre?
   local function DIRMoveHomeward(O, A, J, D)
+    -- If going home isn't allowed? Not allow it to go home
+    if J == JOB.HOME and O.F & OFL.NOHOME ~= 0 then J = JOB.NONE end;
     -- Preserve action but action stopped? Set object walking
     if A == ACT.KEEP and O.A == ACT.STOP then A = ACT.WALK end;
     -- Go left if homeward is to the left
     if O.X < O.P.HX then return A, J, DIR.R end;
     -- Go right if homeward is to the right
     if O.X > O.P.HX then return A, J, DIR.L end;
-    -- Return original parameters but no direction
-    return A, J, DIR.NONE;
+    -- If can't go inside then just stop
+    if O.F & OFL.NOHOME ~= 0 then return ACT.STOP, JOB.NONE, DIR.NONE end;
+    -- Prevent all Diggers entering trade centre
+    SetAllDiggersNoHome(O.P.D);
+    -- On the exact X pixel of home so go inside
+    return ACT.PHASE, JOB.PHASE, DIR.UL;
   end
   -- Keep original direction
   local function DIRKeep(O, A, J, D) return A, J, O.D end;
@@ -3749,8 +3773,12 @@ local function ProcessObjectMovement()
       SetAction(aObj, ACT.DIG, JOB.DIGDOWN, DIR.D);
     -- Object wants to enter the trading centre? Stop object
     elseif aObj.J == JOB.HOME and ObjectIsAtHome(aObj) then
-      -- Go into trade centre
-      SetAction(aObj, ACT.PHASE, JOB.PHASE, DIR.UL);
+      -- If object can't entre? Just stop it.
+      if aObj.F & OFL.NOHOME ~= 0 then
+        SetAction(aObj, ACT.STOP, JOB.NONE, DIR.NONE);
+      -- Go into trade centre and if successful? Prevent diggers entering
+      elseif SetAction(aObj, ACT.PHASE, JOB.PHASE, DIR.UL) then
+        SetAllDiggersNoHome(aObj.P.D) end;
     -- Object is for rails only and train is not on track
     elseif aObj.F & OFL.TRACK ~= 0 then
       -- Get X pos adjust depending on direction
@@ -3824,10 +3852,9 @@ local function ProcessObjects()
       if aObj.A == ACT.DEATH and                    -- ...dead?
          aObj.AT >= aTimerData.DEADWAIT and         -- ...death timer exceeded?
          DestroyObject(iObjId, aObj) then goto EOO; -- ...object destroyed?
-      -- Object is phasing and phase delay reached?
+      -- Object is phasing and phase delay reached? Process phase destination
       elseif aObj.A == ACT.PHASE and aObj.AT >= aObj.OD.TELEDELAY then
-        -- Process the phase destination
-        PhaseLogic(aObj);
+        return PhaseLogic(aObj);
       -- Object is hidden and object is in the trade-centre?
       elseif aObj.A == ACT.HIDE and aObj.J == JOB.PHASE then
         -- Health at full?
@@ -4027,13 +4054,6 @@ local function ProcessDiggerButtonClick()
   -- Play select sound
   PlayStaticSound(aSfxData.CLICK);
 end
--- Return if we can move selected digger ----------------------------------- --
-local function SelectedDiggerIsMovable()
-  -- Return true if an object selected, object is digger, object belongs to me
-  -- and object is not busy else return false.
-  return aActiveObject and aActiveObject.F & OFL.DIGGER ~= 0 and
-     aActiveObject.P == aActivePlayer and aActiveObject.F & OFL.BUSY == 0;
-end
 -- Select devices ---------------------------------------------------------- --
 local function SelectDevice()
   -- For each object
@@ -4054,63 +4074,32 @@ local function SelectDevice()
   -- Failed? Play sound
   PlayStaticSound(aSfxData.ERROR);
 end
+-- Select info screens ----------------------------------------------------- --
+local function SelectInfoScreen(iScreen)
+  -- Play sound effect to show the player clicked it
+  PlayStaticSound(aSfxData.CLICK);
+  -- If the screen is currently selected? Turn off the info screen
+  if iInfoScreen == iScreen then iInfoScreen = nil;
+  -- Turn on the specified info screen
+  else iInfoScreen = iScreen end;
+end
+-- Show inventory screen --------------------------------------------------- --
+local function SelectInventoryScreen() SelectInfoScreen(1) end;
+-- Show location screen ---------------------------------------------------- --
+local function SelectLocationScreen() SelectInfoScreen(2) end;
+-- Show status screen ------------------------------------------------------ --
+local function SelectStatusScreen() SelectInfoScreen(3) end;
+-- Init the book ----------------------------------------------------------- --
+local function SelectBook()
+  -- Play sound effect to show the player clicked it
+  PlayStaticSound(aSfxData.CLICK);
+  -- Remove play sound function
+  SetPlaySounds(false);
+  -- Init the book
+  InitBook(true);
+end
 -- Check input state ------------------------------------------------------- --
 local function ProcInput()
-  -- Get keyboard ids
-  local aKeys<const> = Input.KeyCodes;
-  -- Keyboard aliases needed
-  local iKey1<const>,      iKey2<const>,         iKey3<const>,
-        iKey4<const>,      iKey5<const>,         iKeyKp0<const>,
-        iKeyKp1<const>,    iKeyKp2<const>,       iKeyKp3<const>,
-        iKeyKp4<const>,    iKeyKp5<const>,       iKeyMinus<const>,
-        iKeyEquals<const>, iKeyBackspace<const>, iKeyEnter<const>,
-        iKeyUp<const>,     iKeyDown<const>,      iKeyLeft<const>,
-        iKeyRight<const>,  iKeyEscape<const>,    iKeyS<const>,
-        iKeyT<const>,      iKeyHome<const>,      iKeyEnd<const>,
-        iKeyDelete<const>, iKeyPgDown<const>,    iKeyReturn<const>,
-        iKeyF5<const>,     iKeyF6<const>,        iKeyF7<const>,
-        iKeyF8<const>,     iKeyE<const>,         iKeySpacebar<const> =
-          aKeys.ONE,       aKeys.TWO,       aKeys.THREE,
-          aKeys.FOUR,      aKeys.FIVE,      aKeys.KP_0,
-          aKeys.KP_1,      aKeys.KP_2,      aKeys.KP_3,
-          aKeys.KP_4,      aKeys.KP_5,      aKeys.MINUS,
-          aKeys.EQUAL,     aKeys.BACKSPACE, aKeys.KP_ENTER,
-          aKeys.UP,        aKeys.DOWN,      aKeys.LEFT,
-          aKeys.RIGHT,     aKeys.ESCAPE,    aKeys.S,
-          aKeys.T,         aKeys.HOME,      aKeys.END,
-          aKeys.DELETE,    aKeys.PAGE_DOWN, aKeys.ENTER,
-          aKeys.F5,        aKeys.F6,        aKeys.F7,
-          aKeys.F8,        aKeys.E,         aKeys.SPACE;
-  -- Select information screen --------------------------------------------- --
-  local function SelectInfoScreen(iScreen)
-    -- Play sound effect to show the player clicked it
-    PlayStaticSound(aSfxData.CLICK);
-    -- If the screen is currently selected? Turn off the info screen
-    if iInfoScreen == iScreen then iInfoScreen = nil;
-    -- Turn on the specified info screen
-    else iInfoScreen = iScreen end;
-  end
-  -- Select info screens --------------------------------------------------- --
-  local function SelectInventoryScreen() SelectInfoScreen(1) end;
-  local function SelectLocationScreen() SelectInfoScreen(2) end;
-  local function SelectStatusScreen() SelectInfoScreen(3) end;
-  -- Init the book --------------------------------------------------------- --
-  local function SelectBook()
-    -- Play sound effect to show the player clicked it
-    PlayStaticSound(aSfxData.CLICK);
-    -- Remove play sound function
-    SetPlaySounds(false);
-    -- Init the book
-    InitBook(true);
-  end
-  -- Select digger if active ----------------------------------------------- --
-  local function SelectDigger(iDiggerId)
-    -- Get specified digger and return if not found
-    local aDigger<const> = aActivePlayer.D[iDiggerId];
-    if not aDigger then return end;
-    -- Select the digger
-    SelectObject(aDigger);
-  end
   -- Select an adjacent digger --------------------------------------------- --
   local function SelectAdjacentDigger(iNegate)
     -- Find the object we selected first
@@ -4132,43 +4121,12 @@ local function ProcInput()
       if aDigger then return SelectObject(aDigger) end;
     end
   end
-  -- Adjust viewport and prevent scroll ------------------------------------ --
-  local function AdjustViewPortXNS(iX)
-    AdjustViewPortX(iX); iPixPosTargetX = iPosX * 16 end;
-  local function AdjustViewPortYNS(iY)
-    AdjustViewPortY(iY); iPixPosTargetY = iPosY * 16 end;
-  -- Returns current pixel tile under mouse cursor ------------------------- --
-  local function GetTileUnderMouse()
-    return
-      UtilClampInt((iPosX * 16) + GetMouseX() - iStageL, 0, iLLPixWm1),
-      UtilClampInt((iPosY * 16) + GetMouseY() - iStageT, 0, iLLPixHm1);
-  end
-  -- Returns current absolute tile under mouse cursor ---------------------- --
-  local function GetAbsTileUnderMouse()
-    local iX<const>, iY<const> = GetTileUnderMouse();
-    return iX // 16, iY // 16;
-  end
   -- We'll set ProcInput to this so we can keep aliases local to this routine.
   local function ProcInputInitialised()
     -- Process viewport scrolling
     ProcessViewPort();
-    -- Player wants to select the first digger?
-    if IsKeyPressed(iKey1) or IsKeyPressed(iKeyKp1) then
-      return SelectDigger(1) end;
-    -- Player wants to select the second digger?
-    if IsKeyPressed(iKey2) or IsKeyPressed(iKeyKp2) then
-      return SelectDigger(2) end;
-    -- Player wants to select the third digger?
-    if IsKeyPressed(iKey3) or IsKeyPressed(iKeyKp3) then
-      return SelectDigger(3) end;
-    -- Player wants to select the fourth digger?
-    if IsKeyPressed(iKey4) or IsKeyPressed(iKeyKp4) then
-      return SelectDigger(4) end;
-    -- Player wants to select the fifth digger?
-    if IsKeyPressed(iKey5) or IsKeyPressed(iKeyKp5) then
-      return SelectDigger(5) end;
     -- Left button pressed?
-    if IsKeyPressed(iKeyMinus) or IsButtonPressed(6) or IsScrollingDown() then
+    if IsButtonPressed(6) or IsScrollingDown() then
       -- Cycle to previous item if digger inventory menu open?
       if aActiveMenu and aActiveMenu == aMenuData[MNU.DROP] then
         CycleObjInventory(aActiveObject, -1);
@@ -4178,7 +4136,7 @@ local function ProcInput()
       return;
     end
     -- Right button pressed?
-    if IsKeyPressed(iKeyEquals) or IsButtonPressed(7) or IsScrollingUp() then
+    if IsButtonPressed(7) or IsScrollingUp() then
       -- Cycle to next item if digger inventory menu open?
       if aActiveMenu and aActiveMenu == aMenuData[MNU.DROP] then
         CycleObjInventory(aActiveObject, 1);
@@ -4187,177 +4145,8 @@ local function ProcInput()
       -- Done
       return;
     end
-    -- Stop digger?
-    if IsKeyPressed(iKeyBackspace) and SelectedDiggerIsMovable() then
-      return SetAction(aActiveObject, ACT.STOP, JOB.NONE, DIR.NONE, true) end;
-    -- Grab items?
-    if IsKeyPressed(iKeySpacebar) and SelectedDiggerIsMovable() then
-      return SetAction(aActiveObject, ACT.GRAB, JOB.KEEP, DIR.KEEP, true) end;
-    -- Teleport?
-    if IsKeyPressed(iKeyKp0) and SelectedDiggerIsMovable() then
-      return SetAction(aActiveObject, ACT.PHASE, JOB.PHASE, DIR.U, true) end;
-    -- Key to select a device?
-    if IsKeyPressed(iKeyReturn) then return SelectDevice() end;
-    -- Book? Load the book
-    if IsKeyPressed(iKeyF5) then return SelectInventoryScreen() end;
-    -- Inventory information? Set selected button and info screen
-    if IsKeyPressed(iKeyF6) then return SelectLocationScreen() end;
-    -- Location information? Set selected button and info screen
-    if IsKeyPressed(iKeyF7) then return SelectStatusScreen() end;
-    -- Status? Set selected button and info screen
-    if IsKeyPressed(iKeyF8) then return SelectBook() end;
-    -- Up key pressed?
-    if IsKeyPressed(iKeyUp) and SelectedDiggerIsMovable() then
-      -- If we're digging left then dig up-left instead
-      if aActiveObject.A == ACT.DIG and aActiveObject.D == DIR.L then
-        return SetAction(aActiveObject, ACT.DIG, JOB.DIG, DIR.UL, true) end;
-      -- If we're digging right then dig up-right instead
-      if aActiveObject.A == ACT.DIG and aActiveObject.D == DIR.R then
-        return SetAction(aActiveObject, ACT.DIG, JOB.DIG, DIR.UR, true) end;
-      -- Jump otherwise
-      return SetAction(aActiveObject, ACT.JUMP, JOB.KEEP, DIR.KEEP, true);
-    end
-    -- Down key pressed?
-    if IsKeyPressed(iKeyDown) and SelectedDiggerIsMovable() then
-      -- If digging left then dig down- left
-      if aActiveObject.A == ACT.DIG and aActiveObject.D == DIR.L then
-        return SetAction(aActiveObject, ACT.DIG, JOB.DIG, DIR.DL, true) end;
-      -- If digging right then dig down-right
-      if aActiveObject.A == ACT.DIG and aActiveObject.D == DIR.R then
-        return SetAction(aActiveObject, ACT.DIG, JOB.DIG, DIR.DR, true) end;
-      -- Otherwise dig down
-      return SetAction(aActiveObject, ACT.WALK, JOB.DIGDOWN, DIR.TCTR, true);
-    end
-    -- Left key pressed?
-    if IsKeyPressed(iKeyLeft) and SelectedDiggerIsMovable() then
-      -- If running left then set digger to dig left
-      if aActiveObject.A == ACT.RUN and aActiveObject.D == DIR.L then
-        return SetAction(aActiveObject, ACT.RUN, JOB.DIG, DIR.L, true) end;
-      -- If walking left then set digger to run left
-      if aActiveObject.A == ACT.WALK and aActiveObject.D == DIR.L then
-        return SetAction(aActiveObject, ACT.RUN, JOB.KNDD, DIR.L, true) end;
-      -- Otherwise walk left
-      return SetAction(aActiveObject, ACT.WALK, JOB.KNDD, DIR.L, true);
-    end
-    -- Right key pressed?
-    if IsKeyPressed(iKeyRight) and SelectedDiggerIsMovable() then
-      -- If running right then set digger to dig right
-      if aActiveObject.A == ACT.RUN and aActiveObject.D == DIR.R then
-        return SetAction(aActiveObject, ACT.RUN, JOB.DIG, DIR.R, true) end;
-      -- If walking right then set digger to dig right
-      if aActiveObject.A == ACT.WALK and aActiveObject.D == DIR.R then
-        return SetAction(aActiveObject, ACT.RUN, JOB.KNDD, DIR.R, true) end;
-      -- Otherwise walk right
-      return SetAction(aActiveObject, ACT.WALK, JOB.KNDD, DIR.R, true);
-    end
     -- If pause key or button pressed?
-    if IsKeyPressed(iKeyEscape) or IsButtonPressed(9) then
-      -- Consts
-      local iPauseX<const>, iPauseY<const> = 160, 72;
-      local iInstructionY<const> = iPauseY + 24;
-      local iSmallTipsY<const> = iInstructionY + 32;
-      local sPaused<const> = "Game paused!";
-      local sInstruction<const> =
-        "Press ESCAPE or START to unpause.\n"..
-        "\n"..
-        "Press Q or START+JB4+JB5 to give up.";
-      local sSmallTips<const> =
-        "F1 OR SELECT+START BUTTON FOR SETUP\n"..
-        "F2 FOR THE GAME AND ENGINE CREDITS\n"..
-        "F11 TO RESET WINDOW SIZE AND POSITION\n"..
-        "F12 TO TAKE A SCREENSHOT";
-      local iKeyQ<const>, iKeyEscape<const> = aKeys.Q, aKeys.ESCAPE;
-      -- Save current music
-      local muMusic<const> = GetMusic();
-      -- Save callbacks
-      local fCBProc<const>, fCBRender<const>, fCBInput<const> = GetCallbacks();
-      -- Stop music
-      StopMusic(1);
-      -- Pause string
-      local nTimeNext, strPause = 0, nil;
-      -- Pause logic callback
-      local function ProcPause()
-        -- Ignore if next update not elapsed
-        if CoreTime() < nTimeNext then return end;
-        -- Set new pause string
-        strPause = UtilFormatNTime("%a/%H:%M:%S");
-        -- Set next update time
-        nTimeNext = CoreTime() + 0.25;
-      end
-      -- Pause render callback
-      local function RenderPause()
-        -- Render terrain, game objects, and a subtle fade
-        RenderInterface();
-        RenderFade(0.5);
-        -- Write text informations
-        DrawInfoFrameAndTitle("GAME PAUSED");
-        fontLittle:SetCRGBA(0, 1, 0, 1);
-        fontLittle:PrintC(iPauseX, iInstructionY, sInstruction);
-        fontTiny:SetCRGBA(0.5, 0.5, 0.5, 1);
-        fontTiny:PrintC(iPauseX, iSmallTipsY, sSmallTips);
-        fontLittle:SetCRGBA(1, 1, 1, 1);
-        -- Get and print local time
-        SetBottomRightTip(strPause);
-      end
-      -- Pause input callback
-      local function InputPause()
-        -- If pause key or pause button pressed?
-        if IsKeyPressed(iKeyEscape) or IsJoyPressed(9) then
-          -- If thumb buttons pressed? Allow the quit
-          if IsJoyPressed(4) and IsJoyPressed(5) then TriggerEnd(InitLose);
-          -- Normal unpause
-          else
-            -- Resume music if we have it
-            if muMusic then PlayMusic(muMusic, nil, 2) end;
-            -- Unpause
-            SetCallbacks(fCBProc, fCBRender, fCBInput);
-          end
-        -- Escape or select button pressed? Allow the quit
-        elseif IsKeyPressed(iKeyQ) then TriggerEnd(InitLose) end;
-      end
-      -- Set pause procedure
-      SetCallbacks(ProcPause, RenderPause, InputPause);
-    end
-    -- Return if in test mode
-    if GetTestMode() then
-      -- Check if Jennite key pressed
-      if IsKeyPressed(iKeyT) then
-        CreateObject(TYP.JENNITE, GetTileUnderMouse());
-        return;
-      end
-      -- Check if shroud key pressed
-      if IsKeyPressed(iKeyS) then
-        UpdateShroud(GetAbsTileUnderMouse());
-        return;
-      end
-      -- Check if explosion key pressed
-      if IsKeyPressed(iKeyE) then
-        AdjustObjectHealth(
-          CreateObject(TYP.TNT, GetTileUnderMouse()), -100);
-        return;
-      end
-      -- Check if key moving
-      if IsKeyHeld(iKeyHome) then AdjustViewPortYNS(-16);
-        if IsKeyHeld(iKeyDelete) then AdjustViewPortXNS(-16);
-        elseif IsKeyHeld(iKeyPgDown) then AdjustViewPortXNS(16) end;
-        return;
-      end
-      if IsKeyHeld(iKeyEnd) then AdjustViewPortYNS(16);
-        if IsKeyHeld(iKeyDelete) then AdjustViewPortXNS(-16);
-        elseif IsKeyHeld(iKeyPgDown) then AdjustViewPortXNS(16); end;
-        return;
-      end
-      if IsKeyHeld(iKeyDelete) then AdjustViewPortXNS(-16);
-        if IsKeyHeld(iKeyHome) then AdjustViewPortYNS(-16);
-        elseif IsKeyHeld(iKeyEnd) then AdjustViewPortYNS(16) end;
-        return;
-      end
-      if IsKeyHeld(iKeyPgDown) then AdjustViewPortXNS(16);
-        if IsKeyHeld(iKeyHome) then AdjustViewPortYNS(-16);
-        elseif IsKeyHeld(iKeyEnd) then AdjustViewPortYNS(16) end;
-        return;
-      end
-    end
+    if IsButtonPressed(9) then InitPause() end;
     -- Left mouse button clicked?
     if IsButtonPressed(0) then
       -- Menu is open and mouse is in its bounds? Process menu click
@@ -4400,7 +4189,7 @@ local function ProcInput()
 end
 ProcInput();
 -- Load level -------------------------------------------------------------- --
-local function LoadLevel(Id, Music, P1R, P1AI, P2R, P2AI, TP, TR, TI)
+local function LoadLevel(Id, Music, iKB, P1R, P1AI, P2R, P2AI, TP, TR, TI)
   -- Set default callbacks if not set
   if not TP then TP = GameProc end;
   if not TR then TR = RenderInterface end;
@@ -4440,11 +4229,11 @@ local function LoadLevel(Id, Music, P1R, P1AI, P2R, P2AI, TP, TR, TI)
   -- Level assets loaded function
   local function OnLoaded(aResources)
     -- Set level data handles
-    local binLevel<const> = aResources[1].H;
+    local binLevel<const> = aResources[1];
     -- Set level objects handle
-    local aLevelObj<const> = aResources[2].H;
+    local aLevelObj<const> = aResources[2];
     -- Set textures and masks
-    texLev = aResources[3].H;
+    texLev = aResources[3];
     -- Makes sure we have the same number of terrain masks as texture tiles
     local iMaskLev<const>, iMaskLevExpect<const> =
       maskLev:Count(), texLev:TileGTC();
@@ -4574,7 +4363,7 @@ local function LoadLevel(Id, Music, P1R, P1AI, P2R, P2AI, TP, TR, TI)
     for iId = 1, #aDigTileData do aGemsAvailable[1 + #aGemsAvailable] =
       aDigTileData[1 + ((iGemStart + iId) % #aDigTileData)] end;
     -- Play in-game music if requested
-    if Music then PlayMusic(aResources[4].H, 0) end;
+    if Music then PlayMusic(aResources[4], 0) end;
     -- Now we want to hear sounds if human player is set
     if P1AI == false then SetPlaySounds(true) end;
     -- Computer is main player?
@@ -4592,7 +4381,17 @@ local function LoadLevel(Id, Music, P1R, P1AI, P2R, P2AI, TP, TR, TI)
     -- that haven't been initialised yet
     TP();
     -- Do fade then set requested game callbacks
-    local function OnFadeIn() SetCallbacks(TP, TR, TI) end;
+    local function OnFadeIn()
+      -- Key bank rqeusted?
+      if iKB then
+        -- Use default keybank?
+        if iKB < 0 then iKB = iKeyBankId end;
+        -- Set specified keybank
+        SetKeys(true, iKB);
+      end
+      -- Set requested callbacks
+      SetCallbacks(TP, TR, TI);
+    end
     Fade(1, 0, 0.04, TR, OnFadeIn, not not Music);
   end
   -- Load level graphics resources asynchronously
@@ -4633,10 +4432,10 @@ end
 local function InitContinueGame(bMusic, aObject)
   -- Post loaded
   local function PostLoaded()
-    -- Set arrow
-    SetCursor(aCursorIdData.ARROW);
     -- We want to hear sounds
     SetPlaySounds(true);
+    -- Restore keybank keys
+    SetKeys(true, iKeyBankId);
     -- Return control to main loop
     SetCallbacks(GameProc, RenderInterface, ProcInput);
     -- If an object was passed? Make it appear
@@ -4647,12 +4446,24 @@ local function InitContinueGame(bMusic, aObject)
   -- Music loaded
   local function OnLoaded(aResource)
     -- Resume game music
-    PlayMusic(aResource[1].H, nil, 2);
+    PlayMusic(aResource[1], nil, 2);
     -- Post loaded functions
     PostLoaded();
   end
+  -- An object was selected?
+  if aObject then
+    -- Get player data and enumerate their diggers
+    local aDiggers<const> = aObject.P.D;
+    for iDiggerId = 1, #aDiggers do
+      -- Get digger object and allow going home again
+      local aDigger<const> = aDiggers[iDiggerId];
+      aDigger.F = aDigger.F & ~OFL.NOHOME;
+    end
+  end
   -- If music reset required then load it
   if bMusic then return LoadResources("Continue", aContAssets, OnLoaded) end;
+  -- Set arrow cursor
+  SetCursor(iCArrow);
   -- Run post loaded functions
   PostLoaded();
 end
@@ -4672,12 +4483,224 @@ local function GetViewportData()
          iPixCenPosY, iPosX, iPosY, iAbsCenPosX, iAbsCenPosY, iViewportW,
          iViewportH;
 end
+-- When scripts have loaded ------------------------------------------------ --
+local function OnReady(GetAPI)
+  -- Get imports
+  TYP, aLevelsData, LoadResources, aObjectData, ACT, JOB, DIR, aTimerData, AI,
+    OFL, aDigTileData, PlayMusic, aTileData, aTileFlags, Fade, BCBlit,
+    SetCallbacks, IsMouseInBounds, aDigData, DF, aSfxData, aJumpRiseData,
+    aJumpFallData, IsButtonPressed, IsButtonHeld, GetMouseX, GetMouseY,
+    PlayStaticSound, PlaySound, IsButtonPressedNoRelease, aMenuData, MFL, MNU,
+    IsMouseXLessThan, InitBook, aObjToUIData, RenderFade, InitWin, InitWinDead,
+    InitLose, InitLoseDead, InitPause, InitTNTMap, InitLobby, texSpr,
+    fontLarge, fontLittle, fontTiny, aDigBlockData, aExplodeDirData, SetCursor,
+    SetKeys, RegisterFBUCallback, GetCallbacks, GetTestMode, RenderShadow,
+    SetBottomRightTip, aRacesData, aDugRandShaftData, aFloodGateData,
+    aTrainTrackData, aExplodeAboveData, maskLev, maskSpr, aGlobalData,
+    aShopData, IsScrollingDown, IsScrollingUp, aAIChoicesData, aShroudCircle,
+    aShroudTileLookup =
+      GetAPI("aObjectTypes", "aLevelsData", "LoadResources", "aObjectData",
+        "aObjectActions", "aObjectJobs", "aObjectDirections", "aTimerData",
+        "aAITypesData", "aObjectFlags", "aDigTileData", "PlayMusic",
+        "aTileData", "aTileFlags", "Fade", "BCBlit", "SetCallbacks",
+        "IsMouseInBounds", "aDigData", "aDigTileFlags", "aSfxData",
+        "aJumpRiseData", "aJumpFallData", "IsButtonPressed", "IsButtonHeld",
+        "GetMouseX", "GetMouseY", "PlayStaticSound", "PlaySound",
+        "IsButtonPressedNoRelease", "aMenuData", "aMenuFlags", "aMenuIds",
+        "IsMouseXLessThan", "InitBook", "aObjToUIData", "RenderFade",
+        "InitWin", "InitWinDead", "InitLose", "InitLoseDead", "InitPause",
+        "InitTNTMap", "InitLobby", "texSpr", "fontLarge", "fontLittle",
+        "fontTiny", "aDigBlockData", "aExplodeDirData", "SetCursor", "SetKeys",
+        "RegisterFBUCallback", "GetCallbacks", "GetTestMode", "RenderShadow",
+        "SetBottomRightTip", "aRacesData", "aDugRandShaftData",
+        "aFloodGateData", "aTrainTrackData", "aExplodeAboveData", "maskLevel",
+        "maskSprites", "aGlobalData", "aShopData", "IsScrollingDown",
+        "IsScrollingUp", "aAIChoicesData", "aShroudCircle",
+        "aShroudTileLookup");
+  -- Get arrow cursor
+  iCArrow = GetAPI("aCursorIdData").ARROW;
+  -- Select digger if active
+  local function SelectDigger(iDiggerId)
+    local aDigger<const> = aActivePlayer.D[iDiggerId];
+    if aDigger then SelectObject(aDigger) end;
+  end
+  -- Select digger shortcuts
+  local function SetDiggerOne() SelectDigger(1) end;
+  local function SetDiggerTwo() SelectDigger(2) end;
+  local function SetDiggerThree() SelectDigger(3) end;
+  local function SetDiggerFour() SelectDigger(4) end;
+  local function SetDiggerFive() SelectDigger(5) end;
+  -- Helper for digging
+  local function GenericAction(iAction, iJob, iDirection)
+    -- Return if object not selected or not mine or not busy.
+    if not aActiveObject or aActiveObject.P ~= aActivePlayer or
+      aActiveObject.F & OFL.BUSY ~= 0 then return end;
+    -- Get object data and if requesting special movement detection?
+    local aObjData<const> = aActiveObject.OD;
+    if iAction == 0 then
+      -- If object can walk?
+      if aObjData[ACT.WALK] then
+        -- If object can run?
+        if aObjData[ACT.RUN] then
+          -- Run if already walking
+          if aActiveObject.A == ACT.WALK and aActiveObject.D == iDirection then
+            iAction = ACT.RUN;
+          -- Else keep to walking
+          else iAction = ACT.WALK end
+        -- Object can't run but can walk?
+        else iAction = ACT.WALK end;
+      -- If object can run? Set to run
+      elseif aObjData[ACT.RUN] then iAction = ACT.RUN;
+      -- If object can creep? Set to creep
+      elseif aObjData[ACT.CREEP] then iAction = ACT.CREEP;
+      -- Show error
+      else error("Invalid action!") end;
+    end
+    -- Return if action, job and direction is not allowed
+    local aKeyData<const> = aObjData.KEYS;
+    if not aKeyData then return end;
+    local aActData<const> = aKeyData[iAction];
+    if not aActData then return end;
+    local aJobData<const> = aActData[iJob];
+    if not aJobData then return end;
+    local aDirData<const> = aJobData[iDirection];
+    if not aDirData then return end;
+    -- Action allowed!
+    return SetAction(aActiveObject, iAction, iJob, iDirection, true);
+  end
+  -- Special multi-function keys
+  local function SpecialKey1()
+    -- One of these is surely to work and fully checked
+    return GenericAction(ACT.MAP, JOB.NONE, DIR.NONE) or
+           GenericAction(ACT.OPEN, JOB.NONE, DIR.NONE) or
+           GenericAction(ACT.DEPLOY, JOB.NONE, DIR.NONE) or
+           GenericAction(ACT.DYING, JOB.NONE, DIR.NONE) or
+           GenericAction(ACT.CREEP, JOB.NONE, DIR.U);
+  end
+  local function SpecialKey2()
+    -- One of these is surely to work and fully checked
+    return GenericAction(ACT.CLOSE, JOB.NONE, DIR.NONE) or
+           GenericAction(ACT.CREEP, JOB.NONE, DIR.D);
+  end
+  -- Basic movement
+  local function MoveLeft() GenericAction(0, JOB.NONE, DIR.L) end;
+  local function MoveRight() GenericAction(0, JOB.NONE, DIR.R) end;
+  local function MoveHome() GenericAction(0, JOB.HOME, DIR.HOME) end;
+  local function MoveFind() GenericAction(0, JOB.SEARCH, DIR.LR) end;
+  local function MoveJump() GenericAction(ACT.JUMP, JOB.KEEP, DIR.KEEP) end;
+  local function MoveStop() GenericAction(ACT.STOP, JOB.NONE, DIR.NONE) end;
+  -- Digging directions events
+  local function DigUpLeft() GenericAction(0, JOB.DIG, DIR.UL) end;
+  local function DigUpRight() GenericAction(0, JOB.DIG, DIR.UR) end;
+  local function DigLeft() GenericAction(0, JOB.DIG, DIR.L) end;
+  local function DigRight() GenericAction(0, JOB.DIG, DIR.R) end;
+  local function DigDownLeft() GenericAction(0, JOB.DIG, DIR.DL) end;
+  local function DigDownRight() GenericAction(0, JOB.DIG, DIR.DR) end;
+  local function DigDown() GenericAction(0, JOB.DIGDOWN, DIR.TCTR) end;
+  -- Drop or grab items?
+  local function DropItems() GenericAction(ACT.DROP, JOB.KEEP, DIR.KEEP) end;
+  local function GrabItems() GenericAction(ACT.GRAB, JOB.KEEP, DIR.KEEP) end;
+  local function Teleport() GenericAction(ACT.PHASE, JOB.PHASE, DIR.U) end;
+  -- Returns current pixel tile under mouse cursor
+  local function GetTileUnderMouse()
+    return UtilClampInt((iPosX * 16) + GetMouseX() - iStageL, 0, iLLPixWm1),
+           UtilClampInt((iPosY * 16) + GetMouseY() - iStageT, 0, iLLPixHm1);
+  end
+  -- Spawn Jennite? (Cheat)
+  local function SpawnJennite()
+    if GetTestMode() then CreateObject(TYP.JENNITE, GetTileUnderMouse()) end;
+  end
+  -- Shroud reveal key? (Cheat)
+  local function ShroudReveal()
+    -- Ignore if not debug mode
+    if not GetTestMode() then return end;
+    -- Returns current absolute tile under mouse cursor
+    local function GetAbsTileUnderMouse()
+      local iX<const>, iY<const> = GetTileUnderMouse();
+      return iX // 16, iY // 16;
+    end
+    -- Do it
+    UpdateShroud(GetAbsTileUnderMouse());
+  end
+  -- Create explosion (Cheat)
+  local function CauseExplosion()
+    if GetTestMode() then
+      AdjustObjectHealth(CreateObject(TYP.TNT, GetTileUnderMouse()), -100);
+    end
+  end
+  -- Adjust viewport and prevent scroll
+  local function AdjustVPXNS(iX)
+    AdjustViewPortX(iX); iPixPosTargetX = iPosX * 16 end;
+  local function AdjustVPYNS(iY)
+    AdjustViewPortY(iY); iPixPosTargetY = iPosY * 16 end;
+  -- Move viewport
+  local function ScrollH(iA) AdjustVPXNS(iA) end;
+  local function ScrollV(iA) AdjustVPYNS(iA) end;
+  local function ScrollUp() if GetTestMode() then ScrollV(-16) end end;
+  local function ScrollDown() if GetTestMode() then ScrollV(16) end end;
+  local function ScrollLeft() if GetTestMode() then ScrollH(-16) end end;
+  local function ScrollRight() if GetTestMode() then ScrollH(16) end end;
+  -- Repeated key events
+  local aKeys<const>, aStates<const> = Input.KeyCodes, Input.States;
+  local aScrollUp<const>, aScrollDown<const>, aScrollLeft<const>,
+        aScrollRight<const>, aReveal<const> =
+    { aKeys.HOME, ScrollUp, "igmsu", "SCROLL MAP UP (DEBUG)" },
+    { aKeys.END, ScrollDown, "igmsd", "SCROLL MAP DOWN (DEBUG)" },
+    { aKeys.DELETE, ScrollLeft, "igmsl", "SCROLL MAP LEFT (DEBUG)" },
+    { aKeys.PAGE_DOWN, ScrollRight, "igmsr", "SCROLL MAP RIGHT (DEBUG)" },
+    { aKeys.O, ShroudReveal, "igsr", "SHROUD REVEAL (DEBUG)" };
+  -- Setup keybank
+  iKeyBankId = GetAPI("RegisterKeys")("IN-GAME", {
+    [aStates.PRESS] = {
+      { aKeys.Q, DigUpLeft, "igddul", "DIG DIAGONALLY UP-LEFT" },
+      { aKeys.R, DigUpRight, "igddur", "DIG DIAGONALLY UP-RIGHT" },
+      { aKeys.A, DigLeft, "igdl", "DIG LEFT" },
+      { aKeys.D, DigRight, "igdr", "DIG RIGHT" },
+      { aKeys.Z, DigDownLeft, "igdddl", "DIG DIAGONALLY DOWN-LEFT" },
+      { aKeys.S, DigDown, "igdd", "DIG DOWN" },
+      { aKeys.C, DigDownRight, "igddr", "DIG DOWN-RIGHT" },
+      { aKeys.BACKSLASH, DropItems, "igdi", "DROP INVENTORY ITEM" },
+      { aKeys.BACKSPACE, Teleport, "igt", "TELEPORT HOME OR TELEPOLE" },
+      { aKeys.ENTER, GrabItems, "iggi", "GRAB COLLIDING ITEMS" },
+      { aKeys.ESCAPE, InitPause, "igp", "PAUSE THE GAME" },
+      { aKeys.F5, SelectInventoryScreen, "igshi", "SHOW DIGGER INVENTORY" },
+      { aKeys.F6, SelectLocationScreen, "igshl", "SHOW DIGGER LOCATIONS" },
+      { aKeys.F7, SelectStatusScreen, "igshs", "SHOW GAME STATUS" },
+      { aKeys.F8, SelectBook, "igshb", "SHOW THE BOOK" },
+      { aKeys.UP, MoveJump, "igj", "JUMP THE OBJECT" },
+      { aKeys.DOWN, MoveStop, "igs", "STOP ALL ACTIVITY IF NOT BUSY" },
+      { aKeys.LEFT, MoveLeft, "igml", "WALK OR RUN OBJECT LEFT" },
+      { aKeys.RIGHT, MoveRight, "igmr", "WALK OR RUN OBJECT RIGHT" },
+      { aKeys.F, MoveFind, "igft", "FIND TREASURE" },
+      { aKeys.H, MoveHome, "igmh", "WALK OR RUN HOME" },
+      { aKeys.LEFT_BRACKET, SpecialKey1, "igska",
+          "DEPLOY, RAISE, TRIGGER OR VIEW THE DEVICE" },
+      { aKeys.RIGHT_BRACKET, SpecialKey2, "igskb", "LOWER THE DEVICE" },
+      { aKeys.N1, SetDiggerOne, "igsdon", "SELECT 1ST DIGGER"  },
+      { aKeys.N2, SetDiggerTwo, "igsdtw", "SELECT 2ND DIGGER"  },
+      { aKeys.N3, SetDiggerThree, "igsdth", "SELECT 3RD DIGGER"  },
+      { aKeys.N4, SetDiggerFour, "igsdfo", "SELECT 4TH DIGGER"  },
+      { aKeys.N5, SetDiggerFive, "igsdfi", "SELECT 5TH DIGGER" },
+      { aKeys.J, SpawnJennite, "igsj", "SPAWN JENNITE (DEBUG)"  },
+      { aKeys.P, CauseExplosion, "igce", "CAUSE EXPLOSION (DEBUG)" },
+      { aKeys.SPACE, SelectDevice, "igcd", "CYCLE DEVICES" },
+      aReveal, aScrollDown, aScrollLeft, aScrollRight, aScrollUp
+    }, [aStates.REPEAT] = {
+      aReveal, aScrollDown, aScrollLeft, aScrollRight, aScrollUp
+    }
+  });
+  -- Pre-initialisations
+  CreateObject = InitCreateObject();
+  MoveOtherObjects = InitMoveOtherObjects();
+  SetAction = InitSetAction();
+  ProcessObjectMovement = ProcessObjectMovement();
+  PhaseLogic();
+end
 -- Exports and imports ----------------------------------------------------- --
-return { A = {                         -- Exports
-  -- Exports --------------------------------------------------------------- --
-  AdjustObjectHealth = AdjustObjectHealth, AdjustViewPortX = AdjustViewPortX,
-  AdjustViewPortY = AdjustViewPortY, BuyItem = BuyItem,
-  CreateObject = CreateObject, DeInitLevel = DeInitLevel,
+return { F = OnReady, A = { AdjustObjectHealth = AdjustObjectHealth,
+  AdjustViewPortX = AdjustViewPortX, AdjustViewPortY = AdjustViewPortY,
+  BuyItem = BuyItem, CreateObject = CreateObject, DeInitLevel = DeInitLevel,
+  DrawInfoFrameAndTitle = DrawInfoFrameAndTitle,
   EndConditionsCheck = EndConditionsCheck, GameProc = GameProc,
   GetAbsMousePos = GetAbsMousePos, GetActiveObject = GetActiveObject,
   GetActivePlayer = GetActivePlayer, GetCapitalValue = GetCapitalValue,
@@ -4690,51 +4713,9 @@ return { A = {                         -- Exports
   RenderObjects = RenderObjects, RenderShroud = RenderShroud,
   RenderTerrain = RenderTerrain, SelectObject = SelectObject,
   SellSpecifiedItems = SellSpecifiedItems, SetPlaySounds = SetPlaySounds,
-  UpdateShroud = UpdateShroud, aGemsAvailable = aGemsAvailable,
-  aLevelData = aLevelData, aObjects = aObjects, aPlayers = aPlayers
-  -- ----------------------------------------------------------------------- --
-  }, F = function(GetAPI)              -- Imports
-  -- Imports --------------------------------------------------------------- --
-  TYP, aLevelsData, LoadResources, aObjectData, ACT, JOB, DIR, aTimerData, AI,
-  OFL, aDigTileData, PlayMusic, aTileData, aTileFlags, Fade, BCBlit,
-  SetCallbacks, IsMouseInBounds, aDigData, DF, aSfxData, aJumpRiseData,
-  aJumpFallData, IsKeyPressed, IsButtonPressed, IsKeyHeld, IsButtonHeld,
-  GetMouseX, GetMouseY, PlayStaticSound, PlaySound, IsButtonPressedNoRelease,
-  aMenuData, MFL, MNU, IsMouseXLessThan, InitBook, aObjToUIData, GetMusic,
-  StopMusic, RenderFade, IsJoyPressed, InitWin, InitWinDead, InitLose,
-  InitLoseDead, InitTNTMap, InitLobby, texSpr, fontLarge, fontLittle, fontTiny,
-  aDigBlockData, aExplodeDirData, SetCursor, aCursorIdData,
-  RegisterFBUCallback, GetCallbacks, GetTestMode, RenderShadow,
-  SetBottomRightTip, aRacesData, aDugRandShaftData, aFloodGateData,
-  aTrainTrackData, aExplodeAboveData, maskLev, maskSpr, aGlobalData, aShopData,
-  IsScrollingDown, IsScrollingUp, aAIChoicesData, aShroudCircle,
-  aShroudTileLookup
-  = -- --------------------------------------------------------------------- --
-  GetAPI("aObjectTypes", "aLevelsData", "LoadResources", "aObjectData",
-    "aObjectActions", "aObjectJobs", "aObjectDirections", "aTimerData",
-    "aAITypesData", "aObjectFlags", "aDigTileData", "PlayMusic", "aTileData",
-    "aTileFlags", "Fade", "BCBlit", "SetCallbacks", "IsMouseInBounds",
-    "aDigData", "aDigTileFlags", "aSfxData", "aJumpRiseData", "aJumpFallData",
-    "IsKeyPressed", "IsButtonPressed", "IsKeyHeld", "IsButtonHeld",
-    "GetMouseX", "GetMouseY", "PlayStaticSound", "PlaySound",
-    "IsButtonPressedNoRelease", "aMenuData", "aMenuFlags", "aMenuIds",
-    "IsMouseXLessThan", "InitBook", "aObjToUIData", "GetMusic", "StopMusic",
-    "RenderFade", "IsJoyPressed", "InitWin", "InitWinDead", "InitLose",
-    "InitLoseDead", "InitTNTMap", "InitLobby", "texSpr", "fontLarge",
-    "fontLittle", "fontTiny", "aDigBlockData", "aExplodeDirData", "SetCursor",
-    "aCursorIdData", "RegisterFBUCallback", "GetCallbacks", "GetTestMode",
-    "RenderShadow", "SetBottomRightTip", "aRacesData", "aDugRandShaftData",
-    "aFloodGateData", "aTrainTrackData", "aExplodeAboveData", "maskLevel",
-    "maskSprites", "aGlobalData", "aShopData", "IsScrollingDown",
-    "IsScrollingUp", "aAIChoicesData", "aShroudCircle", "aShroudTileLookup");
-  -- Pre-initialisations --------------------------------------------------- --
-  CreateObject = InitCreateObject();
-  MoveOtherObjects = InitMoveOtherObjects();
-  SetAction = InitSetAction();
-  ProcessObjectMovement = ProcessObjectMovement();
-  PhaseLogic();
-  -- ----------------------------------------------------------------------- --
-end };
+  TriggerEnd = TriggerEnd, UpdateShroud = UpdateShroud,
+  aGemsAvailable = aGemsAvailable, aLevelData = aLevelData,
+  aObjects = aObjects, aPlayers = aPlayers } };
 -- ------------------------------------------------------------------------- --
 end                                    -- End of 'InternalsScope' namespace
 -- ------------------------------------------------------------------------- --

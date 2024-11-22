@@ -22,7 +22,7 @@ enum EvtWinCmd : size_t                // Render thread event commands
   /* -- Window events ------------------------------------------------------ */
   EWC_WIN_ATTENTION,                   // 01: Request attention
   EWC_WIN_CENTRE,                      // 02: Put window in centre
-  EWC_WIN_CURPOSGET,                   // 03: Resend input events
+  EWC_WIN_CURPOSGET,                   // 03: Get cursor position
   EWC_WIN_CURRESET,                    // 04: Reset cursor
   EWC_WIN_CURSET,                      // 05: Set cursor
   EWC_WIN_CURSETVIS,                   // 06: Set cursor visibility
@@ -45,9 +45,11 @@ enum EvtWinCmd : size_t                // Render thread event commands
   EWC_CB_SET,                          // 22: Set clipboard (via Clip class)
   EWC_CB_SETNR,                        // 23: " but no callback
   /* ----------------------------------------------------------------------- */
-  EWC_NOLOG,                           // 24: Events after this aren't logged
+  EWC_NOLOG,                           // Events after this aren't logged
   /* ----------------------------------------------------------------------- */
-  EWC_MAX = EWC_NOLOG,                 // 24: Below are just codes
+  EWC_WIN_CURPOSSET = EWC_NOLOG,       // 24: Set cursor position
+  /* ----------------------------------------------------------------------- */
+  EWC_MAX,                             // 25: Maximum number of async events
 };/* ----------------------------------------------------------------------- */
 static class EvtWin final :            // Event list for window thread
   /* -- Dependencies ------------------------------------------------------- */

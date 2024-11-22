@@ -15,8 +15,8 @@
 local Fade, LoadLevel, LoadResources, PlayMusic, SetCallbacks, aGlobalData,
   aLevelTypesData, aLevelsData, fontLarge;
 -- Assets required --------------------------------------------------------- --
-local aAssets<const> = { { T = 1, F = false,    P = { 320, 240, 0, 0, 0 } },
-                         { T = 7, F = "select", P = { } } };
+local aAssets<const> = { { T = 1, F = false, P = { 320, 240, 0, 0, 0 } },
+                         { T = 7, F = "select" } };
 -- Init scene function ----------------------------------------------------- --
 local function InitScene(iZoneId)
   -- Set level number and get data for it.
@@ -25,9 +25,9 @@ local function InitScene(iZoneId)
    -- On loaded function
   local function OnLoaded(aResources)
     -- Play scene music
-    PlayMusic(aResources[2].H);
+    PlayMusic(aResources[2]);
     -- Set scene texture
-    local texScene = aResources[1].H;
+    local texScene = aResources[1];
     texScene:TileSTC(1);
     texScene:TileA(192, 272, 512, 512);
     -- Set first tile number
@@ -70,7 +70,7 @@ local function InitScene(iZoneId)
                 -- Release assets to garbage collector
                 texScene = nil;
                 -- Load the requested level
-                LoadLevel(iLevelId, "game");
+                LoadLevel(iLevelId, "game", -1);
               end
               -- Fade out and then load the level
               Fade(0, 1, 0.04, RenderScene, OnRequiredFadeOut, true);
@@ -97,14 +97,14 @@ local function InitScene(iZoneId)
   -- Load resources
   LoadResources("Scene "..aLevelInfo.n.."/"..aTerrain.n, aAssets, OnLoaded);
 end
--- Exports and imports ----------------------------------------------------- --
-return { A = { InitScene = InitScene }, F = function(GetAPI)
-  -- Imports --------------------------------------------------------------- --
+-- Scripts have been loaded ------------------------------------------------ --
+local function OnReady(GetAPI)
+  -- Grab imports
   Fade, LoadLevel, LoadResources, PlayMusic, SetCallbacks, aGlobalData,
-  aLevelTypesData, aLevelsData, fontLarge
-  = -- --------------------------------------------------------------------- --
-  GetAPI("Fade", "LoadLevel", "LoadResources", "PlayMusic", "SetCallbacks",
-    "aGlobalData", "aLevelTypesData", "aLevelsData", "fontLarge");
-  -- ----------------------------------------------------------------------- --
-end };
+    aLevelTypesData, aLevelsData, fontLarge =
+      GetAPI("Fade", "LoadLevel", "LoadResources", "PlayMusic", "SetCallbacks",
+        "aGlobalData", "aLevelTypesData", "aLevelsData", "fontLarge");
+end
+-- Exports and imports ----------------------------------------------------- --
+return { A = { InitScene = InitScene }, F = OnReady };
 -- End-of-File ============================================================= --

@@ -80,6 +80,7 @@ LLFUNC(Reset, 0, AgVariable{lS, 1}().Reset())
 /* ========================================================================= */
 // $ Variable:Set
 // > String:string=The new cvar value.
+// < Success:integer=The return code.
 // ? Sets the new value of the specified cvar name. An exception is raised if
 // ? any error occurs. See Variable.Result to see the possible results.
 /* ------------------------------------------------------------------------- */
@@ -90,8 +91,8 @@ LLFUNC(Set, 1, LuaUtilPushVar(lS, AgVariable{lS, 1}().Set(AgString{lS, 2})))
 ** ######################################################################### **
 ** ------------------------------------------------------------------------- */
 LLRSMFBEGIN                            // Variable:* member functions begin
-  LLRSFUNC(Default), LLRSFUNC(Destroy), LLRSFUNC(Get), LLRSFUNC(Id),
-  LLRSFUNC(Name),    LLRSFUNC(Reset),   LLRSFUNC(Set),
+  LLRSFUNC(Default), LLRSFUNC(Destroy), LLRSFUNC(Empty), LLRSFUNC(Get),
+  LLRSFUNC(Id),      LLRSFUNC(Name),    LLRSFUNC(Reset), LLRSFUNC(Set),
 LLRSEND                                // Variable:* member functions end
 /* ========================================================================= **
 ** ######################################################################### **
@@ -162,7 +163,7 @@ LLFUNC(Save, 1, LuaUtilPushVar(lS, cCVars->Save()))
 ** ######################################################################### **
 ** ------------------------------------------------------------------------- */
 LLRSBEGIN                              // Variable.* namespace functions begin
-  LLRSFUNC(Empty),    LLRSFUNC(Exists), LLRSFUNC(GetInt), LLRSFUNC(Register),
+  LLRSFUNC(Exists),   LLRSFUNC(GetInt), LLRSFUNC(Register),
   LLRSFUNC(ResetInt), LLRSFUNC(Save),   LLRSFUNC(SetInt),
 LLRSEND                                // Variable.* namespace functions end
 /* ========================================================================= **

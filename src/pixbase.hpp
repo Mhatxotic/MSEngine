@@ -18,58 +18,64 @@ class SysBase :                        // Safe exception handler namespace
   public Ident                         // Mutex name
 { /* -- Class to rebuffer system generated output to log ------------------- */
 #if !defined(BUILD) && defined(MACOS)  // Not applicable on build or not MacOS
-  class Redirect                       // Linux: close() doesn't unblock read()
-  { /* --------------------------------------------------------------------- */
+  class Redirect final :               // Linux: close() doesn't unblock read()
+    /* -- Base classes ----------------------------------------------------- */
+    private Thread,                    // Thread to monitor file descriptor
+    private Memory                     // Storage for read text data
+  { /* -- Private variables ------------------------------------------------ */
     static constexpr int iInvalid=-1;  // Handle is invalid value
     /* --------------------------------------------------------------------- */
     const int      iRequested,         // Requested handle
                    iSaved;             // Saved handle
-    Memory         mBuffer;            // Buffer for output datat
     array<int,2>   iaPipes;            // Pipes
-    int           &iRead;              // Read end of the pipe
-    int           &iWrite;             // Write end of the pipe
-    Thread         tThread;            // Monitor thread
+    int           &iRead,              // Read end of the pipe (iaPipes[0])
+                  &iWrite;             // Write end of the pipe (iaPipes[1])
     /* -- Async off-main thread function ----------------------------------- */
     int ThreadMain(Thread&)
     { // Until thread should exit or end of file
-      while(tThread.ThreadShouldNotExit())
+      while(ThreadShouldNotExit())
       { // Read some data and if we got some? Return how much we read
         switch(const size_t stRead = static_cast<size_t>
-          (read(iRead, mBuffer.MemPtr(), mBuffer.MemSize())))
+          (read(iRead, MemPtr(), MemSize())))
         { // Success?
           default:
-            // Report read
-            cLog->LogDebugExSafe("[$>$] $", stRead, tThread.IdentGet(),
-              mBuffer.MemToString());
+          { // Report read string to log
+            cLog->LogWarningExSafe("$<$>: $",
+              IdentGet(), stRead, MemToString(stRead));
             // Fallthrough to break
             [[fallthrough]];
-          // Handle was closed? Terminate the thread
+          } // Handle was closed? Terminate the thread
           case 0: break;
           // Error?
           case StdMaxSizeT:
-            // Ignore it if we're quitting
-            if(tThread.ThreadShouldNotExit()) break;
+          { // Ignore it if we're quitting
+            if(ThreadShouldNotExit()) break;
             // Else throw error
             XCS("Error reading system output from pipe!",
-              "Output", tThread.IdentGet(), "Bytes", mBuffer.MemSize());
+              "Output", IdentGet(), "Bytes", MemSize());
+          }
         } // Don't get here
       } // Return success to thread manager
       return 1;
     }
     /* --------------------------------------------------------------------- */
+    void CloseRead(void) { if(iRead) close(iRead); }
+    /* --------------------------------------------------------------------- */
     void Reset(void)
     { // Close write pipe handle if opened
       if(iWrite != iInvalid) close(iWrite);
-      // Return if the read pipe handle not opened
-      if(iRead == iInvalid) return;
-      // Signal the exit
-      tThread.ThreadSetExit();
-      // Close the read pipe so the thread can exit
-      close(iRead);
-      // Stop the thread and wait for it to exit
-      tThread.ThreadDeInit();
+      // Thread is running?
+      if(ThreadIsRunning())
+      { // Signal the exit
+        ThreadSetExit();
+        // Close the read pipe so the thread can exit
+        CloseRead();
+        // Wait for the thread to exit
+        ThreadJoin();
+      } // Thread not running for some reason so just close the handle
+      else CloseRead();
       // Restore original handle allocated by system
-      dup2(iSaved, iRequested);
+      if(iSaved != iInvalid) dup2(iSaved, iRequested);
     }
     /* ------------------------------------------------------------- */ public:
     void ResetSafe(void)
@@ -81,36 +87,42 @@ class SysBase :                        // Safe exception handler namespace
     /* --------------------------------------------------------------------- */
     Redirect(const int iHandle, const string &strNName) :
       /* ------------------------------------------------------------------- */
+      Thread{ strNName, STP_LOW },     // Initialise low priority thread
+      Memory{ 4096 },                  // Initialise buffer
       iRequested(iHandle),             // Store requested handle
       iSaved(dup(iHandle)),            // Duplicate requested handle
-      mBuffer{ 4096 },                 // Initialise buffer
       iaPipes{ iInvalid, iInvalid },   // Initialise pipe handles
       iRead(iaPipes[0]),               // Init reference to read pipe
-      iWrite(iaPipes[1]),              // Init reference to write pipe
-      tThread{ strNName, STP_LOW }     // Initialise low priority thread
+      iWrite(iaPipes[1])               // Init reference to write pipe
       /* ------------------------------------------------------------------- */
     { // Return if handle not copied
-      if(iSaved == -1)
-        XCL("Failed to copy specified output handle!",
-            "Name", tThread.IdentGet());
+      if(iSaved == iInvalid)
+        XCL("Failed to copy specified output handle!", "Name", IdentGet());
       // Create pipe handles and show error on failure
       if(pipe(iaPipes.data()))
         XCL("Failed to redirect specified output to buffer!",
-            "Name", tThread.IdentGet());
+            "Name", IdentGet());
       // Redirect requested output handle to the pipe
-      if(dup2(iWrite, iHandle) == -1)
+      if(dup2(iWrite, iHandle) == iInvalid)
         XCL("Failed to redirect output handle to the pipe!",
-            "Name", tThread.IdentGet());
+            "Name", IdentGet(), "OldFd", iWrite, "NewFd", iHandle);
       // Close the other handle
-      if(close(iWrite) == -1)
+      if(close(iWrite) == iInvalid)
         XCL("Failed to close second pipe handle!",
-            "Name", tThread.IdentGet());
+            "Name", IdentGet(), "Fd", iWrite);
+      // Reset the closed write handle now it is invalid
+      iWrite = iInvalid;
       // Start the monitoring thread if it is open
-      if(iRead != -1)
-        tThread.ThreadInit(bind(&Redirect::ThreadMain, this, _1), this);
+      if(iRead != iInvalid)
+        ThreadInit(bind(&Redirect::ThreadMain, this, _1), this);
     }
     /* --------------------------------------------------------------------- */
-    ~Redirect(void) { Reset(); }
+    ~Redirect(void)
+    { // Close the handles
+      Reset();
+      // Close the duplicated std handle in the constructor
+      if(iSaved != iInvalid) close(iSaved);
+    }
     /* --------------------------------------------------------------------- */
   } rStdErr;                  // Capture stdout and stderr
 #endif
@@ -320,6 +332,11 @@ class SysBase :                        // Safe exception handler namespace
     DumpStack(osS);
     // Add extra information if set
     if(*cpExtra) osS << cCommon->Lf() << cpExtra << cCommon->Lf();
+ // Not building the command line too?
+#if !defined(BUILD) && defined(MACOS)
+    // Shut down the stderr monitoring thread
+    rStdErr.ResetSafe();
+#endif
     // Print it to stderr
     fputs(osS.str().c_str(), stderr);
     // Dump mods to log
@@ -383,12 +400,7 @@ class SysBase :                        // Safe exception handler namespace
   }
   /* ----------------------------------------------------------------------- */
   ExitState HandleSignalSafe(const int iSignal)
-  { // Not building the command line too?
-#if !defined(BUILD) && defined(MACOS)
-    // Shut down the stderr monitoring thread
-    rStdErr.ResetSafe();
-#endif
-    // Which signal
+  { // Which signal
     switch(iSignal)
     { // The signal is usually initiated by the process itself when it calls
       // abort function of the C Standard Library, but it can be sent to the

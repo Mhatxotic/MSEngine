@@ -1,7 +1,7 @@
 <!DOCTYPE html>
-<!-- Reference for the Mhatxotic Engine API version 24.11.20.3 -->
-<!-- Automatically built at Wed Nov 20 21:15:44 2024 +0000 -->
-<!-- With Mhatxotic Engine Project Management Utility version 24.11.20.3 -->
+<!-- Reference for the Mhatxotic Engine API version 24.11.27.1 -->
+<!-- Automatically built at Wed Nov 27 19:34:49 2024 +0000 -->
+<!-- With Mhatxotic Engine Project Management Utility version 24.11.27.1 -->
 <!-- Copyright (c) 2006-2024 Mhatxotic Design, All Rights Reserved Worldwide -->
 <HTML lang="en-GB">
 <HEAD>
@@ -11,18 +11,18 @@
 	<META name="apple-mobile-web-app-title" content="Mhatxotic Engine API">
 	<META name="author" content="Mhatxotic Design">
 	<META name="copyright" content="Copyright © 2006-2024 Mhatxotic Design, All Rights Reserved">
-	<META name="description" content="Reference for the Mhatxotic Engine API version 24.11.20.3">
+	<META name="description" content="Reference for the Mhatxotic Engine API version 24.11.27.1">
 	<META name="format-detection" content="telephone=no">
-	<META name="generator" content="Mhatxotic Engine Project Management Utility version 24.11.20.3">
+	<META name="generator" content="Mhatxotic Engine Project Management Utility version 24.11.27.1">
 	<META name="google-site-verification" content="BvWxrqmgaIxqe_W8AW3OGK0fdCI_JfB_-gcOOxCF9_4">
 	<META name="googlebot" content="index,follow">
-	<META name="og:description" content="Reference for the Mhatxotic Engine API version 24.11.20.3">
+	<META name="og:description" content="Reference for the Mhatxotic Engine API version 24.11.27.1">
 	<META name="og:image" content="https://repository-images.githubusercontent.com/611875607/ee7aa468-9797-4763-9a2d-ea3d782ef413">
-	<META name="og:title" content="Mhatxotic Engine 24.11.20.3 API reference">
+	<META name="og:title" content="Mhatxotic Engine 24.11.27.1 API reference">
 	<META name="og:url" content="https://mhatxotic.github.io/Engine/">
 	<META name="robots" content="index,follow">
 	<META name="viewport" content="width=device-width, initial-scale=1">
-	<TITLE>Mhatxotic Engine 24.11.20.3 API reference</TITLE>
+	<TITLE>Mhatxotic Engine 24.11.27.1 API reference</TITLE>
 	<STYLE media="screen">
 	* { margin:0; padding:0 }
 	BODY { background-color:#111; border:0; font-family:sans-serif; overflow-x:hidden; text-shadow: 1px 1px #111 }
@@ -60,7 +60,7 @@
 	</STYLE>
 </HEAD>
 <BODY id="idx.top">
-	<H1>Mhatxotic Engine 24.11.20.3 API reference</H1>
+	<H1>Mhatxotic Engine 24.11.27.1 API reference</H1>
 	<NOSCRIPT>
 		<H2>JavaScript is required to show and hide elements.</H2>
 	</NOSCRIPT>
@@ -1830,7 +1830,6 @@
 									<LI><A href="#cv.inp_fstoggler">inp_fstoggler</A></LI>
 									<LI><A href="#cv.inp_joydeffdz">inp_joydeffdz</A></LI>
 									<LI><A href="#cv.inp_joydefrdz">inp_joydefrdz</A></LI>
-									<LI><A href="#cv.inp_joystick">inp_joystick</A></LI>
 									<LI><A href="#cv.inp_rawmouse">inp_rawmouse</A></LI>
 									<LI><A href="#cv.inp_stickykey">inp_stickykey</A></LI>
 									<LI><A href="#cv.inp_stickymouse">inp_stickymouse</A></LI>
@@ -1842,6 +1841,7 @@
 									<LI><A href="#cv.lua_cache">lua_cache</A></LI>
 									<LI><A href="#cv.lua_gcpause">lua_gcpause</A></LI>
 									<LI><A href="#cv.lua_gcstepmul">lua_gcstepmul</A></LI>
+									<LI><A href="#cv.lua_lastver">lua_lastver</A></LI>
 									<LI><A href="#cv.lua_randomseed">lua_randomseed</A></LI>
 									<LI><A href="#cv.lua_script">lua_script</A></LI>
 									<LI><A href="#cv.lua_sizestack">lua_sizestack</A></LI>
@@ -5714,9 +5714,9 @@
 		<H4>Syntax:-</H4>
 		<PRE><U>Name</U> = Input.GetKeyName(<I><U>Value</U></I>)</PRE>
 		<H4>Function Parameters:-</H4>
-		<PRE><U>Value</U> <I>(integer)</I> = The id of the key<BR></PRE>
+		<PRE><U>Value</U> <I>(integer)</I> = The key id of the key<BR></PRE>
 		<H4>Return Parameters:-</H4>
-		<PRE><U>Name</U> <I>(stringr)</I> = The name of the key<BR></PRE>
+		<PRE><U>Name</U> <I>(integer)</I> = The scan id of the key<BR></PRE>
 		<H4>Synopsis:-</H4>
 		<PRE>Returns the name of the specified key </PRE>
 		<H4><A href="#idx:Input">&#x25B2; Return to table of contents</A></H4>
@@ -5784,7 +5784,7 @@
 		<H4>Function Parameters:-</H4>
 		<PRE><U>Func</U> <I>(function)</I> = The callback function to use<BR></PRE>
 		<H4>Synopsis:-</H4>
-		<PRE>When a joystick is disconnected or disconnected&#x2c; this callback will be triggered with the joystick id and a boolean if wether the </PRE>
+		<PRE>Sets the callback event when a joystick event occurs and then polls the joysticks sending results to the callback&#x2e; Specify &#x27;nil&#x27; to clear the event&#x2e; The callback syntax is &#x27;Callback&#x28;iJoystick&#x2c; bConnected&#x29;&#x27; Where &#x27;iJoystick&#x27; is the unique joystick id given to the joystick and  &#x27;bConnected&#x27; is if the joystick was connected &#x28;true&#x29; or disconnected &#x28;false&#x29;&#x2e;<BR></PRE>
 		<H4><A href="#idx:Input">&#x25B2; Return to table of contents</A></H4>
 	</DIV>
 	<DIV id="Input.OnKey" style="display:none">
@@ -5824,7 +5824,7 @@
 		<H4>Function Parameters:-</H4>
 		<PRE><U>Func</U> <I>(function)</I> = The callback function to use<BR></PRE>
 		<H4>Synopsis:-</H4>
-		<PRE>When the mouse is moved&#x2c; this function will be called with the current cursor x and y position based on the main framebuffer&#x2e;<BR></PRE>
+		<PRE>Sets teh callback function for When the mouse is moved&#x2e; It will also be called immediately after setting a function&#x2e; The syntax for the callback is &#x27;Callback&#x28;nX&#x2c; nY&#x29;&#x27; where &#x27;nX&#x27; is the left co&#x2d;ordinate and &#x27;nY&#x27; is the top co&#x2d;ordinate&#x2e; Setting the function to &#x27;nil&#x27; unreferences the already referenced function&#x2e;<BR></PRE>
 		<H4><A href="#idx:Input">&#x25B2; Return to table of contents</A></H4>
 	</DIV>
 	<DIV id="Input.OnMouseScroll" style="display:none">
@@ -5854,7 +5854,7 @@
 		<H4>Function Parameters:-</H4>
 		<PRE><U>X</U> <I>(integer)</I> = The X co-ordinate of the mouse cursor.<BR><U>Y</U> <I>(integer)</I> = The Y co-ordinate of the mouse cursor.<BR></PRE>
 		<H4>Synopsis:-</H4>
-		<PRE>Sets the position of the mouse cursor relative to the top&#x2d;left of the main FBO matrix&#x2c; meaning X could be negative&#x2e;<BR></PRE>
+		<PRE>Sets the position of the mouse cursor relative to the top&#x2d;left of the main FBO matrix&#x2c; meaning X could be negative&#x2e; The specified co&#x2d;ordinates will also be sent to the &#x27;Input&#x2e;OnMouseMove&#x27; callback if set&#x2e;<BR></PRE>
 		<H4><A href="#idx:Input">&#x25B2; Return to table of contents</A></H4>
 	</DIV>
 	<DIV id="Input.SetJoyAxisDeadZones" style="display:none">
@@ -10328,9 +10328,11 @@
 	<DIV id="Variable:Set" style="display:none">
 		<H3>Variable:Set</H3>
 		<H4>Syntax:-</H4>
-		<PRE>Variable:Set(<I><U>String</U></I>)</PRE>
+		<PRE><U>Success</U> = Variable:Set(<I><U>String</U></I>)</PRE>
 		<H4>Function Parameters:-</H4>
 		<PRE><U>String</U> <I>(string)</I> = The new cvar value.<BR></PRE>
+		<H4>Return Parameters:-</H4>
+		<PRE><U>Success</U> <I>(integer)</I> = The return code.<BR></PRE>
 		<H4>Synopsis:-</H4>
 		<PRE>Sets the new value of the specified cvar name&#x2e; An exception is raised if any error occurs&#x2e; See Variable&#x2e;Result to see the possible results&#x2e;<BR></PRE>
 		<H4><A href="#idx:Variable">&#x25B2; Return to table of contents</A></H4>
@@ -11592,11 +11594,6 @@
 		<PRE>Specifies the gamepad reverse deadzone&#x2e;<BR></PRE>
 		<H4><A href="#idx.cv">&#x25B2; Return to table of contents</A></H4>
 	</DIV>
-	<DIV id="cv.inp_joystick" style="display:none">
-		<H3>inp_joystick</H3>
-		<PRE>Specifies how to deal with detecting connected gamepads&#x2e;<BR>[&#x2d;1] JOY_DETECT  &#x3d; Detect at start&#x2e; Disable if no gamepads connected&#x2e;<BR>[0]  JOY_DISABLE &#x3d; Disable gamepads completely&#x2e;<BR>[1]  JOY_ENABLE  &#x3d; Enable gamepads and always try to detect new gamepads&#x2e;<BR></PRE>
-		<H4><A href="#idx.cv">&#x25B2; Return to table of contents</A></H4>
-	</DIV>
 	<DIV id="cv.inp_rawmouse" style="display:none">
 		<H3>inp_rawmouse</H3>
 		<PRE>Enables raw mouse input if available&#x2e;<BR></PRE>
@@ -11650,6 +11647,11 @@
 	<DIV id="cv.lua_gcstepmul" style="display:none">
 		<H3>lua_gcstepmul</H3>
 		<PRE>Overrides Lua&#x27;s internal LUA_GCSTEP value with this&#x2e;<BR></PRE>
+		<H4><A href="#idx.cv">&#x25B2; Return to table of contents</A></H4>
+	</DIV>
+	<DIV id="cv.lua_lastver" style="display:none">
+		<H3>lua_lastver</H3>
+		<PRE>Specifies the last known version of LUA used with the engine&#x2e; If the current LUA version is different to this then the code cache will be completely deleted so all code is recompiled&#x2e;<BR></PRE>
 		<H4><A href="#idx.cv">&#x25B2; Return to table of contents</A></H4>
 	</DIV>
 	<DIV id="cv.lua_randomseed" style="display:none">
@@ -12223,6 +12225,6 @@
 		<H4><A href="#idx.cv">&#x25B2; Return to table of contents</A></H4>
 	</DIV>
 	<ADDRESS>Copyright &copy; 2024 Mhatxotic Design, All Rights Reserved.<BR>
-	This document was generated at Wed Nov 20 21:15:44 2024 +0000</ADDRESS>
+	This document was generated at Wed Nov 27 19:34:49 2024 +0000</ADDRESS>
 </BODY>
 </HTML>

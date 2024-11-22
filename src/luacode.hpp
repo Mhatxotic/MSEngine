@@ -10,12 +10,12 @@
 namespace ILuaCode {                   // Start of private module namespace
 /* -- Dependencies --------------------------------------------------------- */
 using namespace IAsset::P;             using namespace IClock::P;
-using namespace ICVarDef::P;           using namespace IError::P;
-using namespace IFileMap::P;           using namespace ILog::P;
-using namespace ILuaUtil::P;           using namespace IMemory::P;
-using namespace ISql::P;               using namespace IStd::P;
-using namespace IString::P;            using namespace Lib::OS::SevenZip;
-using namespace Lib::Sqlite;
+using namespace ICredit::P;            using namespace ICVarDef::P;
+using namespace IError::P;             using namespace IFileMap::P;
+using namespace ILog::P;               using namespace ILuaUtil::P;
+using namespace IMemory::P;            using namespace ISql::P;
+using namespace IStd::P;               using namespace IString::P;
+using namespace Lib::OS::SevenZip;     using namespace Lib::Sqlite;
 /* ------------------------------------------------------------------------- */
 namespace P {                          // Start of public module namespace
 /* -- Consts --------------------------------------------------------------- */
@@ -28,8 +28,8 @@ static enum LuaCache : unsigned int    // User cache setting
   LCC_MAX                              // Maximum number of settings
 } /* ----------------------------------------------------------------------- */
 lcSetting;                             // Initialised by CVar later
-/* -- Cache and compilation results ---------------------------------------- */
-enum LuaCompResult : unsigned int
+/* ------------------------------------------------------------------------- */
+enum LuaCompResult : unsigned int      // Cache and compilation results
 { /* ----------------------------------------------------------------------- */
   LCR_CACHED,                          // [0] Using cached version
   LCR_RECOMPILE,                       // [1] Code compiled and stored
@@ -41,6 +41,27 @@ enum LuaCompResult : unsigned int
 /* -- Set lua cache setting ------------------------------------------------ */
 static CVarReturn LuaCodeSetCache(const LuaCache lcVal)
   { return CVarSimpleSetIntNGE(lcSetting, lcVal, LCC_MAX); }
+/* -- Check lua version ---------------------------------------------------- */
+static CVarReturn LuaCodeCheckVersion(const string &strVal, string &strNVal)
+{ // Get current LUA version
+  const string_view &svVersion = cCredits->CreditGetItem(CL_LUA).GetVersion();
+  // Is version the same? Then we're good
+  if(strVal == svVersion) return ACCEPT;
+  // Log that the LUA version is different
+  cLog->LogWarningExSafe("LuaCode detected LUA version mismatch ($ != $) so "
+    "the code cache will be flushed.", strVal, svVersion);
+  // Clear the cache and if succeeded?
+  if(cSql->FlushTable(cSql->strvLCTable) == SQLITE_OK)
+  { // Write success in the console
+    cLog->LogWarningSafe("LuaCode flushed the LUA code cache successfully!");
+    // Update cvar to the current version
+    strNVal = svVersion;
+  } // Failed? Write reason to console
+  else cLog->LogWarningExSafe("LuaCode failed to flush the LUA code cache "
+    "because $ ($)!", cSql->GetErrorStr(), cSql->GetError());
+  // Accepted
+  return ACCEPT;
+}
 /* -- Callback for lua_dump ------------------------------------------------ */
 namespace LuaCodeDumpHelper
 { /* -- Memory blocks structure for dump function -------------------------- */
@@ -172,7 +193,7 @@ static LuaCompResult LuaCodeCompileBuffer(lua_State*const lS,
         strRef, stSize, hex, uiCRC);
     } // No results
     else cLog->LogDebugExSafe(
-      "LuaCode will compile '$'[$]($$) for the first time!",
+      "LuaCode will recompile '$'[$]($$) as the module was modified!",
         strRef, stSize, hex, uiCRC);
   } // Error reading database so try to rebuild table
   else cSql->LuaCacheRebuildTable();

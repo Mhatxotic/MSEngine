@@ -15,8 +15,8 @@ local random<const>, remove<const> = math.random, table.remove;
 local DeInitLevel, Fade, GameProc, GetMusic, InitScore, LoadLevel,
   LoadResources, LockViewPort, PlayMusic, ProcessViewPort, RegisterFBUCallback,
   RenderObjects, RenderTerrain, SelectObject, SetCallbacks, SetCursor,
-  aCreditsData, aCreditsXData, aCursorIdData, aEndLoadData, aLevelTypesData,
-  aLevelsData, aObjectTypes, aObjects, aPlayers, fontLarge, fontLittle;
+  aCreditsData, aCreditsXData, aEndLoadData, aLevelTypesData, aLevelsData,
+  aObjectTypes, aObjects, aPlayers, fontLarge, fontLittle;
 -- Assets required --------------------------------------------------------- --
 local aAssets<const> = { { T = 2, F = "vignette", P = { 0 } } };
 local aEndLevelData<const> = { n = "END", f = "end", t = false };
@@ -25,7 +25,7 @@ local function InitCredits(bRolling)
   -- When assets have loaded
   local function OnLoaded(aResources)
     -- Set vignette texture
-    local texVig = aResources[1].H;
+    local texVig = aResources[1];
     -- Register frame buffer update
     local iStageW, iStageH, iStageL, iStageT, iStageR, iStageB, iStageM;
     local function OnFrameBufferUpdate(...)
@@ -135,7 +135,7 @@ local function InitCredits(bRolling)
       -- Credits input procedure
       local function ExtraInput() end
       -- When faded out to title? Load demo level
-      LoadLevel(aEndLevelData, strMusic, nil,
+      LoadLevel(aEndLevelData, strMusic, nil, nil,
         true, aObjectTypes.DIGRANDOM, true, ExtraProc, RenderExtra,
         ExtraInput);
     end
@@ -218,12 +218,9 @@ local function InitCredits(bRolling)
         -- Fade out to next level
         Fade(0, 1, 0.04, fcbCreditsRender, OnFadeOut);
       end
-      -- Set input procedure
-      local function CreditsInput() SetCursor(aCursorIdData.ARROW) end;
       -- Load demo level
-      LoadLevel(iLevelId, strMusic, nil, true,
-        aObjectTypes.DIGRANDOM, true, CreditsProc, fcbCreditsRender,
-        CreditsInput);
+      LoadLevel(iLevelId, strMusic, nil, nil, true,
+        aObjectTypes.DIGRANDOM, true, CreditsProc, fcbCreditsRender, nil);
     end
     -- Load first level or credits
     if bRolling then InitRollingCredits("credits");
@@ -232,23 +229,24 @@ local function InitCredits(bRolling)
   -- Load bank texture
   LoadResources("Credits", aAssets, OnLoaded);
 end
--- Exports and imports ----------------------------------------------------- --
-return { A={ InitCredits = InitCredits }, F=function(GetAPI)
-  -- Imports --------------------------------------------------------------- --
+-- Script has been laoded -------------------------------------------------- --
+local function OnReady(GetAPI)
+  -- Imports
   DeInitLevel, Fade, GameProc, GetMusic, InitScore, LoadLevel, LoadResources,
-  LockViewPort, PlayMusic, ProcessViewPort, RegisterFBUCallback, RenderObjects,
-  RenderTerrain, SelectObject, SetCallbacks, SetCursor, aCreditsData,
-  aCreditsXData, aCursorIdData, aLevelTypesData, aLevelsData, aObjectTypes,
-  aObjects, aPlayers, fontLarge, fontLittle
-  = -- --------------------------------------------------------------------- --
-  GetAPI("DeInitLevel", "Fade", "GameProc", "GetMusic", "InitScore",
-    "LoadLevel", "LoadResources", "LockViewPort", "PlayMusic",
-    "ProcessViewPort", "RegisterFBUCallback", "RenderObjects", "RenderTerrain",
-    "SelectObject", "SetCallbacks", "SetCursor", "aCreditsData",
-    "aCreditsXData", "aCursorIdData", "aLevelTypesData", "aLevelsData",
-    "aObjectTypes", "aObjects", "aPlayers", "fontLarge", "fontLittle");
-  -- Set ending level load data -------------------------------------------- --
+    LockViewPort, PlayMusic, ProcessViewPort, RegisterFBUCallback,
+    RenderObjects, RenderTerrain, SelectObject, SetCallbacks, SetCursor,
+    aCreditsData, aCreditsXData, aLevelTypesData, aLevelsData,
+    aObjectTypes, aObjects, aPlayers, fontLarge, fontLittle =
+      GetAPI("DeInitLevel", "Fade", "GameProc", "GetMusic", "InitScore",
+        "LoadLevel", "LoadResources", "LockViewPort", "PlayMusic",
+        "ProcessViewPort", "RegisterFBUCallback", "RenderObjects",
+        "RenderTerrain", "SelectObject", "SetCallbacks", "SetCursor",
+        "aCreditsData", "aCreditsXData", "aLevelTypesData",
+        "aLevelsData", "aObjectTypes", "aObjects", "aPlayers", "fontLarge",
+        "fontLittle");
+  -- Set ending level load data
   aEndLevelData.t = aLevelTypesData[4];
-  -- ----------------------------------------------------------------------- --
-end };
+end
+-- Exports and imports ----------------------------------------------------- --
+return { A = { InitCredits = InitCredits }, F = OnReady };
 -- End-of-File ============================================================= --

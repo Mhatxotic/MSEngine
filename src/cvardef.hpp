@@ -173,7 +173,8 @@ enum CVarEnums : size_t
   ERR_LMRESETLIMIT, ERR_MINVRAM,       ERR_MINRAM,
   /* -- Lua cvars ---------------------------------------------------------- */
   LUA_TICKTIMEOUT,  LUA_TICKCHECK,     LUA_CACHE,           LUA_SIZESTACK,
-  LUA_GCPAUSE,      LUA_GCSTEPMUL,     LUA_RANDOMSEED,      LUA_SCRIPT,
+  LUA_GCPAUSE,      LUA_GCSTEPMUL,     LUA_LASTVER,         LUA_RANDOMSEED,
+  LUA_SCRIPT,
   /* -- Audio cvars -------------------------------------------------------- */
   AUD_DELAY,        AUD_VOL,           AUD_INTERFACE,       AUD_CHECK,
   AUD_NUMSOURCES,   AUD_SAMVOL,        AUD_STRBUFCOUNT,     AUD_STRBUFFER,
@@ -191,8 +192,8 @@ enum CVarEnums : size_t
   /* -- Fmv cvars ---------------------------------------------------------- */
   FMV_ABUFFER,      FMV_IOBUFFER,      FMV_MAXDRIFT,
   /* -- Input cvars -------------------------------------------------------- */
-  INP_JOYDEFFDZ,    INP_JOYDEFRDZ,     INP_JOYSTICK,        INP_FSTOGGLER,
-  INP_RAWMOUSE,     INP_STICKYKEY,     INP_STICKYMOUSE,
+  INP_JOYDEFFDZ,    INP_JOYDEFRDZ,     INP_FSTOGGLER,       INP_RAWMOUSE,
+  INP_STICKYKEY,    INP_STICKYMOUSE,
   /* -- Network cvars ------------------------------------------------------ */
   NET_CBPFLAG1,     NET_CBPFLAG2,      NET_BUFFER,          NET_RTIMEOUT,
   NET_STIMEOUT,     NET_CIPHERTLSv1,   NET_CIPHERTLSv13,    NET_CASTORE,

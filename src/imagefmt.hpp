@@ -16,10 +16,10 @@ using namespace IError::P;             using namespace IFileMap::P;
 using namespace IFStream::P;           using namespace IImageDef::P;
 using namespace IImageLib::P;          using namespace ILog::P;
 using namespace IMemory::P;            using namespace IStd::P;
-using namespace ISystem::P;            using namespace IString::P;
-using namespace ITexDef::P;            using namespace IUtf;
-using namespace IUtil::P;              using namespace Lib::NSGif;
-using namespace Lib::OS::JpegTurbo;    using namespace Lib::Png;
+using namespace IString::P;            using namespace ITexDef::P;
+using namespace IUtf;                  using namespace IUtil::P;
+using namespace Lib::NSGif;            using namespace Lib::OS::JpegTurbo;
+using namespace Lib::Png;
 /* ------------------------------------------------------------------------- */
 namespace P {                          // Start of public module namespace
 /* ========================================================================= **
@@ -583,19 +583,24 @@ class CodecPNG final :                 // Members initially private
       ~PngWriter(void) { png_destroy_write_struct(&psData, &piData); }
     } // Send file stream to constructor
     pwC{ fmData };
-    // Set metadata
-    pwC.Meta("Title", cSystem->GetGuestTitle());
-    pwC.Meta("Version", cSystem->GetGuestVersion());
-    pwC.Meta("Author", cSystem->GetGuestAuthor());
-    pwC.Meta("Copyright", cSystem->GetGuestCopyright());
-    pwC.Meta("Creation Time", cmSys.FormatTime());
-    pwC.Meta("Description", cSystem->ENGName()+" Exported Image");
-    pwC.Meta("Software", StrFormat("$ ($) v$.$.$.$ ($-bit) by $",
-      cSystem->ENGName(), cSystem->ENGBuildType(), cSystem->ENGMajor(),
-      cSystem->ENGMinor(), cSystem->ENGBuild(), cSystem->ENGRevision(),
-      cSystem->ENGBits(), cSystem->ENGAuthor()));
-    pwC.Meta("Source", "OpenGL");
-    pwC.Meta("Comment", cSystem->GetGuestWebsite());
+    // Set system data in metadata
+    { using namespace ISystem::P;
+      pwC.Meta("Title", cSystem->GetGuestTitle());
+      pwC.Meta("Version", cSystem->GetGuestVersion());
+      pwC.Meta("Author", cSystem->GetGuestAuthor());
+      pwC.Meta("Copyright", cSystem->GetGuestCopyright());
+      pwC.Meta("Creation Time", cmSys.FormatTime());
+      pwC.Meta("Description", cSystem->ENGName() + " Exported Image");
+      pwC.Meta("Software", StrFormat("$ ($) v$.$.$.$ ($-bit) by $",
+        cSystem->ENGName(), cSystem->ENGBuildType(), cSystem->ENGMajor(),
+        cSystem->ENGMinor(), cSystem->ENGBuild(), cSystem->ENGRevision(),
+        cSystem->ENGBits(), cSystem->ENGAuthor()));
+      pwC.Meta("Comment", cSystem->GetGuestWebsite());
+    } // Set renderer in metadata
+    { using namespace IOgl::P;
+      pwC.Meta("Source", StrFormat("$ ($ by $)",
+        cOgl->GetRenderer(), cOgl->GetVersion(), cOgl->GetVendor()));
+    }
     // Create vector array to hold pointers to each scanline
     PngPtrVec ppvList{ isData.DimGetHeight<size_t>() };
     // Bit depth and colour type of data

@@ -10,7 +10,7 @@
 -- (c) Mhatxotic Design, 2024          (c) Millennium Interactive Ltd., 1994 --
 -- ========================================================================= --
 -- Core function aliases --------------------------------------------------- --
-local assert<const>, max<const> = assert, math.max;
+local error<const>, max<const> = error, math.max;
 -- M-Engine function aliases ----------------------------------------------- --
 local UtilIsInteger<const>, UtilIsTable<const> = Util.IsInteger, Util.IsTable;
 -- Diggers function and data aliases --------------------------------------- --
@@ -24,15 +24,15 @@ local aAssets3<const> = { { T = 2, F = "ending3",P = { 0 } } };
 -- Init ending screen functions -------------------------------------------- --
 local function InitEnding(iRaceId)
   -- Check race id and check ending data
-  assert(UtilIsInteger(iRaceId), "No race id specified!");
+  if not UtilIsInteger(iRaceId) then error("No race id specified!") end;
   local aEndingItem<const> = aEndingData[iRaceId];
-  assert(UtilIsTable(aEndingData), "Invalid race id!");
+  if not UtilIsTable(aEndingData) then error("Invalid race id!") end;
   -- When assets have loaded?
   local function OnEnding1Loaded(aResources)
     -- Play win music
-    PlayMusic(aResources[2].H, nil, nil, nil, 371767);
+    PlayMusic(aResources[2], nil, nil, nil, 371767);
     -- Load lobby texture
-    local texLobby = aResources[1].H;
+    local texLobby = aResources[1];
           texLobby:TileA(0, 272, 512, 512);
           texLobby:TileA(0, 214, 238, 271);
           texLobby:TileA(305,   0, 512, 184);
@@ -62,7 +62,7 @@ local function InitEnding(iRaceId)
           -- Ending screen 2 resources loaded?
           local function OnEnding2Loaded(aResources)
             -- Load texture and tiles
-            local texEnding = aResources[1].H;
+            local texEnding = aResources[1];
             -- Set tile ending
             local iTileEnding<const> = aEndingItem[2];
             -- Set custom race specific texts
@@ -94,7 +94,7 @@ local function InitEnding(iRaceId)
                   -- When ending 3 resources have loaded
                   local function OnEnding3Loaded(aResources)
                     -- Load stranger texture and tiles
-                    local texStr = aResources[1].H;
+                    local texStr = aResources[1];
                     local iTileStrBg<const> = texStr:TileA(0, 0, 428, 240);
                     local iTileStr<const> = texStr:TileA(0, 330, 113, 512);
                     -- Credits render callback
@@ -165,14 +165,14 @@ local function InitEnding(iRaceId)
   -- Load bank texture
   LoadResources("Ending1", aAssets1, OnEnding1Loaded);
 end
--- Exports and imports ----------------------------------------------------- --
-return { A={ InitEnding = InitEnding }, F=function(GetAPI)
-  -- Imports --------------------------------------------------------------- --
+-- Scripts have been loaded ------------------------------------------------ --
+local function OnReady(GetAPI)
+  -- Grab imports
   Fade, InitCredits, LoadResources, PlayMusic, SetCallbacks, aEndingData,
-  fontLittle
-  = -- --------------------------------------------------------------------- --
-  GetAPI("Fade", "InitCredits","LoadResources", "PlayMusic", "SetCallbacks",
-    "aEndingData", "fontLittle");
-  -- ----------------------------------------------------------------------- --
-end };
+    fontLittle =
+      GetAPI("Fade", "InitCredits","LoadResources", "PlayMusic",
+        "SetCallbacks", "aEndingData", "fontLittle");
+end
+-- Exports and imports ----------------------------------------------------- --
+return { A = { InitEnding = InitEnding }, F = OnReady };
 -- End-of-File ============================================================= --

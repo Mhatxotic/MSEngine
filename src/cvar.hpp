@@ -80,6 +80,7 @@ class CVarItem :                       // Members initially private
     CR_OK,                             // Sql call commited the variable
     CR_FAIL,                           // Sql call update cvar failed
     CR_OK_PURGE,                       // Sql call succeeded with purge
+    CR_OK_NOTHING_TO_DO,               // Sql call succeeded with nothing to do
     CR_FAIL_PURGE,                     // Sql call failed purge
     CR_FAIL_PURGE_NOT_CHANGED,         // Sql call succeded but no changes
     CR_FAIL_PURGE_UNKNOWN_ERROR,       // Unknown result from sql purge call
@@ -178,56 +179,60 @@ class CVarItem :                       // Members initially private
   CommitResult Commit(void)
   { // Ignore if variable not modified, force saved or loaded
     if(FlagIsClear(COMMIT|OSAVEFORCE|LOADED)) return CR_FAIL_NOT_SAVEABLE;
-    // If the value is the same as the default value?
+    // If the value is the same as the default value and force not enabled?
     if(IsValueUnchanged())
-    { // Purge it, no point in writing it. Compare result
-      switch(cSql->CVarPurge(GetVar()))
-      { case Sql::PR_OK    : return CR_OK_PURGE;
-        case Sql::PR_FAIL  : return CR_FAIL_PURGE;
-        case Sql::PR_OK_NC : return CR_FAIL_PURGE_NOT_CHANGED;
-        default            : return CR_FAIL_PURGE_UNKNOWN_ERROR;
-      }
+    { // If the value was loaded from the database?
+      if(FlagIsSet(LOADED))
+      { // Don't delete the variable if force save is enabled
+        if(FlagIsSet(OSAVEFORCE)) return CR_OK_NOTHING_TO_DO;
+        // Purge the cvar from the database
+        switch(cSql->CVarPurge(GetVar()))
+        { case Sql::PR_OK    : return CR_OK_PURGE;
+          case Sql::PR_FAIL  : return CR_FAIL_PURGE;
+          case Sql::PR_OK_NC : return CR_FAIL_PURGE_NOT_CHANGED;
+          default            : return CR_FAIL_PURGE_UNKNOWN_ERROR;
+        }
+      } // Was not loaded from the database so nothing to do if no force save
+      else if(FlagIsClear(OSAVEFORCE)) return CR_OK_NOTHING_TO_DO;
     } // Nothing to write if variable was just loaded
     else if(FlagIsSetAndClear(LOADED, COMMIT|OSAVEFORCE))
       return CR_FAIL_LOADED_NOT_MODIFIED;
-    // Value different from default?
-    else
-    { // If we are to encrypt
-      if(FlagIsSet(CPROTECTED)) try
-      { // Try encryption and/or compression and store result in database
-        if(FlagIsSet(CDEFLATE)) Commit(Block<AESZLIBEncoder>(GetValue()));
-        else Commit(Block<AESEncoder>(GetValue()));
-      } // exception occured
-      catch(const exception &e)
-      { // Log exception
-        cLog->LogErrorExSafe("CVars encrypt exception: $", e.what());
-        // Capture exceptions again, try raw encoder and return string
-        try { Commit(Block<RAWEncoder>(GetValue())); }
-        // exception occured again?
-        catch(const exception &e2)
-        { // Log exception and return failure
-          cLog->LogErrorExSafe("CVars store exception: $", e2.what());
-          return CR_FAIL_ENCRYPT;
-        } // Success
-      } // If we are to compress
-      else if(FlagIsSet(CDEFLATE)) try
-      { // Try compression and commit the result to the database
-        Commit(Block<ZLIBEncoder>(GetValue()));
-      } // exception occured
-      catch(const exception &e)
-      { // Log exception
-        cLog->LogErrorExSafe("CVars compress exception: $", e.what());
-        // Capture exceptions again, try raw encoder and return string
-        try { Commit(Block<RAWEncoder>(GetValue())); }
-        // exception occured again?
-        catch(const exception &e2)
-        { // Log exception and return failure
-          cLog->LogErrorExSafe("CVars store exception: $", e2.what());
-          return CR_FAIL_COMPRESS;
-        } // Success
-      } // Commit the unencrypted cvar and return if failed
-      else if(!cSql->CVarCommitString(GetVar(), GetValue())) return CR_FAIL;
-    } // Successfully saved so remove commit flag
+    // If we are to encrypt?
+    if(FlagIsSet(CPROTECTED)) try
+    { // Try encryption and/or compression and store result in database
+      if(FlagIsSet(CDEFLATE)) Commit(Block<AESZLIBEncoder>(GetValue()));
+      else Commit(Block<AESEncoder>(GetValue()));
+    } // exception occured?
+    catch(const exception &e)
+    { // Log exception
+      cLog->LogErrorExSafe("CVars encrypt exception: $", e.what());
+      // Capture exceptions again, try raw encoder and return string
+      try { Commit(Block<RAWEncoder>(GetValue())); }
+      // exception occured again?
+      catch(const exception &e2)
+      { // Log exception and return failure
+        cLog->LogErrorExSafe("CVars store exception: $", e2.what());
+        return CR_FAIL_ENCRYPT;
+      } // Success
+    } // If we are to compress?
+    else if(FlagIsSet(CDEFLATE)) try
+    { // Try compression and commit the result to the database
+      Commit(Block<ZLIBEncoder>(GetValue()));
+    } // exception occured?
+    catch(const exception &e)
+    { // Log exception
+      cLog->LogErrorExSafe("CVars compress exception: $", e.what());
+      // Capture exceptions again, try raw encoder and return string
+      try { Commit(Block<RAWEncoder>(GetValue())); }
+      // exception occured again?
+      catch(const exception &e2)
+      { // Log exception and return failure
+        cLog->LogErrorExSafe("CVars store exception: $", e2.what());
+        return CR_FAIL_COMPRESS;
+      } // Success
+    } // Commit the unencrypted cvar and return if failed
+    else if(!cSql->CVarCommitString(GetVar(), GetValue())) return CR_FAIL;
+    // Successfully saved so remove commit flag
     FlagClear(COMMIT);
     // Success
     return CR_OK;

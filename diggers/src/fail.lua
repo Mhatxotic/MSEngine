@@ -12,55 +12,66 @@
 -- Core function aliases --------------------------------------------------- --
 -- M-Engine function aliases ----------------------------------------------- --
 -- Diggers function and data aliases --------------------------------------- --
-local Fade, InitScore, IsButtonReleased, IsButtonReleased, LoadResources,
-  PlayMusic, PlayStaticSound, SetCallbacks, SetCursor, aCursorIdData, aSfxData,
-  fontLarge;
+local Fade, InitScore, IsButtonPressed, LoadResources, PlayMusic,
+  PlayStaticSound, SetCallbacks, SetCursor, fontLarge;
+-- Locals ------------------------------------------------------------------ --
+local iCExit;                          -- Exit cursor id
+local iKeyBankId;                      -- Key bank id
+local iSSelect;                        -- Select sfx id
 -- Assets required --------------------------------------------------------- --
-local aAssets<const> = { { T = 7, F = "lose", P = { } } };
+local aAssets<const> = { { T = 7, F = "lose" } };
+-- Game over render tick --------------------------------------------------- --
+local function RenderProc()
+  -- Show fail message
+  fontLarge:SetCRGB(1, 0.25, 0.25);
+  fontLarge:PrintC(160, 90, "NO ZONES LEFT TO MINE!");
+  fontLarge:PrintC(160, 122, "Your mission has failed!");
+end
+-- Finish procedure -------------------------------------------------------- --
+local function Finish()
+  -- Play sound
+  PlayStaticSound(iSSelect);
+  -- Fade out and load title with fade
+  Fade(0,1, 0.04, RenderProc, InitScore, true);
+end
+-- Input procedure to fade out when mouse clicked -------------------------- --
+local function InputProc() if IsButtonPressed(0) then Finish() end end;
+-- When fail screen has faded in ------------------------------------------- --
+local function OnFadeIn()
+  -- Set exit cursor
+  SetCursor(iCExit);
+  -- Set fail keys
+  SetKeys(true, iKeyBankId);
+  -- Change render procedures
+  SetCallbacks(nil, RenderProc, InputProc);
+end
+-- When fail assets have loaded? ------------------------------------------- --
+local function OnLoaded(aResources)
+  -- Stop music so we can break the good news
+  PlayMusic(aResources[1]);
+  -- Fade in
+  Fade(1, 0, 0.04, RenderProc, OnFadeIn);
+end
 -- Init ending screen functions -------------------------------------------- --
-local function InitFail()
-  -- When fail assets have loaded?
-  local function OnLoaded(aResources)
-    -- Stop music so we can break the good news
-    PlayMusic(aResources[1].H);
-    -- Game over render tick
-    local function GameOverRenderProc()
-      -- Show fail message
-      fontLarge:SetCRGB(1, 0.25, 0.25);
-      fontLarge:PrintC(160, 90, "NO ZONES LEFT TO MINE!");
-      fontLarge:PrintC(160, 122, "Your mission has failed!");
-    end
-    -- When fail screen has faded in
-    local function OnFadeIn()
-      -- Set exit cursor
-      SetCursor(aCursorIdData.EXIT);
-      -- Input procedure
-      local function FailInput()
-        -- Mouse button not clicked? Return!
-        if IsButtonReleased(0) then return end;
-        -- Play sound
-        PlayStaticSound(aSfxData.SELECT);
-        -- Fade out and load title with fade
-        Fade(0,1, 0.04, GameOverRenderProc, InitScore, true);
-      end
-      -- Change render procedures
-      SetCallbacks(nil, GameOverRenderProc, FailInput);
-    end
-    -- Fade in
-    Fade(1, 0, 0.04, GameOverRenderProc, OnFadeIn);
-  end
-  -- Load music and when finished
-  LoadResources("No More Zones", aAssets, OnLoaded);
+local function InitFail() LoadResources("GAME OVER", aAssets, OnLoaded) end;
+-- Scripts have been loaded ------------------------------------------------ --
+local function OnReady(GetAPI)
+  -- Grab imports
+  Fade, InitScore, IsButtonPressed, LoadResources, PlayMusic, PlayStaticSound,
+    SetCallbacks, SetCursor, SetKeys, fontLarge =
+      GetAPI("Fade", "InitScore", "IsButtonPressed",  "LoadResources",
+        "PlayMusic", "PlayStaticSound", "SetCallbacks", "SetCursor", "SetKeys",
+        "fontLarge");
+  -- Register keybinds
+  iKeyBankId = GetAPI("RegisterKeys")("IN-GAME NO MORE ZONES", {
+    [Input.States.PRESS] =
+      { { Input.KeyCodes.ESCAPE, Finish, "ignmzl", "LEAVE" } }
+  });
+  -- Get exit cursor id
+  iCExit = GetAPI("aCursorIdData").EXIT;
+  -- Get select sound effect id
+  iSSelect = GetAPI("aSfxData").SELECT;
 end
 -- Exports and imports ----------------------------------------------------- --
-return { A = { InitFail = InitFail }, F = function(GetAPI)
-  -- Imports --------------------------------------------------------------- --
-  Fade, InitScore, IsButtonReleased, LoadResources, PlayMusic, PlayStaticSound,
-  SetCallbacks, SetCursor, aCursorIdData, aSfxData, fontLarge
-  = -- --------------------------------------------------------------------- --
-  GetAPI("Fade", "InitScore", "IsButtonReleased",  "LoadResources",
-    "PlayMusic", "PlayStaticSound", "SetCallbacks", "SetCursor",
-    "aCursorIdData", "aSfxData", "fontLarge");
-  -- ----------------------------------------------------------------------- --
-end };
+return { A = { InitFail = InitFail }, F = OnReady };
 -- End-of-File ============================================================= --
