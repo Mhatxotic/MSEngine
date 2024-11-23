@@ -27,7 +27,9 @@ BUILD_FLAGS(Input,
   // No flags                          Mouse cursor is enabled?
   IF_NONE                   {Flag[0]}, IF_CURSOR                 {Flag[1]},
   // Full-screen toggler enabled?      Mouse cursor has focus?
-  IF_FSTOGGLER              {Flag[2]}, IF_MOUSEFOCUS             {Flag[3]}
+  IF_FSTOGGLER              {Flag[2]}, IF_MOUSEFOCUS             {Flag[3]},
+  // Send events at startup
+  IF_INITEVENTS             {Flag[4]}
 );/* -- Axis class --------------------------------------------------------- */
 class JoyAxisInfo
 { /* -------------------------------------------------------------- */ private:
@@ -365,31 +367,7 @@ static class Input final :             // Handles keyboard, mouse & controllers
   JoyStatus        jsStatus;           // Joystick detection/polling state
   /* ----------------------------------------------------------------------- */
   int              iWinWidth,          // Actual window width
-                   iWinHeight,         // Actual window height
-                   iWinWidthD2,        // Actual half window width
-                   iWinHeightD2;       // Actual half window height
-  /* -- Set cursor position ------------------------------------------------ */
-  void OnSetCurPos(const EvtMainEvent &emeEvent)
-  { // Get reference to actual arguments vector
-    const EvtMainArgs &emaArgs = emeEvent.aArgs;
-    // This function is called on an event sent by cEvtMain->Add. It it assume
-    // to send only two parameters which is the newly requested X and Y
-    // position. Glfw says that SetCursorPos should only be used in the Window
-    // thread, so this is why it can't be an on-demand call.
-    // More information:- https://www.glfw.org/docs/3.1/group__input.html
-    // Calculate new position based on main fbo matrix.
-    const float
-      fAdjX = (emaArgs[0].f - cFboCore->fboMain.ffcStage.GetCoLeft()) /
-        cFboCore->fboMain.GetCoRight() * GetWindowWidth(),
-      fAdjY = (emaArgs[1].f - cFboCore->fboMain.ffcStage.GetCoTop()) /
-        cFboCore->fboMain.GetCoBottom() * GetWindowHeight(),
-      // Clamp the new position to the window bounds.
-      fNewX = UtilClamp(fAdjX, 0.0f, cFboCore->fboMain.GetCoRight() - 1.0f),
-      fNewY = UtilClamp(fAdjY, 0.0f, cFboCore->fboMain.GetCoBottom() - 1.0f);
-    // Now translate that position back into the actual window cursor pos.
-    cGlFW->WinSetCursorPos(static_cast<double>(fNewX),
-                           static_cast<double>(fNewY));
-  }
+                   iWinHeight;         // Actual window height
   /* -- Filtered key pressed ----------------------------------------------- */
   void OnFilteredKey(const EvtMainEvent &emeEvent)
   { // Get key pressed
@@ -547,9 +525,6 @@ static class Input final :             // Handles keyboard, mouse & controllers
     while(const unsigned int uiChar = utfString.Next())
       if(uiChar >= 32) cConsole->OnCharPress(uiChar);
   }
-  /* -- Update half window ------------------------------------------------- */
-  void UpdateWindowSizeD2(void) { iWinWidthD2 = GetWindowWidth()/2;
-                                  iWinHeightD2 = GetWindowHeight()/2; }
   /* -- Event handler for 'glfwSetJoystickCallback' ------------------------ */
   static void OnGamePad(int iJId, int iEvent)
     { cEvtMain->Add(EMC_INP_JOY_STATE, iJId, iEvent); }
@@ -576,28 +551,32 @@ static class Input final :             // Handles keyboard, mouse & controllers
   int GetWindowHeight(void) const { return iWinHeight; }
   /* -- Update window size from actual glfw window ------------------------- */
   void UpdateWindowSize(void)
-  { // Get new window size
-    cGlFW->WinGetSize(iWinWidth, iWinHeight);
-    // Update half window size
-    UpdateWindowSizeD2();
-  }
+    { cGlFW->WinGetSize(iWinWidth, iWinHeight); }
   /* -- Update window size (from display) ---------------------------------- */
   void SetWindowSize(const int iX, const int iY)
-  { // Update new size
-    iWinWidth = iX;
-    iWinHeight = iY;
-    // Update half size
-    UpdateWindowSizeD2();
-  }
+    { iWinWidth = iX; iWinHeight = iY; }
   /* -- Request input state ------------------------------------------------ */
   void RequestMousePosition(void) const
     { cEvtWin->AddUnblock(EWC_WIN_CURPOSGET); }
   /* -- Forcefully move the cursor ----------------------------------------- */
-  void SetCursorPos(const double dX, const double dY)
-    { cEvtMain->Add(EMC_INP_SET_CUR_POS, dX, dY); }
+  void SetCursorPos(const GLfloat fX, const GLfloat fY)
+  { // Expand the stage co-ordinates to actual desktop window co-ordinates
+    const GLfloat
+      fAdjX = (fX + -cFboCore->fboMain.ffcStage.GetCoLeft()) /
+        cFboCore->fboMain.GetCoRight() * GetWindowWidth(),
+      fAdjY = (fY + -cFboCore->fboMain.ffcStage.GetCoTop()) /
+        cFboCore->fboMain.GetCoBottom() * GetWindowHeight(),
+      // Clamp the new position to the window bounds.
+      fNewX = UtilClamp(fAdjX, 0.0f, GetWindowWidth() - 1.0f),
+      fNewY = UtilClamp(fAdjY, 0.0f, GetWindowHeight() - 1.0f);
+     // Dispatch the request to set the cursor
+     cEvtWin->AddUnblock(EWC_WIN_CURPOSSET,
+       static_cast<double>(fNewX), static_cast<double>(fNewY));
+  }
+  /* -- Forcefully move the cursor to the centre --------------------------- */
   void SetCursorCentre(void)
-    { SetCursorPos(static_cast<double>(iWinWidthD2),
-                   static_cast<double>(iWinHeightD2)); }
+    { SetCursorPos(cFboCore->GetMatrixWidth() / 2.0f,
+                   cFboCore->GetMatrixHeight() / 2.0f); }
   /* -- Joystick main tick ------------------------------------------------- */
   void PollJoysticks(void)
   { // If joystick enabled? Enumerate joysticks and refresh data
@@ -769,7 +748,6 @@ static class Input final :             // Handles keyboard, mouse & controllers
                JoyInfo(GLFW_JOYSTICK_15), JoyInfo(GLFW_JOYSTICK_16) } },
     /* -- Init events for event manager ------------------------------------ */
     EvtMain::RegVec{                   // Events list to register
-      { EMC_INP_SET_CUR_POS,  bind(&Input::OnSetCurPos,   this, _1) },
       { EMC_INP_CHAR,         bind(&Input::OnFilteredKey, this, _1) },
       { EMC_INP_PASTE,        bind(&Input::OnWindowPaste, this, _1) },
       { EMC_INP_MOUSE_MOVE,   bind(&Input::OnMouseMove,   this, _1) },
@@ -793,9 +771,7 @@ static class Input final :             // Handles keyboard, mouse & controllers
     lfOnJoyState{ "OnJoyState" },      // Init joy state lua event
     jsStatus(JOY_DISABLE),             // Initial joystick status is disabled
     iWinWidth(0),                      // Window width init by display
-    iWinHeight(0),                     // Window height init by display
-    iWinWidthD2(0),                    // Window width/2 init by display
-    iWinHeightD2(0)                    // Window height/2 init by display
+    iWinHeight(0)                      // Window height init by display
     /* -- No code ---------------------------------------------------------- */
     { }
   /* -- Destructor --------------------------------------------------------- */
@@ -824,6 +800,9 @@ static class Input final :             // Handles keyboard, mouse & controllers
   /* -- Set first console key ---------------------------------------------- */
   CVarReturn SetConsoleKey1(const int iK)
     { return CVarSimpleSetIntNG(iConsoleKey1, iK, GLFW_KEY_LAST); }
+  /* -- Set send joystick events at startup -------------------------------- */
+  CVarReturn SetSendEventsEnabled(const bool bState)
+    { FlagSetOrClear(IF_INITEVENTS, bState); return ACCEPT; }
   /* -- Set second console key --------------------------------------------- */
   CVarReturn SetConsoleKey2(const int iK)
     { return CVarSimpleSetIntNG(iConsoleKey2, iK, GLFW_KEY_LAST); }

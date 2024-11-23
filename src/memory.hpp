@@ -147,6 +147,17 @@ class MemConst                         // Start of const MemBase Block Class
     // Return the tested bit
     return UtilBitTest(MemPtr<char>(), stPos);
   }
+  /* -- Stringview'ify the memory ------------------------------------------ */
+  const string_view MemToString(const size_t stBytes) const
+  { // Return empty string if no size
+    if(MemIsEmpty()) return { };
+    // Check position
+    if(!MemCheckParam(0, stBytes))
+      XC("Invalid size!",
+         "Source", MemPtr(), "Bytes", stBytes, "Maximum", MemSize());
+    // There is no null character so we have to limit the size
+    return { MemPtr<char>(), stBytes };
+  }
   /* -- Stringify the memory ----------------------------------------------- */
   const string MemToString(void) const
   { // Return empty string if no size

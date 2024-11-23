@@ -2523,15 +2523,15 @@ local aCreditsXData<const> = {
   { "Complete conversion",             "Mhatxotic Design" },
   { "Setup music loop",                "S.S. Secret Mission 1\n\z
                                         By PowerTrace\n\z
-                                        Edited by Mhatxotic Design\n\z
+                                        Edited by Mhat\n\z
                                         AmigaRemix.com" },
   { "Credits music loop",              "4U 07:00 V2001\n\z
                                         By Enuo\n\z
-                                        Edited by Mhatxotic Design\n\z
+                                        Edited by Mhat\n\z
                                         ModArchive.org" },
   { "Gameover music loop",             "1000 Years Of Funk\n\z
                                         By Dimitri D. L.\n\z
-                                        Edited by Mhatxotic Design\n\z
+                                        Edited by Mhat\n\z
                                         ModArchive.Org" },
   { "Conversion powered by",           "Mhatxotic Engine" },
   { "GLFW OpenGL front-end",           "Marcus Geelnard\n\z
@@ -2577,31 +2577,29 @@ local aSetupButtonData<const> = { -- nil's are filled in 'setup.lua' init
 local aSetupOptionData<const> = { -- nil's are filled in 'setup.lua' init
   -- Option name -- Value -- UpdateFunc --- DownFunc --- UpFunc ------------ --
   { "Monitor",         "", nil,           nil,         nil,
-    "CHANGES THE MONITOR THE GAME WILL APPEAR ON BY DEFAULT. PRESS \z
-     APPLY WHEN YOU ARE HAPPY WITH THE SELECTION TO ACTIVATE IT", },
+    "CHANGES THE MONITOR THE GAME WILL APPEAR ON BY DEFAULT. PRESS APPLY \z
+     WHEN YOU ARE HAPPY WITH THE SELECTION TO ACTIVATE IT", },
   { "Display State",   "", nil,           nil,         nil,
-    "CHANGES THE DEFAULT WINDOW STYLE OF THE GAME. PRESS APPLY WHEN YOU \z
-     ARE HAPPY WITH THE SELECTION TO ACTIVATE IT" },
+    "CHANGES THE DEFAULT WINDOW STYLE OF THE GAME. PRESS APPLY WHEN YOU ARE \z
+     HAPPY WITH THE SELECTION TO ACTIVATE IT" },
   { "Full-Resolution", "", nil,           nil,         nil,
-    "ALLOWS YOU TO SET A CUSTOM DESKTOP RESOLUTION FOR EXCLUSIVE \z
-     FULL-SCREEN MODE. PRESS APPLY WHEN YOU ARE HAPPY WITH THE SELECTION \z
-     TO ACTIVATE IT" },
+    "ALLOWS YOU TO SET A CUSTOM DESKTOP RESOLUTION FOR EXCLUSIVE FULL-SCREEN \z
+     MODE. PRESS APPLY WHEN YOU ARE HAPPY WITH THE SELECTION TO ACTIVATE IT" },
   { "Window Size",     "", nil,           nil,         nil,
-    "ALLOWS YOU TO SET A CUSTOM WINDOW SIZE FOR DECORATED WINDOW ONLY \z
-     MODE. PRESS APPLY WHEN YOU ARE HAPPY WITH THE SELECTION TO ACTIVATE \z
-     IT" },
+    "ALLOWS YOU TO SET A CUSTOM WINDOW SIZE FOR DECORATED WINDOW ONLY MODE. \z
+     PRESS APPLY WHEN YOU ARE HAPPY WITH THE SELECTION TO ACTIVATE IT" },
   { "Frame Limiter",   "", nil,           nil,         nil,
-    "ALLOWS YOU TO CHOOSE FROM A RANGE OF FRAME-LIMITING OPTIONS TO \z
-     BALANCE THE PERFORMANCE VERSUS POWER USAGE OF RENDERING. SOME VALUES \z
-     MAY BE INEFFECTIVE WHEN THE VSYNC VALUE IS BEING OVERRIDDEN IN YOUR \z
-     VIDEO ADAPTER SETTINGS OR WHEN YOUR SYSTEM IS UNDERPERFORMING. THE \z
-     CHANGE IS INSTANTLY APPLIED" },
+    "ALLOWS YOU TO CHOOSE FROM A RANGE OF FRAME-LIMITING OPTIONS TO BALANCE \z
+     THE PERFORMANCE VERSUS POWER USAGE OF RENDERING. SOME VALUES MAY BE \z
+     INEFFECTIVE WHEN THE VSYNC VALUE IS BEING OVERRIDDEN IN YOUR VIDEO \z
+     ADAPTER SETTINGS OR WHEN YOUR SYSTEM IS UNDERPERFORMING. THE CHANGE IS \z
+     INSTANTLY APPLIED" },
   { "Texture Filter",  "", nil,           nil,         nil,
     "APPLY A BILINEAR UPSCALE FILTER TO THE MAIN FRAMEBUFFER. THE GAME IS \z
      RENDERED IN 320x240. THE CHANGE OF OPTION IS INSTANTLY APPLIED" },
   { "Audio Device",    "", nil,           nil,         nil,
-    "ALLOWS YOU TO SET THE DEFAULT AUDIO DEVICE TO USE FOR THE GAME. \z
-     PRESS APPLY WHEN YOU ARE HAPPY WITH THE SELECTION TO ACTIVATE IT" },
+    "ALLOWS YOU TO SET THE DEFAULT AUDIO DEVICE TO USE FOR THE GAME. PRESS \z
+     APPLY WHEN YOU ARE HAPPY WITH THE SELECTION TO ACTIVATE IT" },
   { "Master Volume",   "", nil,           nil,         nil,
     "CHANGES THE FINAL OUTPUT VOLUME OF ALL MUSIC, SOUND EFFECTS AND FMV \z
      MIXED TOGETHER. THE CHANGE OF OPTION IS INSTANTLY APPLIED" },
@@ -2643,7 +2641,7 @@ local aIntroSubTitles<const> = {
 };-- SHO - HID - LINES ----------------------------------------------------- --
 -- Imports and exports ----------------------------------------------------- --
 return { F = Util.Blank, A = {         -- Sending API to main loader
--- Exports ----------------------------------------------------------------- --
+  -- Exports --------------------------------------------------------------- --
   aAIChoicesData = aAIChoicesData, aAITypesData = AI,
   aCreditsData = aCreditsData, aCreditsXData = aCreditsXData,
   aCursorData = aCursorData, aCursorIdData = CID,
@@ -2663,6 +2661,6 @@ return { F = Util.Blank, A = {         -- Sending API to main loader
   aShroudTileLookup = aShroudTileLookup, aTileData = aTileData,
   aTileFlags = TF, aTimerData = aTimerData, aTrainTrackData = aTrainTrackData,
   aZoneData = aZoneData
--- ------------------------------------------------------------------------- --
+  -- ----------------------------------------------------------------------- --
 } };                                   -- End of definitions to send to loader
 -- End-of-File ============================================================= --

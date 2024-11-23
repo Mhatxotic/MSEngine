@@ -38,20 +38,21 @@ class SysBase :                        // Safe exception handler namespace
           (read(iRead, mBuffer.MemPtr(), mBuffer.MemSize())))
         { // Success?
           default:
-            // Report read
-            cLog->LogDebugExSafe("[$>$] $", stRead, tThread.IdentGet(),
-              mBuffer.MemToString());
+          { // Report read string to log
+            cLog->LogWarningExSafe("[$>$] $",
+              stRead, tThread.IdentGet(), mBuffer.MemToString(stRead));
             // Fallthrough to break
             [[fallthrough]];
-          // Handle was closed? Terminate the thread
+          } // Handle was closed? Terminate the thread
           case 0: break;
           // Error?
           case StdMaxSizeT:
-            // Ignore it if we're quitting
+          { // Ignore it if we're quitting
             if(tThread.ThreadShouldNotExit()) break;
             // Else throw error
             XCS("Error reading system output from pipe!",
               "Output", tThread.IdentGet(), "Bytes", mBuffer.MemSize());
+          }
         } // Don't get here
       } // Return success to thread manager
       return 1;

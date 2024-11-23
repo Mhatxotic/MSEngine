@@ -94,8 +94,8 @@ LLFUNC(SetJoyAxisDeadZones, 0,
 // ? main FBO matrix, meaning X could be negative.
 /* ------------------------------------------------------------------------- */
 LLFUNC(SetCursorPos, 0,
-  const AgDouble aX{lS, 1},
-                 aY{lS, 2};
+  const AgGLfloat aX{lS, 1},
+                  aY{lS, 2};
   cInput->SetCursorPos(aX, aY))
 /* ========================================================================= */
 // $ Input.ClearStates
@@ -240,6 +240,13 @@ LLFUNC(OnJoyState, 0, cLua->SetLuaRef(lS, cInput->lfOnJoyState))
 /* ------------------------------------------------------------------------- */
 LLFUNC(OnKey, 0, cLua->SetLuaRef(lS, cInput->lfOnKey))
 /* ========================================================================= */
+// $ Input.RefreshJoysticks
+// ? Request refresh of joysticks. Use this if you needed to delay setting the
+// ? OnJoy() event callback and therefore you need to request the list again.
+// ? The function will only work if 'inp_joystick' is not 0.
+/* ------------------------------------------------------------------------- */
+LLFUNC(RefreshJoysticks, 0, cInput->BeginDetection());
+/* ========================================================================= */
 // $ Input.GetKeyName
 // > Value:integer=The id of the key
 // < Name:stringr=The name of the key
@@ -263,10 +270,10 @@ LLRSBEGIN                              // Input.* namespace functions begin
   LLRSFUNC(OnDragDrop),                LLRSFUNC(OnJoyState),
   LLRSFUNC(OnKey),                     LLRSFUNC(OnMouseClick),
   LLRSFUNC(OnMouseFocus),              LLRSFUNC(OnMouseMove),
-  LLRSFUNC(OnMouseScroll),             LLRSFUNC(SetCursor),
-  LLRSFUNC(SetCursorCentre),           LLRSFUNC(SetCursorPos),
-  LLRSFUNC(SetJoyAxisDeadZones),       LLRSFUNC(SetJoyAxisForwardDeadZone),
-  LLRSFUNC(SetJoyAxisReverseDeadZone),
+  LLRSFUNC(OnMouseScroll),             LLRSFUNC(RefreshJoysticks),
+  LLRSFUNC(SetCursor),                 LLRSFUNC(SetCursorCentre),
+  LLRSFUNC(SetCursorPos),              LLRSFUNC(SetJoyAxisDeadZones),
+  LLRSFUNC(SetJoyAxisForwardDeadZone), LLRSFUNC(SetJoyAxisReverseDeadZone),
 LLRSEND                                // Input.* namespace functions end
 /* ========================================================================= **
 ** ######################################################################### **

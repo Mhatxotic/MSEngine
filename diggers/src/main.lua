@@ -10,68 +10,56 @@
 -- (c) Mhatxotic Design, 2024          (c) Millennium Interactive Ltd., 1994 --
 -- ========================================================================= --
 -- Lua aliases (optimisation) ---------------------------------------------- --
-local ceil<const>, collectgarbage<const>, error<const>, floor<const>,
-  format<const>, max<const>, min<const>, pairs<const>, random<const>,
-  remove<const>, sort<const>, tostring<const>, unpack<const> =
-    math.ceil, collectgarbage, error, math.floor, string.format, math.max,
-    math.min, pairs, math.random, table.remove, table.sort, tostring,
-    table.unpack;
+local collectgarbage<const>, error<const>, floor<const>, format<const>,
+  max<const>, min<const>, pairs<const>, random<const>, remove<const>,
+  tostring<const>, unpack<const> =
+    collectgarbage, error, math.floor, string.format, math.max, math.min,
+    pairs, math.random, table.remove, tostring, table.unpack;
 -- M-Engine aliases (optimisation) ----------------------------------------- --
 local AssetParseBlock<const>, CoreLog<const>, CoreOnTick<const>,
-  CoreStack<const>, CoreWrite<const>, DisplayReset<const>,
-  FboConEnabled<const>, FboDraw<const>, CoreCatchup<const>, CoreTicks<const>,
-  CoreTime<const>, InputClearStates<const>, InputGetJoyAxis<const>,
-  InputGetJoyButton<const>, InputGetNumJoyAxises<const>, InputSetCursor<const>,
-  InputSetCursorPos<const>, SShotFbo<const>, TextureCreate<const>,
-  UtilBlank<const>, UtilClamp<const>, UtilClampInt<const>, UtilDuration<const>,
-  UtilExplode<const>, UtilImplode<const>, UtilIsFunction<const>,
-  UtilIsInteger<const>, UtilIsNumber<const>, UtilIsString<const>,
-  UtilIsTable<const>, UtilRoundInt<const>, VariableRegister<const> =
-    Asset.ParseBlock, Core.Log, Core.OnTick, Core.Stack,
-    Core.Write, Display.Reset, Fbo.ConEnabled, Fbo.Draw, Core.Catchup,
-    Core.Ticks, Core.Time, Input.ClearStates, Input.GetJoyAxis,
-    Input.GetJoyButton, Input.GetNumJoyAxises, Input.SetCursor,
-    Input.SetCursorPos, SShot.Fbo, Texture.Create, Util.Blank, Util.Clamp,
-    Util.ClampInt, Util.Duration, Util.Explode, Util.Implode, Util.IsFunction,
-    Util.IsInteger, Util.IsNumber, Util.IsString, Util.IsTable, Util.RoundInt,
+  CoreStack<const>, CoreWrite<const>, DisplayReset<const>, FboDraw<const>,
+  CoreCatchup<const>, InputSetCursor<const>, InputSetCursorCentre<const>,
+  CoreTime<const>, SShotFbo<const>,
+  TextureCreate<const>, UtilBlank<const>, UtilClamp<const>,
+  UtilDuration<const>, UtilExplode<const>, UtilImplode<const>,
+  UtilIsFunction<const>, UtilIsInteger<const>, UtilIsNumber<const>,
+  UtilIsString<const>, UtilIsTable<const>, VariableRegister<const> =
+    Asset.ParseBlock, Core.Log, Core.OnTick, Core.Stack, Core.Write,
+    Display.Reset, Fbo.Draw, Core.Catchup, Input.SetCursor,
+    Input.SetCursorCentre, Core.Time, SShot.Fbo, Texture.Create, Util.Blank,
+    Util.Clamp, Util.Duration, Util.Explode, Util.Implode, Util.IsFunction,
+    Util.IsInteger, Util.IsNumber, Util.IsString, Util.IsTable,
     Variable.Register;
--- Globals ----------------------------------------------------------------- --
+-- Locals ------------------------------------------------------------------ --
 local fboMain<const> = Fbo.Main();     -- Main frame buffer object class
 local fFont<const> = Font.Console();   -- Main console class
 local aKeys<const> = Input.KeyCodes;   -- Keyboard codes
-local CId, CBProc, CBRender, CBInput;  -- Generic tick callbacks
-local aCursorIdData, aCursorData;      -- Cursor data
-local CursorMin, CursorMax;            -- Cursor minimum and maximum
-local CursorOX, CursorOY;              -- Cursor origin co-ordinates
-local fcbFrameBufferCallbacks = { };   -- Frame buffer updated function
--- Input handling variables ------------------------------------------------ --
-local aAPI;                            -- API to send to other functions
+local CBProc, CBRender, CBInput;       -- Generic tick callbacks
+local fcbFrameBufferCbs<const> = { };  -- Frame buffer updated function
+local iCursorArrow, iCursorWait;       -- Cursor ids for arrow and wait
+local aAPI<const>         = { };       -- API to send to other functions
 local aCache              = { };       -- File cache
-local aModules            = { };       -- Modules data
-local aKeyState           = { };       -- Formatted keyboard state
-local aMouseState         = { };       -- Formatted mouse state
-local aJoyState                        -- Joystick state
+local aModules<const>     = { };       -- Modules data
 local bTestMode           = false;     -- Test mode enabled
 local fcbFading           = false;     -- Fading callback
-local iCursorX, iCursorY  = 0, 0;      -- Cursor position
-local nWheelX, nWheelY    = 0, 0;      -- Mouse wheel state
-local nJoyAX, nJoyAY      = 0, 0;      -- Joystick axis values
-local fcbMouse            = UtilBlank; -- Joystick to mouse conversion function
-local aJoy                = { };       -- Joysticks connected data
-local iJoyActive;                      -- Currently active joystick
 local texSpr;                          -- Sprites texture
 local fontLarge;                       -- Large font (16px)
 local fontLittle;                      -- Little font (8px)
 local fontTiny;                        -- Tiny font (5px)
 local fontSpeech;                      -- Speech font (10px)
--- Stage size -------------------------------------------------------------- --
-local iStageWidth, iStageHeight;       -- Width and height
-local iStageLeft, iStageTop;           -- Top left corner
-local iStageRight, iStageBottom;       -- Bottom right corner
+-- Stage dimensions -------------------------------------------------------- --
+local iStageWidth  = 320;              -- Width of stage
+local iStageHeight = 240;              -- Height of stage
+local iStageLeft   = 0;                -- Left of stage
+local iStageTop    = 0;                -- Top of stage
+local iStageRight  = iStageWidth;      -- Right of stage
+local iStageBottom = iStageHeight;     -- Bottom of stage
 -- Library functions loaded later ------------------------------------------ --
-local InitSetup, InitScene, InitCredits, InitEnding, LoadLevel,
-  InitIntro, InitFail, InitScore, InitTitle, InitNewGame, aObjectTypes,
-  aLevelsData, aRacesData, CheckGlobalKeys, InitDebugPlay, MusicVolume;
+local aLevelsData, aObjectTypes, aRacesData, ClearStates, InitCredits,
+  InitDebugPlay, InitEnding, InitFail, InitIntro, InitNewGame, InitScene,
+  InitScore, InitSetup, InitTitle, JoystickProc, LoadLevel, MusicVolume;
+-- These could be called even though they aren't initialised yet ----------- --
+local SetKeys, SetCursor = UtilBlank, UtilBlank;
 -- Constants for loader ---------------------------------------------------- --
 local aBFlags<const> = Image.Flags;    -- Get bitmap loading flags
 local iPNG<const> = aBFlags.FCE_PNG;   -- Get forced PNG format flag
@@ -79,14 +67,12 @@ local aPFlags<const> = Pcm.Flags;      -- Get waveform loading flags
 local iOGG<const> = aPFlags.FCE_OGG;   -- Get forced wave format
 local aPrFlags<const> = Asset.Progress;-- Asset progress flags
 local iFStart<const> = aPrFlags.FILESTART; -- File opened with information
--- Generic function to return a handle ------------------------------------ --
+-- Generic function to return a handle ------------------------------------- --
 local function GenericReturnHandle(hH) return hH end;
--- Function to parse a script --------------------------------------------- --
-local function ParseScript(aA)
-  -- Get name of asset
-  local sName<const> = aA:Name();
-  -- Compile the script and get the return value
-  local aModData<const> = AssetParseBlock(sName, 1, aA);
+-- Parse the return value of a script -------------------------------------- --
+local function ParseScriptResult(sName, aModData)
+  -- Check parameters
+  if not UtilIsString(sName) then error("Bad name: "..tostring(sName)) end;
   if not UtilIsTable(aModData) then error(sName..": bad return!") end;
   local fcbModCb<const> = aModData.F;
   if not UtilIsFunction(fcbModCb) then error(sName..": bad callback!") end;
@@ -110,192 +96,16 @@ local function ParseScript(aA)
   -- Put returned data in API for later when everything is loaded and we'll
   -- call the modules callback function with the fully loaded API.
   aModules[1 + #aModules] = aModData;
+end
+-- Function to parse a script ---------------------------------------------- --
+local function ParseScript(aScript)
+  -- Get name of module
+  local sName<const> = aScript:Name();
+  -- Compile the script and parse the return value
+  ParseScriptResult(sName, AssetParseBlock(sName, 1, aScript));
   -- Return success
   return true;
 end
--- Get current key state for specified key --------------------------------- --
-local function GetKeyState(iKey) return aKeyState[iKey] or 0 end;
--- Clear specified key state for specified key ----------------------------- --
-local function ClearKeyState(iKey) aKeyState[iKey] = nil end;
--- Mouse is in specified bounds -------------------------------------------- --
-local function IsMouseInBounds(iX1, iY1, iX2, iY2)
-  return iCursorX >= iX1 and iCursorY >= iY1 and
-         iCursorX < iX2 and iCursorY < iY2 end;
-local function IsMouseNotInBounds(iX1, iY1, iX2, iY2)
-  return iCursorX < iX1 or iCursorY < iY1 or
-         iCursorX >= iX2 or iCursorY >= iY2 end;
-local function IsMouseXLessThan(iX) return iCursorX < iX end;
-local function IsMouseXGreaterEqualThan(iX) return iCursorX >= iX end;
-local function IsMouseYLessThan(iY) return iCursorY < iY end;
-local function IsMouseYGreaterEqualThan(iY) return iCursorY >= iY end;
-local function GetMouseX() return iCursorX end;
-local function GetMouseY() return iCursorY end;
--- Get mouse scrolling state ----------------------------------------------- --
-local function IsScrollingLeft()
-  if nWheelX <= 0 then return false else nWheelX = 0 return true end;
-end
--- Get mouse scrolling state ----------------------------------------------- --
-local function IsScrollingRight()
-  if nWheelX >= 0 then return false else nWheelX = 0 return true end;
-end
--- Get mouse scrolling state ----------------------------------------------- --
-local function IsScrollingUp()
-  if nWheelY <= 0 then return false else nWheelY = 0 return true end;
-end
--- Get mouse scrolling state ----------------------------------------------- --
-local function IsScrollingDown()
-  if nWheelY >= 0 then return false else nWheelY = 0 return true end;
-end
--- Returns current mouse button state -------------------------------------- --
-local function GetMouseState(iButton) return aMouseState[iButton] or 0 end;
--- Clears the specified mouse button state --------------------------------- --
-local function ClearMouseState(iButton) aMouseState[iButton] = nil end;
--- Returns true if the specified mouse button is held down ----------------- --
-local function IsMouseHeld(iButton) return GetMouseState(iButton) > 0 end;
--- Returns true if the specified mouse button was pressed ------------------ --
-local function IsMousePressed(iButton)
-  if GetMouseState(iButton) == 0 then return false end;
-  ClearMouseState(iButton);
-  return true;
-end
--- Returns true if the specified mouse button was pressed ------------------ --
-local function IsMousePressedNoRelease(iButton)
-  if GetMouseState(iButton) == 0 then return false end;
-  return true;
-end
--- Returns true if the specified mouse button was pressed ------------------ --
-local function IsMouseReleased(iButton) return not IsMousePressed(iButton) end;
--- Returns current joystick state ------------------------------------------ --
-local function GetJoyState(iButton)
-  if not iJoyActive then return 0 end;
-  return InputGetJoyButton(iJoyActive, iButton);
-end
--- Returns true if specified joystick button was pressed ------------------- --
-local function IsJoyPressed(iButton) return GetJoyState(iButton) == 1 end
--- Returns true if specified joystick button is held down ------------------ --
-local function IsJoyHeld(iButton) return GetJoyState(iButton) >= 1 end
--- Returns true if specified joystick button is released ------------------- --
-local function IsJoyReleased(iButton) return not IsJoyPressed(iButton) end
--- Returns true if specified mouse or joystick button is pressed ----------- --
-local function IsButtonPressed(iButton)
-  return IsMousePressed(iButton) or IsJoyPressed(iButton);
-end
--- Returns true if specified mouse or joystick button is pressed ----------- --
-local function IsButtonPressedNoRelease(iButton)
-  return IsMousePressedNoRelease(iButton) or IsJoyPressed(iButton);
-end
--- Returns true if specified mouse or joystick button is held -------------- --
-local function IsButtonHeld(iButton)
-  return IsMouseHeld(iButton) or IsJoyHeld(iButton);
-end
--- Returns true if specified mouse or joystick button is released ---------- --
-local function IsButtonReleased(iButton)
-  return IsMouseReleased(iButton) and IsJoyReleased(iButton);
-end
--- Is key being pressed? (Doesn't repeat) ---------------------------------- --
-local function IsKeyPressed(iKey)
-  if GetKeyState(iKey) == 1 then ClearKeyState(iKey) return true end;
-  return false;
-end
--- Is key not being pressed? ----------------------------------------------- --
-local function IsKeyReleased(iKey) return not IsKeyPressed(iKey) end;
--- Is key being pressed (uses OS repeat speed) ----------------------------- --
-local function IsKeyRepeating(iKey)
-  if IsKeyPressed(iKey) then return true end;
-  if GetKeyState(iKey) < 2 then return false end;
-  ClearKeyState(iKey);
-  return true;
-end
--- Is key being held? (FPS dependent) -------------------------------------- --
-local function IsKeyHeld(iKey) return GetKeyState(iKey) >= 1 end;
--- When a key is pressed --------------------------------------------------- --
-Input.OnKey(function(iKey, iState) aKeyState[iKey] = iState end);
--- When the mouse is clicked ----------------------------------------------- --
-Input.OnMouseClick(function(iButton, iState) aMouseState[iButton] = iState end);
--- Check joystick states --------------------------------------------------- --
-local function OnJoyState(iJ, bState)
-  -- Joystick is connected? Insert into joysticks list
-  if bState then aJoy[1 + #aJoy] = iJ;
-  -- Joystick was removed? Find joystick and remove it
-  else
-    for iI = 1, #aJoy do if aJoy[iI] == iJ then remove(aJoy, iI) break end end;
-  end
-  -- If we have joysticks?
-  if #aJoy > 0 then
-    -- Joystick id
-    for iJoy = 1, #aJoy do
-      -- Get joystick
-      local iJoyPending<const> = aJoy[iJoy];
-      -- Get number of axises and return if not have two
-      local iNumAxises<const> = InputGetNumJoyAxises(iJoyPending);
-      if iNumAxises >= 2 then
-        -- Set the first active joystick
-        iJoyActive = iJoyPending;
-        -- Mouse callback
-        local function JoystickMoveCallback()
-          -- Ignore if no joystick is available
-          if not iJoyActive then fcbMouse = UtilBlank return end;
-          -- Axis going left?
-          local nAxisX<const> = InputGetJoyAxis(iJoyActive, 0);
-          if nAxisX < 0 then
-            -- Reset if positive
-            if nJoyAX > 0 then nJoyAX = 0 end;
-            -- Update X axis acceleration
-            nJoyAX = UtilClamp(nJoyAX - 0.5, -5, 0);
-          -- Axis going right?
-          elseif nAxisX > 0 then
-            -- Reset if negative
-            if nJoyAX < 0 then nJoyAX = 0 end;
-            -- Update X axis acceleration
-            nJoyAX = UtilClamp(nJoyAX + 0.5, 0, 5);
-          -- X Axis not going left or right? Reset X axis acceleration
-          else nJoyAX = 0 end;
-          -- Axis going up?
-          local nAxisY<const> = InputGetJoyAxis(iJoyActive, 1);
-          if nAxisY < 0 then
-            -- Reset if positive
-            if nJoyAY > 0 then nJoyAY = 0 end;
-            -- Update Y axis acceleration
-            nJoyAY = UtilClamp(nJoyAY - 0.5, -5, 0);
-          -- Axis going down?
-          elseif nAxisY > 0 then
-            -- Reset if negative
-            if nJoyAY < 0 then nJoyAY = 0 end;
-            -- Update Y axis acceleration
-            nJoyAY = UtilClamp(nJoyAY + 0.5, 0, 5);
-          -- Y Axis not going up or down? Reset Y axis acceleration
-          else nJoyAY = 0 end;
-          -- Axis moving?
-          if nJoyAX ~= 0 or nJoyAY ~= 0 then
-            -- Adjust mouse position
-            iCursorX, iCursorY =
-              UtilClampInt(iCursorX + nJoyAX, iStageLeft, iStageRight - 1),
-              UtilClampInt(iCursorY + nJoyAY, iStageTop, iStageBottom - 1);
-            -- Update mouse position
-            InputSetCursorPos(iCursorX, iCursorY);
-          -- No axis pressed
-          end
-        end
-        -- Real update mouse info
-        fcbMouse = JoystickMoveCallback;
-        -- Success
-        return;
-      end
-    end
-  end
-  -- Joystick no longer valid
-  iJoyActive = nil;
-  -- Clear joystick to mouse callback
-  fcbMouse = UtilBlank;
-end
--- When a joystick device is changed --------------------------------------- --
-Input.OnJoyState(OnJoyState);
--- When the mouse wheel is moved ------------------------------------------- --
-local function OnMouseScroll(nX, nY) nWheelX, nWheelY = nX, nY end;
-Input.OnMouseScroll(OnMouseScroll);
--- When the mouse is moved ------------------------------------------------- --
-local function OnMouseMove(nX, nY) iCursorX,iCursorY = floor(nX),floor(nY) end;
-Input.OnMouseMove(OnMouseMove);
 -- Error handler ----------------------------------------------------------- --
 local function SetErrorMessage(sReason)
   -- Activate main frame buffer object just incase it isn't
@@ -319,18 +129,25 @@ local function SetErrorMessage(sReason)
      Reason:-\n\n\z
      \rcffffff00"..tostring(sReason).."\rr\n\n\z
      Press C to copy to clipboard, R to retry or X to quit.";
+  -- Get key states
+  local iRelease<const> = Input.States.RELEASE;
   -- Keys used in tick function
   local iKeyC<const>, iKeyR<const>, iKeyX<const> = aKeys.C, aKeys.R, aKeys.X;
+  -- Input event callback
+  local function OnKey(iKey, iState)
+    -- Ignore if not releasing a key
+    if iState ~= iRelease then return end;
+    -- Check for pressed keys from instructions
+    if     iKey == iKeyC then return Util.ClipSet(sFullReason);
+    elseif iKey == iKeyR then return Core.Reset();
+    elseif iKey == iKeyX then return Core.Quit() end;
+  end
+  -- Override current input funciton
+  Input.OnKey(OnKey);
   -- Second change bool
   local nNext = 0;
   -- Callback function
   local function OnTick()
-   -- Console disabled? Check for reset keys
-    if not FboConEnabled() then
-      if IsKeyPressed(iKeyC) then return Util.ClipSet(sFullReason) end;
-      if IsKeyPressed(iKeyR) then return Core.Reset() end;
-      if IsKeyPressed(iKeyX) then return Core.Quit() end;
-    end
     -- Set clear colour depending on time
     local nTime<const>, nRed = CoreTime();
     if nTime % 1 < 0.5 then nRed = 0.5 else nRed = 1.0 end;
@@ -345,51 +162,6 @@ local function SetErrorMessage(sReason)
   -- Set loop function
   CoreOnTick(OnTick);
 end
--- Set cursor -------------------------------------------------------------- --
-local function SetCursor(iId)
-  -- Check parameter
-  if not UtilIsInteger(iId) then
-    error("Cursor id integer is invalid! "..tostring(iId)) end;
-  -- Get cursor data for id and check it
-  local aCursorItem<const> = aCursorData[iId];
-  if not UtilIsTable(aCursorItem) then
-    error("Cursor id not valid! "..tostring(aCursorItem)) end;
-  -- Set new cursor dynamics
-  CursorMin, CursorMax, CursorOX, CursorOY =
-    aCursorItem[1], aCursorItem[2], aCursorItem[3], aCursorItem[4];
-  -- Set cursor id
-  CId = iId;
-end
--- Set global keys availability status. The keys will initially not be
--- available until the intro movie begins.
-local function SetGlobalKeys(bState)
-  -- Keys used it global keys
-  local iKeyF1<const>, iKeyF2<const>, iKeyF11<const>, iKeyF12<const> =
-    aKeys.F1, aKeys.F2, aKeys.F11, aKeys.F12;
-  -- Actual function
-  local function Function(bState)
-    -- Callback
-    local function Callback()
-      -- F1 key pressed?
-      if IsKeyPressed(iKeyF1) then InitSetup(1);
-      -- F2 key pressed?
-      elseif IsKeyPressed(iKeyF2) or (IsJoyPressed(8) and IsJoyPressed(9))
-        then InitSetup(2);
-      -- F11 key pressed?
-      elseif IsKeyPressed(iKeyF11) then DisplayReset();
-      -- F12 key pressed?
-      elseif IsKeyPressed(iKeyF12) then SShotFbo(fboMain) end;
-    end
-    -- Set global keys if enabled
-    if bState then CheckGlobalKeys = Callback;
-    -- Disabled
-    else CheckGlobalKeys = UtilBlank end
-  end
-  -- Assign new function and call it
-  SetGlobalKeys = Function;
-  Function(bState);
-end
-SetGlobalKeys(false);
 -- Get callbacks ----------------------------------------------------------- --
 local function GetCallbacks() return CBProc, CBRender, CBInput end;
 -- Set callbacks ----------------------------------------------------------- --
@@ -477,9 +249,6 @@ local function LoadResources(sProcedure, aResources, fComplete)
       aResource.ST3 = aResource.ST1 + aResource.ST2;
       -- Loaded counter increment
       iLoaded = iLoaded + 1;
-      -- Execute the resource callback if available
-      local fcbCallback<const> = aResource.A;
-      if UtilIsFunction(fcbCallback) then fcbCallback() end;
       -- No need to show intermediate load times if cached
       if bCached then bCached = ".";
       -- Wasn't cached?
@@ -499,9 +268,9 @@ local function LoadResources(sProcedure, aResources, fComplete)
       -- Set new cache
       aCache = aNCache;
       -- Set arrow cursor
-      SetCursor(aCursorIdData.ARROW);
+      SetCursor(iCursorArrow);
       -- Enable global keys
-      SetGlobalKeys(true);
+      SetKeys(true);
       -- Garbage collect to remove unloaded assets
       collectgarbage();
       -- Execute finished handler function with our resource list
@@ -543,11 +312,11 @@ local function LoadResources(sProcedure, aResources, fComplete)
     else aTypeData[1](unpack(aDstParams)) end;
   end
   -- Disable global keys until everything has loaded
-  SetGlobalKeys(false);
+  SetKeys(false);
   -- Clear callbacks but keep the last render callback
   SetCallbacks(nil, CBRender, nil);
   -- Set loading cursor
-  if aCursorIdData then SetCursor(aCursorIdData.WAIT) end;
+  SetCursor(iCursorWait);
   -- Initialise counters
   iTotal, iLoaded = #aResources, 0;
   -- Load first item
@@ -605,19 +374,10 @@ local function SetBottomRightTipAndShadow(strTip)
 end
 -- Bounds checking painter ------------------------------------------------- --
 local function BCBlit(texHandle, iTexIndex, iLeft, iTop, iRight, iBottom)
-  -- If not out of bounds draw the texture
+  -- Return if draw is not in bounds (occlusion)
   if min(iRight, iStageRight)   <= max(iLeft, iStageLeft) or
      min(iBottom, iStageBottom) <= max(iTop, iStageTop) then return end;
   texHandle:BlitSLTRB(iTexIndex, iLeft, iTop, iRight, iBottom);
-end
--- Clear input states ------------------------------------------------------ --
-local function ClearStates()
-  -- Make sure user can't input anything
-  InputClearStates();
-  -- Clear keyboard and mouse
-  for iKey in pairs(aKeyState) do ClearKeyState(iKey) end
-  for iButton in pairs(aMouseState) do aMouseState[iButton] = nil end
-  nWheelX, nWheelY = 0, 0;
 end
 -- Is fading --------------------------------------------------------------- --
 local function IsFading() return not not fcbFading end;
@@ -635,7 +395,7 @@ local function Fade(S, E, C, D, A, M, L, T, R, B, Z)
   -- If already fading, run the after function
   if UtilIsFunction(fcbFading) then fcbFading() end;
   -- Set loading cursor because player can't control anything
-  SetCursor(aCursorIdData.WAIT);
+  SetCursor(iCursorWait);
   -- During function
   local function During(nVal)
     -- Clear states
@@ -656,7 +416,7 @@ local function Fade(S, E, C, D, A, M, L, T, R, B, Z)
     -- No callbacks incase caller forgets to set anything
     SetCallbacks(nil, nil, nil);
     -- Set arrow incase caller forgets to set one
-    SetCursor(aCursorIdData.ARROW);
+    SetCursor(iCursorArrow);
     -- Call the after function
     A();
   end
@@ -707,8 +467,6 @@ local function Fade(S, E, C, D, A, M, L, T, R, B, Z)
     Finish();
   end
 end
--- Get cursor -------------------------------------------------------------- --
-local function GetCursor() return CId end;
 -- Refresh viewport info --------------------------------------------------- --
 local function RefreshViewportInfo()
   -- Refresh matrix parameters
@@ -719,13 +477,8 @@ local function RefreshViewportInfo()
   iStageWidth, iStageHeight, iStageLeft, iStageTop, iStageRight, iStageBottom =
     floor(iStageWidth), floor(iStageHeight), floor(iStageLeft),
     floor(iStageTop), floor(iStageRight), floor(iStageBottom);
-  -- Clamp mouse cursor into stage
-  if     iCursorX  < iStageLeft   then iCursorX = iStageLeft;
-  elseif iCursorY  < iStageTop    then iCursorY = iStageTop end;
-  if     iCursorX >= iStageRight  then iCursorX = iStageRight-1;
-  elseif iCursorY >= iStageBottom then iCursorY = iStageBottom-1 end;
   -- Call frame buffer callbacks
-  for _, fcbC in pairs(fcbFrameBufferCallbacks) do
+  for _, fcbC in pairs(fcbFrameBufferCbs) do
     fcbC(iStageWidth, iStageHeight,
       iStageLeft, iStageTop, iStageRight, iStageBottom) end;
 end
@@ -737,26 +490,29 @@ local function RegisterFrameBufferUpdateCallback(sName, fCB)
   if nil ~= fCB and not UtilIsFunction(fCB) then
     error("Invalid callback function! "..tostring(fCB)) end;
   -- Register callback when frame buffer is updated
-  fcbFrameBufferCallbacks[sName] = fCB;
+  fcbFrameBufferCbs[sName] = fCB;
   -- If a callback was set then call it
   if nil ~= fCB then fCB(iStageWidth, iStageHeight,
     iStageLeft, iStageTop, iStageRight, iStageBottom) end;
 end
 -- Returns wether test mode is enabled ------------------------------------- --
 local function GetTestMode() return bTestMode end;
--- Refresh viewport info and automatically when window size changes
-RefreshViewportInfo();
-Fbo.OnRedraw(RefreshViewportInfo);
--- Setup a default sprite set until the real sprite is loaded since we are
--- loading everything asynchronously.
-texSpr = TextureCreate(Image.Blank("placeholder", 1, 1, false, true), 0);
-texSpr:TileSTC(1024);
--- Initialise viewport and cursor
-InputSetCursor(false);
--- Initialise function callbacks
-SetCallbacks(nil, nil, nil);
 -- The first tick function
 local function fcbTick()
+  -- Refresh viewport info and automatically when window size changes
+  Fbo.OnRedraw(RefreshViewportInfo);
+  RefreshViewportInfo();
+  -- Initialise base API functions
+  ParseScriptResult("main", { A={ BCBlit = BCBlit, Fade = Fade,
+    GetCallbacks = GetCallbacks, GetTestMode = GetTestMode,
+    IsFading = IsFading, LoadResources = LoadResources,
+    RefreshViewportInfo = RefreshViewportInfo,
+    RegisterFBUCallback = RegisterFrameBufferUpdateCallback,
+    RenderFade = RenderFade, RenderShadow = RenderShadow,
+    SetBottomRightTip = SetBottomRightTip,
+    SetBottomRightTipAndShadow = SetBottomRightTipAndShadow,
+    SetCallbacks = SetCallbacks, TimeIt = TimeIt }, F=UtilBlank
+  });
   -- Empty callback function for CVar events
   local function fcbEmpty() return true end;
   -- Register file data CVar
@@ -765,37 +521,6 @@ local function fcbTick()
   local iCFR<const> = aCVF.STRINGSAVE|aCVF.TRIM|aCVF.PROTECTED|aCVF.DEFLATE;
   -- Default CVar flags for boolean storage
   local iCFB<const> = aCVF.BOOLEANSAVE;
-  -- Initialise base API functions
-  aAPI = {
-    GetKeyState = GetKeyState, ClearKeyState = ClearKeyState,
-    IsMouseInBounds = IsMouseInBounds, IsMouseNotInBounds = IsMouseNotInBounds,
-    IsMouseXLessThan = IsMouseXLessThan,
-    IsMouseXGreaterEqualThan = IsMouseXGreaterEqualThan,
-    IsMouseYLessThan = IsMouseYLessThan,
-    IsMouseYGreaterEqualThan = IsMouseYGreaterEqualThan,
-    GetMouseX = GetMouseX, GetMouseY = GetMouseY,
-    IsScrollingLeft = IsScrollingLeft, IsScrollingRight = IsScrollingRight,
-    IsScrollingUp = IsScrollingUp, IsScrollingDown = IsScrollingDown,
-    GetMouseState = GetMouseState, ClearMouseState = ClearMouseState,
-    IsMouseHeld = IsMouseHeld, IsMousePressed = IsMousePressed,
-    IsMousePressedNoRelease = IsMousePressedNoRelease,
-    IsMouseReleased = IsMouseReleased, GetJoyState = GetJoyState,
-    IsJoyPressed = IsJoyPressed, IsJoyHeld = IsJoyHeld,
-    IsJoyReleased = IsJoyReleased, IsButtonPressed = IsButtonPressed,
-    IsButtonPressedNoRelease = IsButtonPressedNoRelease,
-    IsButtonHeld = IsButtonHeld, IsButtonReleased = IsButtonReleased,
-    IsKeyReleased = IsKeyReleased, IsKeyPressed = IsKeyPressed,
-    IsKeyRepeating = IsKeyRepeating, IsKeyHeld = IsKeyHeld,
-    SetCursor = SetCursor, SetGlobalKeys = SetGlobalKeys,
-    GetCallbacks = GetCallbacks, SetCallbacks = SetCallbacks,
-    LoadResources = LoadResources, TimeIt = TimeIt, RenderFade = RenderFade,
-    BCBlit = BCBlit, ClearStates = ClearStates, Fade = Fade,
-    GetCursor = GetCursor, RefreshViewportInfo = RefreshViewportInfo,
-    IsFading = IsFading, SetBottomRightTip = SetBottomRightTip,
-    RegisterFBUCallback = RegisterFrameBufferUpdateCallback,
-    GetTestMode = GetTestMode, RenderShadow = RenderShadow,
-    SetBottomRightTipAndShadow = SetBottomRightTipAndShadow
-  };
   -- 4 save slots so 4 save variables
   for iI = 1, 4 do
     aAPI["VarGameData"..iI] =
@@ -807,21 +532,22 @@ local function fcbTick()
   aAPI.VarGameIntro = VariableRegister("gam_intro", 1, iCFB, fcbEmpty);
   -- ...and a CVar that lets us start straight into a level
   aAPI.VarGameTest = VariableRegister("gam_test", "", aCVF.STRING, fcbEmpty);
-  -- Data script loaded event
-  local function DataLoaded()
-    aCursorIdData, aCursorData = aAPI.aCursorIdData, aAPI.aCursorData;
-  end;
+  -- Setup a default sprite set until the real sprite is loaded since we are
+  -- loading everything asynchronously.
+  texSpr = TextureCreate(Image.Blank("placeholder", 1, 1, false, true), 0);
+  texSpr:TileSTC(1024);
+  -- Initialise function callbacks
+  SetCallbacks(nil, nil, nil);
   -- Base code scripts that are to be loaded
   local aBaseScripts<const> = {
-    {T=9,F="audio",  P={}}, {T=9,F="bank",   P={}}, {T=9,F="book",  P={}},
-    {T=9,F="cntrl",  P={}}, {T=9,F="credits",P={}},
-    {T=9,F="data",   P={},A=DataLoaded },           {T=9,F="debug", P={}},
-    {T=9,F="end",    P={}}, {T=9,F="ending", P={}}, {T=9,F="fail",  P={}},
-    {T=9,F="file",   P={}}, {T=9,F="game",   P={}}, {T=9,F="intro", P={}},
-    {T=9,F="lobby",  P={}}, {T=9,F="map",    P={}}, {T=9,F="post",  P={}},
-    {T=9,F="race",   P={}}, {T=9,F="scene",  P={}}, {T=9,F="score", P={}},
-    {T=9,F="setup",  P={}}, {T=9,F="shop",   P={}}, {T=9,F="title", P={}},
-    {T=9,F="tntmap", P={}},
+    {T=9,F="audio",  P={}}, {T=9,F="bank",   P={}}, {T=9,F="book",   P={}},
+    {T=9,F="cntrl",  P={}}, {T=9,F="credits",P={}}, {T=9,F="data",   P={}},
+    {T=9,F="debug",  P={}}, {T=9,F="end",    P={}}, {T=9,F="ending", P={}},
+    {T=9,F="fail",   P={}}, {T=9,F="file",   P={}}, {T=9,F="game",   P={}},
+    {T=9,F="input",  P={}}, {T=9,F="intro",  P={}}, {T=9,F="lobby",  P={}},
+    {T=9,F="map",    P={}}, {T=9,F="post",   P={}}, {T=9,F="race",   P={}},
+    {T=9,F="scene",  P={}}, {T=9,F="score",  P={}}, {T=9,F="setup",  P={}},
+    {T=9,F="shop",   P={}}, {T=9,F="title",  P={}}, {T=9,F="tntmap", P={}},
   };
   -- Base fonts that are to be loaded
   local aBaseFonts<const> = {
@@ -922,38 +648,57 @@ local function fcbTick()
       local aModData<const> = aModules[iI];
       aModData.F(GetAPI, aModData);
     end
-    -- Set music volume function for transition function
-    MusicVolume = aAPI.MusicVolume;
-    -- Assign loaded sound effects
-    aAPI.RegisterSounds(aData, iBaseSounds, #aBaseSounds);
+    -- Load dependecies we need on this module
+    aLevelsData, aObjectTypes, aRacesData, ClearStates, InitCredits,
+      InitDebugPlay, InitEnding, InitFail, InitIntro, InitNewGame, InitScene,
+      InitScore, InitSetup, InitTitle, JoystickProc, LoadLevel, MusicVolume,
+      SetCursor, SetKeys =
+        GetAPI("aLevelsData", "aObjectTypes", "aRacesData", "ClearStates",
+          "InitCredits", "InitDebugPlay", "InitEnding", "InitFail",
+          "InitIntro", "InitNewGame", "InitScene", "InitScore", "InitSetup",
+          "InitTitle", "JoystickProc", "LoadLevel", "MusicVolume", "SetCursor",
+          "SetKeys");
+    -- Assign loaded sound effects (audio.hpp)
+    GetAPI("RegisterSounds")(aData, iBaseSounds, #aBaseSounds);
+    -- We need the cursor ids for the arrow and waiting (input.hpp)
+    local aCursorIdData<const> = GetAPI("aCursorIdData");
+    iCursorArrow = aCursorIdData.ARROW;
+    iCursorWait = aCursorIdData.WAIT;
+    -- Get cursor render function (input.hpp)
+    local CursorRender<const> = aAPI.CursorRender;
+    -- Global function key callbacks
+    local function GkCbConfig() InitSetup(1) end;
+    local function GkCbReadme() InitSetup(2) end;
+    local function GkCbBinds() InitSetup(3) end;
+    local function GkCbSShot() SShotFbo(fboMain) end;
+    -- Register the global function keys
+    GetAPI("RegisterGlobalKeys")({ [Input.States.PRESS] = {
+      { aKeys.F1,  GkCbConfig,           "Setup screen" };
+      { aKeys.F2,  GkCbReadme,           "Show credits" },
+--    { aKeys.F3,  GkCbBinds,            "Setup keybinds" },
+      { aKeys.F10, InputSetCursorCentre, "Set cursor centre" },
+      { aKeys.F11, DisplayReset,         "Reset window size" },
+      { aKeys.F12, GkCbSShot,            "Take screenshot" },
+    }});
     -- Main procedure callback
     local function MainCallback()
-      -- Update mouse position
-      fcbMouse();
-      -- Check global keys
-      CheckGlobalKeys();
+      -- Poll joysticks (input.hpp)
+      JoystickProc();
       -- Execute input, tick and render callbacks
       CBInput();
       CBProc();
       CBRender();
-      -- Draw mouse cursor
-      texSpr:BlitSLT(CoreTicks() // 4 % CursorMax + CursorMin,
-        iCursorX + CursorOX, iCursorY + CursorOY);
+      -- Draw mouse cursor (input.hpp)
+      CursorRender();
       -- Draw screen at end of LUA tick
       FboDraw();
     end
     -- Set main callback
     fcbTick = MainCallback;
-    -- Load functions
-    InitSetup, InitScene, InitScore, InitCredits, InitEnding, LoadLevel,
-      InitIntro, InitTitle, InitFail, aLevelsData, aRacesData, aObjectTypes,
-      InitNewGame, InitDebugPlay =
-        GetAPI("InitSetup", "InitScene", "InitScore", "InitCredits",
-          "InitEnding", "LoadLevel", "InitIntro", "InitTitle", "InitFail",
-          "aLevelsData", "aRacesData", "aObjectTypes", "InitNewGame",
-          "InitDebugPlay");
     -- Init game counters so testing stuff quickly works properly
     InitNewGame();
+    -- Hide the cursor
+    InputSetCursor(false);
     -- Tests
     local sTestValue<const> = aAPI.VarGameTest:Get();
     if #sTestValue > 0 then
@@ -976,8 +721,10 @@ local function fcbTick()
       -- Testing a races ending
       elseif iStartLevel > -10 and iStartLevel <= -6 then
         return InitEnding(#aRacesData + (-10 - iStartLevel));
+      -- Test a specific lvel
       elseif iStartLevel <= #aLevelsData then
         return LoadLevel(iStartLevel, "game");
+      -- Test a specific level with starting scene
       elseif iStartLevel > #aLevelsData and iStartLevel <= #aLevelsData*2 then
         return InitScene(iStartLevel-#aLevelsData, "game");
       end
@@ -989,9 +736,6 @@ local function fcbTick()
       -- Initialise intro with setup dialog
       return InitIntro(false);
     end
-    -- Set initial cursor position
-    iCursorX, iCursorY = 0, 0;
-    InputSetCursorPos(0, 0);
     -- Initialise setup screen by default
     InitIntro(true);
     -- No longer show setup screen

@@ -196,8 +196,8 @@ class Core final :                     // Members initially private
           // this to something different when they cleanly exit their loops.
           cEvtMain->SetExitReason(EMC_LUA_ERROR);
           // Is graphical mode enabled?
-          if(cSystem->IsGraphicalMode())
-          { // Scan for game controllers and inform scripts if enabled
+          if(cSystem->IsGraphicalMode() and cInput->FlagIsSet(IF_INITEVENTS))
+          { // Scan for game controllers and inform scripts
             cInput->BeginDetection();
             // Send current mouse position to scripts
             cInput->RequestMousePosition();

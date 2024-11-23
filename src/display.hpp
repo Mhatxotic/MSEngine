@@ -178,8 +178,12 @@ static class Display final :
   /* -- Window was asked to be hidden -------------------------------------- */
   void OnReqHide(const EvtWinEvent&) { cGlFW->WinHide(); }
   /* -- Resend mouse position ---------------------------------------------- */
-  void OnReqCursorPos(const EvtWinEvent&)
+  void OnReqGetCursorPos(const EvtWinEvent&)
     { cGlFW->WinSendMousePosition(); }
+  /* -- Set mouse position ------------------------------------------------- */
+  void OnReqSetCursorPos(const EvtWinEvent &eweEvent)
+    { cGlFW->WinSetCursorPos(eweEvent.aArgs.front().d,
+                             eweEvent.aArgs.back().d); }
   /* -- Window cursor request ---------------------------------------------- */
   void OnReqSetCursor(const EvtWinEvent &eweEvent)
     { cGlFW->SetCursor(static_cast<GlFWCursorType>
@@ -1011,26 +1015,27 @@ static class Display final :
       { EMC_WIN_SCALE,         bind(&Display::OnScale,       this, _1) },
     },
     EvtWin::RegVec{                    // Register window events
-      { EWC_WIN_ATTENTION,   bind(&Display::OnReqAttention,   this, _1) },
-      { EWC_WIN_CENTRE,      bind(&Display::OnReqCentre,      this, _1) },
-      { EWC_WIN_CURPOSGET,   bind(&Display::OnReqCursorPos,   this, _1) },
-      { EWC_WIN_CURRESET,    bind(&Display::OnReqResetCursor, this, _1) },
-      { EWC_WIN_CURSET,      bind(&Display::OnReqSetCursor,   this, _1) },
-      { EWC_WIN_CURSETVIS,   bind(&Display::OnReqSetCurVisib, this, _1) },
-      { EWC_WIN_FOCUS,       bind(&Display::OnReqFocus,       this, _1) },
-      { EWC_WIN_HIDE,        bind(&Display::OnReqHide,        this, _1) },
-      { EWC_WIN_LIMITS,      bind(&Display::OnReqSetLimits,   this, _1) },
-      { EWC_WIN_MAXIMISE,    bind(&Display::OnReqMaximise,    this, _1) },
-      { EWC_WIN_MINIMISE,    bind(&Display::OnReqMinimise,    this, _1) },
-      { EWC_WIN_MOVE,        bind(&Display::OnReqMove,        this, _1) },
-      { EWC_WIN_RESET,       bind(&Display::OnReqReset,       this, _1) },
-      { EWC_WIN_RESIZE,      bind(&Display::OnReqResize,      this, _1) },
-      { EWC_WIN_RESTORE,     bind(&Display::OnReqRestore,     this, _1) },
-      { EWC_WIN_SETICON,     bind(&Display::OnReqSetIcons,    this, _1) },
-      { EWC_WIN_SETRAWMOUSE, bind(&Display::OnReqSetRawMouse, this, _1) },
-      { EWC_WIN_SETSTKKEYS,  bind(&Display::OnReqStickyKeys,  this, _1) },
-      { EWC_WIN_SETSTKMOUSE, bind(&Display::OnReqStickyMouse, this, _1) },
-      { EWC_WIN_TOGGLE_FS,   bind(&Display::OnReqToggleFS,    this, _1) },
+      { EWC_WIN_ATTENTION,   bind(&Display::OnReqAttention,    this, _1) },
+      { EWC_WIN_CENTRE,      bind(&Display::OnReqCentre,       this, _1) },
+      { EWC_WIN_CURPOSGET,   bind(&Display::OnReqGetCursorPos, this, _1) },
+      { EWC_WIN_CURPOSSET,   bind(&Display::OnReqSetCursorPos, this, _1) },
+      { EWC_WIN_CURRESET,    bind(&Display::OnReqResetCursor,  this, _1) },
+      { EWC_WIN_CURSET,      bind(&Display::OnReqSetCursor,    this, _1) },
+      { EWC_WIN_CURSETVIS,   bind(&Display::OnReqSetCurVisib,  this, _1) },
+      { EWC_WIN_FOCUS,       bind(&Display::OnReqFocus,        this, _1) },
+      { EWC_WIN_HIDE,        bind(&Display::OnReqHide,         this, _1) },
+      { EWC_WIN_LIMITS,      bind(&Display::OnReqSetLimits,    this, _1) },
+      { EWC_WIN_MAXIMISE,    bind(&Display::OnReqMaximise,     this, _1) },
+      { EWC_WIN_MINIMISE,    bind(&Display::OnReqMinimise,     this, _1) },
+      { EWC_WIN_MOVE,        bind(&Display::OnReqMove,         this, _1) },
+      { EWC_WIN_RESET,       bind(&Display::OnReqReset,        this, _1) },
+      { EWC_WIN_RESIZE,      bind(&Display::OnReqResize,       this, _1) },
+      { EWC_WIN_RESTORE,     bind(&Display::OnReqRestore,      this, _1) },
+      { EWC_WIN_SETICON,     bind(&Display::OnReqSetIcons,     this, _1) },
+      { EWC_WIN_SETRAWMOUSE, bind(&Display::OnReqSetRawMouse,  this, _1) },
+      { EWC_WIN_SETSTKKEYS,  bind(&Display::OnReqStickyKeys,   this, _1) },
+      { EWC_WIN_SETSTKMOUSE, bind(&Display::OnReqStickyMouse,  this, _1) },
+      { EWC_WIN_TOGGLE_FS,   bind(&Display::OnReqToggleFS,     this, _1) },
     },
     DimCoInt{ -1, -1, 0, 0 },          // Requested position and size
     moSelected(nullptr),               // No monitor selected

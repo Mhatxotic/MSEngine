@@ -28,8 +28,8 @@ static enum LuaCache : unsigned int    // User cache setting
   LCC_MAX                              // Maximum number of settings
 } /* ----------------------------------------------------------------------- */
 lcSetting;                             // Initialised by CVar later
-/* -- Cache and compilation results ---------------------------------------- */
-enum LuaCompResult : unsigned int
+/* ------------------------------------------------------------------------- */
+enum LuaCompResult : unsigned int      // Cache and compilation results
 { /* ----------------------------------------------------------------------- */
   LCR_CACHED,                          // [0] Using cached version
   LCR_RECOMPILE,                       // [1] Code compiled and stored
@@ -172,7 +172,7 @@ static LuaCompResult LuaCodeCompileBuffer(lua_State*const lS,
         strRef, stSize, hex, uiCRC);
     } // No results
     else cLog->LogDebugExSafe(
-      "LuaCode will compile '$'[$]($$) for the first time!",
+      "LuaCode will recompile '$'[$]($$) as the module was modified!",
         strRef, stSize, hex, uiCRC);
   } // Error reading database so try to rebuild table
   else cSql->LuaCacheRebuildTable();

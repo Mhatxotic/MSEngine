@@ -1100,6 +1100,18 @@ const CVarItemStaticList cvislList{ {  // Default cvars (from cvars.hpp)
 { CFL_VIDEO, "inp_rawmouse", cCommon->One(),
   CB(cInput->SetRawMouseEnabled, bool), TBOOLEANSAVE|PANY },
 /* ------------------------------------------------------------------------- */
+// ! INP_INITEVENTS
+// ? Automatically sends joystick and mouse position events at start up after
+// ? the script has compiled and before rendering the first frame. This means
+// ? you will get the list of joysticks from the OnJoy() callback and the mouse
+// ? position from the OnMouseMove() callback. If you don't want this to happen
+// ? at startup and you want the events to be polled at a different time, set
+// ? this to 0 and use the Input.RefreshJoysticks() API function. The default
+// ? value is 1.
+/* ------------------------------------------------------------------------- */
+{ CFL_VIDEO, "inp_initevents", cCommon->One(),
+  CB(cInput->SetSendEventsEnabled, bool), TBOOLEAN|PSYSTEM },
+/* ------------------------------------------------------------------------- */
 // ! INP_STICKYKEY
 // ? Enables sticky key presses.
 /* ------------------------------------------------------------------------- */
