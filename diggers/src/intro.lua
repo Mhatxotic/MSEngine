@@ -252,7 +252,7 @@ local function InitIntro(bAndSetup)
       -- Set intro callbacks
       SetCallbacks(nil, Render, InputProc);
       -- Load setup now
-      if bAndSetup then PlayVideo() InitSetup() end;
+      if bAndSetup then PlayVideo() InitSetup(1) end;
     end
     -- Fade in
     Fade(1, 0, 0.025, Render, OnFadeIn);

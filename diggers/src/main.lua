@@ -12,9 +12,9 @@
 -- Lua aliases (optimisation) ---------------------------------------------- --
 local collectgarbage<const>, error<const>, floor<const>, format<const>,
   max<const>, min<const>, pairs<const>, random<const>, remove<const>,
-  tostring<const>, unpack<const> =
+  tonumber<const>, tostring<const>, unpack<const> =
     collectgarbage, error, math.floor, string.format, math.max, math.min,
-    pairs, math.random, table.remove, tostring, table.unpack;
+    pairs, math.random, table.remove, tonumber, tostring, table.unpack;
 -- M-Engine aliases (optimisation) ----------------------------------------- --
 local AssetParseBlock<const>, CoreLog<const>, CoreOnTick<const>,
   CoreStack<const>, CoreWrite<const>, DisplayReset<const>, FboDraw<const>,
@@ -56,8 +56,9 @@ local iStageRight  = iStageWidth;      -- Right of stage
 local iStageBottom = iStageHeight;     -- Bottom of stage
 -- Library functions loaded later ------------------------------------------ --
 local aLevelsData, aObjectTypes, aRacesData, ClearStates, InitCredits,
-  InitDebugPlay, InitEnding, InitFail, InitIntro, InitNewGame, InitScene,
-  InitScore, InitSetup, InitTitle, JoystickProc, LoadLevel, MusicVolume;
+  InitTitleCredits, InitDebugPlay, InitEnding, InitFail, InitIntro,
+  InitNewGame, InitScene, InitScore, InitSetup, InitTitle, JoystickProc,
+  LoadLevel, MusicVolume;
 -- These could be called even though they aren't initialised yet ----------- --
 local SetKeys, SetCursor = UtilBlank, UtilBlank;
 -- Constants for loader ---------------------------------------------------- --
@@ -540,14 +541,15 @@ local function fcbTick()
   SetCallbacks(nil, nil, nil);
   -- Base code scripts that are to be loaded
   local aBaseScripts<const> = {
-    {T=9,F="audio",  P={}}, {T=9,F="bank",   P={}}, {T=9,F="book",   P={}},
-    {T=9,F="cntrl",  P={}}, {T=9,F="credits",P={}}, {T=9,F="data",   P={}},
-    {T=9,F="debug",  P={}}, {T=9,F="end",    P={}}, {T=9,F="ending", P={}},
-    {T=9,F="fail",   P={}}, {T=9,F="file",   P={}}, {T=9,F="game",   P={}},
-    {T=9,F="input",  P={}}, {T=9,F="intro",  P={}}, {T=9,F="lobby",  P={}},
-    {T=9,F="map",    P={}}, {T=9,F="post",   P={}}, {T=9,F="race",   P={}},
-    {T=9,F="scene",  P={}}, {T=9,F="score",  P={}}, {T=9,F="setup",  P={}},
-    {T=9,F="shop",   P={}}, {T=9,F="title",  P={}}, {T=9,F="tntmap", P={}},
+    {T=9,F="audio",  P={}}, {T=9,F="bank",    P={}}, {T=9,F="book",     P={}},
+    {T=9,F="cntrl",  P={}}, {T=9,F="credits", P={}}, {T=9,F="data",     P={}},
+    {T=9,F="debug",  P={}}, {T=9,F="end",     P={}}, {T=9,F="ending",   P={}},
+    {T=9,F="fail",   P={}}, {T=9,F="file",    P={}}, {T=9,F="game",     P={}},
+    {T=9,F="input",  P={}}, {T=9,F="intro",   P={}}, {T=9,F="lobby",    P={}},
+    {T=9,F="map",    P={}}, {T=9,F="post",    P={}}, {T=9,F="race",     P={}},
+    {T=9,F="scene",  P={}}, {T=9,F="score",   P={}}, {T=9,F="setup",    P={}},
+    {T=9,F="shop",   P={}}, {T=9,F="title",   P={}}, {T=9,F="tcredits", P={}},
+    {T=9,F="tntmap", P={}},
   };
   -- Base fonts that are to be loaded
   local aBaseFonts<const> = {
@@ -651,13 +653,13 @@ local function fcbTick()
     -- Load dependecies we need on this module
     aLevelsData, aObjectTypes, aRacesData, ClearStates, InitCredits,
       InitDebugPlay, InitEnding, InitFail, InitIntro, InitNewGame, InitScene,
-      InitScore, InitSetup, InitTitle, JoystickProc, LoadLevel, MusicVolume,
-      SetCursor, SetKeys =
+      InitScore, InitSetup, InitTitle, InitTitleCredits, JoystickProc,
+      LoadLevel, MusicVolume, SetCursor, SetKeys =
         GetAPI("aLevelsData", "aObjectTypes", "aRacesData", "ClearStates",
           "InitCredits", "InitDebugPlay", "InitEnding", "InitFail",
           "InitIntro", "InitNewGame", "InitScene", "InitScore", "InitSetup",
-          "InitTitle", "JoystickProc", "LoadLevel", "MusicVolume", "SetCursor",
-          "SetKeys");
+          "InitTitle", "InitTitleCredits", "JoystickProc", "LoadLevel",
+          "MusicVolume", "SetCursor", "SetKeys");
     -- Assign loaded sound effects (audio.hpp)
     GetAPI("RegisterSounds")(aData, iBaseSounds, #aBaseSounds);
     -- We need the cursor ids for the arrow and waiting (input.hpp)
@@ -714,13 +716,17 @@ local function fcbTick()
       elseif iStartLevel == -2 then return InitFail();
       -- Testing the game over
       elseif iStartLevel == -3 then return InitScore();
-      -- Testing the credits
+      -- Testing the final credits
       elseif iStartLevel == -4 then return InitCredits(false);
-      -- Testing the rolling credits
+      -- Testing the final rolling credits
       elseif iStartLevel == -5 then return InitCredits(true);
+      -- Testing the title screen rolling credits
+      elseif iStartLevel == -6 then return InitTitleCredits();
       -- Testing a races ending
-      elseif iStartLevel > -10 and iStartLevel <= -6 then
-        return InitEnding(#aRacesData + (-10 - iStartLevel));
+      elseif iStartLevel > -11 and iStartLevel <= -7 then
+        return InitEnding(#aRacesData + (-11 - iStartLevel));
+      -- Reserved for testing map post mortem maybe (todo)
+      elseif iStartLevel <= -11 then
       -- Test a specific lvel
       elseif iStartLevel <= #aLevelsData then
         return LoadLevel(iStartLevel, "game");
@@ -730,9 +736,9 @@ local function fcbTick()
       end
     end
     -- If being run for first time
-    if aAPI.VarGameSetup:Get() == "0" then
+    if 0 == tonumber(aAPI.VarGameSetup:Get()) then
       -- Skip intro? Initialise title screen
-      if aAPI.VarGameIntro:Get() == "0" then return InitTitle() end;
+      if 0 == tonumber(aAPI.VarGameIntro:Get()) then return InitTitle() end;
       -- Initialise intro with setup dialog
       return InitIntro(false);
     end

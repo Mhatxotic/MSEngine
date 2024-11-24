@@ -196,9 +196,9 @@ class Core final :                     // Members initially private
           // this to something different when they cleanly exit their loops.
           cEvtMain->SetExitReason(EMC_LUA_ERROR);
           // Is graphical mode enabled?
-          if(cSystem->IsGraphicalMode() and cInput->FlagIsSet(IF_INITEVENTS))
+          if(cSystem->IsGraphicalMode() && cInput->FlagIsSet(IF_INITEVENTS))
           { // Scan for game controllers and inform scripts
-            cInput->BeginDetection();
+            cInput->AutoDetectJoystick();
             // Send current mouse position to scripts
             cInput->RequestMousePosition();
           } // Execute startup script
@@ -313,7 +313,7 @@ class Core final :                     // Members initially private
   }
   /* -- Redraw the frame buffer when error occurs -------------------------- */
   void CoreForceRedrawFrameBuffer(const bool bAndConsole)
-  { // Flush log and return if in bot mode
+  { // Flush log if we have a text mode console
     if(cSystem->IsTextMode()) cConsole->FlushToLog();
     // Return if no graphical mode
     if(cSystem->IsNotGraphicalMode()) return;

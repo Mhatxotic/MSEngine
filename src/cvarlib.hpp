@@ -686,6 +686,14 @@ const CVarItemStaticList cvislList{ {  // Default cvars (from cvars.hpp)
 { CFL_NONE, "lua_gcstepmul", "100",
   CB(cLua->SetGCStep, int), TUINTEGER|PSYSTEM },
 /* ------------------------------------------------------------------------- */
+// ! LUA_LASTVER
+// ? Specifies the last known version of LUA used with the engine. If the
+// ? current LUA version is different to this then the code cache will be
+// ? completely deleted so all code is recompiled.
+/* ------------------------------------------------------------------------- */
+{ CFL_NONE, "lua_lastver", LUA_VDIR "." LUA_VERSION_RELEASE,
+  CBSTR(LuaCodeCheckVersion), TSTRINGSAVE|OSAVEFORCE },
+/* ------------------------------------------------------------------------- */
 // ! LUA_RANDOMSEED
 // ? Specifies a fixed random seed that Lua's math.random() function should
 // ? use. Specify zero to have this value randomised at startup with entropy
@@ -1077,15 +1085,6 @@ const CVarItemStaticList cvislList{ {  // Default cvars (from cvars.hpp)
 /* ------------------------------------------------------------------------- */
 { CFL_VIDEO, "inp_joydefrdz", "0.25",
   CB(cInput->SetDefaultJoyRevDZ, float), TUFLOATSAVE|PANY },
-/* ------------------------------------------------------------------------- */
-// ! INP_JOYSTICK
-// ? Specifies how to deal with detecting connected gamepads.
-// ? [-1] JOY_DETECT  = Detect at start. Disable if no gamepads connected.
-// ? [0]  JOY_DISABLE = Disable gamepads completely.
-// ? [1]  JOY_ENABLE  = Enable gamepads and always try to detect new gamepads.
-/* ------------------------------------------------------------------------- */
-{ CFL_VIDEO, "inp_joystick", cCommon->NOne(),
-  CB(cInput->SetJoystickEnabled, JoyStatus), TINTEGERSAVE|PANY },
 /* ------------------------------------------------------------------------- */
 // ! INP_FSTOGGLER
 // ? Enables or disables the ALT+ENTER or OPTION+ENTER combinations to switch

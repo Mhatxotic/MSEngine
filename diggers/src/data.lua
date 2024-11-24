@@ -2634,7 +2634,7 @@ local aIntroSubTitles<const> = {
                   "heads towards the trading centre." } },
   { 2050, 2180, { "For him, the ultimate test. The greatest",
                   "challenge of his life lies ahead." } },
-  { 2200, 2290, { "The rewards for success,",
+  { 2200, 2290, { "The reward for success,",
                   "will be wealth unlimited." } },
   { 2310, 2440, { "The results of failure,",
                   "are unthinkable!" } },

@@ -18,31 +18,26 @@ local CoreRAM<const>, DisplayVRAM<const>, UtilBytes<const>,
 local iCVAppTitle<const> = Variable.Internal.app_version;
 local strVersion<const> = VariableGetInt(iCVAppTitle).." ";
 -- Diggers function and data aliases --------------------------------------- --
-local DeInitLevel, Fade, GameProc, GetActivePlayer, GetGameTicks,
-  GetOpponentPlayer, InitLobby, InitNewGame, IsButtonReleased, IsKeyReleased,
-  IsMouseInBounds, LoadLevel, LoadResources, LoadSaveData, PlayStaticSound,
-  ProcessViewPort, RegisterFBUCallback, RenderObjects, RenderTerrain,
-  SelectObject, SetCallbacks, SetCursor, aCreditsData, aCursorIdData,
-  aLevelsData, aObjectTypes, aObjects, aSfxData, fontLarge, fontLittle,
-  fontTiny;
+local aCursorIdData, aLevelsData, aObjects, aObjectTypes, aSfxData,
+  DeInitLevel, Fade, fontTiny, GameProc, GetActivePlayer, GetGameTicks,
+  GetOpponentPlayer, InitLobby, InitNewGame, InitTitleCredits,
+  IsButtonReleased, IsMouseInBounds, LoadLevel, LoadResources, LoadSaveData,
+  PlayStaticSound, ProcessViewPort, RegisterFBUCallback, RenderObjects,
+  RenderTerrain, SelectObject, SetCallbacks, SetCursor;
 -- Assets required --------------------------------------------------------- --
 local aAssets<const> = { { T = 2, F = "title", P = { 0 } } };
 -- Initialise the title screen function ------------------------------------ --
-local function InitTitle()
-  -- When title resources have loaded?
-  local function OnTitleLoaded(aResources)
-    -- Stage bounds
-    local iStageL, iStageR;
-    -- Load texture and credit tiles
-    local texTitle = aResources[1].H;
+local function InitTitle(texTitle)
+  -- Resources are ready?
+  local function OnTitleReady(bMusic)
+    -- Initialise title texture
     texTitle:SetCRGBA(1, 1, 1, 1);
     texTitle:TileSTC(1);
-    texTitle:TileA(  0, 240, 162, 281);
-    texTitle:TileA(  0, 344, 150, 512);
-    texTitle:TileA(344, 344, 512, 512);
-    local tileCredits<const> = texTitle:TileA(0, 0, 512, 240);
-    -- Set version
-    local strSubTitle;
+    texTitle:TileS(0,   0, 240, 162, 281);
+    texTitle:TileA(     0, 344, 150, 512);
+    texTitle:TileA(   344, 344, 512, 512);
+    -- Stage bounds and subtitle
+    local iStageL, iStageR, strSubTitle;
     -- Set credits
     local strCredits<const> =
       "ORIGINAL VERSIONS BY TOBY SIMPSON AND MIKE FROGGATT\n\z
@@ -51,7 +46,7 @@ local function InitTitle()
          ALL RIGHTS RESERVED\n\z
        PRESS F1 TO SETUP THE ENGINE OR F2 FOR ACKNOWLEDGEMENTS AT ANY TIME";
     -- Main demo level loader
-    local function LoadDemoLevel(strMusic);
+    local function LoadDemoLevel(strTitle)
       -- Setup frame buffer updated callback
       local function OnFrameBufferUpdated(...)
         local _ _, _, iStageL, _, iStageR, _ = ...;
@@ -67,9 +62,9 @@ local function InitTitle()
           RenderTerrain();
           RenderObjects();
           -- Render title objects
-          texTitle:BlitSLT(1, 79, 12 - n1);
-          texTitle:BlitSLT(2, iStageL - n1, 72);
-          texTitle:BlitSLT(3, (iStageR - 168) + n2, 72);
+          texTitle:BlitLT(79, 12 - n1);
+          texTitle:BlitSLT(1, iStageL - n1, 72);
+          texTitle:BlitSLT(2, (iStageR - 168) + n2, 72);
           -- Render status text
           fontTiny:SetCRGB(1, 0.9, 0);
           fontTiny:PrintC(160, 58 - n1, strSubTitle);
@@ -84,9 +79,9 @@ local function InitTitle()
             RenderTerrain();
             RenderObjects();
             -- Render title objects
-            texTitle:BlitSLT(1, 79, 12);
-            texTitle:BlitSLT(2, iStageL, 72);
-            texTitle:BlitSLT(3, iStageR - 168, 72);
+            texTitle:BlitLT(79, 12);
+            texTitle:BlitSLT(1, iStageL, 72);
+            texTitle:BlitSLT(2, iStageR - 168, 72);
             -- Render status text
             fontTiny:SetCRGB(1, 0.9, 0);
             fontTiny:PrintC(160, 58, strSubTitle);
@@ -110,9 +105,9 @@ local function InitTitle()
           RenderTerrain();
           RenderObjects();
           -- Render title objects
-          texTitle:BlitSLT(1, 79, -148 + n1);
-          texTitle:BlitSLT(2, iStageL - 168 + n1, 72);
-          texTitle:BlitSLT(3, iStageR - n2, 72);
+          texTitle:BlitLT(79, -148 + n1);
+          texTitle:BlitSLT(1, iStageL - 168 + n1, 72);
+          texTitle:BlitSLT(2, iStageR - n2, 72);
           -- Render status text
           fontTiny:SetCRGB(1, 0.9, 0);
           fontTiny:PrintC(160, 58 - n1, strSubTitle);
@@ -199,71 +194,8 @@ local function InitTitle()
           RegisterFBUCallback("title");
           -- De-init level
           DeInitLevel();
-          -- Credits counter and texts
-          local iCreditsCounter, iCreditsNext = 0, 0;
-          local strCredits1, iCredits1Y;
-          local strCredits2, iCredits2Y;
-          -- Set new credit function
-          local iCreditId;
-          local function SetCredit(iId)
-            -- Set credit
-            iCreditId = iId;
-            -- Get credit data and return if failed
-            local aData<const> = aCreditsData[iId];
-            if not aData then return end;
-            -- Set strings
-            iCreditsNext = iCreditsNext + 120;
-            strCredits1 = aData[1];
-            strCredits2 = aData[2];
-            -- Now we need to measure the height of all three strings so we
-            -- can place the credits in the exact vertical centre of the screen
-            local iCredits1H = fontLittle:PrintWS(320, 0, strCredits1);
-            local iCredits2H = fontLarge:PrintWS(320, 0, strCredits2)/2;
-            iCredits1Y = 120 - iCredits2H - 4 - iCredits1H;
-            iCredits2Y = 120 - iCredits2H;
-            -- Success
-            return true;
-          end
-          SetCredit(1);
-          -- Render credits proc
-          local function RenderCredits()
-            -- Set text colour
-            fontLittle:SetCRGB(1, 0.7, 1);
-            fontLarge:SetCRGB(1, 1, 1);
-            -- Draw background
-            texTitle:BlitSLT(tileCredits, -96, 0);
-            -- Display text compared to amount of time passed
-            fontLittle:PrintC(160, iCredits1Y, strCredits1);
-            fontLarge:PrintC(160, iCredits2Y, strCredits2);
-          end
-          -- When credits have faded in?
-          local function OnRenderCreditsFadeIn()
-            -- Credits main logic
-            local function CreditsLogic()
-              -- Increment counter and if ignore if counter not exceeded
-              iCreditsCounter = iCreditsCounter + 1;
-              if iCreditsCounter < iCreditsNext then return end;
-              -- Set next credit and return if succeeded
-              if SetCredit(iCreditId + 1) then return end;
-              -- Fade out to credits and load demo level
-              Fade(0, 1, 0.04, RenderCredits, LoadDemoLevel);
-            end
-            -- Get code for ESCAPE so user can leave the screen
-            local aKeys<const> = Input.KeyCodes;
-            local iKeyEscape<const> = aKeys.ESCAPE
-            -- Credits input logic
-            local function CreditsInput()
-              -- Ignore if no button or escape not pressed
-              if IsButtonReleased(0) and
-                 IsKeyReleased(iKeyEscape) then return end;
-              -- Fade out to credits and load demo level
-              Fade(0, 1, 0.04, RenderCredits, LoadDemoLevel);
-            end
-            -- Set credits callback
-            SetCallbacks(CreditsLogic, RenderCredits, CreditsInput);
-          end
-          -- Fade in
-          Fade(1, 0, 0.04, RenderCredits, OnRenderCreditsFadeIn);
+          -- Init title screen credits without music
+          InitTitleCredits(texTitle);
         end
         -- Fade out to credits
         Fade(0, 1, 0.04, RenderLeaveProc, OnDemoLevelFadeOut);
@@ -322,34 +254,43 @@ local function InitTitle()
       -- If zero or one zone completed then allow showing the first two zones
       if #aZones <= 1 then aZones[1], aZones[2] = 1, 2 end;
       -- Load AI vs AI and use random zone
-      LoadLevel(aZones[random(#aZones)], strMusic, aObjectTypes.DIGRANDOM,
+      LoadLevel(aZones[random(#aZones)], strTitle, aObjectTypes.DIGRANDOM,
         true, aObjectTypes.DIGRANDOM, true, DemoLevelProc, DemoLevelRender,
         DemoLevelInput);
     end
     -- Load demonstration level with title music
-    LoadDemoLevel("title");
+    if bMusic then LoadDemoLevel("title") else LoadDemoLevel() end;
   end
+  -- When title resources have loaded?
+  local function OnTitleLoaded(aResources)
+    -- Load texture and credit tiles
+    texTitle = aResources[1].H;
+    -- Resources are ready
+    OnTitleReady(true);
+  end
+  -- If we were sent the title texture we don't need to load anything
+  if texTitle then return OnTitleReady(false) end;
   -- Load title screen resource
   LoadResources("Title Screen", aAssets, OnTitleLoaded);
 end
+-- Script ready function --------------------------------------------------- --
+local function OnReady(GetAPI)
+  -- Get imports
+  aCursorIdData, aLevelsData, aObjects, aObjectTypes, aSfxData, DeInitLevel,
+    Fade, fontTiny, GameProc, GetActivePlayer, GetGameTicks, GetOpponentPlayer,
+    InitLobby, InitNewGame, InitTitleCredits, IsButtonReleased,
+    IsMouseInBounds, LoadLevel, LoadResources, LoadSaveData, PlayStaticSound,
+    ProcessViewPort, RegisterFBUCallback, RenderObjects, RenderTerrain,
+    SelectObject, SetCallbacks, SetCursor =
+      GetAPI("aCursorIdData", "aLevelsData", "aObjects", "aObjectTypes",
+        "aSfxData", "DeInitLevel", "Fade", "fontTiny", "GameProc",
+        "GetActivePlayer", "GetGameTicks", "GetOpponentPlayer", "InitLobby",
+        "InitNewGame", "InitTitleCredits", "IsButtonReleased",
+        "IsMouseInBounds", "LoadLevel", "LoadResources", "LoadSaveData",
+        "PlayStaticSound", "ProcessViewPort", "RegisterFBUCallback",
+        "RenderObjects", "RenderTerrain", "SelectObject", "SetCallbacks",
+        "SetCursor");
+end
 -- Return imports and exports ---------------------------------------------- --
-return { A = { InitTitle = InitTitle }, F = function(GetAPI)
-  -- Imports --------------------------------------------------------------- --
-  LoadResources, SetCallbacks, SetCursor, aLevelsData, aObjectTypes, LoadLevel,
-  IsMouseInBounds, aCursorIdData, aSfxData, IsButtonReleased, PlayStaticSound,
-  Fade, aCreditsData, IsKeyReleased, InitLobby, DeInitLevel, InitNewGame,
-  fontTiny, fontLittle, fontLarge, GetGameTicks, RenderTerrain, RenderObjects,
-  SelectObject, GameProc, RegisterFBUCallback, aObjects, GetActivePlayer,
-  GetOpponentPlayer, LoadSaveData, ProcessViewPort
-  = -- --------------------------------------------------------------------- --
-  GetAPI("LoadResources", "SetCallbacks", "SetCursor", "aLevelsData",
-    "aObjectTypes", "LoadLevel", "IsMouseInBounds", "aCursorIdData", "aSfxData",
-    "IsButtonReleased", "PlayStaticSound", "Fade", "aCreditsData",
-    "IsKeyReleased", "InitLobby", "DeInitLevel", "InitNewGame", "fontTiny",
-    "fontLittle", "fontLarge", "GetGameTicks", "RenderTerrain",
-    "RenderObjects", "SelectObject", "GameProc", "RegisterFBUCallback",
-    "aObjects", "GetActivePlayer", "GetOpponentPlayer", "LoadSaveData",
-    "ProcessViewPort");
-  -- ----------------------------------------------------------------------- --
-end };
+return { A = { InitTitle = InitTitle }, F = OnReady };
 -- End-of-File ============================================================= --

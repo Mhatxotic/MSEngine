@@ -1,7 +1,7 @@
 <!DOCTYPE html>
-<!-- Reference for the Mhatxotic Engine API version 24.11.23.55 -->
-<!-- Automatically built at Sat Nov 23 23:47:08 2024 +0000 -->
-<!-- With Mhatxotic Engine Project Management Utility version 24.11.23.55 -->
+<!-- Reference for the Mhatxotic Engine API version 24.11.24.44 -->
+<!-- Automatically built at Sun Nov 24 23:21:08 2024 +0000 -->
+<!-- With Mhatxotic Engine Project Management Utility version 24.11.24.44 -->
 <!-- Copyright (c) 2006-2024 Mhatxotic Design, All Rights Reserved Worldwide -->
 <HTML lang="en-GB">
 <HEAD>
@@ -11,18 +11,18 @@
 	<META name="apple-mobile-web-app-title" content="Mhatxotic Engine API">
 	<META name="author" content="Mhatxotic Design">
 	<META name="copyright" content="Copyright © 2006-2024 Mhatxotic Design, All Rights Reserved">
-	<META name="description" content="Reference for the Mhatxotic Engine API version 24.11.23.55">
+	<META name="description" content="Reference for the Mhatxotic Engine API version 24.11.24.44">
 	<META name="format-detection" content="telephone=no">
-	<META name="generator" content="Mhatxotic Engine Project Management Utility version 24.11.23.55">
+	<META name="generator" content="Mhatxotic Engine Project Management Utility version 24.11.24.44">
 	<META name="google-site-verification" content="BvWxrqmgaIxqe_W8AW3OGK0fdCI_JfB_-gcOOxCF9_4">
 	<META name="googlebot" content="index,follow">
-	<META name="og:description" content="Reference for the Mhatxotic Engine API version 24.11.23.55">
+	<META name="og:description" content="Reference for the Mhatxotic Engine API version 24.11.24.44">
 	<META name="og:image" content="https://repository-images.githubusercontent.com/611875607/ee7aa468-9797-4763-9a2d-ea3d782ef413">
-	<META name="og:title" content="Mhatxotic Engine 24.11.23.55 API reference">
+	<META name="og:title" content="Mhatxotic Engine 24.11.24.44 API reference">
 	<META name="og:url" content="https://mhatxotic.github.io/Engine/">
 	<META name="robots" content="index,follow">
 	<META name="viewport" content="width=device-width, initial-scale=1">
-	<TITLE>Mhatxotic Engine 24.11.23.55 API reference</TITLE>
+	<TITLE>Mhatxotic Engine 24.11.24.44 API reference</TITLE>
 	<STYLE media="screen">
 	* { margin:0; padding:0 }
 	BODY { background-color:#111; border:0; font-family:sans-serif; overflow-x:hidden; text-shadow: 1px 1px #111 }
@@ -60,7 +60,7 @@
 	</STYLE>
 </HEAD>
 <BODY id="idx.top">
-	<H1>Mhatxotic Engine 24.11.23.55 API reference</H1>
+	<H1>Mhatxotic Engine 24.11.24.44 API reference</H1>
 	<NOSCRIPT>
 		<H2>JavaScript is required to show and hide elements.</H2>
 	</NOSCRIPT>
@@ -1832,7 +1832,6 @@
 									<LI><A href="#cv.inp_initevents">inp_initevents</A></LI>
 									<LI><A href="#cv.inp_joydeffdz">inp_joydeffdz</A></LI>
 									<LI><A href="#cv.inp_joydefrdz">inp_joydefrdz</A></LI>
-									<LI><A href="#cv.inp_joystick">inp_joystick</A></LI>
 									<LI><A href="#cv.inp_rawmouse">inp_rawmouse</A></LI>
 									<LI><A href="#cv.inp_stickykey">inp_stickykey</A></LI>
 									<LI><A href="#cv.inp_stickymouse">inp_stickymouse</A></LI>
@@ -1844,6 +1843,7 @@
 									<LI><A href="#cv.lua_cache">lua_cache</A></LI>
 									<LI><A href="#cv.lua_gcpause">lua_gcpause</A></LI>
 									<LI><A href="#cv.lua_gcstepmul">lua_gcstepmul</A></LI>
+									<LI><A href="#cv.lua_lastver">lua_lastver</A></LI>
 									<LI><A href="#cv.lua_randomseed">lua_randomseed</A></LI>
 									<LI><A href="#cv.lua_script">lua_script</A></LI>
 									<LI><A href="#cv.lua_sizestack">lua_sizestack</A></LI>
@@ -5844,7 +5844,7 @@
 		<H4>Syntax:-</H4>
 		<PRE>Input.RefreshJoysticks()</PRE>
 		<H4>Synopsis:-</H4>
-		<PRE>Request refresh of joysticks&#x2e; Use this if you needed to delay setting the OnJoy&#x28;&#x29; event callback and therefore you need to request the list again&#x2e;<BR>The function will only work if &#x27;inp_joystick&#x27; is not 0&#x2e;<BR></PRE>
+		<PRE>Request refresh of joysticks&#x2e; Use this if you needed to delay setting the OnJoy&#x28;&#x29; event callback and therefore you need to request the list again&#x2e;<BR></PRE>
 		<H4><A href="#idx:Input">&#x25B2; Return to table of contents</A></H4>
 	</DIV>
 	<DIV id="Input.SetCursor" style="display:none">
@@ -11607,11 +11607,6 @@
 		<PRE>Specifies the gamepad reverse deadzone&#x2e;<BR></PRE>
 		<H4><A href="#idx.cv">&#x25B2; Return to table of contents</A></H4>
 	</DIV>
-	<DIV id="cv.inp_joystick" style="display:none">
-		<H3>inp_joystick</H3>
-		<PRE>Specifies how to deal with detecting connected gamepads&#x2e;<BR>[&#x2d;1] JOY_DETECT  &#x3d; Detect at start&#x2e; Disable if no gamepads connected&#x2e;<BR>[0]  JOY_DISABLE &#x3d; Disable gamepads completely&#x2e;<BR>[1]  JOY_ENABLE  &#x3d; Enable gamepads and always try to detect new gamepads&#x2e;<BR></PRE>
-		<H4><A href="#idx.cv">&#x25B2; Return to table of contents</A></H4>
-	</DIV>
 	<DIV id="cv.inp_rawmouse" style="display:none">
 		<H3>inp_rawmouse</H3>
 		<PRE>Enables raw mouse input if available&#x2e;<BR></PRE>
@@ -11665,6 +11660,11 @@
 	<DIV id="cv.lua_gcstepmul" style="display:none">
 		<H3>lua_gcstepmul</H3>
 		<PRE>Overrides Lua&#x27;s internal LUA_GCSTEP value with this&#x2e;<BR></PRE>
+		<H4><A href="#idx.cv">&#x25B2; Return to table of contents</A></H4>
+	</DIV>
+	<DIV id="cv.lua_lastver" style="display:none">
+		<H3>lua_lastver</H3>
+		<PRE>Specifies the last known version of LUA used with the engine&#x2e; If the current LUA version is different to this then the code cache will be completely deleted so all code is recompiled&#x2e;<BR></PRE>
 		<H4><A href="#idx.cv">&#x25B2; Return to table of contents</A></H4>
 	</DIV>
 	<DIV id="cv.lua_randomseed" style="display:none">
@@ -12238,6 +12238,6 @@
 		<H4><A href="#idx.cv">&#x25B2; Return to table of contents</A></H4>
 	</DIV>
 	<ADDRESS>Copyright &copy; 2024 Mhatxotic Design, All Rights Reserved.<BR>
-	This document was generated at Sat Nov 23 23:47:08 2024 +0000</ADDRESS>
+	This document was generated at Sun Nov 24 23:21:08 2024 +0000</ADDRESS>
 </BODY>
 </HTML>

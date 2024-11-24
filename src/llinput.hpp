@@ -243,9 +243,8 @@ LLFUNC(OnKey, 0, cLua->SetLuaRef(lS, cInput->lfOnKey))
 // $ Input.RefreshJoysticks
 // ? Request refresh of joysticks. Use this if you needed to delay setting the
 // ? OnJoy() event callback and therefore you need to request the list again.
-// ? The function will only work if 'inp_joystick' is not 0.
 /* ------------------------------------------------------------------------- */
-LLFUNC(RefreshJoysticks, 0, cInput->BeginDetection());
+LLFUNC(RefreshJoysticks, 0, cInput->AutoDetectJoystick());
 /* ========================================================================= */
 // $ Input.GetKeyName
 // > Value:integer=The id of the key

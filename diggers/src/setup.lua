@@ -10,37 +10,31 @@
 -- (c) Mhatxotic Design, 2024          (c) Millennium Interactive Ltd., 1994 --
 -- ========================================================================= --
 -- Core function aliases --------------------------------------------------- --
-local tonumber<const>, tostring<const>, pairs<const>, remove<const>,
-  format<const>, floor<const>, cos<const>, sin<const>, min<const>, max<const>,
-  rep<const>, len<const>, ipairs<const> =
-    tonumber, tostring, pairs, table.remove, string.format, math.floor,
-    math.cos, math.sin, math.min, math.max, string.rep, utf8.len, ipairs;
+local cos<const>, floor<const>, format<const>, ipairs<const>, len<const>,
+  max<const>, min<const>, pairs<const>, remove<const>, rep<const>, sin<const>,
+  tonumber<const>, tostring<const> =
+    math.cos, math.floor, string.format, ipairs, utf8.len, math.max, math.min,
+    pairs, table.remove, string.rep, math.sin, tonumber, tostring;
 -- M-Engine function aliases ----------------------------------------------- --
-local CoreMonitor<const>, CoreMonitorData<const>, CoreMonitors<const>,
-  CoreVidModeData<const>, CoreVidModes<const>, CoreTime<const>,
-  CoreCPUUsage<const>, CoreRAM<const>, CoreGPUFPS<const>, CoreEngine<const>,
-  DisplayGetSize<const>, UtilGetRatio<const>, UtilClampInt<const>,
-  UtilClamp<const>, UtilExplode<const>, AudioGetNumPBDs<const>,
-  AudioGetPBDName<const>, AudioReset<const>, VariableGetInt<const>,
-  VariableSetInt<const>, DisplayVReset<const>, DisplayReset<const>,
-  CoreLibrary<const>, CoreLicense<const>, VariableResetInt<const>,
-  UtilWordWrap<const>, DisplayFSType<const> =
-    Display.Monitor, Display.MonitorData, Display.Monitors,
-    Display.VidModeData, Display.VidModes, Core.Time, Core.CPUUsage, Core.RAM,
-    Display.GPUFPS, Core.Engine, Display.GetSize, Util.GetRatio, Util.ClampInt,
-    Util.Clamp, Util.Explode, Audio.GetNumPBDevices, Audio.GetPBDeviceName,
-    Audio.Reset, Variable.GetInt, Variable.SetInt, Display.VReset,
-    Display.Reset, Core.Library, Core.License, Variable.ResetInt,
-    Util.WordWrap, Display.FSType;
+local AudioGetNumPBDs<const>, AudioGetPBDName<const>, AudioReset<const>,
+  CoreCPUUsage<const>, CoreEngine<const>, CoreLibrary<const>,
+  CoreLicense<const>, CoreRAM<const>, CoreTime<const>, DisplayFSType<const>,
+  DisplayGetSize<const>, DisplayGPUFPS<const>, DisplayMonitor<const>,
+  DisplayMonitorData<const>, DisplayMonitors<const>, DisplayReset<const>,
+  DisplayVidModeData<const>, DisplayVidModes<const>, DisplayVReset<const>,
+  UtilClamp<const>, UtilClampInt<const>, UtilExplode<const>,
+  UtilGetRatio<const>, UtilWordWrap<const>, VariableGetInt<const>,
+  VariableResetInt<const>, VariableSetInt<const> =
+    Audio.GetNumPBDevices, Audio.GetPBDeviceName, Audio.Reset, Core.CPUUsage,
+    Core.Engine, Core.Library, Core.License, Core.RAM, Core.Time,
+    Display.FSType, Display.GetSize, Display.GPUFPS, Display.Monitor,
+    Display.MonitorData, Display.Monitors, Display.Reset, Display.VidModeData,
+    Display.VidModes, Display.VReset, Util.Clamp, Util.ClampInt, Util.Explode,
+    Util.GetRatio, Util.WordWrap, Variable.GetInt, Variable.ResetInt,
+    Variable.SetInt;
 -- Constants --------------------------------------------------------------- --
 local iCredits<const> = Core.Libraries.MAX;
 local aCVars<const> = Variable.Internal;
-local aKeys<const> = Input.KeyCodes;
-local iKeyEscape<const>, iKeyPageUp<const>, iKeyPageDown<const>,
-  iKeyHome<const>, iKeyEnd<const>, iKeyUp<const>, iKeyDown<const>
-  = -- --------------------------------------------------------------------- --
-  aKeys.ESCAPE, aKeys.PAGE_UP, aKeys.PAGE_DOWN, aKeys.HOME, aKeys.END,
-  aKeys.UP, aKeys.DOWN;
 local iNativeMode<const> = Display.FSTypes.NATIVE;
 -- Read and prepare engine version information ----------------------------- --
 local sAppTitle, sAppVendor, iAppMajor<const>, iAppMinor<const>,
@@ -68,13 +62,13 @@ local iCVvidvsync<const>, iCVappdelay<const>, iCVtexfilter<const>,
       aCVars.vid_monitor, aCVars.win_width, aCVars.win_height, aCVars.vid_fs,
       aCVars.vid_fsmode, aCVars.aud_interface;
 -- Diggers function and data aliases --------------------------------------- --
-local GetCallbacks, GetCursor, GetMouseY, GetMusic, InitSetup, IsButtonHeld,
-  IsButtonPressed, IsFading, IsKeyPressed, IsKeyRepeating, IsMouseInBounds,
-  IsMouseYGreaterEqualThan, IsMouseYLessThan, IsScrollingDown, IsScrollingLeft,
-  IsScrollingRight, IsScrollingUp, LoadResources, PlayMusic, PlayStaticSound,
-  RegisterFBUCallback, RenderFade, RenderShadow, SetCallbacks, SetCursor,
-  StopMusic, aButtonData, aCursorIdData, aSfxData, fontLarge, fontLittle,
-  fontTiny, texSpr;
+local aCursorIdData, aSetupButtonData, aSetupOptionData, aSfxData, fontLarge,
+  fontLittle, fontTiny, GetCallbacks, GetCursor, GetKeyBank, GetMouseY,
+  GetMusic, InitSetup, IsButtonHeld, IsButtonPressed, IsFading,
+  IsMouseInBounds, IsMouseYGreaterEqualThan, IsMouseYLessThan, IsScrollingDown,
+  IsScrollingLeft, IsScrollingRight, IsScrollingUp, LoadResources, PlayMusic,
+  PlayStaticSound, RegisterFBUCallback, RegisterKeys, RenderFade, RenderShadow,
+  SetCallbacks, SetCursor, SetKeys, StopMusic, texSpr;
 -- Assets required --------------------------------------------------------- --
 local aAssets<const> = { { T = 7, F = "setup", P = { } } };
 -- Frame-limiter types ----------------------------------------------------- --
@@ -105,10 +99,10 @@ local aWindowSizes<const> = {          -- Keep to arbitrary aspect ratios
   { 960, 540}, --[[ (16:9 ) qHD     --]] { 960, 720}, --[[ ( 4:3 ) 0.69M3  --]]
   {1024, 576}, --[[ (16:9 ) 0.59M9  --]] {1280, 720}, --[[ (16:9 ) WXGA    --]]
   {1280, 800}, --[[ (16:10) WXGA    --]] {1280, 960}, --[[ ( 4:3 ) SXGA-   --]]
-  {1400, 900}, --[[ (16:9)  WSXGA   --]] {1600,1200}, --[[ (16:9 ) HD+     --]]
+  {1400, 900}, --[[ (16:9 ) WSXGA   --]] {1600,1200}, --[[ (16:9 ) HD+     --]]
   {1680,1050}, --[[ (16:10) WSXGA+  --]] {1920,1080}, --[[ (16:9 ) FHD     --]]
   {1920,1200}, --[[ (16:10) WUXGA   --]] {2048,1280}, --[[ (16:10) 2.62MA  --]]
-  {2304,1440}, --[[ (16:10) 3.32MA  --]] {2560,1440}, --[[ (16:9)  WQHD    --]]
+  {2304,1440}, --[[ (16:10) 3.32MA  --]] {2560,1440}, --[[ (16:9 ) WQHD    --]]
   {2560,1600}  --[[ (16:10) WQXGA   --]]
 };
 -- Other ----------------------------------------------------------------------
@@ -127,241 +121,34 @@ local iFullScreenMode, iFullScreenModeOriginal;
 local iFullScreenStateOriginal, iAudioDeviceIdOriginal;
 local iMonitorIdOriginal;
 local iCursorId, fcbTick, fcbRender, fcbInput;
+local iKeyBankSetup, iKeyBankReadme, iKeyBankBind, iKeyBankLast;
 local aReadmeData, aReadmeVisibleLines, aReadmeColourData = { }, { }, { };
 local iReadmeIndexBegin, iReadmeIndexEnd, iReadmeRows, iReadmeCols,
   iReadmeSpacing, iReadmePaddingX, iReadmePaddingY =
    1, 1, 28, 77, 6, 8, 27;
 local iReadmeColsM1<const> = iReadmeCols - 1;
-local nRAMUsePercentage, nGPUFramesPerSecond, aOptionData;
+local nRAMUsePercentage, nGPUFramesPerSecond;
 local iCatSize, iCatBottom, nTime = 15, nil, nil;
 local sStatusLineSave, nStatusLineSize, nStatusLinePos, nTipId;
-local aCreditLines, lastMusic, nCPUUsageSystem, nCPUUsageProcess;
+local lastMusic, nCPUUsageSystem, nCPUUsageProcess;
 local iStageW, iStageH, iStageL, iStageT, iStageR, iStageB;
+local aCreditLines<const> = { };
 -- ------------------------------------------------------------------------- --
 local function GetMonitorIdOrPrimary()
   -- If the monitor id is set to the primary monitor then we need to return
   -- the actual id of the primary monitor instead
-  if iMonitorId == -1 then return CoreMonitor() end;
+  if iMonitorId == -1 then return DisplayMonitor() end;
   -- Return selected monitor id
   return iMonitorId;
 end
 -- ------------------------------------------------------------------------- --
 local function UpdateLabels()
   -- This will update the text on all the labels based on updated values
-  for iI = 1, #aOptionData do
-    local aData<const> = aOptionData[iI];
+  for iI = 1, #aSetupOptionData do
+    local aData<const> = aSetupOptionData[iI];
     aData[2] = aData[3]();
   end
 end
--- ------------------------------------------------------------------------- --
-local function MonitorUpdate()
-  if iMonitorId == -1 then return "Primary Monitor" end;
-  local sMsg<const> = CoreMonitorData(iMonitorId);
-  if #sMsg > 34 then return sMsg:sub(0,30).."..." end;
-  return sMsg;
-end
-local function MonitorDown()
-  if iMonitorId == -1 then return end;
-  iMonitorId = iMonitorId - 1;
-  UpdateLabels()
-end
-local function MonitorUp()
-  if iMonitorId == CoreMonitors()-1 then return end;
-  iMonitorId = iMonitorId + 1;
-  UpdateLabels()
-end
--- ------------------------------------------------------------------------- --
-local function FSStateUpdate()
-  if DisplayFSType() == iNativeMode then return aWindowLabels[4] end;
-  return aWindowLabels[iFullScreenState + 1];
-end
-local function FSStateDown()
-  if iFullScreenState <= 0 or
-     DisplayFSType() == iNativeMode then return end;
-  iFullScreenState = iFullScreenState - 1;
-  if iFullScreenState < 2 then iFullScreenMode = -2 end;
-  UpdateLabels()
-end
-local function FSStateUp()
-  if iFullScreenState >= #aWindowLabels-2 or
-     DisplayFSType() == iNativeMode then return end;
-  iFullScreenState = iFullScreenState + 1;
-  if iFullScreenState == 2 then iFullScreenMode = -1 end;
-  UpdateLabels()
-end
--- ------------------------------------------------------------------------- --
-local function FSResUpdate()
-  if iFullScreenMode == -2 or
-     DisplayFSType() == iNativeMode then return "Disabled" end;
-  if iFullScreenMode == -1 then return "Automatic" end;
-  -- Which one
-  local iWidth<const>, iHeight<const>, iBits<const>, nRefresh<const> =
-    CoreVidModeData(GetMonitorIdOrPrimary(), iFullScreenMode);
-  -- Return data
-  return iWidth.."x"..iHeight.."x"..iBits.." "..nRefresh.."hz ("..
-    UtilGetRatio(iWidth, iHeight)..")";
-end
-local function FSResDown()
-  if iFullScreenMode <= -1 or
-     DisplayFSType() == iNativeMode then
-    return end;
-  iFullScreenMode = iFullScreenMode - 1;
-end
-local function FSResUp()
-  if iFullScreenMode <= -2 or
-     DisplayFSType() == iNativeMode or
-     iFullScreenMode >= CoreVidModes(GetMonitorIdOrPrimary())-1 then
-    return end;
-  iFullScreenMode = iFullScreenMode + 1;
-end
--- ------------------------------------------------------------------------- --
-local function WSizeUpdate()
-  -- Ignore if in full-screen
-  if iFullScreenState ~= 0 or
-     DisplayFSType() == iNativeMode then
-    return "Disabled" end;
-  -- Custom resolution? Return custom resolution label with size
-  if iWindowId <= 1 then
-    local iWinX<const>, iWinY<const> = DisplayGetSize();
-    return aCustomLabels[iWindowId + 1].." "..
-      iWinX.."x"..iWinY.." ("..UtilGetRatio(iWinX, iWinY)..")";
-  end
-  -- Which one
-  local aData<const> = aWindowSizes[iWindowId];
-  if not aData then return "Unknown ("..iWindowId..")" end;
-  -- Return data
-  return aData[1].."x"..aData[2].." ("..UtilGetRatio(aData[1], aData[2])..")";
-end
-local function WSizeDown()
-  if iFullScreenState ~= 0 or
-     DisplayFSType() == iNativeMode then return end;
-  iWindowId = iWindowId - 1;
-  if iWindowId < 1 then iWindowId = 1 end;
-end
-local function WSizeUp()
-  if iFullScreenState ~= 0 or
-     DisplayFSType() == iNativeMode then return end;
-  iWindowId = iWindowId + 1;
-  if iWindowId > #aWindowSizes then iWindowId = #aWindowSizes end;
-end
--- ------------------------------------------------------------------------- --
-local function GetVarVidVsync() return tonumber(VariableGetInt(iCVvidvsync)) end;
--- ------------------------------------------------------------------------- --
-local function GetVarAppDelay() return tonumber(VariableGetInt(iCVappdelay)) end;
--- ------------------------------------------------------------------------- --
-local function LimiterGet()
-  -- Get VSync value, thread delay and kernel tick rate
-  local iFrameLimiter = 1 + GetVarVidVsync();
-  -- Check for delay and if set? Set software category too
-  if GetVarAppDelay() > 0 then iFrameLimiter = iFrameLimiter + 4 end;
-  -- Return value
-  return iFrameLimiter;
-end
--- ------------------------------------------------------------------------- --
-local function LimiterUpdate()
-  -- Get VSync value, thread delay and kernel tick rate
-  local iFrameLimiter = 1 + GetVarVidVsync();
-  -- Check for delay and if set? Set software category too
-  if GetVarAppDelay() > 0 then iFrameLimiter = iFrameLimiter + 4 end;
-  -- Set original value
-  return aFrameLimiterLabels[LimiterGet()+1];
-end
--- ------------------------------------------------------------------------- --
-local function LimiterSet(iFrameLimiter)
-  -- Set frame limiter options
-  local iVSync, iDelay;
-  if iFrameLimiter >= 4 then iVSync, iDelay = -1 + (iFrameLimiter % 4), 1;
-  else iVSync, iDelay = -1 + iFrameLimiter, 0 end;
-  VariableSetInt(iCVvidvsync, iVSync);
-  VariableSetInt(iCVappdelay, iDelay);
-end
--- ------------------------------------------------------------------------- --
-local function LimiterDown()
-  LimiterSet(UtilClampInt(LimiterGet()-1, 0, #aFrameLimiterLabels-1));
-end
--- ------------------------------------------------------------------------- --
-local function LimiterUp()
-  LimiterSet(UtilClampInt(LimiterGet()+1, 0, #aFrameLimiterLabels-1));
-end
--- ------------------------------------------------------------------------- --
-local function GetVarTexFilter()
-  return tonumber(VariableGetInt(iCVtexfilter)) end;
--- ------------------------------------------------------------------------- --
-local function SetVarTexFilter(iV) return VariableSetInt(iCVtexfilter, iV) end;
--- ------------------------------------------------------------------------- --
-local function FilterUpdate()
-  -- Point filtering if disabled
-  if GetVarTexFilter() == 0 then return "Point" end;
-  -- Anything else is bilinear
-  return "Bilinear";
-end
--- ------------------------------------------------------------------------- --
-local function FilterSwap()
-  -- Set enabled (GL_LINEAR) if was disabled
-  if GetVarTexFilter() == 0 then return SetVarTexFilter(3) end;
-  -- Set disabled (GL_NEAREST) if was enabled
-  SetVarTexFilter(0);
-end
--- ------------------------------------------------------------------------- --
-local function AudioUpdate()
-  if iAudioDeviceId == -1 then return "Default Playback Device";
-  elseif iAudioDeviceId >= AudioGetNumPBDs() then
-    return "Invalid Playback Device" end;
-  local N = AudioGetPBDName(iAudioDeviceId);
-  local L<const> = "OpenAL Soft on ";
-  if N:sub(1, #L) == L then N = N:sub(#L) end;
-  if #N > 34 then return N:sub(0,30).."..." end;
-  return N;
-end
--- ------------------------------------------------------------------------- --
-local function AudioDown()
-  if iAudioDeviceId == -1 then return end;
-  iAudioDeviceId = iAudioDeviceId - 1;
-end
--- ------------------------------------------------------------------------- --
-local function AudioUp()
-  if iAudioDeviceId == AudioGetNumPBDs()-1 then return end;
-  iAudioDeviceId = iAudioDeviceId + 1;
-end
--- ------------------------------------------------------------------------- --
-local function VPrepare(sCV) return floor(VariableGetInt(sCV) * 100).."%" end;
--- ------------------------------------------------------------------------- --
-local function VSet(sCV, iAdj)
-  VariableSetInt(sCV,
-    UtilClamp(tonumber(VariableGetInt(sCV)) + (iAdj*0.05), 0, 1));
-end
--- ------------------------------------------------------------------------- --
-local function VMasterUpdate() return VPrepare(iCVaudvol) end;
--- ------------------------------------------------------------------------- --
-local function VMasterSet(iAdj) VSet(iCVaudvol, iAdj) end;
--- ------------------------------------------------------------------------- --
-local function VMasterDown() VMasterSet(-1) end;
--- ------------------------------------------------------------------------- --
-local function VMasterUp() VMasterSet(1) end;
--- ------------------------------------------------------------------------- --
-local function VStreamUpdate() return VPrepare(iCVaudstrvol) end;
--- ------------------------------------------------------------------------- --
-local function VStreamSet(iAdj) VSet(iCVaudstrvol, iAdj) end;
--- ------------------------------------------------------------------------- --
-local function VStreamDown() VStreamSet(-1) end;
--- ------------------------------------------------------------------------- --
-local function VStreamUp() VStreamSet(1) end;
--- ------------------------------------------------------------------------- --
-local function VSampleSet(iAdj) VSet(iCVaudsamvol, iAdj) end;
--- ------------------------------------------------------------------------- --
-local function VSampleUpdate() return VPrepare(iCVaudsamvol) end;
--- ------------------------------------------------------------------------- --
-local function VSampleDown() VSampleSet(-1) end;
--- ------------------------------------------------------------------------- --
-local function VSampleUp() VSampleSet(1) end;
--- ------------------------------------------------------------------------- --
-local function VFMVUpdate() return VPrepare(iCVaudfmvvol) end;
--- ------------------------------------------------------------------------- --
-local function VFMVSet(iAdj) VSet(iCVaudfmvvol, iAdj) end;
--- ------------------------------------------------------------------------- --
-local function VFMVDown() VFMVSet(-1) end;
--- ------------------------------------------------------------------------- --
-local function VFMVUp() VFMVSet(1) end;
 -- ------------------------------------------------------------------------- --
 local function FlickerColour1()
   fontLarge:SetCRGBA(1, 1, 1, 1);
@@ -461,6 +248,8 @@ local function Finish()
   lastMusic = nil;
   -- Restore redraw callback
   RegisterFBUCallback("setup");
+  -- Restore original keys
+  SetKeys(true, iKeyBankLast);
 end
 -- ------------------------------------------------------------------------- --
 local function Refresh()
@@ -468,7 +257,7 @@ local function Refresh()
   local function RefreshMonitorSettings()
     -- Initialise monitor video modes and use primary monitor if invalid
     iMonitorId = tonumber(VariableGetInt(iCVvidmonitor));
-    if iMonitorId < -1 or iMonitorId >= CoreMonitors() then
+    if iMonitorId < -1 or iMonitorId >= DisplayMonitors() then
       iMonitorId = -1 end;
     iMonitorIdOriginal = iMonitorId;
     -- Initialise video resolution and use desktop resolution if invalid
@@ -487,7 +276,7 @@ local function Refresh()
     -- If the full-screen mode CVar is invalid then reset to 'automatic' mode
     -- where the engine will set the full-screen mode to the desktop mode.
     if iFullScreenMode < -2 or
-      iFullScreenMode >= CoreVidModes(GetMonitorIdOrPrimary()) then
+      iFullScreenMode >= DisplayVidModes(GetMonitorIdOrPrimary()) then
         iFullScreenMode = -1 end;
     -- Record the the initialised variables so we can check if they were
     -- modified when the user clicks the apply button.
@@ -561,26 +350,6 @@ local function ApplySettings()
   Refresh();
 end
 -- ------------------------------------------------------------------------- --
-local function SetDefaults()
-  -- Push defaults
-  iFullScreenState = 0;
-  iFullScreenMode = -3;
-  iMonitorId = -1;
-  iAudioDeviceId = -1;
-  iWindowId = 1;
-  -- Other options
-  VariableResetInt(iCVappdelay);
-  VariableResetInt(iCVvidvsync);
-  VariableResetInt(iCVtexfilter);
-  -- Reset volumes
-  VariableResetInt(iCVaudvol);
-  VariableResetInt(iCVaudstrvol);
-  VariableResetInt(iCVaudsamvol);
-  VariableResetInt(iCVaudfmvvol);
-  -- Set new settings
-  ApplySettings();
-end
--- ------------------------------------------------------------------------- --
 local nAlpha<const> = 1/60;
 local function ProcSysInfo()
   -- Get time
@@ -588,7 +357,7 @@ local function ProcSysInfo()
   -- Get cpu info, ram info and nGPUFramesPerSecond
   nCPUUsageProcess, nCPUUsageSystem = CoreCPUUsage();
   nRAMUsePercentage = CoreRAM();
-  nGPUFramesPerSecond = (nAlpha * CoreGPUFPS()) + (1.0 - nAlpha) *
+  nGPUFramesPerSecond = (nAlpha * DisplayGPUFPS()) + (1.0 - nAlpha) *
     (nGPUFramesPerSecond or 60);
 end
 -- ------------------------------------------------------------------------- --
@@ -665,26 +434,27 @@ local function SetReadme(Line)
 end
 -- ------------------------------------------------------------------------- --
 local function ScrollReadme(iAdj) SetReadme(iReadmeIndexBegin + iAdj) end;
+local function ScrollReadmePageUp() ScrollReadme(-29) end;
+local function ScrollReadmePageDown() ScrollReadme(29) end;
+local function ScrollReadmeUp() ScrollReadme(-1) end;
+local function ScrollReadmeDown() ScrollReadme(1) end;
+local function ScrollReadmeHome() SetReadme(1) end;
+local function ScrollReadmeEnd() SetReadme(#aReadmeData) end;
 -- ------------------------------------------------------------------------- --
 local function ProcReadmeInput()
-  -- Check and process key commands
-  if IsKeyPressed(iKeyEscape) then Finish();
-  elseif IsKeyRepeating(iKeyPageUp) or
-         IsScrollingLeft() then ScrollReadme(-29);
-  elseif IsKeyRepeating(iKeyPageDown) or
-         IsScrollingRight() then ScrollReadme(29);
-  elseif IsKeyPressed(iKeyHome) then SetReadme(1);
-  elseif IsKeyPressed(iKeyEnd) then SetReadme(0x7FFFFFFF);
-  elseif IsKeyRepeating(iKeyUp) or IsScrollingUp() then ScrollReadme(-1);
-  elseif IsKeyRepeating(iKeyDown) or IsScrollingDown() then ScrollReadme(1);
+  -- Check for mouse scroll wheel moving
+  if IsScrollingLeft() then ScrollReadmePageUp();
+  elseif IsScrollingRight() then ScrollReadmePageDown();
+  elseif IsScrollingUp() then ScrollReadmeUp();
+  elseif IsScrollingDown() then ScrollReadmeDown();
   -- Cancel button pressed? Cancel readme
   elseif IsButtonPressed(1) then InitSetup(1);
   -- Select button pressed? Scroll!
   elseif IsButtonHeld(0) then
     -- On bottom section of screen? Scroll down
-    if IsMouseYGreaterEqualThan(206) then ScrollReadme(1);
+    if IsMouseYGreaterEqualThan(206) then ScrollReadmeDown();
     -- Else scroll up if on top section of screen
-    elseif IsMouseYLessThan(32) then ScrollReadme(-1) end;
+    elseif IsMouseYLessThan(32) then ScrollReadmeUp() end;
   end
 end
 -- ------------------------------------------------------------------------- --
@@ -703,7 +473,9 @@ local function InitReadme()
   ProcReadme();
   -- Arrow cursor
   SetCursor(aCursorIdData.ARROW);
-  -- Allow input
+  -- Restore original keys
+  SetKeys(true, iKeyBankReadme);
+  -- Set readme procedures
   SetCallbacks(ProcReadme, RenderReadme, ProcReadmeInput);
 end
 -- ----------------------------------------------------------------------- --
@@ -751,21 +523,21 @@ local function RenderSetup()
     RenderFade(nButtonIntensity, 4, iY, 316, iY + iCatSize, 1022);
     texSpr:SetCRGB(1, 1, 1);
     -- Set tip
-    SetTip(iSelectedOption, aOptionData[iSelectedOption][6]);
+    SetTip(iSelectedOption, aSetupOptionData[iSelectedOption][6]);
   -- No selected option so remove tip if a button isn't selected
   end
   -- For each category
-  for I, D in pairs(aOptionData) do
+  for I, D in pairs(aSetupOptionData) do
     local nIntensity;
     if iSelectedOption == I then fontLittle:SetCRGB(1, 1, 1);
     else
-      nIntensity = 0.5 + (((I/#aOptionData) + nTime) % 0.5);
+      nIntensity = 0.5 + (((I/#aSetupOptionData) + nTime) % 0.5);
       fontLittle:SetCRGB(0, 0, nIntensity);
     end
     fontLittle:Print(8, 17+(I*iCatSize), D[1]);
     if iSelectedOption == I then fontLittle:SetCRGB(1, 1, 1);
     else
-      nIntensity = 0.5 + (((I/#aOptionData) + -nTime) % 0.5);
+      nIntensity = 0.5 + (((I/#aSetupOptionData) + -nTime) % 0.5);
       fontLittle:SetCRGB(0, nIntensity, 0);
     end
     fontLittle:PrintR(312, 17+(I*iCatSize), D[2]);
@@ -774,7 +546,7 @@ local function RenderSetup()
   iSelectedButton = 0;
   -- For each button
   texSpr:SetCRGB(0, 0, 0);
-  for N, D in pairs(aButtonData) do
+  for N, D in pairs(aSetupButtonData) do
     -- Mouse in bounds?
     if IsMouseInBounds(D[1], D[2], D[3], D[4]) then
       -- Set tip
@@ -805,7 +577,7 @@ local function LastOne(Index)
   -- Play sound
   PlayStaticSound(aSfxData.CLICK);
   -- Get data
-  local D = aOptionData[Index];
+  local D = aSetupOptionData[Index];
   -- Call last function
   D[4]();
   -- Refresh
@@ -816,7 +588,7 @@ local function NextOne(Index)
   -- Play sound
   PlayStaticSound(aSfxData.CLICK);
   -- Get data
-  local D = aOptionData[Index];
+  local D = aSetupOptionData[Index];
   -- Call next function
   D[5]();
   -- Refresh
@@ -824,11 +596,8 @@ local function NextOne(Index)
 end
 -- ------------------------------------------------------------------------- --
 local function ProcSetupInput()
-  -- If escape was pressed, return to game
-  if IsKeyPressed(iKeyEscape) or IsButtonPressed(1) then
-    return Finish() end;
   -- For each button
-  for _, aData in pairs(aButtonData) do
+  for _, aData in pairs(aSetupButtonData) do
     -- Mouse in bounds?
     if IsMouseInBounds(aData[1], aData[2], aData[3], aData[4]) then
       -- Nothing selected
@@ -898,14 +667,375 @@ local function InitConfig()
   SetTip(0, sStatusLineSave);
   -- Refresh all settings
   Refresh();
-  -- Set configuration screen
+  -- Restore original keys
+  SetKeys(true, iKeyBankSetup);
+  -- Set configuration procedures
   SetCallbacks(ProcSetup, RenderSetup, ProcSetupInput)
 end
 -- ------------------------------------------------------------------------- --
-local function InitThirdPartyCredits()
-  -- Initialise credit lines
-  aCreditLines = { };
-  -- Box function
+local function DoInitSetup(iMode)
+  -- Ignore if fading
+  if IsFading() then return end;
+  -- Get current callbacks
+  local CBProc, CBRender, CBInput = GetCallbacks();
+  -- Available modes
+  local aModes<const> = {
+    { InitConfig, RenderSetup  },
+    { InitReadme, RenderReadme },
+  };
+  -- Set and check requested mode/
+  local aMode<const> = aModes[iMode];
+  if not aMode then error("Invalid mode: "..iMode) end;
+  -- Return if function already set
+  if CBRender == aMode[2] then return end;
+  -- Save current keybank so we can restore it on exit
+  if not iKeyBankLast then iKeyBankLast = GetKeyBank() end;
+  -- Remove the mode and go through available modes
+  remove(aModes, iMode);
+  for iIndex = 1, #aModes do
+    -- Get mode data and just call init function if we're still in setup
+    local aAltMode<const> = aModes[iIndex];
+    if CBRender == aAltMode[2] then return aMode[1]() end;
+  end
+  -- Required setup assets finished loading
+  local function OnLoaded(aResource)
+    -- Save current music
+    lastMusic = GetMusic();
+    -- Play setup music
+    PlayMusic(aResource[1].H, nil, 1);
+    -- Initialise button intensity
+    nButtonIntensity, nButtonIntensityIncrement = 1, 0.01;
+    -- Backup old callbacks (Return to them later)
+    fcbTick, fcbRender, fcbInput = CBProc, CBRender, CBInput;
+    -- Backup current cursor id
+    iCursorId = GetCursor();
+    -- Get time
+    nTime = CoreTime();
+    -- Calculate bottom of categories
+    iCatBottom = 28 + (#aSetupOptionData * iCatSize);
+    -- Call the mode init function
+    aMode[1]();
+  end
+  -- Load bank texture
+  LoadResources("Setup", aAssets, OnLoaded);
+  -- On frame buffer refresh callback
+  local function OnRedraw(...)
+    -- Update stage bounds
+    iStageW, iStageH, iStageL, iStageT, iStageR, iStageB = ...;
+    -- Refresh settings
+    Refresh();
+  end
+  -- Register frame buffer update
+  RegisterFBUCallback("setup", OnRedraw);
+end
+InitSetup = DoInitSetup;
+-- Script has been initialised --------------------------------------------- --
+local function OnReady(GetAPI)
+  -- Grab import functions and data
+  aCursorIdData, aSetupButtonData, aSetupOptionData, aSfxData, fontLarge,
+    fontLittle, fontTiny, GetCallbacks, GetCursor, GetKeyBank, GetMouseY,
+    GetMusic, IsButtonHeld, IsButtonPressed, IsFading, IsMouseInBounds,
+    IsMouseYGreaterEqualThan, IsMouseYLessThan, IsScrollingDown,
+    IsScrollingLeft, IsScrollingRight, IsScrollingUp, LoadResources, PlayMusic,
+    PlayStaticSound, RegisterFBUCallback, RegisterKeys, RenderFade,
+    RenderShadow, SetCallbacks, SetCursor, SetKeys, StopMusic, texSpr =
+      GetAPI("aCursorIdData", "aSetupButtonData", "aSetupOptionData",
+        "aSfxData", "fontLarge", "fontLittle", "fontTiny", "GetCallbacks",
+        "GetCursor", "GetKeyBank", "GetMouseY", "GetMusic", "IsButtonHeld",
+        "IsButtonPressed", "IsFading", "IsMouseInBounds",
+        "IsMouseYGreaterEqualThan", "IsMouseYLessThan", "IsScrollingDown",
+        "IsScrollingLeft", "IsScrollingRight", "IsScrollingUp",
+        "LoadResources", "PlayMusic", "PlayStaticSound", "RegisterFBUCallback",
+        "RegisterKeys", "RenderFade", "RenderShadow", "SetCallbacks",
+        "SetCursor", "SetKeys", "StopMusic", "texSpr");
+  -- Callback to set all settings to default
+  local function SetDefaults()
+    -- Push defaults
+    iFullScreenState = 0;
+    iFullScreenMode = -3;
+    iMonitorId = -1;
+    iAudioDeviceId = -1;
+    iWindowId = 1;
+    -- Other options
+    VariableResetInt(iCVappdelay);
+    VariableResetInt(iCVvidvsync);
+    VariableResetInt(iCVtexfilter);
+    -- Reset volumes
+    VariableResetInt(iCVaudvol);
+    VariableResetInt(iCVaudstrvol);
+    VariableResetInt(iCVaudsamvol);
+    VariableResetInt(iCVaudfmvvol);
+    -- Set new settings
+    ApplySettings();
+  end
+  -- Apply button data
+  local aButtons<const> = { { "APPLY", ApplySettings },
+                            { "DONE",  Finish },
+                            { "RESET", SetDefaults },
+                            { "ABOUT", InitReadme },
+                          };
+  -- Start and end vertical position
+  local iY1<const>, iY2<const> = 193, 212;
+  -- Start drawing buttons from the left and the size of each button. We set
+  -- the shader to round off any sub-pixelling so fractions are handled safely.
+  local nX, nSize<const> = 4, 312 / #aButtons;
+  -- Text position
+  local nSizeD2<const>, iYText<const> = nSize / 2, iY1 + 6;
+  -- For each button
+  for iIndex = 1, #aButtons do
+    -- Get the button data
+    local aCb<const> = aButtons[iIndex];
+    local aButton<const> = aSetupButtonData[aCb[1]];
+    -- Set button co-ordinates
+    aButton[1], aButton[2], aButton[3], aButton[4] = nX, iY1, nX + nSize, iY2;
+    -- Click function
+    aButton[6] = aCb[2];
+    -- Text position
+    aButton[8], aButton[9] = nX + nSizeD2, iYText;
+    -- Next button position
+    nX = nX + nSize;
+  end;
+  -- Option picker callbacks : Monitor choice callbacks
+  local function MonitorUpdate()
+    if iMonitorId == -1 then return "Primary Monitor" end;
+    local sMsg<const> = DisplayMonitorData(iMonitorId);
+    if #sMsg > 34 then return sMsg:sub(0,30).."..." end;
+    return sMsg;
+  end
+  local function MonitorDown()
+    if iMonitorId == -1 then return end;
+    iMonitorId = iMonitorId - 1;
+    UpdateLabels()
+  end
+  local function MonitorUp()
+    if iMonitorId == DisplayMonitors()-1 then return end;
+    iMonitorId = iMonitorId + 1;
+    UpdateLabels()
+  end
+  -- Full-screen state callbacks
+  local function FSStateUpdate()
+    if DisplayFSType() == iNativeMode then return aWindowLabels[4] end;
+    return aWindowLabels[iFullScreenState + 1];
+  end
+  local function FSStateDown()
+    if iFullScreenState <= 0 or
+       DisplayFSType() == iNativeMode then return end;
+    iFullScreenState = iFullScreenState - 1;
+    if iFullScreenState < 2 then iFullScreenMode = -2 end;
+    UpdateLabels()
+  end
+  local function FSStateUp()
+    if iFullScreenState >= #aWindowLabels-2 or
+       DisplayFSType() == iNativeMode then return end;
+    iFullScreenState = iFullScreenState + 1;
+    if iFullScreenState == 2 then iFullScreenMode = -1 end;
+    UpdateLabels()
+  end
+  -- Resolution callbacks
+  local function FSResUpdate()
+    if iFullScreenMode == -2 or
+       DisplayFSType() == iNativeMode then return "Disabled" end;
+    if iFullScreenMode == -1 then return "Automatic" end;
+    -- Which one
+    local iWidth<const>, iHeight<const>, iBits<const>, nRefresh<const> =
+      DisplayVidModeData(GetMonitorIdOrPrimary(), iFullScreenMode);
+    -- Return data
+    return iWidth.."x"..iHeight.."x"..iBits.." "..nRefresh.."hz ("..
+      UtilGetRatio(iWidth, iHeight)..")";
+  end
+  local function FSResDown()
+    if iFullScreenMode <= -1 or
+       DisplayFSType() == iNativeMode then
+      return end;
+    iFullScreenMode = iFullScreenMode - 1;
+  end
+  local function FSResUp()
+    if iFullScreenMode <= -2 or
+       DisplayFSType() == iNativeMode or
+       iFullScreenMode >= DisplayVidModes(GetMonitorIdOrPrimary())-1 then
+      return end;
+    iFullScreenMode = iFullScreenMode + 1;
+  end
+  -- Window size callbacks
+  local function WSizeUpdate()
+    -- Ignore if in full-screen
+    if iFullScreenState ~= 0 or
+       DisplayFSType() == iNativeMode then
+      return "Disabled" end;
+    -- Custom resolution? Return custom resolution label with size
+    if iWindowId <= 1 then
+      local iWinX<const>, iWinY<const> = DisplayGetSize();
+      return aCustomLabels[iWindowId + 1].." "..
+        iWinX.."x"..iWinY.." ("..UtilGetRatio(iWinX, iWinY)..")";
+    end
+    -- Which one
+    local aData<const> = aWindowSizes[iWindowId];
+    if not aData then return "Unknown ("..iWindowId..")" end;
+    -- Return data
+    return aData[1].."x"..aData[2]..
+      " ("..UtilGetRatio(aData[1], aData[2])..")";
+  end
+  local function WSizeDown()
+    if iFullScreenState ~= 0 or
+       DisplayFSType() == iNativeMode then return end;
+    iWindowId = iWindowId - 1;
+    if iWindowId < 1 then iWindowId = 1 end;
+  end
+  local function WSizeUp()
+    if iFullScreenState ~= 0 or
+       DisplayFSType() == iNativeMode then return end;
+    iWindowId = iWindowId + 1;
+    if iWindowId > #aWindowSizes then iWindowId = #aWindowSizes end;
+  end
+  -- Frame limiter choice callbacks
+  local function GetVarVidVsync()
+    return tonumber(VariableGetInt(iCVvidvsync)) end;
+  local function GetVarAppDelay()
+    return tonumber(VariableGetInt(iCVappdelay)) end;
+  local function LimiterGet()
+    -- Get VSync value, thread delay and kernel tick rate
+    local iFrameLimiter = 1 + GetVarVidVsync();
+    -- Check for delay and if set? Set software category too
+    if GetVarAppDelay() > 0 then iFrameLimiter = iFrameLimiter + 4 end;
+    -- Return value
+    return iFrameLimiter;
+  end
+  local function LimiterUpdate()
+    -- Get VSync value, thread delay and kernel tick rate
+    local iFrameLimiter = 1 + GetVarVidVsync();
+    -- Check for delay and if set? Set software category too
+    if GetVarAppDelay() > 0 then iFrameLimiter = iFrameLimiter + 4 end;
+    -- Set original value
+    return aFrameLimiterLabels[LimiterGet()+1];
+  end
+  local function LimiterSet(iFrameLimiter)
+    -- Set frame limiter options
+    local iVSync, iDelay;
+    if iFrameLimiter >= 4 then iVSync, iDelay = -1 + (iFrameLimiter % 4), 1;
+    else iVSync, iDelay = -1 + iFrameLimiter, 0 end;
+    VariableSetInt(iCVvidvsync, iVSync);
+    VariableSetInt(iCVappdelay, iDelay);
+  end
+  local function LimiterDown()
+    LimiterSet(UtilClampInt(LimiterGet()-1, 0, #aFrameLimiterLabels-1));
+  end
+  local function LimiterUp()
+    LimiterSet(UtilClampInt(LimiterGet()+1, 0, #aFrameLimiterLabels-1));
+  end
+  -- Filter choice callbacks
+  local function GetVarTexFilter()
+    return tonumber(VariableGetInt(iCVtexfilter)) end;
+  local function SetVarTexFilter(iV)
+    return VariableSetInt(iCVtexfilter, iV) end;
+  local function FilterUpdate()
+    -- Point filtering if disabled
+    if GetVarTexFilter() == 0 then return "Point" end;
+    -- Anything else is bilinear
+    return "Bilinear";
+  end
+  local function FilterSwap()
+    -- Set enabled (GL_LINEAR) if was disabled
+    if GetVarTexFilter() == 0 then return SetVarTexFilter(3) end;
+    -- Set disabled (GL_NEAREST) if was enabled
+    SetVarTexFilter(0);
+  end
+  -- Audio device set callbacks
+  local function AudioUpdate()
+    if iAudioDeviceId == -1 then return "Default Playback Device";
+    elseif iAudioDeviceId >= AudioGetNumPBDs() then
+      return "Invalid Playback Device" end;
+    local N = AudioGetPBDName(iAudioDeviceId);
+    local L<const> = "OpenAL Soft on ";
+    if N:sub(1, #L) == L then N = N:sub(#L) end;
+    if #N > 34 then return N:sub(0,30).."..." end;
+    return N;
+  end
+  local function AudioDown()
+    if iAudioDeviceId == -1 then return end;
+    iAudioDeviceId = iAudioDeviceId - 1;
+  end
+  local function AudioUp()
+    if iAudioDeviceId == AudioGetNumPBDs()-1 then return end;
+    iAudioDeviceId = iAudioDeviceId + 1;
+  end
+  -- Volume set utilities
+  local function VPrepare(sCV) return floor(VariableGetInt(sCV)*100).."%" end;
+  local function VSet(sCV, iAdj)
+    VariableSetInt(sCV,
+      UtilClamp(tonumber(VariableGetInt(sCV)) + (iAdj*0.05), 0, 1));
+  end
+  -- Master volume callbacks
+  local function VMasterUpdate() return VPrepare(iCVaudvol) end;
+  local function VMasterSet(iAdj) VSet(iCVaudvol, iAdj) end;
+  local function VMasterDown() VMasterSet(-1) end;
+  local function VMasterUp() VMasterSet(1) end;
+  -- Stream volume callbacks
+  local function VStreamUpdate() return VPrepare(iCVaudstrvol) end;
+  local function VStreamSet(iAdj) VSet(iCVaudstrvol, iAdj) end;
+  local function VStreamDown() VStreamSet(-1) end;
+  local function VStreamUp() VStreamSet(1) end;
+  -- Sample volume callbacks
+  local function VSampleSet(iAdj) VSet(iCVaudsamvol, iAdj) end;
+  local function VSampleUpdate() return VPrepare(iCVaudsamvol) end;
+  local function VSampleDown() VSampleSet(-1) end;
+  local function VSampleUp() VSampleSet(1) end;
+  -- FMV volume callbacks
+  local function VFMVUpdate() return VPrepare(iCVaudfmvvol) end;
+  local function VFMVSet(iAdj) VSet(iCVaudfmvvol, iAdj) end;
+  local function VFMVDown() VFMVSet(-1) end;
+  local function VFMVUp() VFMVSet(1) end;
+  -- Apply functions to static option table
+  for iI, aF in ipairs({
+    { MonitorUpdate, MonitorDown, MonitorUp  }, -- [01]
+    { FSStateUpdate, FSStateDown, FSStateUp  }, -- [02]
+    { FSResUpdate,   FSResDown,   FSResUp    }, -- [03]
+    { WSizeUpdate,   WSizeDown,   WSizeUp    }, -- [04]
+    { LimiterUpdate, LimiterDown, LimiterUp  }, -- [05]
+    { FilterUpdate,  FilterSwap,  FilterSwap }, -- [06]
+    { AudioUpdate,   AudioDown,   AudioUp    }, -- [07]
+    { VMasterUpdate, VMasterDown, VMasterUp  }, -- [08]
+    { VStreamUpdate, VStreamDown, VStreamUp  }, -- [09]
+    { VSampleUpdate, VSampleDown, VSampleUp  }, -- [10]
+    { VFMVUpdate,    VFMVDown,    VFMVUp     }, -- [11]
+  }) do
+    local aOptionItem<const> = aSetupOptionData[iI];
+    aOptionItem[3] = aF[1];
+    aOptionItem[4] = aF[2];
+    aOptionItem[5] = aF[3];
+  end
+  -- Setup key bank
+  local aKeys<const>, aStates<const> = Input.KeyCodes, Input.States;
+  local iKeyEscape<const>, iKeyPageUp<const>, iKeyPageDown<const>,
+    iKeyHome<const>, iKeyEnd<const>, iKeyUp<const>, iKeyDown<const> =
+      aKeys.ESCAPE, aKeys.PAGE_UP,aKeys.PAGE_DOWN, aKeys.HOME, aKeys.END,
+      aKeys.UP, aKeys.DOWN;
+  -- Setup configuration keys
+  local aGenericEscape<const> = { iKeyEscape, Finish, "Exit setup screen" };
+  local aOnlyEscape<const> = { [aStates.PRESS] = { aGenericEscape } };
+  iKeyBankSetup = RegisterKeys(aOnlyEscape);
+  -- Setup readme keys
+  local aReadmePageUp<const>,
+        aReadmePageDown<const>,
+        aReadmeHome<const>,
+        aReadmeEnd<const>,
+        aReadmeUp<const>,
+        aReadmeDown<const> =
+    { iKeyPageUp,   ScrollReadmePageUp,   "Page readme up" },
+    { iKeyPageDown, ScrollReadmePageDown, "Page readme down" },
+    { iKeyHome,     ScrollReadmeHome,     "Start of readme" },
+    { iKeyEnd,      ScrollReadmeEnd,      "End of readme" },
+    { iKeyUp,       ScrollReadmeUp,       "Scroll readme up" },
+    { iKeyDown,     ScrollReadmeDown,     "Scroll readme down" };
+  iKeyBankReadme = RegisterKeys({
+    [aStates.PRESS] = { aGenericEscape, aReadmePageUp, aReadmePageDown,
+      aReadmeHome, aReadmeEnd, aReadmeUp, aReadmeDown },
+    [aStates.REPEAT] = { aReadmePageUp, aReadmePageDown, aReadmeHome,
+      aReadmeEnd, aReadmeUp, aReadmeDown },
+  });
+  -- Setup bind keys
+  iKeyBankBind = RegisterKeys(aOnlyEscape);
+
+  -- Init third party credits
   local function Header(sString)
     -- Add ellipsis
     sString = sString.."...";
@@ -980,127 +1110,6 @@ local function InitThirdPartyCredits()
   while #aCreditLines > 0 and #aCreditLines[#aCreditLines] == 0 do
     remove(aCreditLines, #aCreditLines) end;
 end
-InitThirdPartyCredits();
--- ------------------------------------------------------------------------- --
-local function DoInitSetup(iMode)
-  -- Ignore if fading
-  if IsFading() then return end;
-  -- Get current callbacks
-  local CBProc, CBRender, CBInput = GetCallbacks();
-  -- Available modes
-  local aModes<const> = {
-    { InitConfig, RenderSetup  },
-    { InitReadme, RenderReadme },
-  };
-  -- Set and check requested mode/
-  local aMode<const> = aModes[iMode];
-  if not aMode then error("Invalid mode: "..iMode) end;
-  -- Return if function already set
-  if CBRender == aMode[2] then return end;
-  -- Remove the mode and go through available modes
-  remove(aModes, iMode);
-  for iIndex = 1, #aModes do
-    -- Get mode data and just call init function if we're still in setup
-    local aAltMode<const> = aModes[iIndex];
-    if CBRender == aAltMode[2] then return aMode[1]() end;
-  end
-  -- Required setup assets finished loading
-  local function OnLoaded(aResource)
-    -- Save current music
-    lastMusic = GetMusic();
-    -- Play setup music
-    PlayMusic(aResource[1].H, nil, 1);
-    -- Initialise button intensity
-    nButtonIntensity, nButtonIntensityIncrement = 1, 0.01;
-    -- Backup old callbacks (Return to them later)
-    fcbTick, fcbRender, fcbInput = CBProc, CBRender, CBInput;
-    -- Backup current cursor id
-    iCursorId = GetCursor();
-    -- Get time
-    nTime = CoreTime();
-    -- Calculate bottom of categories
-    iCatBottom = 28 + (#aOptionData * iCatSize);
-    -- Call the mode init function
-    aMode[1]();
-  end
-  -- Load bank texture
-  LoadResources("Setup", aAssets, OnLoaded);
-  -- On frame buffer refresh callback
-  local function OnRedraw(...)
-    -- Update stage bounds
-    iStageW, iStageH, iStageL, iStageT, iStageR, iStageB = ...;
-    -- Refresh settings
-    Refresh();
-  end
-  -- Register frame buffer update
-  RegisterFBUCallback("setup", OnRedraw);
-end
-InitSetup = DoInitSetup;
 -- Return imports and exports ---------------------------------------------- --
-return { A = { InitSetup = InitSetup }, F = function(GetAPI)
-  -- Imports --------------------------------------------------------------- --
-  GetCallbacks, GetCursor, GetMouseY, GetMusic, IsButtonHeld, IsButtonPressed,
-  IsFading, IsKeyPressed, IsKeyRepeating, IsMouseInBounds,
-  IsMouseYGreaterEqualThan, IsMouseYLessThan, IsScrollingDown, IsScrollingLeft,
-  IsScrollingRight, IsScrollingUp, LoadResources, PlayMusic, PlayStaticSound,
-  RegisterFBUCallback, RenderFade, RenderShadow, SetCallbacks, SetCursor,
-  StopMusic, aButtonData, aCursorIdData, aOptionData, aSfxData, fontLarge,
-  fontLittle, fontTiny, texSpr
-  = -- --------------------------------------------------------------------- --
-  GetAPI("GetCallbacks", "GetCursor", "GetMouseY", "GetMusic",  "IsButtonHeld",
-    "IsButtonPressed", "IsFading", "IsKeyPressed", "IsKeyRepeating",
-    "IsMouseInBounds", "IsMouseYGreaterEqualThan", "IsMouseYLessThan",
-    "IsScrollingDown", "IsScrollingLeft", "IsScrollingRight", "IsScrollingUp",
-    "LoadResources", "PlayMusic", "PlayStaticSound", "RegisterFBUCallback",
-    "RenderFade", "RenderShadow", "SetCallbacks", "SetCursor", "StopMusic",
-    "aSetupButtonData", "aCursorIdData", "aSetupOptionData", "aSfxData",
-    "fontLarge", "fontLittle", "fontTiny", "texSpr");
-  -- Apply button data ----------------------------------------------------- --
-  local aButtons<const> = { { "APPLY", ApplySettings },
-                            { "DONE",  Finish },
-                            { "RESET", SetDefaults },
-                            { "ABOUT", InitReadme },
-                          };
-  -- Start and end vertical position
-  local iY1<const>, iY2<const> = 193, 212;
-  -- Start drawing buttons from the left and the size of each button. We set
-  -- the shader to round off any sub-pixelling so fractions are handled safely.
-  local nX, nSize<const> = 4, 312 / #aButtons;
-  -- Text position
-  local nSizeD2<const>, iYText<const> = nSize / 2, iY1 + 6;
-  -- For each button
-  for iIndex = 1, #aButtons do
-    -- Get the button data
-    local aCb<const> = aButtons[iIndex];
-    local aButton<const> = aButtonData[aCb[1]];
-    -- Set button co-ordinates
-    aButton[1], aButton[2], aButton[3], aButton[4] = nX, iY1, nX + nSize, iY2;
-    -- Click function
-    aButton[6] = aCb[2];
-    -- Text position
-    aButton[8], aButton[9] = nX + nSizeD2, iYText;
-    -- Next button position
-    nX = nX + nSize;
-  end;
-  -- Apply functions to static option table -------------------------------- --
-  for iI, aF in ipairs({
-    { MonitorUpdate, MonitorDown, MonitorUp  }, -- [01]
-    { FSStateUpdate, FSStateDown, FSStateUp  }, -- [02]
-    { FSResUpdate,   FSResDown,   FSResUp    }, -- [03]
-    { WSizeUpdate,   WSizeDown,   WSizeUp    }, -- [04]
-    { LimiterUpdate, LimiterDown, LimiterUp  }, -- [05]
-    { FilterUpdate,  FilterSwap,  FilterSwap }, -- [06]
-    { AudioUpdate,   AudioDown,   AudioUp    }, -- [07]
-    { VMasterUpdate, VMasterDown, VMasterUp  }, -- [08]
-    { VStreamUpdate, VStreamDown, VStreamUp  }, -- [09]
-    { VSampleUpdate, VSampleDown, VSampleUp  }, -- [10]
-    { VFMVUpdate,    VFMVDown,    VFMVUp     }, -- [11]
-  }) do
-    local aOptionItem<const> = aOptionData[iI];
-    aOptionItem[3] = aF[1];
-    aOptionItem[4] = aF[2];
-    aOptionItem[5] = aF[3];
-  end
-  -- ----------------------------------------------------------------------- --
-end };
+return { A = { InitSetup = InitSetup }, F = OnReady };
 -- == End-of-File ========================================================== --

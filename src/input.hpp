@@ -28,8 +28,8 @@ BUILD_FLAGS(Input,
   IF_NONE                   {Flag[0]}, IF_CURSOR                 {Flag[1]},
   // Full-screen toggler enabled?      Mouse cursor has focus?
   IF_FSTOGGLER              {Flag[2]}, IF_MOUSEFOCUS             {Flag[3]},
-  // Send events at startup
-  IF_INITEVENTS             {Flag[4]}
+  // Send events at startup            Do joystick polling?
+  IF_INITEVENTS             {Flag[4]}, IF_POLLJOYSTICKS          {Flag[5]}
 );/* -- Axis class --------------------------------------------------------- */
 class JoyAxisInfo
 { /* -------------------------------------------------------------- */ private:
@@ -303,7 +303,7 @@ class JoyInfo :
   /* -- Constructor -------------------------------------------------------- */
   explicit JoyInfo(const int iNId) :
     /* -- Initialisers ----------------------------------------------------- */
-    JoyFlags(JF_NONE),                 // Set no flags
+    JoyFlags{ JF_NONE },               // Set no flags
     /* -- Initialise joystick axises --------------------------------------- */
 #define JAI(x) JoyAxisInfo{ GLFW_GAMEPAD_AXIS_ ## x }
     /* --------------------------------------------------------------------- */
@@ -337,13 +337,6 @@ class JoyInfo :
 };/* -- Joystick state typedefs -------------------------------------------- */
 typedef array<JoyInfo, GLFW_JOYSTICK_LAST+1> JoyList; // Actual joystick data
 typedef JoyList::const_iterator JoyListIt; // Iterator for vector of joys
-/* ========================================================================= */
-enum JoyStatus : int                   // Joystick init status
-{ /* ----------------------------------------------------------------------- */
-  JOY_DETECT = -1,                     // Automatically detect at startup
-  JOY_DISABLE,                         // Joystick polling is disabled
-  JOY_ENABLE                           // Joystick polling is enabled
-};/* ----------------------------------------------------------------------- */
 /* == Input class ========================================================== */
 static class Input final :             // Handles keyboard, mouse & controllers
   /* -- Base classes ------------------------------------------------------- */
@@ -364,7 +357,7 @@ static class Input final :             // Handles keyboard, mouse & controllers
                    lfOnDragDrop,       // Drag and dropped files
                    lfOnJoyState;       // Joystick connection event
   /* -------------------------------------------------------------- */ private:
-  JoyStatus        jsStatus;           // Joystick detection/polling state
+  size_t           stConnected;        // Joysticks connected
   /* ----------------------------------------------------------------------- */
   int              iWinWidth,          // Actual window width
                    iWinHeight;         // Actual window height
@@ -494,6 +487,9 @@ static class Input final :             // Handles keyboard, mouse & controllers
     vFiles.clear();
     vFiles.shrink_to_fit();
   }
+  /* -- Enable or disable joystick polling --------------------------------- */
+  void EnablePolling(void) { FlagSet(IF_POLLJOYSTICKS); }
+  void DisablePolling(void) { FlagClear(IF_POLLJOYSTICKS); }
   /* -- Joystick state changed --------------------------------------------- */
   void OnJoyState(const EvtMainEvent &emeEvent)
   { // Get reference to actual arguments vector
@@ -502,11 +498,17 @@ static class Input final :             // Handles keyboard, mouse & controllers
     const int iId = emaArgs[0].i;
     // What happened to the joystick?
     switch(const int iState = emaArgs[1].i)
-    { // Connected? Setup joystick and return
+    { // Connected?
       case GLFW_CONNECTED:
+        // Increase connected count and enable polling if the first
+        if(++stConnected == 1) EnablePolling();
+        // Setup the joystick state and return
         return SetupJoystickAndDispatch(static_cast<size_t>(iId));
       // Disconnected?
       case GLFW_DISCONNECTED:
+        // Decrease connected count and disable polling if the last
+        if(!--stConnected) DisablePolling();
+        // Clear the joystick state and return
         return ClearJoystickAndDispatch(static_cast<size_t>(iId));
       // Invalid code?
       default:
@@ -578,12 +580,11 @@ static class Input final :             // Handles keyboard, mouse & controllers
     { SetCursorPos(cFboCore->GetMatrixWidth() / 2.0f,
                    cFboCore->GetMatrixHeight() / 2.0f); }
   /* -- Joystick main tick ------------------------------------------------- */
+  void DoPollJoysticks(void)
+    { for(JoyInfo &jsData : GetJoyList())
+        jsData.RefreshDataIfConnected(); }
   void PollJoysticks(void)
-  { // If joystick enabled? Enumerate joysticks and refresh data
-    if(jsStatus != JOY_DISABLE)
-      for(JoyInfo &jsData : GetJoyList())
-        jsData.RefreshDataIfConnected();
-  }
+    { if(FlagIsSet(IF_POLLJOYSTICKS)) DoPollJoysticks(); }
   bool JoystickExists(const size_t stId)
     { return GetJoyData(stId).IsConnected(); }
   /* -- Dispatch connected event to lua ------------------------------------ */
@@ -599,47 +600,45 @@ static class Input final :             // Handles keyboard, mouse & controllers
     DispatchLuaEvent(stJoystickId, false);
     // Clear joystick, axis and button data
     jsData.Disconnect();
+    jsData.ClearState();
   }
   /* -- Initialise a new joystick ------------------------------------------ */
   void SetupJoystickAndDispatch(const size_t stJoystickId)
-  { // Detect if is gamepad?
-    GetJoyData(stJoystickId).Connect();
+  { // Get joystick data and ign ore if joystick wasn't originally connected
+    JoyInfo &jsData = GetJoyData(stJoystickId);
+    if(jsData.IsConnected()) return;
+    // Begin detection and refresh data
+    jsData.Connect();
+    jsData.RefreshData();
     // Send lua event to let guest know joystick was connected and return
     DispatchLuaEvent(stJoystickId, true);
   }
   /* -- Return a joystick is present? -------------------------------------- */
   void AutoDetectJoystick(void)
-  { // Joysticks detected count
-    size_t stCount = 0;
-    // Enumerate joysticks...
+  { // Reset connected count
+    stConnected = 0;
+    // Enumerate joysticks and if joystick is present?
     for(JoyInfo &jsData : GetJoyList())
       // If joystick is present?
       if(jsData.IsPresent())
       { // Send event that the joystick was connected
-        cEvtMain->Add(EMC_INP_JOY_STATE, jsData.GetId(), GLFW_CONNECTED);
-        ++stCount;
+        SetupJoystickAndDispatch(jsData.GetId());
+        // Increase connected count
+        ++stConnected;
       } // Send event that the joystick was disconnected
-      else cEvtMain->Add(EMC_INP_JOY_STATE, jsData.GetId(), GLFW_DISCONNECTED);
-    // If we did not find joysticks? Disable polling
-    if(!stCount)
-    { // If smart detection was enabled?
-      if(jsStatus == JOY_DETECT)
-      { // Display joystick polling to save on CPU resources
-        jsStatus = JOY_DISABLE;
-        // Log result
-        cLog->LogInfoSafe(
-          "Input disabling joystick polling as no devices are detected.");
-      } // Done
-      return;
-    } // Poll joysticks
-    PollJoysticks();
-    // Done if smart detection was not enabled
-    if(jsStatus != JOY_DETECT) return;
-    // Joystick polling set to enabled
-    jsStatus = JOY_ENABLE;
+      else ClearJoystickAndDispatch(jsData.GetId());
+    // If we did not find joysticks? Tell log and return
+    if(!stConnected)
+    { // Disable polling
+      DisablePolling();
+      // Log no controllers
+      return cLog->LogInfoSafe("Input detected no controller devices.");
+    } // Enable polling
+    EnablePolling();
     // Log result
     cLog->LogInfoExSafe(
-      "Input enabling joystick polling as $ devices are detected.", stCount);
+      "Input enabling joystick polling as $ devices are detected.",
+      stConnected);
   }
   // -- CVar callback to toggle raw mouse ---------------------------------- */
   CVarReturn SetRawMouseEnabled(const bool bState)
@@ -662,22 +661,6 @@ static class Input final :             // Handles keyboard, mouse & controllers
     // CVar allowed to be set
     return ACCEPT;
   }
-  // -- Initialise joysticks ----------------------------------------------- */
-  void BeginDetection(void)
-  { // Check current user setting
-    switch(jsStatus)
-    { // Set to detection mode or enable? Redetect joysticks
-      case JOY_DETECT: case JOY_ENABLE: AutoDetectJoystick(); break;
-      // Disable it? Set to disabled and clear joystick states
-      case JOY_DISABLE: ClearJoystickButtons(); break;
-      // Invalid value
-      default: break;
-    }
-  }
-  // -- CVar callback to toggling joystick polling ------------------------- */
-  CVarReturn SetJoystickEnabled(const JoyStatus jsNewStatus)
-    { return CVarSimpleSetIntNLGE(jsStatus, jsNewStatus,
-        JOY_DETECT, JOY_ENABLE); }
   /* -- Clear joystick state ----------------------------------------------- */
   void ClearJoystickButtons(void)
     { StdForEach(par_unseq, GetJoyList().begin(), GetJoyList().end(),
@@ -738,14 +721,14 @@ static class Input final :             // Handles keyboard, mouse & controllers
     IHelper(__FUNCTION__),             // Init initialisation helper class
     InputFlags(IF_NONE),               // No flags set initially
     /* -- Init joysticks --------------------------------------------------- */
-    JoyList{ { JoyInfo(GLFW_JOYSTICK_1),  JoyInfo(GLFW_JOYSTICK_2),
-               JoyInfo(GLFW_JOYSTICK_3),  JoyInfo(GLFW_JOYSTICK_4),
-               JoyInfo(GLFW_JOYSTICK_5),  JoyInfo(GLFW_JOYSTICK_6),
-               JoyInfo(GLFW_JOYSTICK_7),  JoyInfo(GLFW_JOYSTICK_8),
-               JoyInfo(GLFW_JOYSTICK_9),  JoyInfo(GLFW_JOYSTICK_10),
-               JoyInfo(GLFW_JOYSTICK_11), JoyInfo(GLFW_JOYSTICK_12),
-               JoyInfo(GLFW_JOYSTICK_13), JoyInfo(GLFW_JOYSTICK_14),
-               JoyInfo(GLFW_JOYSTICK_15), JoyInfo(GLFW_JOYSTICK_16) } },
+    JoyList{ { JoyInfo{ GLFW_JOYSTICK_1  }, JoyInfo{ GLFW_JOYSTICK_2 },
+               JoyInfo{ GLFW_JOYSTICK_3  }, JoyInfo{ GLFW_JOYSTICK_4 },
+               JoyInfo{ GLFW_JOYSTICK_5  }, JoyInfo{ GLFW_JOYSTICK_6 },
+               JoyInfo{ GLFW_JOYSTICK_7  }, JoyInfo{ GLFW_JOYSTICK_8 },
+               JoyInfo{ GLFW_JOYSTICK_9  }, JoyInfo{ GLFW_JOYSTICK_10 },
+               JoyInfo{ GLFW_JOYSTICK_11 }, JoyInfo{ GLFW_JOYSTICK_12 },
+               JoyInfo{ GLFW_JOYSTICK_13 }, JoyInfo{ GLFW_JOYSTICK_14 },
+               JoyInfo{ GLFW_JOYSTICK_15 }, JoyInfo{ GLFW_JOYSTICK_16 } } },
     /* -- Init events for event manager ------------------------------------ */
     EvtMain::RegVec{                   // Events list to register
       { EMC_INP_CHAR,         bind(&Input::OnFilteredKey, this, _1) },
@@ -769,7 +752,7 @@ static class Input final :             // Handles keyboard, mouse & controllers
     lfOnChar{ "OnFilteredKey" },       // Init filtered keypress lua event
     lfOnDragDrop{ "OnDragDrop" },      // Init drag & drop lua event
     lfOnJoyState{ "OnJoyState" },      // Init joy state lua event
-    jsStatus(JOY_DISABLE),             // Initial joystick status is disabled
+    stConnected(0),                    // Init joystick count to zero
     iWinWidth(0),                      // Window width init by display
     iWinHeight(0)                      // Window height init by display
     /* -- No code ---------------------------------------------------------- */

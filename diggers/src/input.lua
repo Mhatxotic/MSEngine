@@ -17,13 +17,14 @@ local error<const>, floor<const>, pairs<const>, remove<const>,
 local CoreTicks<const>, InputClearStates<const>, InputGetJoyAxis<const>,
   InputGetJoyButton<const>, InputGetNumJoyAxises<const>, InputSetCursor<const>,
   InputSetCursorPos<const>, UtilBlank<const>, UtilClamp<const>,
-  UtilIsInteger<const>, UtilIsTable<const>
+  UtilIsBoolean<const>, UtilIsFunction<const>, UtilIsInteger<const>,
+  UtilIsString<const>, UtilIsTable<const>
   = ------------------------------------------------------------------------ --
   Core.Ticks, Input.ClearStates, Input.GetJoyAxis, Input.GetJoyButton,
   Input.GetNumJoyAxises, Input.SetCursor, Input.SetCursorPos, Util.Blank,
-  Util.Clamp, Util.IsInteger, Util.IsTable;
+  Util.Clamp, Util.IsBoolean, Util.IsFunction, Util.IsInteger, Util.IsString,
+  Util.IsTable;
 -- Globals ----------------------------------------------------------------- --
-local aStates<const> = Input.States;   -- Keyboard press states
 local aKeys<const> = Input.KeyCodes;   -- Keyboard scan codes
 local aCursorIdData, aCursorData;      -- Cursor data
 local iCursorMin, iCursorMax;          -- Cursor minimum and maximum
@@ -253,13 +254,30 @@ local function RegisterKeys(aKeys)
   -- Check that given table is valid
   if not UtilIsTable(aKeys) then
     error("Key table is invalid! "..tostring(aKeys)) end;
-  -- Add keybinds to key bank
-  aKeyBank[#aKeyBank + 1] = aKeys;
-  -- Add all keys to global bank in key bank
+  -- Check and add all keys to global bank in key bank
   local aGlobalBank<const> = aKeyBank[1];
   for iCategory, aBinds in pairs(aKeys) do
-    for iIndex = 1, #aBinds do aGlobalBank[#aGlobalBank] = aBinds[iIndex] end;
+    for iIndex = 1, #aBinds do
+      -- Get bind details
+      local aBind<const> = aBinds[iIndex];
+      -- Check default key
+      local iKey<const> = aBind[1];
+      if not UtilIsInteger(iKey) then
+        error("Invalid key "..tostring(iKey).." at index "..iIndex) end;
+      -- Check callback when key pressed
+      local fcbCb<const> = aBind[2];
+      if not UtilIsFunction(fcbCb) then
+        error("Invalid callback "..tostring(fcbCb).." at index "..iIndex) end;
+      -- Check description
+      local sDesc<const> = aBind[3];
+      if not UtilIsString(sDesc) then
+        error("Invalid label "..tostring(sDesc).." at index "..iIndex) end;
+      -- Valid bind so add it to the global key list
+      aGlobalBank[1 + #aGlobalBank] = aBind;
+    end
   end
+  -- Add keybinds to key bank
+  aKeyBank[1 + #aKeyBank] = aKeys;
   -- Return identifier
   return #aKeyBank;
 end
@@ -269,44 +287,57 @@ local function GetKeyBank() return iKeyBank end;
 local function SetGlobalKeyBinds(aKeys) aGlobalKeyBinds = aKeys end;
 -- Set global keys availability status. The keys will initially not be
 -- available until the intro movie begins.
-local function SetKeys(bState, iIdentifier)
-  -- Clear keybinds list
-  aKeyBinds = {
-    [aStates.PRESS] = { },               -- Pressed keys to functions
-    [aStates.RELEASE] = { },             -- Released keys to functions
-    [aStates.REPEAT] = { }               -- Repeated keys to functions
-  };
-  -- If we're to add the persistent keys?
-  if bState then
-    for iCategory, aBinds in pairs(aGlobalKeyBinds) do
+local function SetKeys()
+  -- Get statics
+  local aStates<const> = Input.States;
+  local iPress<const>, iRelease<const>, iRepeat<const> =
+    aStates.PRESS, aStates.RELEASE, aStates.REPEAT;
+  -- Real function
+  local function DoSetKeys(bState, iIdentifier)
+    -- Check parameters
+    if not UtilIsBoolean(bState) then
+      error("Bad global key state: "..tostring(bState)) end;
+    -- Clear keybinds list
+    aKeyBinds = {
+      [iPress]   = { },                -- Pressed keys to functions
+      [iRelease] = { },                -- Released keys to functions
+      [iRepeat]  = { },                -- Repeated keys to functions
+    };
+    -- If we're to add the persistent keys?
+    if bState then
+      for iCategory, aBinds in pairs(aGlobalKeyBinds) do
+        local aKeyBindsCat<const> = aKeyBinds[iCategory];
+        for iIndex = 1, #aBinds do
+          local aBind<const> = aBinds[iIndex];
+          aKeyBindsCat[aBind[1]] = aBind[2];
+        end
+      end
+    end
+    -- Done if no keys are to be set?
+    if not iIdentifier then iKeyBank = 0 return end;
+    -- Make sure identifier is valid
+    if not UtilIsInteger(iIdentifier) then
+      error("Invalid table index type: "..tostring(iIdentifier)) end;
+    if iIdentifier == 0 then iKeyBank = 0 return end;
+    -- Get and check identifier in key bank
+    local aKeys<const> = aKeyBank[iIdentifier];
+    if not UtilIsTable(aKeys) then
+      error("Invalid table index not registered: "..iIdentifier) end;
+    -- Add binds from key bank to currently active keybinds
+    for iCategory, aBinds in pairs(aKeys) do
       local aKeyBindsCat<const> = aKeyBinds[iCategory];
       for iIndex = 1, #aBinds do
         local aBind<const> = aBinds[iIndex];
         aKeyBindsCat[aBind[1]] = aBind[2];
       end
     end
+    -- Set keybank id so modules can restore a previous keybank
+    iKeyBank = iIdentifier;
   end
-  -- Done if no keys are to be set?
-  if not iIdentifier then iKeyBank = 0 return end;
-  -- Make sure identifier is valid
-  if not UtilIsInteger(iIdentifier) then
-    error("Invalid table index type: "..tostring(iIdentifier)) end;
-  if iIdentifier == 0 then iKeyBank = 0 return end;
-  -- Get and check identifier in key bank
-  local aKeys<const> = aKeyBank[iIdentifier];
-  if not UtilIsTable(aKeys) then
-    error("Invalid table index not registered: "..iIdentifier) end;
-  -- Add binds from key bank to currently active keybinds
-  for iCategory, aBinds in pairs(aKeys) do
-    local aKeyBindsCat<const> = aKeyBinds[iCategory];
-    for iIndex = 1, #aBinds do
-      local aBind<const> = aBinds[iIndex];
-      aKeyBindsCat[aBind[1]] = aBind[2];
-    end
-  end
-  -- Set keybank id so modules can restore a previous keybank
-  iKeyBank = iIdentifier;
+  -- Set the real function
+  SetKeys = DoSetKeys;
 end
+SetKeys();
 -- Register global keys ---------------------------------------------------- --
 local function RegisterGlobalKeys(aKeys)
   -- Check parameter
@@ -350,9 +381,10 @@ return { A = {
   ClearKeyState = ClearKeyState, ClearMouseState = ClearMouseState,
   ClearStates = ClearStates, CursorRender = CursorRender,
   GetCallbacks = GetCallbacks, GetCursor = GetCursor,
-  GetJoyState = GetJoyState, GetKeyState = GetKeyState,
-  GetMouseState = GetMouseState, GetMouseX = GetMouseX, GetMouseY = GetMouseY,
-  IsButtonHeld = IsButtonHeld, IsButtonPressed = IsButtonPressed,
+  GetJoyState = GetJoyState, GetKeyBank = GetKeyBank,
+  GetKeyState = GetKeyState, GetMouseState = GetMouseState,
+  GetMouseX = GetMouseX, GetMouseY = GetMouseY, IsButtonHeld = IsButtonHeld,
+  IsButtonPressed = IsButtonPressed,
   IsButtonPressedNoRelease = IsButtonPressedNoRelease,
   IsButtonReleased = IsButtonReleased, IsJoyHeld = IsJoyHeld,
   IsJoyPressed = IsJoyPressed, IsJoyReleased = IsJoyReleased,
@@ -368,8 +400,8 @@ return { A = {
   IsMouseYLessThan = IsMouseYLessThan, IsScrollingDown = IsScrollingDown,
   IsScrollingLeft = IsScrollingLeft, IsScrollingRight = IsScrollingRight,
   IsScrollingUp = IsScrollingUp, JoystickProc = JoystickProc,
-  RegisterGlobalKeys = RegisterGlobalKeys, SetCursor = SetCursor,
-  SetKeys = SetKeys;
+  RegisterGlobalKeys = RegisterGlobalKeys, RegisterKeys = RegisterKeys,
+  SetCursor = SetCursor, SetKeys = SetKeys;
   -- ----------------------------------------------------------------------- --
   }, F = function(GetAPI)
   -- Imports --------------------------------------------------------------- --
