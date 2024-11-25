@@ -19,11 +19,11 @@ local collectgarbage<const>, error<const>, floor<const>, format<const>,
 local AssetParseBlock<const>, CoreLog<const>, CoreOnTick<const>,
   CoreStack<const>, CoreWrite<const>, DisplayReset<const>, FboDraw<const>,
   CoreCatchup<const>, InputSetCursor<const>, InputSetCursorCentre<const>,
-  CoreTime<const>, SShotFbo<const>,
-  TextureCreate<const>, UtilBlank<const>, UtilClamp<const>,
-  UtilDuration<const>, UtilExplode<const>, UtilImplode<const>,
-  UtilIsFunction<const>, UtilIsInteger<const>, UtilIsNumber<const>,
-  UtilIsString<const>, UtilIsTable<const>, VariableRegister<const> =
+  CoreTime<const>, SShotFbo<const>, TextureCreate<const>, UtilBlank<const>,
+  UtilClamp<const>, UtilDuration<const>, UtilExplode<const>,
+  UtilImplode<const>, UtilIsFunction<const>, UtilIsInteger<const>,
+  UtilIsNumber<const>, UtilIsString<const>, UtilIsTable<const>,
+  VariableRegister<const> =
     Asset.ParseBlock, Core.Log, Core.OnTick, Core.Stack, Core.Write,
     Display.Reset, Fbo.Draw, Core.Catchup, Input.SetCursor,
     Input.SetCursorCentre, Core.Time, SShot.Fbo, Texture.Create, Util.Blank,
@@ -200,7 +200,7 @@ local aTypes<const> = {
   -- Async function   Params  Prefix Suffix  Data loader function  Info?   Id
 };
 -- Loader ------------------------------------------------------------------ --
-local function LoadResources(sProcedure, aResources, fComplete)
+local function LoadResources(sProcedure, aResources, fComplete, ...)
   -- Check parameters
   if not UtilIsString(sProcedure) then
     error("Procedure name string is invalid! "..tostring(sProcedure)) end;
@@ -215,6 +215,8 @@ local function LoadResources(sProcedure, aResources, fComplete)
   local function ProgressUpdate(iCmd, ...)
     if iCmd == iFStart then aInfo = { ... } end;
   end
+  -- Grab extra parameters to send to callback
+  local aParams<const> = { ... };
   -- Load item
   local function LoadItem(iI)
     -- Get resource data
@@ -275,7 +277,7 @@ local function LoadResources(sProcedure, aResources, fComplete)
       -- Garbage collect to remove unloaded assets
       collectgarbage();
       -- Execute finished handler function with our resource list
-      TimeIt(sProcedure, fComplete, aResources);
+      TimeIt(sProcedure, fComplete, aResources, unpack(aParams));
     end
     -- Setup handle
     local function SetupSecondStage()
@@ -397,6 +399,8 @@ local function Fade(S, E, C, D, A, M, L, T, R, B, Z)
   if UtilIsFunction(fcbFading) then fcbFading() end;
   -- Set loading cursor because player can't control anything
   SetCursor(iCursorWait);
+  -- Disable all keybanks and globals
+  SetKeys(false);
   -- During function
   local function During(nVal)
     -- Clear states
@@ -414,10 +418,12 @@ local function Fade(S, E, C, D, A, M, L, T, R, B, Z)
   local function Finish()
     -- Reset fade vars
     S, fcbFading = E, nil;
-    -- No callbacks incase caller forgets to set anything
-    SetCallbacks(nil, nil, nil);
     -- Set arrow incase caller forgets to set one
     SetCursor(iCursorArrow);
+    -- Enable global keys
+    SetKeys(true);
+    -- No callbacks incase caller forgets to set anything
+    SetCallbacks(nil, nil, nil);
     -- Call the after function
     A();
   end
@@ -541,15 +547,15 @@ local function fcbTick()
   SetCallbacks(nil, nil, nil);
   -- Base code scripts that are to be loaded
   local aBaseScripts<const> = {
-    {T=9,F="audio",  P={}}, {T=9,F="bank",    P={}}, {T=9,F="book",     P={}},
-    {T=9,F="cntrl",  P={}}, {T=9,F="credits", P={}}, {T=9,F="data",     P={}},
-    {T=9,F="debug",  P={}}, {T=9,F="end",     P={}}, {T=9,F="ending",   P={}},
-    {T=9,F="fail",   P={}}, {T=9,F="file",    P={}}, {T=9,F="game",     P={}},
-    {T=9,F="input",  P={}}, {T=9,F="intro",   P={}}, {T=9,F="lobby",    P={}},
-    {T=9,F="map",    P={}}, {T=9,F="post",    P={}}, {T=9,F="race",     P={}},
-    {T=9,F="scene",  P={}}, {T=9,F="score",   P={}}, {T=9,F="setup",    P={}},
-    {T=9,F="shop",   P={}}, {T=9,F="title",   P={}}, {T=9,F="tcredits", P={}},
-    {T=9,F="tntmap", P={}},
+    {T=9,F="audio",   P={}}, {T=9,F="bank",    P={}}, {T=9,F="book",   P={}},
+    {T=9,F="cntrl",   P={}}, {T=9,F="credits", P={}}, {T=9,F="data",   P={}},
+    {T=9,F="debug",   P={}}, {T=9,F="end",     P={}}, {T=9,F="ending", P={}},
+    {T=9,F="fail",    P={}}, {T=9,F="file",    P={}}, {T=9,F="game",   P={}},
+    {T=9,F="input",   P={}}, {T=9,F="intro",   P={}}, {T=9,F="lobby",  P={}},
+    {T=9,F="map",     P={}}, {T=9,F="pause",   P={}}, {T=9,F="post",   P={}},
+    {T=9,F="race",    P={}}, {T=9,F="scene",   P={}}, {T=9,F="score",  P={}},
+    {T=9,F="setup",   P={}}, {T=9,F="shop",    P={}}, {T=9,F="title",  P={}},
+    {T=9,F="tcredits",P={}}, {T=9,F="tntmap",  P={}},
   };
   -- Base fonts that are to be loaded
   local aBaseFonts<const> = {

@@ -104,8 +104,8 @@ class Core final :                     // Members initially private
       cPalettes->palDefault.Commit();
       // Set main framebuffer as default
       cFboCore->ActivateMain();
-      // Reset cursor type, show it and clear input states
-      cInput->SetCursor(true);
+      // Reset input environment
+      cInput->ResetEnvironment();
       // Reset main matrix. No need to force a change if it's already set.
       cDisplay->SetDefaultMatrix(false);
       // Cant't disable console if leaving, can if entering
@@ -195,13 +195,7 @@ class Core final :                     // Members initially private
           // to handle the error and try to recover. The actual loops will set
           // this to something different when they cleanly exit their loops.
           cEvtMain->SetExitReason(EMC_LUA_ERROR);
-          // Is graphical mode enabled?
-          if(cSystem->IsGraphicalMode() && cInput->FlagIsSet(IF_INITEVENTS))
-          { // Scan for game controllers and inform scripts
-            cInput->AutoDetectJoystick();
-            // Send current mouse position to scripts
-            cInput->RequestMousePosition();
-          } // Execute startup script
+          // Execute startup script
           LuaCodeExecuteFile(lS, cCVars->GetStrInternal(LUA_SCRIPT));
           // Done
           break;

@@ -24,17 +24,16 @@ local CoreTicks<const>, InputClearStates<const>, InputGetJoyAxis<const>,
   Input.GetNumJoyAxises, Input.SetCursor, Input.SetCursorPos, Util.Blank,
   Util.Clamp, Util.IsBoolean, Util.IsFunction, Util.IsInteger, Util.IsString,
   Util.IsTable;
+-- Diggers function and data aliases --------------------------------------- --
+local aCursorData, aCursorIdData, texSpr;
 -- Globals ----------------------------------------------------------------- --
 local aKeys<const> = Input.KeyCodes;   -- Keyboard scan codes
-local aCursorIdData, aCursorData;      -- Cursor data
 local iCursorMin, iCursorMax;          -- Cursor minimum and maximum
 local iCursorAdjX, iCursorAdjY;        -- Cursor origin co-ordinates
-local texSpr;                          -- Texture where cursors are
 local iCId;                            -- Current cursor id
 local iStageLeft, iStageRight;         -- Stage left and top
 local iStageTop, iStageBottom;         -- Stage right and bottom
 -- Input handling variables ------------------------------------------------ --
-local aKeyState<const>    = { };       -- Formatted keyboard state
 local aMouseState<const>  = { };       -- Formatted mouse state
 local iCursorX, iCursorY  = 160, 120;  -- Cursor position
 local nWheelX, nWheelY    = 0, 0;      -- Mouse wheel state
@@ -47,10 +46,6 @@ local aGlobalKeyBinds;                 -- Global keybinds (defined later)
 local aKeyBinds;                       -- Key/state/func translation lookup
 local aKeyBank<const> = { { } };       -- All keys ([1] reserved for all)
 local iKeyBank = 0;                    -- Currently active keybank
--- Get current key state for specified key --------------------------------- --
-local function GetKeyState(iKey) return aKeyState[iKey] or 0 end;
--- Clear specified key state for specified key ----------------------------- --
-local function ClearKeyState(iKey) aKeyState[iKey] = nil end;
 -- Mouse is in specified bounds -------------------------------------------- --
 local function IsMouseInBounds(iX1, iY1, iX2, iY2)
   return iCursorX >= iX1 and iCursorY >= iY1 and
@@ -126,29 +121,11 @@ end
 local function IsButtonReleased(iButton)
   return IsMouseReleased(iButton) and IsJoyReleased(iButton);
 end
--- Is key being pressed? (Doesn't repeat) ---------------------------------- --
-local function IsKeyPressed(iKey)
-  if GetKeyState(iKey) == 1 then ClearKeyState(iKey) return true end;
-  return false;
-end
--- Is key not being pressed? ----------------------------------------------- --
-local function IsKeyReleased(iKey) return not IsKeyPressed(iKey) end;
--- Is key being pressed (uses OS repeat speed) ----------------------------- --
-local function IsKeyRepeating(iKey)
-  if IsKeyPressed(iKey) then return true end;
-  if GetKeyState(iKey) < 2 then return false end;
-  ClearKeyState(iKey);
-  return true;
-end
--- Is key being held? (FPS dependent) -------------------------------------- --
-local function IsKeyHeld(iKey) return GetKeyState(iKey) >= 1 end;
 -- When a key is pressed --------------------------------------------------- --
 local function OnKey(iKey, iState)
-  -- Get function for key and call the function if set
+  -- Get function for key and call the function if set else set state of it
   local aKey<const> = aKeyBinds[iState][iKey];
   if aKey then aKey() end;
-  -- Else use our global key press table (DELETE ME WHEN KEYBINDS DONE)
-  aKeyState[iKey] = iState;
 end
 -- When the mouse is clicked ----------------------------------------------- --
 local function OnMouseClick(iButton, iState) aMouseState[iButton] = iState end
@@ -231,7 +208,9 @@ end
 -- When the mouse wheel is moved ------------------------------------------- --
 local function OnMouseScroll(nX, nY) nWheelX, nWheelY = nX, nY end;
 -- When the mouse is moved ------------------------------------------------- --
-local function OnMouseMove(nX, nY) iCursorX,iCursorY = floor(nX),floor(nY) end;
+local function OnMouseMove(nX, nY)
+  iCursorX, iCursorY = floor(nX), floor(nY);
+end
 -- Get cursor -------------------------------------------------------------- --
 local function GetCursor() return iCId end;
 -- Set cursor -------------------------------------------------------------- --
@@ -268,12 +247,15 @@ local function RegisterKeys(aKeys)
       local fcbCb<const> = aBind[2];
       if not UtilIsFunction(fcbCb) then
         error("Invalid callback "..tostring(fcbCb).." at index "..iIndex) end;
-      -- Check description
+      -- Check description (this is optional so it doesn't show on keybinds)
       local sDesc<const> = aBind[3];
-      if not UtilIsString(sDesc) then
-        error("Invalid label "..tostring(sDesc).." at index "..iIndex) end;
-      -- Valid bind so add it to the global key list
-      aGlobalBank[1 + #aGlobalBank] = aBind;
+      if sDesc ~= nil then
+        -- Check is valid string before accepting
+        if not UtilIsString(sDesc) and #sDesc > 0 then
+          error("Invalid label "..tostring(sDesc).." at index "..iIndex) end;
+        -- Valid bind so add it to the global key list
+        aGlobalBank[1 + #aGlobalBank] = aBind;
+      end
     end
   end
   -- Add keybinds to key bank
@@ -350,7 +332,6 @@ local function ClearStates()
   -- Make sure user can't input anything
   InputClearStates();
   -- Clear keyboard and mouse
-  for iKey in pairs(aKeyState) do ClearKeyState(iKey) end
   for iButton in pairs(aMouseState) do aMouseState[iButton] = nil end
   nWheelX, nWheelY = 0, 0;
 end
@@ -375,21 +356,29 @@ local function OnFrameBufferUpdate(_, _, nLeft, nTop, nRight, nBottom)
   -- Cursor is off the bottom of screen? Clamp it to bottom
   elseif iCursorY >= iStageBottom then iCursorY = iStageBottom-1 end;
 end
+-- Script has been initialised --------------------------------------------- --
+local function OnReady(GetAPI)
+  -- Get imports
+  aCursorData, aCursorIdData, texSpr =
+    GetAPI("aCursorData", "aCursorIdData", "texSpr");
+  -- Enable cursor clamper when fbo changes
+  GetAPI("RegisterFBUCallback")("input", OnFrameBufferUpdate);
+  -- Enable input capture events
+  Input.OnJoyState(OnJoyState);
+  Input.OnKey(OnKey);
+  Input.OnMouseClick(OnMouseClick);
+  Input.OnMouseMove(OnMouseMove);
+  Input.OnMouseScroll(OnMouseScroll);
+end
 -- Exports and imports ----------------------------------------------------- --
-return { A = {
-  -- Exports --------------------------------------------------------------- --
-  ClearKeyState = ClearKeyState, ClearMouseState = ClearMouseState,
+return { F = OnReady, A = { ClearMouseState = ClearMouseState,
   ClearStates = ClearStates, CursorRender = CursorRender,
-  GetCallbacks = GetCallbacks, GetCursor = GetCursor,
-  GetJoyState = GetJoyState, GetKeyBank = GetKeyBank,
-  GetKeyState = GetKeyState, GetMouseState = GetMouseState,
-  GetMouseX = GetMouseX, GetMouseY = GetMouseY, IsButtonHeld = IsButtonHeld,
-  IsButtonPressed = IsButtonPressed,
+  GetCursor = GetCursor, GetJoyState = GetJoyState, GetKeyBank = GetKeyBank,
+  GetMouseState = GetMouseState, GetMouseX = GetMouseX, GetMouseY = GetMouseY,
+  IsButtonHeld = IsButtonHeld, IsButtonPressed = IsButtonPressed,
   IsButtonPressedNoRelease = IsButtonPressedNoRelease,
   IsButtonReleased = IsButtonReleased, IsJoyHeld = IsJoyHeld,
   IsJoyPressed = IsJoyPressed, IsJoyReleased = IsJoyReleased,
-  IsKeyHeld = IsKeyHeld, IsKeyPressed = IsKeyPressed,
-  IsKeyReleased = IsKeyReleased, IsKeyRepeating = IsKeyRepeating,
   IsMouseHeld = IsMouseHeld, IsMouseInBounds = IsMouseInBounds,
   IsMouseNotInBounds = IsMouseNotInBounds, IsMousePressed = IsMousePressed,
   IsMousePressedNoRelease = IsMousePressedNoRelease,
@@ -401,24 +390,5 @@ return { A = {
   IsScrollingLeft = IsScrollingLeft, IsScrollingRight = IsScrollingRight,
   IsScrollingUp = IsScrollingUp, JoystickProc = JoystickProc,
   RegisterGlobalKeys = RegisterGlobalKeys, RegisterKeys = RegisterKeys,
-  SetCursor = SetCursor, SetKeys = SetKeys;
-  -- ----------------------------------------------------------------------- --
-  }, F = function(GetAPI)
-  -- Imports --------------------------------------------------------------- --
-  texSpr, aCursorIdData, aCursorData =
-    GetAPI("texSpr", "aCursorIdData", "aCursorData");
-  -- Enable cursor fixer when fbo changes ---------------------------------- --
-  GetAPI("RegisterFBUCallback")("input", OnFrameBufferUpdate);
-  -- Pur cursor in centre -------------------------------------------------- --
-  Input.SetCursorCentre();
-  -- Enable input capture events ------------------------------------------- --
-  Input.OnJoyState(OnJoyState);
-  Input.OnKey(OnKey);
-  Input.OnMouseClick(OnMouseClick);
-  Input.OnMouseMove(OnMouseMove);
-  Input.OnMouseScroll(OnMouseScroll);
-  -- Request joystick events again (we didn't get them on the first frame) - --
-  Input.RefreshJoysticks();
-  -- ----------------------------------------------------------------------- --
-end };
+  SetCursor = SetCursor, SetKeys = SetKeys } };
 -- End-of-File ============================================================= --

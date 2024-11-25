@@ -355,7 +355,7 @@ local function InitScore()
                 -- Dereference assets for garbage collection
                 texTitle = true;
                 --- ...and return to title screen!
-                InitTitle(true);
+                InitTitle();
               end
               -- Fade out...
               Fade(0, 1, 0.01, RenderScore, OnFadeOut, true);

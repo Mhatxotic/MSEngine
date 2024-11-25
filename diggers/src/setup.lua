@@ -64,7 +64,7 @@ local iCVvidvsync<const>, iCVappdelay<const>, iCVtexfilter<const>,
 -- Diggers function and data aliases --------------------------------------- --
 local aCursorIdData, aSetupButtonData, aSetupOptionData, aSfxData, fontLarge,
   fontLittle, fontTiny, GetCallbacks, GetCursor, GetKeyBank, GetMouseY,
-  GetMusic, InitSetup, IsButtonHeld, IsButtonPressed, IsFading,
+  GetMusic, InitSetup, IsButtonHeld, IsButtonPressed,
   IsMouseInBounds, IsMouseYGreaterEqualThan, IsMouseYLessThan, IsScrollingDown,
   IsScrollingLeft, IsScrollingRight, IsScrollingUp, LoadResources, PlayMusic,
   PlayStaticSound, RegisterFBUCallback, RegisterKeys, RenderFade, RenderShadow,
@@ -240,16 +240,20 @@ local function Finish()
   SetCallbacks(fcbTick, fcbRender, fcbInput);
   -- Set original cursor
   SetCursor(iCursorId);
-  -- No music to set? Stop current music and return
-  if not lastMusic then return StopMusic() end;
-  -- Resume music
-  PlayMusic(lastMusic, nil, 2);
-  -- Do not keep reference to handle
-  lastMusic = nil;
+  -- Music to resume?
+  if lastMusic then
+    -- Play the music
+    PlayMusic(lastMusic, nil, 2);
+    -- Do not keep reference to handle
+    lastMusic = nil;
+  -- No music to set? Just stop the setup music
+  else StopMusic() end;
   -- Restore redraw callback
   RegisterFBUCallback("setup");
-  -- Restore original keys
+  -- Restore original keybank
   SetKeys(true, iKeyBankLast);
+  -- Done with saved keybank id
+  iKeyBankLast = nil;
 end
 -- ------------------------------------------------------------------------- --
 local function Refresh()
@@ -674,8 +678,6 @@ local function InitConfig()
 end
 -- ------------------------------------------------------------------------- --
 local function DoInitSetup(iMode)
-  -- Ignore if fading
-  if IsFading() then return end;
   -- Get current callbacks
   local CBProc, CBRender, CBInput = GetCallbacks();
   -- Available modes
@@ -734,7 +736,7 @@ local function OnReady(GetAPI)
   -- Grab import functions and data
   aCursorIdData, aSetupButtonData, aSetupOptionData, aSfxData, fontLarge,
     fontLittle, fontTiny, GetCallbacks, GetCursor, GetKeyBank, GetMouseY,
-    GetMusic, IsButtonHeld, IsButtonPressed, IsFading, IsMouseInBounds,
+    GetMusic, IsButtonHeld, IsButtonPressed, IsMouseInBounds,
     IsMouseYGreaterEqualThan, IsMouseYLessThan, IsScrollingDown,
     IsScrollingLeft, IsScrollingRight, IsScrollingUp, LoadResources, PlayMusic,
     PlayStaticSound, RegisterFBUCallback, RegisterKeys, RenderFade,
@@ -742,7 +744,7 @@ local function OnReady(GetAPI)
       GetAPI("aCursorIdData", "aSetupButtonData", "aSetupOptionData",
         "aSfxData", "fontLarge", "fontLittle", "fontTiny", "GetCallbacks",
         "GetCursor", "GetKeyBank", "GetMouseY", "GetMusic", "IsButtonHeld",
-        "IsButtonPressed", "IsFading", "IsMouseInBounds",
+        "IsButtonPressed", "IsMouseInBounds",
         "IsMouseYGreaterEqualThan", "IsMouseYLessThan", "IsScrollingDown",
         "IsScrollingLeft", "IsScrollingRight", "IsScrollingUp",
         "LoadResources", "PlayMusic", "PlayStaticSound", "RegisterFBUCallback",
@@ -1005,27 +1007,20 @@ local function OnReady(GetAPI)
   end
   -- Setup key bank
   local aKeys<const>, aStates<const> = Input.KeyCodes, Input.States;
-  local iKeyEscape<const>, iKeyPageUp<const>, iKeyPageDown<const>,
-    iKeyHome<const>, iKeyEnd<const>, iKeyUp<const>, iKeyDown<const> =
-      aKeys.ESCAPE, aKeys.PAGE_UP,aKeys.PAGE_DOWN, aKeys.HOME, aKeys.END,
-      aKeys.UP, aKeys.DOWN;
-  -- Setup configuration keys
-  local aGenericEscape<const> = { iKeyEscape, Finish, "Exit setup screen" };
+  local aGenericEscape<const> = { aKeys.ESCAPE, Finish };
   local aOnlyEscape<const> = { [aStates.PRESS] = { aGenericEscape } };
+  -- Setup configuration keys
   iKeyBankSetup = RegisterKeys(aOnlyEscape);
   -- Setup readme keys
-  local aReadmePageUp<const>,
-        aReadmePageDown<const>,
-        aReadmeHome<const>,
-        aReadmeEnd<const>,
-        aReadmeUp<const>,
-        aReadmeDown<const> =
-    { iKeyPageUp,   ScrollReadmePageUp,   "Page readme up" },
-    { iKeyPageDown, ScrollReadmePageDown, "Page readme down" },
-    { iKeyHome,     ScrollReadmeHome,     "Start of readme" },
-    { iKeyEnd,      ScrollReadmeEnd,      "End of readme" },
-    { iKeyUp,       ScrollReadmeUp,       "Scroll readme up" },
-    { iKeyDown,     ScrollReadmeDown,     "Scroll readme down" };
+  local aReadmePageUp<const>, aReadmePageDown<const>,
+        aReadmeHome<const>,   aReadmeEnd<const>,
+        aReadmeUp<const>,     aReadmeDown<const> =
+    { aKeys.PAGE_UP,   ScrollReadmePageUp },
+    { aKeys.PAGE_DOWN, ScrollReadmePageDown },
+    { aKeys.HOME,      ScrollReadmeHome },
+    { aKeys.END,       ScrollReadmeEnd },
+    { aKeys.UP,        ScrollReadmeUp },
+    { aKeys.DOWN,      ScrollReadmeDown };
   iKeyBankReadme = RegisterKeys({
     [aStates.PRESS] = { aGenericEscape, aReadmePageUp, aReadmePageDown,
       aReadmeHome, aReadmeEnd, aReadmeUp, aReadmeDown },
@@ -1034,7 +1029,6 @@ local function OnReady(GetAPI)
   });
   -- Setup bind keys
   iKeyBankBind = RegisterKeys(aOnlyEscape);
-
   -- Init third party credits
   local function Header(sString)
     -- Add ellipsis

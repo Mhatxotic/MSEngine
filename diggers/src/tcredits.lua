@@ -13,14 +13,13 @@
 -- M-Engine function aliases ----------------------------------------------- --
 -- Diggers function and data aliases --------------------------------------- --
 local aCreditsData, Fade, fontLarge, fontLittle, InitTitle, InitTitle,
-  IsButtonReleased, LoadResources, PlayMusic, RegisterKeys, SetCallbacks,
-  SetKeys;
+  IsButtonReleased, LoadResources, PlayMusic, SetCallbacks, SetKeys;
 -- Assets required --------------------------------------------------------- --
 local aAssets<const> = { { T = 2, F = "title", P = { 0 } },
                          { T = 7, F = "title", P = {   } } };
 -- Locals ------------------------------------------------------------------ --
 local texTitle;                        -- Title screen texture
-local iKeyBankTitleCredit;             -- Key bank for credits cancel
+local iKeyBankId;                      -- Key bank for title credits keys
 local iCreditsCounter, iCreditsNext;   -- Credits timer and next trigger
 local strCredits1, iCredits1Y;         -- Large font title text and position
 local strCredits2, iCredits2Y;         -- Small font subtitle text and position
@@ -83,7 +82,7 @@ end
 -- When credits have faded in? --------------------------------------------- --
 local function OnRenderCreditsFadeIn()
   -- Set keys for this screen
-  SetKeys(true, iKeyBankTitleCredit);
+  SetKeys(true, iKeyBankId);
   -- Set credits callback
   SetCallbacks(CreditsLogic, RenderCredits, CreditsInput);
 end
@@ -125,15 +124,14 @@ end
 local function OnReady(GetAPI)
   -- Get imports
   aCreditsData, Fade, fontLarge, fontLittle, InitTitle, IsButtonReleased,
-  LoadResources, PlayMusic, RegisterKeys, SetCallbacks, SetKeys =
+  LoadResources, PlayMusic, SetCallbacks, SetKeys =
     GetAPI("aCreditsData", "Fade", "fontLarge", "fontLittle", "InitTitle",
-      "IsButtonReleased", "LoadResources", "PlayMusic", "RegisterKeys",
-      "SetCallbacks", "SetKeys");
+      "IsButtonReleased", "LoadResources", "PlayMusic", "SetCallbacks",
+      "SetKeys");
   -- Register keybinds
   local aKeys<const>, aStates<const> = Input.KeyCodes, Input.States;
-  local iKeyEscape<const> = aKeys.ESCAPE;
-  iKeyBankTitleCredit = RegisterKeys({
-    [aStates.PRESS] = { { iKeyEscape, FadeToTitle, "Cancel credits screen" } }
+  iKeyBankId = GetAPI("RegisterKeys")({
+    [aStates.PRESS] = { { aKeys.ESCAPE, FadeToTitle } }
   });
 end
 -- Return imports and exports ---------------------------------------------- --

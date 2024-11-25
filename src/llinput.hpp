@@ -91,7 +91,8 @@ LLFUNC(SetJoyAxisDeadZones, 0,
 // > X:integer=The X co-ordinate of the mouse cursor.
 // > Y:integer=The Y co-ordinate of the mouse cursor.
 // ? Sets the position of the mouse cursor relative to the top-left of the
-// ? main FBO matrix, meaning X could be negative.
+// ? main FBO matrix, meaning X could be negative. The specified co-ordinates
+// ? will also be sent to the 'Input.OnMouseMove' callback if set.
 /* ------------------------------------------------------------------------- */
 LLFUNC(SetCursorPos, 0,
   const AgGLfloat aX{lS, 1},
@@ -200,10 +201,15 @@ LLFUNC(OnMouseClick, 0, cLua->SetLuaRef(lS, cInput->lfOnMouseClick))
 /* ========================================================================= */
 // $ Input.OnMouseMove
 // > Func:function=The callback function to use
-// ? When the mouse is moved, this function will be called with the
-// ? current cursor x and y position based on the main framebuffer.
+// ? Sets teh callback function for When the mouse is moved. It will also be
+// ? called immediately after setting a function. The syntax for the callback
+// ? is 'Callback(nX, nY)' where 'nX' is the left co-ordinate and 'nY' is the
+// ? top co-ordinate. Setting the function to 'nil' unreferences the already
+// ? referenced function.
 /* ------------------------------------------------------------------------- */
-LLFUNC(OnMouseMove, 0, cLua->SetLuaRef(lS, cInput->lfOnMouseMove))
+LLFUNC(OnMouseMove, 0,
+  if(cLua->SetLuaRef(lS, cInput->lfOnMouseMove))
+    cInput->RequestMousePosition())
 /* ========================================================================= */
 // $ Input.OnDragDrop
 // > Func:function=The callback function to use
@@ -228,10 +234,16 @@ LLFUNC(OnChar, 0, cLua->SetLuaRef(lS, cInput->lfOnChar))
 /* ========================================================================= */
 // $ Input.OnJoyState
 // > Func:function=The callback function to use
-// ? When a joystick is disconnected or disconnected, this callback will be
-// ? triggered with the joystick id and a boolean if wether the
+// ? Sets the callback event when a joystick event occurs and then polls the
+// ? joysticks sending results to the callback. Specify 'nil' to clear the
+// ? event. The callback syntax is 'Callback(iJoystick, bConnected)' Where
+// ? 'iJoystick' is the unique joystick id given to the joystick and
+// ?  'bConnected' is if the joystick was connected (true) or disconnected
+// ? (false).
 /* ------------------------------------------------------------------------- */
-LLFUNC(OnJoyState, 0, cLua->SetLuaRef(lS, cInput->lfOnJoyState))
+LLFUNC(OnJoyState, 0,
+  if(cLua->SetLuaRef(lS, cInput->lfOnJoyState))
+    cInput->AutoDetectJoystick())
 /* ========================================================================= */
 // $ Input.OnKey
 // > Func:function=The callback function to use
@@ -239,12 +251,6 @@ LLFUNC(OnJoyState, 0, cLua->SetLuaRef(lS, cInput->lfOnJoyState))
 // ? key that was pressed
 /* ------------------------------------------------------------------------- */
 LLFUNC(OnKey, 0, cLua->SetLuaRef(lS, cInput->lfOnKey))
-/* ========================================================================= */
-// $ Input.RefreshJoysticks
-// ? Request refresh of joysticks. Use this if you needed to delay setting the
-// ? OnJoy() event callback and therefore you need to request the list again.
-/* ------------------------------------------------------------------------- */
-LLFUNC(RefreshJoysticks, 0, cInput->AutoDetectJoystick());
 /* ========================================================================= */
 // $ Input.GetKeyName
 // > Value:integer=The id of the key
@@ -269,10 +275,10 @@ LLRSBEGIN                              // Input.* namespace functions begin
   LLRSFUNC(OnDragDrop),                LLRSFUNC(OnJoyState),
   LLRSFUNC(OnKey),                     LLRSFUNC(OnMouseClick),
   LLRSFUNC(OnMouseFocus),              LLRSFUNC(OnMouseMove),
-  LLRSFUNC(OnMouseScroll),             LLRSFUNC(RefreshJoysticks),
-  LLRSFUNC(SetCursor),                 LLRSFUNC(SetCursorCentre),
-  LLRSFUNC(SetCursorPos),              LLRSFUNC(SetJoyAxisDeadZones),
-  LLRSFUNC(SetJoyAxisForwardDeadZone), LLRSFUNC(SetJoyAxisReverseDeadZone),
+  LLRSFUNC(OnMouseScroll),             LLRSFUNC(SetCursor),
+  LLRSFUNC(SetCursorCentre),           LLRSFUNC(SetCursorPos),
+  LLRSFUNC(SetJoyAxisDeadZones),       LLRSFUNC(SetJoyAxisForwardDeadZone),
+  LLRSFUNC(SetJoyAxisReverseDeadZone),
 LLRSEND                                // Input.* namespace functions end
 /* ========================================================================= **
 ** ######################################################################### **

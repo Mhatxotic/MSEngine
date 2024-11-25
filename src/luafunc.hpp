@@ -224,12 +224,15 @@ CTOR_MEM_BEGIN_CSLAVE(LuaFuncs, LuaFunc, ICHelperUnsafe),
   /* -- De-initialise saved function --------------------------------------- */
   void LuaFuncDeInit(void)
     { for(int &iReference : aReferences) LuaFuncRmSetRef(iReference); }
+  /* -- Set empty callbacks ------------------------------------------------ */
+  void LuaFuncClearRef(void)
+    { LuaFuncRmSetRef(iLiveReference, LuaFuncGetEmptyFunc()); }
   /* -- Set a new function ------------------------------------------------- */
   void LuaFuncSet(void)
   { // If last item on stack is a C function?
     if(LuaUtilIsCFunction(LuaFuncGetState(), -1))
     { // De-init old reference if it not empty function
-      LuaFuncRmSetRef(iLiveReference, LuaFuncGetEmptyFunc());
+      LuaFuncClearRef();
       // Set reference to C function
       iLiveReference = LuaUtilRefInit(LuaFuncGetState());
       if(LuaUtilIsNotRefValid(iLiveReference))
@@ -242,7 +245,7 @@ CTOR_MEM_BEGIN_CSLAVE(LuaFuncs, LuaFunc, ICHelperUnsafe),
     } // If last item on stack is a regular function?
     else if(LuaUtilIsFunction(LuaFuncGetState(), -1))
     { // Set reference to c function. Do NOT de-initialise empty function
-      LuaFuncRmSetRef(iLiveReference, LuaFuncGetEmptyFunc());
+      LuaFuncClearRef();
       // Set reference to regular function
       iLiveReference = LuaUtilRefInit(LuaFuncGetState());
       if(LuaUtilIsNotRefValid(iLiveReference))

@@ -12,8 +12,8 @@
 -- Lua aliases (optimisation) ---------------------------------------------- --
 local error, tostring = error, tostring;
 -- M-Engine aliases (optimisation) ----------------------------------------- --
-local UtilIsInteger<const>, UtilIsNumber<const>, UtilIsTable<const> =
-  Util.IsInteger, Util.IsNumber, Util.IsTable;
+local UtilBlank<const>, UtilIsInteger<const>, UtilIsNumber<const>,
+  UtilIsTable<const> = Util.Blank, Util.IsInteger, Util.IsNumber, Util.IsTable;
 -- Input handling variables ------------------------------------------------ --
 local aSounds             = { };       -- Sound effects
 local vVideo;                          -- FMV playback handle
@@ -139,13 +139,10 @@ local function RegisterSounds(aHandles, iStart, iExpect)
     error("Only "..#aSounds.." of "..iExpect.." sound effects!") end;
 end
 -- Return module information ----------------------------------------------- --
-return { A = {                         -- Exports
-  GetMusic = GetMusic, LoopSound = LoopSound,
+return { F = UtilBlank, A = { GetMusic = GetMusic, LoopSound = LoopSound,
   LoopStaticSound = LoopStaticSound, MusicVolume = MusicVolume,
   PauseMusic = PauseMusic, PlayMusic = PlayMusic, PlaySound = PlaySound,
   PlayStaticSound = PlayStaticSound, RegisterSounds = RegisterSounds,
   ResumeMusic = ResumeMusic, StopMusic = StopMusic, StopSound = StopSound,
-  VideoPlay = VideoPlay, VideoStop = VideoStop, InitTNTMap = InitTNTMap
-}, F = function(GetAPI)                -- Imports (none)
-end };
+  VideoPlay = VideoPlay, VideoStop = VideoStop, InitTNTMap = InitTNTMap } };
 -- End-of-File ============================================================= --

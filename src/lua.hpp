@@ -50,16 +50,18 @@ static class Lua final :
     { cEvtMain->ConfirmExit(); return 0; }
   /* -- Return lua state --------------------------------------------------- */
   lua_State *GetState(void) const { return lsState.get(); }
-  /* -- Set a lua reference (LuaFunc can't have this check) ---------------- */
-  void SetLuaRef(lua_State*const lS, LuaFunc &lrEvent, const int iParam=1)
-  { // Check we have the correct number of requested parameters
-    LuaUtilCheckParams(lS, iParam);
-    // It must be a function
-    LuaUtilCheckFunc(lS, iParam);
-    // And must be on the main thread
+  /* -- Set or clear a lua reference (LuaFunc can't have this check) ------- */
+  bool SetLuaRef(lua_State*const lS, LuaFunc &lrEvent)
+  { // Must be on the main thread
     StateAssert(lS);
-    // Set the function
+    // Check we have the correct number of requested parameters
+    LuaUtilCheckParams(lS, 1);
+    // If is nil then clear it and return failure
+    if(LuaUtilIsNil(lS, 1)) { lrEvent.LuaFuncClearRef(); return false; }
+    // Set the function if valid
     lrEvent.LuaFuncSet();
+    // Return success
+    return true;
   }
   /* -- Ask LUA to tell guest to redraw ------------------------------------ */
   void SendRedraw(const EvtMainEvent&)

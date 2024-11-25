@@ -19,18 +19,14 @@ local UtilIsBoolean<const>, UtilIsInteger<const>, UtilIsString<const>,
 -- Diggers function and data aliases --------------------------------------- --
 local Fade, GetCapitalValue, GetGameTicks, InitPost, InitScore,
   IsButtonReleased, LoadResources, PlayMusic, PlayStaticSound, RenderFade,
-  RenderObjects, RenderTerrain, SetCallbacks, SetCursor, aCursorIdData,
-  aGemsAvailable, aGlobalData, aSfxData, fontLarge;
+  RenderObjects, RenderTerrain, SetCallbacks, SetCursor, SetKeys,
+  aCursorIdData, aGemsAvailable, aGlobalData, aSfxData, fontLarge;
 -- Resources --------------------------------------------------------------- --
 local aEndAssets<const>  = { T = 2, F = "end", P = { 0 } };
 local aWinAssets<const>  = { true,  -- Select win routines
              { aEndAssets, { T = 7, F = "select", P = { } } } };
 local aLoseAssets<const> = { false, -- Select lose routines
              { aEndAssets, { T = 7, F = "lose",   P = { } } } };
--- Need some key codes ----------------------------------------------------- --
-local aKeys<const> = Input.KeyCodes;
-local iKeyUp<const>, iKeyDown<const>, iKeyLeft<const>, iKeyRight<const> =
-  aKeys.UP, aKeys.DOWN, aKeys.LEFT, aKeys.RIGHT;
 -- Initialise the lose screen ---------------------------------------------- --
 local function InitEnd(iLId, aActivePlayer, aOpponentPlayer, aInfoResources,
   iEndTexId, sMsg)
@@ -289,6 +285,8 @@ local function InitEnd(iLId, aActivePlayer, aOpponentPlayer, aInfoResources,
     -- Change render procedures
     SetCallbacks(ProcAnimateEnd, RenderEnd, nil);
   end
+  -- Disable keys
+  SetKeys(true);
   -- Load level ending resources
   LoadResources("ZoneEnd", aInfoResources[2], OnLoaded);
 end
@@ -311,14 +309,14 @@ return { A = {                         -- Exports
   -- Imports ------------------------------------------------------------- --
   Fade, GetCapitalValue, GetGameTicks, InitPost, InitScore, IsButtonReleased,
   LoadResources, PlayMusic, PlayStaticSound, RenderFade, RenderObjects,
-  RenderTerrain, SetCallbacks, SetCursor, aCursorIdData, aGemsAvailable,
-  aGlobalData, aSfxData, fontLarge
+  RenderTerrain, SetCallbacks, SetCursor, SetKeys, aCursorIdData,
+  aGemsAvailable, aGlobalData, aSfxData, fontLarge
   = -- ------------------------------------------------------------------- --
   GetAPI("Fade", "GetCapitalValue", "GetGameTicks", "InitPost", "InitScore",
     "IsButtonReleased", "LoadResources", "PlayMusic", "PlayStaticSound",
     "RenderFade", "RenderObjects", "RenderTerrain", "SetCallbacks",
-    "SetCursor", "aCursorIdData", "aGemsAvailable", "aGlobalData", "aSfxData",
-    "fontLarge");
+    "SetCursor", "SetKeys", "aCursorIdData", "aGemsAvailable", "aGlobalData",
+    "aSfxData", "fontLarge");
   -- --------------------------------------------------------------------- --
 end };
 -- End-of-File ============================================================= --

@@ -288,12 +288,14 @@ class JoyInfo :
     if(const char*const cpG = glfwGetJoystickGUID(GetId()))
       cLog->LogDebugExSafe("- Gamepad Identifier: $.", cpG);
   }
-  /* -- Reset data ------------------------------------------------------- */
+  /* -- Remove connected flag ---------------------------------------------- */
+  void DoDisconnect(void) { FlagClear(JF_CONNECTED); }
+  /* -- Reset data --------------------------------------------------------- */
   void Disconnect(void)
   { // Ignore if already disconnected
     if(IsDisconnected()) return;
     // No longer connected
-    FlagClear(JF_CONNECTED);
+    DoDisconnect();
     // We lost the specified joystick
     cLog->LogInfoExSafe("Input disconnected $ '$' (I:$).",
       GetGamepadOrJoystickString(), IdentGet(), GetId());
@@ -411,13 +413,16 @@ static class Input final :             // Handles keyboard, mouse & controllers
     // Set event to lua callbacks
     lfOnMouseClick.LuaFuncDispatch(emaArgs[1].i, emaArgs[2].i, emaArgs[3].i);
   }
-  /* -- Mouse button clicked ----------------------------------------------- */
+  /* -- Dispatch mouse move event ------------------------------------------ */
+  void DispatchMouseMove(const double dX, const double dY)
+    { lfOnMouseMove.LuaFuncDispatch(dX, dY); }
+  /* -- Mouse moved -------------------------------------------------------- */
   void OnMouseMove(const EvtMainEvent &emeEvent)
   { // Get reference to actual arguments vector
     const EvtMainArgs &emaArgs = emeEvent.aArgs;
     // Recalculate cursor position based on framebuffer size and send the
     // new co-ordinates to the lua callback handler
-    lfOnMouseMove.LuaFuncDispatch(
+    DispatchMouseMove(
       static_cast<double>(cFboCore->fboMain.ffcStage.GetCoLeft()) +
         ((emaArgs[1].d / GetWindowWidth()) *
         static_cast<double>(cFboCore->fboMain.GetCoRight())),
@@ -543,6 +548,21 @@ static class Input final :             // Handles keyboard, mouse & controllers
     // Request to set cursor visibility
     CommitCursor();
   }
+  /* -- Reset environment -------------------------------------------------- */
+  void ResetEnvironment(void)
+  { // Reset cursor visibility
+    SetCursor(true);
+    // For each joystick
+    for(JoyInfo &jsData : GetJoyList())
+    { // Clear the connected flag
+      jsData.DoDisconnect();
+      // Clear the state
+      jsData.ClearState();
+    } // No devices connected until the joystick event is set again.
+    stConnected = 0;
+    // Disable polling
+    DisablePolling();
+  }
   /* -- Get button list data ----------------------------------------------- */
   JoyList &GetJoyList(void)
     { return static_cast<JoyList&>(*this); }
@@ -571,9 +591,11 @@ static class Input final :             // Handles keyboard, mouse & controllers
       // Clamp the new position to the window bounds.
       fNewX = UtilClamp(fAdjX, 0.0f, GetWindowWidth() - 1.0f),
       fNewY = UtilClamp(fAdjY, 0.0f, GetWindowHeight() - 1.0f);
-     // Dispatch the request to set the cursor
-     cEvtWin->AddUnblock(EWC_WIN_CURPOSSET,
-       static_cast<double>(fNewX), static_cast<double>(fNewY));
+    // Dispatch the request to set the cursor
+    cEvtWin->AddUnblock(EWC_WIN_CURPOSSET,
+      static_cast<double>(fNewX), static_cast<double>(fNewY));
+    // Dispatch an event to the mouse moved since GlFW won't send an update
+    DispatchMouseMove(static_cast<double>(fX), static_cast<double>(fY));
   }
   /* -- Forcefully move the cursor to the centre --------------------------- */
   void SetCursorCentre(void)
@@ -627,39 +649,18 @@ static class Input final :             // Handles keyboard, mouse & controllers
         ++stConnected;
       } // Send event that the joystick was disconnected
       else ClearJoystickAndDispatch(jsData.GetId());
-    // If we did not find joysticks? Tell log and return
+    // If we did not find joysticks?
     if(!stConnected)
-    { // Disable polling
+    { // Disable polling to not waste CPU cycles
       DisablePolling();
       // Log no controllers
-      return cLog->LogInfoSafe("Input detected no controller devices.");
+      return cLog->LogDebugSafe("Input detected no controller devices.");
     } // Enable polling
     EnablePolling();
     // Log result
-    cLog->LogInfoExSafe(
+    cLog->LogDebugExSafe(
       "Input enabling joystick polling as $ devices are detected.",
       stConnected);
-  }
-  // -- CVar callback to toggle raw mouse ---------------------------------- */
-  CVarReturn SetRawMouseEnabled(const bool bState)
-  { // Send request to set raw mouse motion state if enabled
-    if(IHIsInitialised()) cEvtWin->AddUnblock(EWC_WIN_SETRAWMOUSE, bState);
-    // CVar allowed to be set
-    return ACCEPT;
-  }
-  // -- CVar callback to toggle sticky keys -------------------------------- */
-  CVarReturn SetStickyKeyEnabled(const bool bState)
-  { // Send request to set sticky keys state if enabled
-    if(IHIsInitialised()) cEvtWin->AddUnblock(EWC_WIN_SETSTKKEYS, bState);
-    // CVar allowed to be set
-    return ACCEPT;
-  }
-  // -- CVar callback to toggle sticky mouse ------------------------------- */
-  CVarReturn SetStickyMouseEnabled(const bool bState)
-  { // Send request to set sticky mouse if enabled
-    if(IHIsInitialised()) cEvtWin->AddUnblock(EWC_WIN_SETSTKMOUSE, bState);
-    // CVar allowed to be set
-    return ACCEPT;
   }
   /* -- Clear joystick state ----------------------------------------------- */
   void ClearJoystickButtons(void)
@@ -671,9 +672,8 @@ static class Input final :             // Handles keyboard, mouse & controllers
   JoyInfo &GetJoyData(const size_t stId) { return GetJoyList()[stId]; }
   /* -- Return joysticks count --------------------------------------------- */
   size_t GetJoyCount(void) const { return GetConstJoyList().size(); }
-  /* -- Disable input events ----------------------------------------------- */
+  /* -- Disable/Enable input events ---------------------------------------- */
   void DisableInputEvents(void) { cEvtMain->UnregisterEx(*this); }
-  /* -- Enable input events ------------------------------------------------ */
   void EnableInputEvents(void) { cEvtMain->RegisterEx(*this); }
   /* -- Init --------------------------------------------------------------- */
   void Init(void)
@@ -761,6 +761,27 @@ static class Input final :             // Handles keyboard, mouse & controllers
   DTORHELPER(~Input, DeInit())
   /* ----------------------------------------------------------------------- */
   DELETECOPYCTORS(Input)               // Suppress default functions for safety
+  // -- CVar callback to toggle raw mouse ---------------------------------- */
+  CVarReturn SetRawMouseEnabled(const bool bState)
+  { // Send request to set raw mouse motion state if enabled
+    if(IHIsInitialised()) cEvtWin->AddUnblock(EWC_WIN_SETRAWMOUSE, bState);
+    // CVar allowed to be set
+    return ACCEPT;
+  }
+  // -- CVar callback to toggle sticky keys -------------------------------- */
+  CVarReturn SetStickyKeyEnabled(const bool bState)
+  { // Send request to set sticky keys state if enabled
+    if(IHIsInitialised()) cEvtWin->AddUnblock(EWC_WIN_SETSTKKEYS, bState);
+    // CVar allowed to be set
+    return ACCEPT;
+  }
+  // -- CVar callback to toggle sticky mouse ------------------------------- */
+  CVarReturn SetStickyMouseEnabled(const bool bState)
+  { // Send request to set sticky mouse if enabled
+    if(IHIsInitialised()) cEvtWin->AddUnblock(EWC_WIN_SETSTKMOUSE, bState);
+    // CVar allowed to be set
+    return ACCEPT;
+  }
   /* -- Handle a deadzone change ------------------------------------------- */
   CVarReturn SetDefaultJoyDZ(const float fDZ,
     const function<void(JoyInfo&)> &fcbCallBack)

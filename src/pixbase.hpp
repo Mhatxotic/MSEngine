@@ -28,8 +28,8 @@ class SysBase :                        // Safe exception handler namespace
     const int      iRequested,         // Requested handle
                    iSaved;             // Saved handle
     array<int,2>   iaPipes;            // Pipes
-    int           &iRead;              // Read end of the pipe
-    int           &iWrite;             // Write end of the pipe
+    int           &iRead,              // Read end of the pipe (iaPipes[0])
+                  &iWrite;             // Write end of the pipe (iaPipes[1])
     /* -- Async off-main thread function ----------------------------------- */
     int ThreadMain(Thread&)
     { // Until thread should exit or end of file
@@ -59,23 +59,23 @@ class SysBase :                        // Safe exception handler namespace
       return 1;
     }
     /* --------------------------------------------------------------------- */
+    void CloseRead(void) { if(iRead) close(iRead); }
+    /* --------------------------------------------------------------------- */
     void Reset(void)
     { // Close write pipe handle if opened
       if(iWrite != iInvalid) close(iWrite);
-      // Return if the read pipe handle not opened
-      if(iRead == iInvalid) return;
       // Thread is running?
       if(ThreadIsRunning())
       { // Signal the exit
         ThreadSetExit();
         // Close the read pipe so the thread can exit
-        close(iRead);
+        CloseRead();
         // Wait for the thread to exit
         ThreadJoin();
       } // Thread not running for some reason so just close the handle
-      else close(iRead);
+      else CloseRead();
       // Restore original handle allocated by system
-      dup2(iSaved, iRequested);
+      if(iSaved != iInvalid) dup2(iSaved, iRequested);
     }
     /* ------------------------------------------------------------- */ public:
     void ResetSafe(void)
@@ -117,7 +117,12 @@ class SysBase :                        // Safe exception handler namespace
         ThreadInit(bind(&Redirect::ThreadMain, this, _1), this);
     }
     /* --------------------------------------------------------------------- */
-    ~Redirect(void) { Reset(); }
+    ~Redirect(void)
+    { // Close the handles
+      Reset();
+      // Close the duplicated std handle in the constructor
+      if(iSaved != iInvalid) close(iSaved);
+    }
     /* --------------------------------------------------------------------- */
   } rStdErr;                  // Capture stdout and stderr
 #endif
