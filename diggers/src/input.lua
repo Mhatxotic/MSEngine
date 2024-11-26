@@ -11,21 +11,26 @@
 -- ========================================================================= --
 -- Lua aliases (optimisation) ---------------------------------------------- --
 local error<const>, floor<const>, pairs<const>, remove<const>,
-  tostring<const> =
-    error, math.floor, pairs, table.remove, tostring;
+  tostring<const>, xpcall<const> =
+    error, math.floor, pairs, table.remove, tostring, xpcall;
 -- M-Engine aliases (optimisation) ----------------------------------------- --
-local CoreTicks<const>, InputClearStates<const>, InputGetJoyAxis<const>,
-  InputGetJoyButton<const>, InputGetNumJoyAxises<const>, InputSetCursor<const>,
-  InputSetCursorPos<const>, UtilBlank<const>, UtilClamp<const>,
-  UtilIsBoolean<const>, UtilIsFunction<const>, UtilIsInteger<const>,
-  UtilIsString<const>, UtilIsTable<const>
+local CoreStack<const>, CoreTicks<const>, DisplayReset<const>,
+  InputClearStates<const>, InputGetJoyAxis<const>, InputGetJoyButton<const>,
+  InputGetNumJoyAxises<const>, InputOnJoyState<const>, InputOnKey<const>,
+  InputOnMouseClick<const>, InputOnMouseMove<const>, InputOnMouseScroll<const>,
+  InputSetCursor<const>, InputSetCursorCentre<const>, InputSetCursorPos<const>,
+  SShotFbo<const>, UtilBlank<const>, UtilClamp<const>, UtilIsBoolean<const>,
+  UtilIsFunction<const>, UtilIsInteger<const>, UtilIsString<const>,
+  UtilIsTable<const>, fboMain<const>
   = ------------------------------------------------------------------------ --
-  Core.Ticks, Input.ClearStates, Input.GetJoyAxis, Input.GetJoyButton,
-  Input.GetNumJoyAxises, Input.SetCursor, Input.SetCursorPos, Util.Blank,
-  Util.Clamp, Util.IsBoolean, Util.IsFunction, Util.IsInteger, Util.IsString,
-  Util.IsTable;
+  Core.Stack, Core.Ticks, Display.Reset, Input.ClearStates, Input.GetJoyAxis,
+  Input.GetJoyButton, Input.GetNumJoyAxises, Input.OnJoyState, Input.OnKey,
+  Input.OnMouseClick, Input.OnMouseMove, Input.OnMouseScroll, Input.SetCursor,
+  Input.SetCursorCentre, Input.SetCursorPos, SShot.Fbo, Util.Blank, Util.Clamp,
+  Util.IsBoolean, Util.IsFunction, Util.IsInteger, Util.IsString, Util.IsTable,
+  Fbo.Main();
 -- Diggers function and data aliases --------------------------------------- --
-local aCursorData, aCursorIdData, texSpr;
+local InitSetup, SetErrorMessage, aCursorData, aCursorIdData, texSpr;
 -- Globals ----------------------------------------------------------------- --
 local aKeys<const> = Input.KeyCodes;   -- Keyboard scan codes
 local iCursorMin, iCursorMax;          -- Cursor minimum and maximum
@@ -44,7 +49,8 @@ local iJoyActive;                      -- Currently active joystick
 -- Current polled keybinds and all available key binds --------------------- --
 local aGlobalKeyBinds;                 -- Global keybinds (defined later)
 local aKeyBinds;                       -- Key/state/func translation lookup
-local aKeyBank<const> = { { } };       -- All keys ([1] reserved for all)
+local aKeyBank<const> = { };           -- All keys
+local aKeyBankCats<const> = { };       -- All keys categorised
 local iKeyBank = 0;                    -- Currently active keybank
 -- Mouse is in specified bounds -------------------------------------------- --
 local function IsMouseInBounds(iX1, iY1, iX2, iY2)
@@ -123,9 +129,12 @@ local function IsButtonReleased(iButton)
 end
 -- When a key is pressed --------------------------------------------------- --
 local function OnKey(iKey, iState)
-  -- Get function for key and call the function if set else set state of it
-  local aKey<const> = aKeyBinds[iState][iKey];
-  if aKey then aKey() end;
+  -- Get function for key and return if it is not assigned
+  local fcbCb<const> = aKeyBinds[iState][iKey];
+  if not fcbCb then return end;
+  -- Protected call so we can handle errors
+  local bResult<const>, sReason<const> = xpcall(fcbCb, CoreStack);
+  if not bResult then SetErrorMessage(sReason) end;
 end
 -- When the mouse is clicked ----------------------------------------------- --
 local function OnMouseClick(iButton, iState) aMouseState[iButton] = iState end
@@ -228,18 +237,25 @@ local function SetCursor(iId)
   -- Set cursor id
   iCId = iId;
 end
--- Register keys from other module and return to them an identifier
-local function RegisterKeys(aKeys)
+-- Register keys from other module and return to them an identifier -------- --
+local function RegisterKeys(sName, aKeys)
   -- Check that given table is valid
   if not UtilIsTable(aKeys) then
     error("Key table is invalid! "..tostring(aKeys)) end;
   -- Check and add all keys to global bank in key bank
-  local aGlobalBank<const> = aKeyBank[1];
   for iCategory, aBinds in pairs(aKeys) do
+    -- Check that given table is valid
+    if not UtilIsTable(aBinds) then
+      error("Invalid key binds table in category "..iCategory.."! "..
+        tostring(aBinds)) end;
+    -- Enumerate binds
     for iIndex = 1, #aBinds do
-      -- Get bind details
+      -- Get bind details and check default key
       local aBind<const> = aBinds[iIndex];
-      -- Check default key
+      if not UtilIsTable(aBind) then
+        error("Invalid key bind table in category "..iCategory..":"..iIndex..
+          "! "..tostring(aBind)) end;
+      -- Check key
       local iKey<const> = aBind[1];
       if not UtilIsInteger(iKey) then
         error("Invalid key "..tostring(iKey).." at index "..iIndex) end;
@@ -253,22 +269,20 @@ local function RegisterKeys(aKeys)
         -- Check is valid string before accepting
         if not UtilIsString(sDesc) and #sDesc > 0 then
           error("Invalid label "..tostring(sDesc).." at index "..iIndex) end;
-        -- Valid bind so add it to the global key list
-        aGlobalBank[1 + #aGlobalBank] = aBind;
       end
     end
   end
   -- Add keybinds to key bank
   aKeyBank[1 + #aKeyBank] = aKeys;
+  aKeyBankCats[1 + #aKeyBankCats] = { sName, aKeys };
   -- Return identifier
   return #aKeyBank;
 end
--- Return current keybinds list
+-- Return current keybinds list -------------------------------------------- --
 local function GetKeyBank() return iKeyBank end;
--- Set global keys table
+-- Set global keys table --------------------------------------------------- --
 local function SetGlobalKeyBinds(aKeys) aGlobalKeyBinds = aKeys end;
--- Set global keys availability status. The keys will initially not be
--- available until the intro movie begins.
+-- Set active keybinds ----------------------------------------------------- --
 local function SetKeys()
   -- Get statics
   local aStates<const> = Input.States;
@@ -320,13 +334,6 @@ local function SetKeys()
   SetKeys = DoSetKeys;
 end
 SetKeys();
--- Register global keys ---------------------------------------------------- --
-local function RegisterGlobalKeys(aKeys)
-  -- Check parameter
-  if not UtilIsTable(aKeys) then error("Invalid keys: "..tostring(aKeys)) end;
-  -- Set the keys
-  aGlobalKeyBinds = aKeys;
-end
 -- Clear input states ------------------------------------------------------ --
 local function ClearStates()
   -- Make sure user can't input anything
@@ -356,24 +363,54 @@ local function OnFrameBufferUpdate(_, _, nLeft, nTop, nRight, nBottom)
   -- Cursor is off the bottom of screen? Clamp it to bottom
   elseif iCursorY >= iStageBottom then iCursorY = iStageBottom-1 end;
 end
+-- Disable key handlers ---------------------------------------------------- --
+local function DisableKeyHandlers()
+  InputOnJoyState(nil);
+  InputOnKey(nil);
+  InputOnMouseClick(nil);
+  InputOnMouseScroll(nil);
+end
+-- Restore key handlers ---------------------------------------------------- --
+local function RestoreKeyHandlers()
+  InputOnJoyState(OnJoyState);
+  InputOnKey(OnKey);
+  InputOnMouseClick(OnMouseClick);
+  InputOnMouseMove(OnMouseMove);
+  InputOnMouseScroll(OnMouseScroll);
+end
 -- Script has been initialised --------------------------------------------- --
 local function OnReady(GetAPI)
   -- Get imports
-  aCursorData, aCursorIdData, texSpr =
-    GetAPI("aCursorData", "aCursorIdData", "texSpr");
+  InitSetup, SetErrorMessage, aCursorData, aCursorIdData, texSpr =
+    GetAPI("InitSetup", "SetErrorMessage", "aCursorData", "aCursorIdData",
+      "texSpr");
   -- Enable cursor clamper when fbo changes
   GetAPI("RegisterFBUCallback")("input", OnFrameBufferUpdate);
   -- Enable input capture events
-  Input.OnJoyState(OnJoyState);
-  Input.OnKey(OnKey);
-  Input.OnMouseClick(OnMouseClick);
-  Input.OnMouseMove(OnMouseMove);
-  Input.OnMouseScroll(OnMouseScroll);
+  RestoreKeyHandlers();
+  -- Global function key callbacks
+  local function GkCbConfig() InitSetup(1) end;
+  local function GkCbBinds() InitSetup(2) end;
+  local function GkCbReadme() InitSetup(3) end;
+  local function GkCbSShot() SShotFbo(fboMain) end;
+  -- Set the global keybinds
+  aGlobalKeyBinds = { [Input.States.PRESS] = {
+    { aKeys.F1,  GkCbConfig,           "SETUP SCREEN" };
+    { aKeys.F2,  GkCbBinds,            "SETUP KEYBINDS" },
+    { aKeys.F3,  GkCbReadme,           "SHOW CREDITS" },
+    { aKeys.F10, InputSetCursorCentre, "SET CURSOR CENTRE" },
+    { aKeys.F11, DisplayReset,         "RESET WINDOW SIZE" },
+    { aKeys.F12, GkCbSShot,            "TAKE SCREENSHOT" },
+  }}
+  -- Add keybinds to key bank categories for configuration
+  aKeyBankCats[1 + #aKeyBankCats] = { "GLOBAL", aGlobalKeyBinds };
 end
 -- Exports and imports ----------------------------------------------------- --
 return { F = OnReady, A = { ClearMouseState = ClearMouseState,
   ClearStates = ClearStates, CursorRender = CursorRender,
-  GetCursor = GetCursor, GetJoyState = GetJoyState, GetKeyBank = GetKeyBank,
+  DisableKeyHandlers = DisableKeyHandlers,
+  GetCursor = GetCursor, GetJoyState = GetJoyState, GetKeys = GetKeys,
+  GetKeyBank = GetKeyBank,
   GetMouseState = GetMouseState, GetMouseX = GetMouseX, GetMouseY = GetMouseY,
   IsButtonHeld = IsButtonHeld, IsButtonPressed = IsButtonPressed,
   IsButtonPressedNoRelease = IsButtonPressedNoRelease,
@@ -389,6 +426,8 @@ return { F = OnReady, A = { ClearMouseState = ClearMouseState,
   IsMouseYLessThan = IsMouseYLessThan, IsScrollingDown = IsScrollingDown,
   IsScrollingLeft = IsScrollingLeft, IsScrollingRight = IsScrollingRight,
   IsScrollingUp = IsScrollingUp, JoystickProc = JoystickProc,
-  RegisterGlobalKeys = RegisterGlobalKeys, RegisterKeys = RegisterKeys,
-  SetCursor = SetCursor, SetKeys = SetKeys } };
+  RegisterKeys = RegisterKeys,
+  RestoreKeyHandlers = RestoreKeyHandlers,
+  SetCursor = SetCursor, SetKeys = SetKeys, aKeyBank = aKeyBank,
+  aKeyBankCats = aKeyBankCats } };
 -- End-of-File ============================================================= --

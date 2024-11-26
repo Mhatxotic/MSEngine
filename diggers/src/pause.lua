@@ -111,7 +111,7 @@ local function OnReady(GetAPI)
         "StopMusic", "TriggerEnd", "fontLittle", "fontTiny");
   -- Setup keybank
   local aKeys<const>, aStates<const> = Input.KeyCodes, Input.States;
-  iKeyBankId = GetAPI("RegisterKeys")({
+  iKeyBankId = GetAPI("RegisterKeys")("PAUSE SCREEN", {
     [aStates.PRESS] = { { aKeys.Q, EndGame }, { aKeys.ESCAPE, ContinueGame } }
   });
 end

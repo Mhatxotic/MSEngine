@@ -29,7 +29,7 @@ local aAssets<const> = { { T = 2, F = "end", P = { 0 } },
 local texEnd;                          -- Post mortem textures
 local sObjectDefault<const> = "MAP POST MORTEM";
 local sObject;                         -- Object selected text
-local iKeyBank;                        -- Key bank to monitor keypresses
+local iKeyBankId;                        -- Key bank to monitor keypresses
 local iObject;                         -- Current object
 -- Post mortem logic ------------------------------------------------------- --
 local function LogicPostMortem()
@@ -149,7 +149,7 @@ local function LogicAnimatedPostMortem()
   -- Clamp fade to fully transparent
   nFade = 0;
   -- Enable post mortem keys
-  SetKeys(true, iKeyBank);
+  SetKeys(true, iKeyBankId);
   -- Set no object id
   iObject = 0;
   -- Set OK (continue) cursor
@@ -218,7 +218,7 @@ local function OnReady(GetAPI)
   local aScrUp<const>, aScrDown<const>, aScrLeft<const>, aScrRight<const> =
     { aKeys.UP, ScrollUp },     { aKeys.DOWN, ScrollDown },
     { aKeys.LEFT, ScrollLeft }, { aKeys.RIGHT, ScrollRight };
-  iKeyBank = GetAPI("RegisterKeys")({
+  iKeyBankId = GetAPI("RegisterKeys")("MAP POST MORTEM", {
     [aStates.PRESS] = { { aKeys.ESCAPE, FadeToLobby },
                         { aKeys.MINUS, PreviousObject },
                         { aKeys.EQUAL, NextObject },

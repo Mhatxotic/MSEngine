@@ -130,7 +130,7 @@ local function OnReady(GetAPI)
       "SetKeys");
   -- Register keybinds
   local aKeys<const>, aStates<const> = Input.KeyCodes, Input.States;
-  iKeyBankId = GetAPI("RegisterKeys")({
+  iKeyBankId = GetAPI("RegisterKeys")("CREDITS KEYS", {
     [aStates.PRESS] = { { aKeys.ESCAPE, FadeToTitle } }
   });
 end

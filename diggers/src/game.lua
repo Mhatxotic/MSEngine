@@ -4589,32 +4589,47 @@ local function OnReady(GetAPI)
   local function AdjustVPYNS(iY)
     AdjustViewPortY(iY); iPixPosTargetY = iPosY * 16 end;
   -- Move viewport
-  local function ScrollH(iA) if GetTestMode() then AdjustVPXNS(iA) end end;
-  local function ScrollV(iA) if GetTestMode() then AdjustVPYNS(iA) end end;
-  local function ScrollUp() ScrollV(-16) end;
-  local function ScrollDown() ScrollV(16) end;
-  local function ScrollLeft() ScrollH(-16) end;
-  local function ScrollRight() ScrollH(16) end;
+  local function ScrollH(iA) AdjustVPXNS(iA) end;
+  local function ScrollV(iA) AdjustVPYNS(iA) end;
+  local function ScrollUp() if GetTestMode() then ScrollV(-16) end end;
+  local function ScrollDown() if GetTestMode() then ScrollV(16) end end;
+  local function ScrollLeft() if GetTestMode() then ScrollH(-16) end end;
+  local function ScrollRight() if GetTestMode() then ScrollH(16) end end;
   -- Setup keybank
   local aKeys<const>, aStates<const> = Input.KeyCodes, Input.States;
-  iKeyBankId = GetAPI("RegisterKeys")({
+  iKeyBankId = GetAPI("RegisterKeys")("GAME KEYS", {
     [aStates.PRESS] = {
-      { aKeys.ONE, SetDiggerOne },     { aKeys.TWO, SetDiggerTwo },
-      { aKeys.THREE, SetDiggerThree }, { aKeys.FOUR, SetDiggerFour },
-      { aKeys.FIVE, SetDiggerFive },   { aKeys.SPACE, SelectDevice },
-      { aKeys.F5, SelectInventory },   { aKeys.F6, SelectLocation },
-      { aKeys.F7, SelectStatus },      { aKeys.F8, SelectBook },
-      { aKeys.UP, JumpDigger },        { aKeys.LEFT, MoveLeft },
-      { aKeys.RIGHT, MoveRight },      { aKeys.Q, DigUpLeft },
-      { aKeys.R, DigUpRight },         { aKeys.A, DigLeft },
-      { aKeys.D, DigRight },           { aKeys.Z, DigDownLeft },
-      { aKeys.X, DigDown },            { aKeys.C, DigDownRight },
-      { aKeys.BACKSPACE, Teleport },   { aKeys.ENTER, GrabItems },
-      { aKeys.DOWN, StopDigger },      { aKeys.J, SpawnJennite },
-      { aKeys.O, ShroudReveal },       { aKeys.P, CauseExplosion },
-      { aKeys.HOME, ScrollUp },        { aKeys.DELETE, ScrollLeft },
-      { aKeys.END, ScrollDown },       { aKeys.PAGE_DOWN, ScrollRight },
-      { aKeys.ESCAPE, InitPause },
+      { aKeys.ONE,       SetDiggerOne,    "SELECT FIRST DIGGER"  },
+      { aKeys.TWO,       SetDiggerTwo,    "SELECT SECOND DIGGER"  },
+      { aKeys.THREE,     SetDiggerThree,  "SELECT THIRD DIGGER"  },
+      { aKeys.FOUR,      SetDiggerFour,   "SELECT FOURTH DIGGER"  },
+      { aKeys.FIVE,      SetDiggerFive,   "SELECT FIFTH DIGGER" },
+      { aKeys.SPACE,     SelectDevice,    "CYCLE DEVICES" },
+      { aKeys.F5,        SelectInventory, "TOGGLE DIGGER INVENTORY STATUS" },
+      { aKeys.F6,        SelectLocation,  "TOGGLE DIGGER LOCATIONS" },
+      { aKeys.F7,        SelectStatus,    "TOGGLE GAME STATUS" },
+      { aKeys.F8,        SelectBook,      "SHOW THE BOOK" },
+      { aKeys.UP,        JumpDigger,      "JUMP THE DIGGER" },
+      { aKeys.LEFT,      MoveLeft,        "WALK OR RUN DIGGER LEFT" },
+      { aKeys.RIGHT,     MoveRight,       "WALK OR RUN DIGGER RIGHT" },
+      { aKeys.Q,         DigUpLeft,       "DIG DIAGONALLY UP-LEFT" },
+      { aKeys.R,         DigUpRight,      "DIG DIAGONALLY UP-RIGHT" },
+      { aKeys.A,         DigLeft,         "DIG LEFT" },
+      { aKeys.D,         DigRight,        "DIG RIGHT" },
+      { aKeys.Z,         DigDownLeft,     "DIG DIAGONALLY DOWN-LEFT" },
+      { aKeys.X,         DigDown,         "DIG DOWN" },
+      { aKeys.C,         DigDownRight,    "DIG DOWN-RIGHT" },
+      { aKeys.BACKSPACE, Teleport,        "TELEPORT HOME OR TELEPOLE" },
+      { aKeys.ENTER,     GrabItems,       "GRAB COLLIDING ITEMS" },
+      { aKeys.DOWN,      StopDigger,      "STOP ALL ACTIVITY IF NOT BUSY" },
+      { aKeys.ESCAPE,    InitPause,       "PAUSE THE GAME" },
+      { aKeys.J,         SpawnJennite,    "SPAWN JENNITE (DEBUG MODE)"  },
+      { aKeys.O,         ShroudReveal,    "SHROUD REVEAL (DEBUG MODE)" },
+      { aKeys.P,         CauseExplosion,  "CAUSE EXPLOSION (DEBUG MODE)" },
+      { aKeys.HOME,      ScrollUp,        "SCROLL MAP UP (DEBUG MODE)" },
+      { aKeys.END,       ScrollDown,      "SCROLL MAP DOWN (DEBUG MODE)" },
+      { aKeys.DELETE,    ScrollLeft,      "SCROLL MAP LEFT (DEBUG MODE)" },
+      { aKeys.PAGE_DOWN, ScrollRight,     "SCROLL MAP RIGHT (DEBUG MODE)" },
     }
   });
   -- Pre-initialisations

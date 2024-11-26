@@ -253,8 +253,8 @@ LLFUNC(OnJoyState, 0,
 LLFUNC(OnKey, 0, cLua->SetLuaRef(lS, cInput->lfOnKey))
 /* ========================================================================= */
 // $ Input.GetKeyName
-// > Value:integer=The id of the key
-// < Name:stringr=The name of the key
+// > Value:integer=The key id of the key
+// < Name:integer=The scan id of the key
 // ? Returns the name of the specified key
 /* ------------------------------------------------------------------------- */
 LLFUNC(GetKeyName, 1,
@@ -371,11 +371,16 @@ LLRSKTEND                              // End of mouse codes
 // ? with its corresponding GLFW code (for use with GetMouseButton[UB]).
 /* ------------------------------------------------------------------------- */
 LLRSKTBEGIN(MouseCodes)                // Beginning of mouse codes
-  LLRSKTITEM(GLFW_MOUSE_BUTTON_,1),    LLRSKTITEM(GLFW_MOUSE_BUTTON_,2),
-  LLRSKTITEM(GLFW_MOUSE_BUTTON_,3),    LLRSKTITEM(GLFW_MOUSE_BUTTON_,4),
-  LLRSKTITEM(GLFW_MOUSE_BUTTON_,5),    LLRSKTITEM(GLFW_MOUSE_BUTTON_,6),
-  LLRSKTITEM(GLFW_MOUSE_BUTTON_,7),    LLRSKTITEM(GLFW_MOUSE_BUTTON_,8),
-  LLRSKTITEM(GLFW_MOUSE_BUTTON_,LEFT), LLRSKTITEM(GLFW_MOUSE_BUTTON_,RIGHT),
+  LLRSKTITEMEX2("ONE",   GLFW_MOUSE_BUTTON_1),
+  LLRSKTITEMEX2("TWO",   GLFW_MOUSE_BUTTON_2),
+  LLRSKTITEMEX2("THREE", GLFW_MOUSE_BUTTON_3),
+  LLRSKTITEMEX2("FOUR",  GLFW_MOUSE_BUTTON_4),
+  LLRSKTITEMEX2("FIVE",  GLFW_MOUSE_BUTTON_5),
+  LLRSKTITEMEX2("SIX",   GLFW_MOUSE_BUTTON_6),
+  LLRSKTITEMEX2("SEVEN", GLFW_MOUSE_BUTTON_7),
+  LLRSKTITEMEX2("EIGHT", GLFW_MOUSE_BUTTON_8),
+  LLRSKTITEM(GLFW_MOUSE_BUTTON_,LEFT),
+  LLRSKTITEM(GLFW_MOUSE_BUTTON_,RIGHT),
   LLRSKTITEM(GLFW_MOUSE_BUTTON_,MIDDLE),
 LLRSKTEND                              // End of mouse codes
 /* ========================================================================= */

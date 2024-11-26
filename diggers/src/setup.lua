@@ -15,27 +15,27 @@ local cos<const>, floor<const>, format<const>, ipairs<const>, len<const>,
   tonumber<const>, tostring<const> =
     math.cos, math.floor, string.format, ipairs, utf8.len, math.max, math.min,
     pairs, table.remove, string.rep, math.sin, tonumber, tostring;
--- M-Engine function aliases ----------------------------------------------- --
+-- M-Engine function and variable aliases ---------------------------------- --
 local AudioGetNumPBDs<const>, AudioGetPBDName<const>, AudioReset<const>,
   CoreCPUUsage<const>, CoreEngine<const>, CoreLibrary<const>,
   CoreLicense<const>, CoreRAM<const>, CoreTime<const>, DisplayFSType<const>,
   DisplayGetSize<const>, DisplayGPUFPS<const>, DisplayMonitor<const>,
   DisplayMonitorData<const>, DisplayMonitors<const>, DisplayReset<const>,
   DisplayVidModeData<const>, DisplayVidModes<const>, DisplayVReset<const>,
-  UtilClamp<const>, UtilClampInt<const>, UtilExplode<const>,
-  UtilGetRatio<const>, UtilWordWrap<const>, VariableGetInt<const>,
-  VariableResetInt<const>, VariableSetInt<const> =
+  InputGetKeyName<const>, InputOnKey<const>, UtilClamp<const>,
+  UtilClampInt<const>, UtilExplode<const>, UtilGetRatio<const>,
+  UtilWordWrap<const>, VariableGetInt<const>, VariableResetInt<const>,
+  VariableSetInt<const>, aCVars<const>, aKeys<const>, aMods<const>,
+  aStates<const>, iCredits<const>, iNativeMode<const> =
     Audio.GetNumPBDevices, Audio.GetPBDeviceName, Audio.Reset, Core.CPUUsage,
     Core.Engine, Core.Library, Core.License, Core.RAM, Core.Time,
     Display.FSType, Display.GetSize, Display.GPUFPS, Display.Monitor,
     Display.MonitorData, Display.Monitors, Display.Reset, Display.VidModeData,
-    Display.VidModes, Display.VReset, Util.Clamp, Util.ClampInt, Util.Explode,
-    Util.GetRatio, Util.WordWrap, Variable.GetInt, Variable.ResetInt,
-    Variable.SetInt;
--- Constants --------------------------------------------------------------- --
-local iCredits<const> = Core.Libraries.MAX;
-local aCVars<const> = Variable.Internal;
-local iNativeMode<const> = Display.FSTypes.NATIVE;
+    Display.VidModes, Display.VReset, Input.GetKeyName, Input.OnKey,
+    Util.Clamp, Util.ClampInt, Util.Explode, Util.GetRatio, Util.WordWrap,
+    Variable.GetInt, Variable.ResetInt, Variable.SetInt, Variable.Internal,
+    Input.KeyCodes, Input.KeyMods, Input.States, Core.Libraries.MAX,
+    Display.FSTypes.NATIVE;
 -- Read and prepare engine version information ----------------------------- --
 local sAppTitle, sAppVendor, iAppMajor<const>, iAppMinor<const>,
   iAppBuild<const>, iAppRevision<const>, _, _, sAppExeType = CoreEngine();
@@ -62,13 +62,14 @@ local iCVvidvsync<const>, iCVappdelay<const>, iCVtexfilter<const>,
       aCVars.vid_monitor, aCVars.win_width, aCVars.win_height, aCVars.vid_fs,
       aCVars.vid_fsmode, aCVars.aud_interface;
 -- Diggers function and data aliases --------------------------------------- --
-local aCursorIdData, aSetupButtonData, aSetupOptionData, aSfxData, fontLarge,
-  fontLittle, fontTiny, GetCallbacks, GetCursor, GetKeyBank, GetMouseY,
-  GetMusic, InitSetup, IsButtonHeld, IsButtonPressed,
-  IsMouseInBounds, IsMouseYGreaterEqualThan, IsMouseYLessThan, IsScrollingDown,
-  IsScrollingLeft, IsScrollingRight, IsScrollingUp, LoadResources, PlayMusic,
-  PlayStaticSound, RegisterFBUCallback, RegisterKeys, RenderFade, RenderShadow,
-  SetCallbacks, SetCursor, SetKeys, StopMusic, texSpr;
+local DisableKeyHandlers, GetCallbacks, GetCursor, GetKeyBank, GetMouseY,
+  GetMusic, InitSetup, IsButtonHeld, IsButtonPressed, IsMouseInBounds,
+  IsMouseYGreaterEqualThan, IsMouseYLessThan, IsScrollingDown, IsScrollingLeft,
+  IsScrollingRight, IsScrollingUp, LoadResources, PlayMusic, PlayStaticSound,
+  RegisterFBUCallback, RegisterKeys, RenderFade, RenderShadow,
+  RestoreKeyHandlers, SetCallbacks, SetCursor, SetKeys, StopMusic,
+  aCursorIdData, aKeyBankCats, aKeyToLiteral, aSetupButtonData,
+  aSetupOptionData, aSfxData, fontLarge, fontLittle, fontTiny, texSpr;
 -- Assets required --------------------------------------------------------- --
 local aAssets<const> = { { T = 7, F = "setup", P = { } } };
 -- Frame-limiter types ----------------------------------------------------- --
@@ -106,33 +107,74 @@ local aWindowSizes<const> = {          -- Keep to arbitrary aspect ratios
   {2560,1600}  --[[ (16:10) WQXGA   --]]
 };
 -- Other ----------------------------------------------------------------------
-local iOColour, aColours<const> = 1, {-- Colour transition animations
+local iOColour, aColours<const> = 1, { -- Colour transition animations
   0xFFF0F0F0,0xFFE0E0E0,0xFFD0D0D0,0xFFC0C0C0,0xFFB0B0B0,0xFFA0A0A0,0xFF909090,
   0xFF808080,0xFF707070,0xFF606060,0xFF505050,0xFF404040,0xFF303030,0xFF202020,
   0xFF101010,0xFF202020,0xFF303030,0xFF404040,0xFF505050,0xFF606060,0xFF707070,
   0xFF808080,0xFF909090,0xFFA0A0A0,0xFFB0B0B0,0xFFC0C0C0,0xFFD0D0D0,0xFFE0E0E0
 };
--- ------------------------------------------------------------------------- --
-local sTitle, sStatusLine1, sStatusLine2;
-local nButtonIntensity, nButtonIntensityIncrement;
-local iWindowId, iWindowIdOriginal, iSelectedOption, iSelectedButton;
-local iFullScreenState, iAudioDeviceId, iMonitorId;
-local iFullScreenMode, iFullScreenModeOriginal;
-local iFullScreenStateOriginal, iAudioDeviceIdOriginal;
-local iMonitorIdOriginal;
-local iCursorId, fcbTick, fcbRender, fcbInput;
-local iKeyBankSetup, iKeyBankReadme, iKeyBankBind, iKeyBankLast;
-local aReadmeData, aReadmeVisibleLines, aReadmeColourData = { }, { }, { };
-local iReadmeIndexBegin, iReadmeIndexEnd, iReadmeRows, iReadmeCols,
-  iReadmeSpacing, iReadmePaddingX, iReadmePaddingY =
-   1, 1, 28, 77, 6, 8, 27;
-local iReadmeColsM1<const> = iReadmeCols - 1;
-local nRAMUsePercentage, nGPUFramesPerSecond;
-local iCatSize, iCatBottom, nTime = 15, nil, nil;
-local sStatusLineSave, nStatusLineSize, nStatusLinePos, nTipId;
-local lastMusic, nCPUUsageSystem, nCPUUsageProcess;
-local iStageW, iStageH, iStageL, iStageT, iStageR, iStageB;
-local aCreditLines<const> = { };
+-- Main locals ------------------------------------------------------------- --
+local fcbInput,                        -- Current input tick function
+      fcbRender,                       -- Current render tick function
+      fcbLogic,                        -- Current logic tick function
+      iLastCursorId,                   -- Cursor id before entering setup
+      iLastKeyBank,                    -- Keybank before entering setup
+      iStageB,                         -- Bottom stage bound
+      iStageH,                         -- Height of stage
+      iStageL,                         -- Left stage bound
+      iStageR,                         -- Right stage bound
+      iStageT,                         -- Top stage bound
+      iStageW,                         -- Width of stage
+      musLast,                         -- Music handle before entering setup
+      nButtonIntensity,                -- Current button intensity
+      nButtonIntensityIncrement,       -- Current button intensity increment
+      nCPUUsageProcess,                -- Current process CPU usage
+      nCPUUsageSystem,                 -- Current system CPU usage
+      nGPUFramesPerSecond,             -- Current graphical frames per second
+      nRAMUsePercentage,               -- Current ram usage percentage
+      nStatusLinePos,                  -- Marquee text tip position
+      nStatusLineSize,                 -- Marquee text tip width
+      nTime,                           -- Current execution time
+      nTipId,                          -- Current tip id
+      sStatusLine1,                    -- Current status title
+      sStatusLine2,                    -- Current status subtitle
+      sStatusLineSave,                 -- Saved status title
+      sTitle;                          -- Current main title
+-- Readme locals ----------------------------------------------------------- --
+local aCreditLines<const> = { };       -- Actual readme data
+local aReadmeColourData<const> = { };  -- Readme colourisation date
+local iKeyBankReadme,                  -- Readme keybank id
+      aReadmeData,                     -- Readme data
+      aReadmeVisibleLines;             -- Readme/binds lines data
+local iReadmeIndexBegin = 1;           -- Current start line
+local iReadmeIndexEnd = 1;             -- Ending line
+local iReadmeRows<const> = 28;         -- Maximum readme on-screen rows
+local iReadmeCols<const> = 77;         -- Maximum readme on-screen columns
+local iReadmeSpacing<const> = 6;       -- Spacing between each line
+local iReadmePaddingX<const> = 8;      -- Starting X co-ordinate
+local iReadmePaddingY<const> = 27;     -- Starting Y co-ordinate
+local iReadmeColsM1<const> = iReadmeCols - 1; -- Readme columns minus one
+-- Configuration locals ---------------------------------------------------- --
+local iCatSize<const> = 15;            -- Category line height
+local iAudioDeviceId,                  -- Current audio device id
+      iAudioDeviceIdOriginal,          -- Original audio device id
+      iCatBottom,                      -- Bottom of categories position
+      iFullScreenMode,                 -- Current full-screen mode number
+      iFullScreenModeOriginal,         -- Original full-screen mode number
+      iFullScreenState,                -- Current full-screen state
+      iFullScreenStateOriginal,        -- Original full-screen state
+      iKeyBankSetup,                   -- Key bank id for configuration screen
+      iMonitorId,                      -- Current monitor id
+      iMonitorIdOriginal,              -- Original monitor id
+      iSelectedButton,                 -- Currently selected button
+      iSelectedOption,                 -- Currently selected option
+      iWindowId,                       -- Current window size id
+      iWindowIdOriginal;               -- Original window size id
+-- Binding locals ---------------------------------------------------------- --
+local aBindingsList<const> = { };      -- All of the formatted keybindings data
+local iBindsIndexBegin = 1;            -- Current starting keybinds position
+local iBindsIndexEnd = 1;              -- Current ending keybinds position
+local iKeyBankBind;                    -- Key bank id for key binds screen
 -- ------------------------------------------------------------------------- --
 local function GetMonitorIdOrPrimary()
   -- If the monitor id is set to the primary monitor then we need to return
@@ -144,10 +186,28 @@ end
 -- ------------------------------------------------------------------------- --
 local function UpdateLabels()
   -- This will update the text on all the labels based on updated values
-  for iI = 1, #aSetupOptionData do
-    local aData<const> = aSetupOptionData[iI];
+  for iIndex = 1, #aSetupOptionData do
+    local aData<const> = aSetupOptionData[iIndex];
     aData[2] = aData[3]();
   end
+end
+-- ------------------------------------------------------------------------- --
+local function ColouriseText(sText)
+  -- Set next colour to start on
+  local iColour, sOutText = iOColour, "";
+  -- For each letter in the title
+  for iIndex = 1, #sText do
+    -- Apply colour to the letter
+    sOutText = sOutText..format("\rc%08x",
+      aColours[1 + (iColour % #aColours)])..
+      sText:sub(iIndex, iIndex);
+    -- Next colour
+    iColour = iColour - 1;
+  end
+  -- Set colour for next time
+  iOColour = (iOColour + 1) % #aColours;
+  -- Return result
+  return sOutText;
 end
 -- ------------------------------------------------------------------------- --
 local function FlickerColour1()
@@ -164,24 +224,6 @@ local function FlickerColours(cbCol1, cbCol2)
   if nTime % 0.43 < 0.215 then cbCol1() else cbCol2() end;
 end
 -- ------------------------------------------------------------------------- --
-local function ColouriseText(sText)
-  -- Set next colour to start on
-  local iColour, sOutText = iOColour, "";
-  -- For each letter in the title
-  for iI = 1, #sText do
-    -- Apply colour to the letter
-    sOutText = sOutText..format("\rc%08x",
-      aColours[1 + (iColour % #aColours)])..
-      sText:sub(iI, iI);
-    -- Next colour
-    iColour = iColour - 1;
-  end
-  -- Set colour for next time
-  iOColour = (iOColour + 1) % #aColours;
-  -- Return result
-  return sOutText;
-end
--- ------------------------------------------------------------------------- --
 local function RenderBackgroundStart(nId)
   -- Render game background
   fcbRender();
@@ -189,7 +231,7 @@ local function RenderBackgroundStart(nId)
   local iStageLP6<const> = iStageL + 6;
   local nTimeM2<const> = nTime * 2;
   texSpr:SetCRGB(0, 0, 0);
-  for iY = iStageT+6, iStageB, 16 do
+  for iY = iStageT + 6, iStageB, 16 do
     local nTimeM2SX<const> = nTimeM2 - iY;
     for iX = iStageLP6, iStageR, 16 do
       local nAngle = nTimeM2SX - iX;
@@ -215,14 +257,11 @@ local function RenderBackgroundStart(nId)
   fontLarge:PrintC(160, 8, ColouriseText(sTitle));
   -- Print tip
   if nStatusLineSize and nStatusLineSize > 0 then
-    fontTiny:PrintM(8-nStatusLinePos, 226,
-      nStatusLinePos, 304+nStatusLinePos, sStatusLine2);
+    fontTiny:PrintM(8 - nStatusLinePos, 226,
+      nStatusLinePos, 304 + nStatusLinePos, sStatusLine2);
     nStatusLinePos = nStatusLinePos + 1;
-    if nStatusLinePos >= nStatusLineSize then
-      nStatusLinePos = 0 end;
-  else
-    fontTiny:PrintC(160, 226, sStatusLine2);
-  end
+    if nStatusLinePos >= nStatusLineSize then nStatusLinePos = 0 end;
+  else fontTiny:PrintC(160, 226, sStatusLine2) end;
   -- Print system information
   FlickerColours(FlickerColour2, FlickerColour1);
   fontTiny:PrintC(160, 217, sStatusLine1);
@@ -235,25 +274,25 @@ end
 -- ------------------------------------------------------------------------- --
 local function Finish()
   -- Unload data
-  aReadmeColourData, aReadmeData = { }, { };
+  aReadmeData, aReadmeVisibleLines = { }, { };
   -- Return to sub-proc
-  SetCallbacks(fcbTick, fcbRender, fcbInput);
+  SetCallbacks(fcbLogic, fcbRender, fcbInput);
   -- Set original cursor
-  SetCursor(iCursorId);
+  SetCursor(iLastCursorId);
   -- Music to resume?
-  if lastMusic then
+  if musLast then
     -- Play the music
-    PlayMusic(lastMusic, nil, 2);
+    PlayMusic(musLast, nil, 2);
     -- Do not keep reference to handle
-    lastMusic = nil;
+    musLast = nil;
   -- No music to set? Just stop the setup music
   else StopMusic() end;
   -- Restore redraw callback
   RegisterFBUCallback("setup");
   -- Restore original keybank
-  SetKeys(true, iKeyBankLast);
+  SetKeys(true, iLastKeyBank);
   -- Done with saved keybank id
-  iKeyBankLast = nil;
+  iLastKeyBank = nil;
 end
 -- ------------------------------------------------------------------------- --
 local function Refresh()
@@ -406,7 +445,7 @@ local function UpdateReadmeLines()
     min(iReadmeIndexBegin + iReadmeRows, #aReadmeData) do
     -- Get line and truncate it if it is too long
     local sLine = aReadmeData[iIndex];
-    if #sLine > iReadmeColsM1 then  sLine = sLine:sub(1, iReadmeColsM1) end;
+    if #sLine > iReadmeColsM1 then sLine = sLine:sub(1, iReadmeColsM1) end;
     -- Insert visible line
     aReadmeVisibleLines[1 + #aReadmeVisibleLines] =
       { iReadmePaddingX, iReadmePaddingY + ((#aReadmeVisibleLines + 1) *
@@ -463,10 +502,6 @@ local function ProcReadmeInput()
 end
 -- ------------------------------------------------------------------------- --
 local function InitReadme()
-  -- Init text colours
-  aReadmeColourData = { };
-  for I = 1, iReadmeRows do
-    aReadmeColourData[1 + #aReadmeColourData] = (I / iReadmeRows) * 0.25 end;
   -- Set title
   sTitle = "ABOUT";
   -- Set readme lines
@@ -482,7 +517,7 @@ local function InitReadme()
   -- Set readme procedures
   SetCallbacks(ProcReadme, RenderReadme, ProcReadmeInput);
 end
--- ----------------------------------------------------------------------- --
+-- ------------------------------------------------------------------------- --
 local function SetTip(nNewTipId, sTip)
   -- Ignore if tip set
   if nNewTipId == nTipId then return end;
@@ -531,41 +566,42 @@ local function RenderSetup()
   -- No selected option so remove tip if a button isn't selected
   end
   -- For each category
-  for I, D in pairs(aSetupOptionData) do
+  for iIndex, aData in pairs(aSetupOptionData) do
     local nIntensity;
-    if iSelectedOption == I then fontLittle:SetCRGB(1, 1, 1);
+    if iSelectedOption == iIndex then fontLittle:SetCRGB(1, 1, 1);
     else
-      nIntensity = 0.5 + (((I/#aSetupOptionData) + nTime) % 0.5);
+      nIntensity = 0.5 + (((iIndex/#aSetupOptionData) + nTime) % 0.5);
       fontLittle:SetCRGB(0, 0, nIntensity);
     end
-    fontLittle:Print(8, 17+(I*iCatSize), D[1]);
-    if iSelectedOption == I then fontLittle:SetCRGB(1, 1, 1);
+    fontLittle:Print(8, 17+(iIndex*iCatSize), aData[1]);
+    if iSelectedOption == iIndex then fontLittle:SetCRGB(1, 1, 1);
     else
-      nIntensity = 0.5 + (((I/#aSetupOptionData) + -nTime) % 0.5);
+      nIntensity = 0.5 + (((iIndex/#aSetupOptionData) + -nTime) % 0.5);
       fontLittle:SetCRGB(0, nIntensity, 0);
     end
-    fontLittle:PrintR(312, 17+(I*iCatSize), D[2]);
+    fontLittle:PrintR(312, 17+(iIndex*iCatSize), aData[2]);
   end
   -- No selected button
   iSelectedButton = 0;
   -- For each button
   texSpr:SetCRGB(0, 0, 0);
-  for N, D in pairs(aSetupButtonData) do
+  for iIndex, aData in pairs(aSetupButtonData) do
     -- Mouse in bounds?
-    if IsMouseInBounds(D[1], D[2], D[3], D[4]) then
+    if IsMouseInBounds(aData[1], aData[2], aData[3], aData[4]) then
       -- Set tip
-      SetTip(D[7], D[10]);
+      SetTip(aData[7], aData[10]);
       -- Set button
-      iSelectedButton = D[7];
+      iSelectedButton = aData[7];
       -- Set glowing colour
       texSpr:SetCRGB(nButtonIntensity, nButtonIntensity, nButtonIntensity);
       -- Draw background
-      RenderFade(1-nButtonIntensity, D[1], D[2], D[3], D[4], 1022);
+      RenderFade(1-nButtonIntensity,
+        aData[1], aData[2], aData[3], aData[4], 1022);
     -- Mouse not in bounds? Just draw black background
-    else RenderFade(0.5, D[1], D[2], D[3], D[4], 1023) end;
+    else RenderFade(0.5, aData[1], aData[2], aData[3], aData[4], 1023) end;
     -- Set button text colour and print the text
     fontLittle:SetCRGB(1, 1, 1);
-    fontLittle:PrintC(D[8], D[9], N);
+    fontLittle:PrintC(aData[8], aData[9], iIndex);
   end
   -- Remove tip if an option isn't selected
   if iSelectedButton == 0 and iSelectedOption == 0 then
@@ -577,26 +613,26 @@ local function RenderSetup()
   texSpr:SetCRGBA(1, 1, 1, 1);
 end
 -- ------------------------------------------------------------------------- --
-local function LastOne(Index)
+local function LastOne(iIndex)
   -- Play sound
   PlayStaticSound(aSfxData.CLICK);
   -- Get data
-  local D = aSetupOptionData[Index];
+  local aData<const> = aSetupOptionData[iIndex];
   -- Call last function
-  D[4]();
+  aData[4]();
   -- Refresh
-  D[2] = D[3]();
+  aData[2] = aData[3]();
 end
 -- ------------------------------------------------------------------------- --
-local function NextOne(Index)
+local function NextOne(iIndex)
   -- Play sound
   PlayStaticSound(aSfxData.CLICK);
   -- Get data
-  local D = aSetupOptionData[Index];
+  local aData<const> = aSetupOptionData[iIndex];
   -- Call next function
-  D[5]();
+  aData[5]();
   -- Refresh
-  D[2] = D[3]();
+  aData[2] = aData[3]();
 end
 -- ------------------------------------------------------------------------- --
 local function ProcSetupInput()
@@ -630,7 +666,7 @@ local function ProcSetupInput()
        IsScrollingUp() then NextOne(iSelectedOption);
     -- Right clicked or mouse scrolled up?
     elseif IsButtonPressed(0) or IsButtonPressed(4) or IsButtonPressed(6) or
-       IsScrollingDown() then LastOne(iSelectedOption) end;
+           IsScrollingDown() then LastOne(iSelectedOption) end;
     -- Done
     return;
   end
@@ -656,8 +692,9 @@ local function InitConfig()
   -- Set title
   sTitle = "SETUP";
   -- Initialise status bars
-  sStatusLine1 = format("%s (%s) %s.%u.%u.%u.%u - %s", sGameName, sAppExeType,
-    sGameVersion, iAppMajor, iAppMinor, iAppBuild, iAppRevision, sGameWebsite);
+  sStatusLine1 = sGameName.." ("..sAppExeType..") "..sGameVersion.."."..
+    iAppMajor.."."..iAppMinor.."."..iAppBuild.."."..iAppRevision.." - "..
+    sGameWebsite;
   sStatusLine2 = sAppVendor.." PROUDLY PRESENTS "..sGameName.."! A REMAKE \z
     FOR MODERN OPERATING SYSTEMS AND HARDWARE FROM THE CLASSIC CD32 AND DOS \z
     DAYS. THIS IS THE CONFIGURATION SCREEN. PRESS ESCAPE OR THE 'DONE' \z
@@ -677,12 +714,189 @@ local function InitConfig()
   SetCallbacks(ProcSetup, RenderSetup, ProcSetupInput)
 end
 -- ------------------------------------------------------------------------- --
+local function ProcSetupInput() end;
+-- ------------------------------------------------------------------------- --
+local function UpdateBindsLines()
+  -- Clear displayed lines
+  aReadmeVisibleLines = { };
+  -- For each line in readme file...
+  for iIndex = iBindsIndexBegin,
+    min(iBindsIndexBegin + iReadmeRows, #aBindingsList) do
+    -- Get line and truncate it if it is too long
+    local aBind<const> = aBindingsList[iIndex];
+    local sLine = format("%-55s %20s", aBind[3], aBind[4]);
+    if #sLine > iReadmeColsM1 then sLine = sLine:sub(1, iReadmeColsM1) end;
+    -- Insert visible line
+    local iY<const> =
+      iReadmePaddingY + ((#aReadmeVisibleLines + 1) * iReadmeSpacing)
+    aReadmeVisibleLines[1 + #aReadmeVisibleLines] =
+      { iReadmePaddingX, iY, sLine, iReadmePaddingX+304, iY+6, aBind };
+  end
+  -- Update statuses
+  sStatusLine1 = "DISPLAYING LINE "..iBindsIndexBegin.." TO "..
+    iBindsIndexEnd.." OF "..#aBindingsList.." OF INPUT BINDINGS";
+  sStatusLine2 =
+    "CURSORS+PGUP+PGDN+HOME+END+LMB+JB1:SCROLL  F2+RMB+JB2:SETUP  ESC:CANCEL";
+  -- Remove marquee settings
+  sStatusLineSave, nStatusLineSize, nStatusLinePos, nTipId =
+    nil, nil, nil, nil;
+end
+-- ------------------------------------------------------------------------- --
+local function SetBinds(iLine)
+  -- Get maximum lines
+  local iMax<const> =
+    UtilClampInt(#aBindingsList - #aReadmeColourData, 1, 0x7FFFFFFF);
+  -- Set to end line?
+  if iLine == 0x7FFFFFFF then iBindsIndexBegin = iMax;
+  -- Set line?
+  else iBindsIndexBegin = UtilClampInt(iLine, 1, iMax) end;
+  -- Set ending line
+  iBindsIndexEnd = UtilClampInt(iBindsIndexBegin +
+    #aReadmeColourData, 1, #aBindingsList);
+  -- Update displayed readme lines
+  UpdateBindsLines();
+end
+-- ------------------------------------------------------------------------- --
+local function ScrollBinds(iAdj) SetBinds(iBindsIndexBegin + iAdj) end;
+local function ScrollBindsPageUp() ScrollBinds(-29) end;
+local function ScrollBindsPageDown() ScrollBinds(29) end;
+local function ScrollBindsUp() ScrollBinds(-1) end;
+local function ScrollBindsDown() ScrollBinds(1) end;
+local function ScrollBindsHome() SetBinds(1) end;
+local function ScrollBindsEnd() SetBinds(#aBindingsList) end;
+-- ------------------------------------------------------------------------- --
+local function ProcBindsInput()
+  -- Check for mouse scroll wheel moving
+  if IsScrollingLeft() then ScrollBindsPageUp();
+  elseif IsScrollingRight() then ScrollBindsPageDown();
+  elseif IsScrollingUp() then ScrollBindsUp();
+  elseif IsScrollingDown() then ScrollBindsDown();
+  -- Cancel button pressed? Cancel binds screen
+  elseif IsButtonPressed(1) then InitSetup(1);
+  -- Anything else?
+  elseif iSelectedOption and IsButtonPressed(0) then
+    -- Get key bind data
+    local aBind<const> = aReadmeVisibleLines[iSelectedOption];
+    local aBindData<const> = aBind[6];
+    -- Set text to receive key
+    aBindData[4] = "???";
+    -- Update readme lines
+    UpdateBindsLines();
+    -- Update tip at the bottom
+    sStatusLine1 = "PRESS ANY KEY TO USE AS NEW KEY BINDING";
+    sStatusLine2 = "CTRL+ESC:CANCEL  \z
+                    CTRL+SPACE:DEFAULT  \z
+                    CTRL+BACKSPACE:CLEAR";
+    -- Get current callbacks
+    local CBProc<const>, CBRender<const>, CBInput<const> = GetCallbacks();
+    -- Disable everything but rendering and animations
+    SetCallbacks(ProcSysInfo, RenderReadme, nil);
+    -- Set cursor to busy
+    SetCursor(aCursorIdData.WAIT);
+    -- Disable all input events
+    DisableKeyHandlers();
+    -- On key scan functino
+    local function OnScanKey(iKey, iState, iMods)
+      -- Ignore if not pressed
+      if iState ~= aStates.PRESS then return end;
+      -- Mods were pressed?
+      if iMods > 0 then
+        -- Control was pressed?
+        if iMods & aMods.CONTROL == iMods then
+          -- Backspace was pressed? Set unbound
+          if iKey == aKeys.BACKSPACE then iKey = 0;
+          -- Escape was pressed? Keep existing key
+          elseif iKey == aKeys.ESCAPE then iKey = aBindData[1][1];
+          -- Space key was pressed? Use default
+          elseif iKey == aKeys.SPACE then iKey = aBindData[2];
+          -- Not recognised? Ignore press
+          else return end;
+        -- Do not process key with mods
+        else return end;
+      end
+      -- Set key code
+      aBindData[1][1] = iKey;
+      aBindData[4] = aKeyToLiteral[iKey] or aKeyToLiteral.UNKNOWN;
+      -- Restore input handlers
+      RestoreKeyHandlers();
+      -- Update readme lines
+      UpdateBindsLines();
+      -- Re-enable callbacks
+      SetCallbacks(CBProc, CBRender, CBInput);
+    end
+    -- Set new callbacks
+    InputOnKey(OnScanKey);
+  -- Select button pressed? Scroll!
+  elseif IsButtonHeld(0) then
+    -- On bottom section of screen? Scroll down
+    if IsMouseYGreaterEqualThan(206) then ScrollBindsDown();
+    -- Else scroll up if on top section of screen
+    elseif IsMouseYLessThan(32) then ScrollBindsUp() end;
+  end
+end
+-- ------------------------------------------------------------------------- --
+local function RenderBinds()
+  -- Render default background
+  RenderReadme();
+  -- Return if no option is selected
+  if not iSelectedOption then return end;
+  -- Get currently selected line data and render a selection rectangle
+  local aData<const> = aReadmeVisibleLines[iSelectedOption];
+  if IsMouseInBounds(aData[1], aData[2], aData[4], aData[5]) then
+    RenderFade(0.25, aData[1], aData[2], aData[4], aData[5]);
+  end
+end;
+-- ------------------------------------------------------------------------- --
+local function ProcBinds()
+  -- Set system info
+  ProcSysInfo();
+  -- Draw readme
+  for iIndex = 1, #aReadmeVisibleLines do
+    -- Get data and if line is being selected?
+    local aData<const> = aReadmeVisibleLines[iIndex];
+    if IsMouseInBounds(aData[1], aData[2], aData[4], aData[5]) then
+      -- Make option selected
+      iSelectedOption = iIndex;
+      -- Set selection cursor
+      SetCursor(aCursorIdData.SELECT);
+      -- No need to process anything else
+      return;
+    end
+  end
+  -- Show up mouse cursor if on top half of screen
+  if IsMouseYGreaterEqualThan(206) then SetCursor(aCursorIdData.BOTTOM);
+  -- Show down mouse cursor if on bottom half of screen
+  elseif IsMouseYLessThan(32) then SetCursor(aCursorIdData.TOP);
+  -- Show default cursor otherwise
+  else SetCursor(aCursorIdData.ARROW) end;
+  -- Clear if selected option
+  if iSelectedOption then iSelectedOption = nil end;
+end
+-- ------------------------------------------------------------------------- --
+local function InitBinds()
+  -- No option selected
+  iSelectedOption = 0;
+  -- Set title
+  sTitle = "BINDINGS";
+  -- Clear status bars
+  SetTip(0, sStatusLineSave);
+  -- Arrow cursor
+  SetCursor(aCursorIdData.ARROW);
+  -- Update binds lines
+  UpdateBindsLines();
+  -- Restore original keys
+  SetKeys(true, iKeyBankBind);
+  -- Set configuration procedures
+  SetCallbacks(ProcBinds, RenderBinds, ProcBindsInput)
+end
+-- ------------------------------------------------------------------------- --
 local function DoInitSetup(iMode)
   -- Get current callbacks
   local CBProc, CBRender, CBInput = GetCallbacks();
   -- Available modes
   local aModes<const> = {
     { InitConfig, RenderSetup  },
+    { InitBinds,  RenderBinds },
     { InitReadme, RenderReadme },
   };
   -- Set and check requested mode/
@@ -691,7 +905,7 @@ local function DoInitSetup(iMode)
   -- Return if function already set
   if CBRender == aMode[2] then return end;
   -- Save current keybank so we can restore it on exit
-  if not iKeyBankLast then iKeyBankLast = GetKeyBank() end;
+  if not iLastKeyBank then iLastKeyBank = GetKeyBank() end;
   -- Remove the mode and go through available modes
   remove(aModes, iMode);
   for iIndex = 1, #aModes do
@@ -702,15 +916,15 @@ local function DoInitSetup(iMode)
   -- Required setup assets finished loading
   local function OnLoaded(aResource)
     -- Save current music
-    lastMusic = GetMusic();
+    musLast = GetMusic();
     -- Play setup music
     PlayMusic(aResource[1].H, nil, 1);
     -- Initialise button intensity
     nButtonIntensity, nButtonIntensityIncrement = 1, 0.01;
     -- Backup old callbacks (Return to them later)
-    fcbTick, fcbRender, fcbInput = CBProc, CBRender, CBInput;
+    fcbLogic, fcbRender, fcbInput = CBProc, CBRender, CBInput;
     -- Backup current cursor id
-    iCursorId = GetCursor();
+    iLastCursorId = GetCursor();
     -- Get time
     nTime = CoreTime();
     -- Calculate bottom of categories
@@ -718,8 +932,6 @@ local function DoInitSetup(iMode)
     -- Call the mode init function
     aMode[1]();
   end
-  -- Load bank texture
-  LoadResources("Setup", aAssets, OnLoaded);
   -- On frame buffer refresh callback
   local function OnRedraw(...)
     -- Update stage bounds
@@ -729,27 +941,31 @@ local function DoInitSetup(iMode)
   end
   -- Register frame buffer update
   RegisterFBUCallback("setup", OnRedraw);
+  -- Load bank texture
+  LoadResources("Setup", aAssets, OnLoaded);
 end
 InitSetup = DoInitSetup;
 -- Script has been initialised --------------------------------------------- --
 local function OnReady(GetAPI)
   -- Grab import functions and data
-  aCursorIdData, aSetupButtonData, aSetupOptionData, aSfxData, fontLarge,
-    fontLittle, fontTiny, GetCallbacks, GetCursor, GetKeyBank, GetMouseY,
-    GetMusic, IsButtonHeld, IsButtonPressed, IsMouseInBounds,
-    IsMouseYGreaterEqualThan, IsMouseYLessThan, IsScrollingDown,
-    IsScrollingLeft, IsScrollingRight, IsScrollingUp, LoadResources, PlayMusic,
-    PlayStaticSound, RegisterFBUCallback, RegisterKeys, RenderFade,
-    RenderShadow, SetCallbacks, SetCursor, SetKeys, StopMusic, texSpr =
-      GetAPI("aCursorIdData", "aSetupButtonData", "aSetupOptionData",
-        "aSfxData", "fontLarge", "fontLittle", "fontTiny", "GetCallbacks",
-        "GetCursor", "GetKeyBank", "GetMouseY", "GetMusic", "IsButtonHeld",
-        "IsButtonPressed", "IsMouseInBounds",
-        "IsMouseYGreaterEqualThan", "IsMouseYLessThan", "IsScrollingDown",
-        "IsScrollingLeft", "IsScrollingRight", "IsScrollingUp",
-        "LoadResources", "PlayMusic", "PlayStaticSound", "RegisterFBUCallback",
-        "RegisterKeys", "RenderFade", "RenderShadow", "SetCallbacks",
-        "SetCursor", "SetKeys", "StopMusic", "texSpr");
+  DisableKeyHandlers, GetCallbacks, GetCursor, GetKeyBank, GetMouseY, GetMusic,
+    IsButtonHeld, IsButtonPressed, IsMouseInBounds, IsMouseYGreaterEqualThan,
+    IsMouseYLessThan, IsScrollingDown, IsScrollingLeft, IsScrollingRight,
+    IsScrollingUp, LoadResources, PlayMusic, PlayStaticSound,
+    RegisterFBUCallback, RegisterKeys, RenderFade, RenderShadow,
+    RestoreKeyHandlers, SetCallbacks, SetCursor, SetKeys, StopMusic,
+    aCursorIdData, aKeyBankCats, aKeyToLiteral, aSetupButtonData,
+    aSetupOptionData, aSfxData, fontLarge, fontLittle, fontTiny, texSpr =
+      GetAPI("DisableKeyHandlers", "GetCallbacks", "GetCursor", "GetKeyBank",
+        "GetMouseY", "GetMusic", "IsButtonHeld", "IsButtonPressed",
+        "IsMouseInBounds", "IsMouseYGreaterEqualThan", "IsMouseYLessThan",
+        "IsScrollingDown", "IsScrollingLeft", "IsScrollingRight",
+        "IsScrollingUp", "LoadResources", "PlayMusic", "PlayStaticSound",
+        "RegisterFBUCallback", "RegisterKeys", "RenderFade", "RenderShadow",
+        "RestoreKeyHandlers", "SetCallbacks", "SetCursor", "SetKeys",
+        "StopMusic", "aCursorIdData", "aKeyBankCats", "aKeyToLiteral",
+        "aSetupButtonData", "aSetupOptionData", "aSfxData", "fontLarge",
+        "fontLittle", "fontTiny", "texSpr");
   -- Callback to set all settings to default
   local function SetDefaults()
     -- Push defaults
@@ -774,6 +990,7 @@ local function OnReady(GetAPI)
   local aButtons<const> = { { "APPLY", ApplySettings },
                             { "DONE",  Finish },
                             { "RESET", SetDefaults },
+                            { "BINDS", InitBinds },
                             { "ABOUT", InitReadme },
                           };
   -- Start and end vertical position
@@ -946,11 +1163,11 @@ local function OnReady(GetAPI)
     if iAudioDeviceId == -1 then return "Default Playback Device";
     elseif iAudioDeviceId >= AudioGetNumPBDs() then
       return "Invalid Playback Device" end;
-    local N = AudioGetPBDName(iAudioDeviceId);
-    local L<const> = "OpenAL Soft on ";
-    if N:sub(1, #L) == L then N = N:sub(#L) end;
-    if #N > 34 then return N:sub(0,30).."..." end;
-    return N;
+    local sName = AudioGetPBDName(iAudioDeviceId);
+    local sPrefix<const> = "OpenAL Soft on ";
+    if sName:sub(1, #sPrefix) == sPrefix then sName = sName:sub(#sPrefix) end;
+    if #sName > 34 then return sName:sub(0,30).."..." end;
+    return sName;
   end
   local function AudioDown()
     if iAudioDeviceId == -1 then return end;
@@ -987,7 +1204,7 @@ local function OnReady(GetAPI)
   local function VFMVDown() VFMVSet(-1) end;
   local function VFMVUp() VFMVSet(1) end;
   -- Apply functions to static option table
-  for iI, aF in ipairs({
+  for iIndex, aF in ipairs({
     { MonitorUpdate, MonitorDown, MonitorUp  }, -- [01]
     { FSStateUpdate, FSStateDown, FSStateUp  }, -- [02]
     { FSResUpdate,   FSResDown,   FSResUp    }, -- [03]
@@ -1000,17 +1217,16 @@ local function OnReady(GetAPI)
     { VSampleUpdate, VSampleDown, VSampleUp  }, -- [10]
     { VFMVUpdate,    VFMVDown,    VFMVUp     }, -- [11]
   }) do
-    local aOptionItem<const> = aSetupOptionData[iI];
+    local aOptionItem<const> = aSetupOptionData[iIndex];
     aOptionItem[3] = aF[1];
     aOptionItem[4] = aF[2];
     aOptionItem[5] = aF[3];
   end
   -- Setup key bank
-  local aKeys<const>, aStates<const> = Input.KeyCodes, Input.States;
   local aGenericEscape<const> = { aKeys.ESCAPE, Finish };
   local aOnlyEscape<const> = { [aStates.PRESS] = { aGenericEscape } };
   -- Setup configuration keys
-  iKeyBankSetup = RegisterKeys(aOnlyEscape);
+  iKeyBankSetup = RegisterKeys("CONFIGURATION", aOnlyEscape);
   -- Setup readme keys
   local aReadmePageUp<const>, aReadmePageDown<const>,
         aReadmeHome<const>,   aReadmeEnd<const>,
@@ -1021,14 +1237,28 @@ local function OnReady(GetAPI)
     { aKeys.END,       ScrollReadmeEnd },
     { aKeys.UP,        ScrollReadmeUp },
     { aKeys.DOWN,      ScrollReadmeDown };
-  iKeyBankReadme = RegisterKeys({
+  iKeyBankReadme = RegisterKeys("README", {
     [aStates.PRESS] = { aGenericEscape, aReadmePageUp, aReadmePageDown,
       aReadmeHome, aReadmeEnd, aReadmeUp, aReadmeDown },
     [aStates.REPEAT] = { aReadmePageUp, aReadmePageDown, aReadmeHome,
       aReadmeEnd, aReadmeUp, aReadmeDown },
   });
   -- Setup bind keys
-  iKeyBankBind = RegisterKeys(aOnlyEscape);
+  local aBindsPageUp<const>, aBindsPageDown<const>,
+        aBindsHome<const>,   aBindsEnd<const>,
+        aBindsUp<const>,     aBindsDown<const> =
+    { aKeys.PAGE_UP,   ScrollBindsPageUp },
+    { aKeys.PAGE_DOWN, ScrollBindsPageDown },
+    { aKeys.HOME,      ScrollBindsHome },
+    { aKeys.END,       ScrollBindsEnd },
+    { aKeys.UP,        ScrollBindsUp },
+    { aKeys.DOWN,      ScrollBindsDown };
+  iKeyBankBind = RegisterKeys("BINDINGS", {
+    [aStates.PRESS] = { aGenericEscape, aBindsPageUp, aBindsPageDown,
+      aBindsHome, aBindsEnd, aBindsUp, aBindsDown },
+    [aStates.REPEAT] = { aBindsPageUp, aBindsPageDown, aBindsHome,
+      aBindsEnd, aBindsUp, aBindsDown },
+  });
   -- Init third party credits
   local function Header(sString)
     -- Add ellipsis
@@ -1088,8 +1318,8 @@ local function OnReady(GetAPI)
       sAuthor:upper());
     -- Add credit license
     local aLines<const> = UtilExplode(CoreLicense(iIndex), "\n");
-    for iI = 1, #aLines do
-      local sLine<const> = aLines[iI];
+    for iIndex = 1, #aLines do
+      local sLine<const> = aLines[iIndex];
       if #sLine > 78 then
         local aWrappedLines<const> = UtilWordWrap(sLine, iReadmeCols, 0);
         for iWI = 1, #aWrappedLines do
@@ -1100,9 +1330,34 @@ local function OnReady(GetAPI)
   end
   -- Add third party credits header
   aCreditLines[1 + #aCreditLines] = "*** END-OF-FILE ***";
+  -- Init text colours
+  for iIndex = 1, iReadmeRows do
+    aReadmeColourData[1 + #aReadmeColourData] =
+      (iIndex / iReadmeRows) * 0.25 end;
   -- Truncate bottom empty lines
   while #aCreditLines > 0 and #aCreditLines[#aCreditLines] == 0 do
     remove(aCreditLines, #aCreditLines) end;
+  -- Build bindings list
+  for iKeyBank = 1, #aKeyBankCats do
+    -- Get keybank data
+    local aTopicData<const> = aKeyBankCats[iKeyBank];
+    local sName<const> = aTopicData[1];
+    local aKeyCats<const> = aTopicData[2];
+    for iKeyCat = 1, #aKeyCats do
+      -- Get category data
+      local aButtons<const> = aKeyCats[iKeyCat];
+      for iBind = 1, #aButtons do
+        -- Add to bindings list if a comment is set
+        local aBind<const> = aButtons[iBind];
+        local iKey<const> = aBind[1];
+        if aBind[3] then
+          aBindingsList[1 + #aBindingsList] =
+            { aBind, iKey, sName..": "..aBind[3],
+              aKeyToLiteral[iKey] or aKeyToLiteral.UNKNOWN };
+        end
+      end
+    end
+  end
 end
 -- Return imports and exports ---------------------------------------------- --
 return { A = { InitSetup = InitSetup }, F = OnReady };

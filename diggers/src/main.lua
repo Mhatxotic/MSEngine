@@ -17,16 +17,16 @@ local collectgarbage<const>, error<const>, floor<const>, format<const>,
     pairs, math.random, table.remove, tonumber, tostring, table.unpack;
 -- M-Engine aliases (optimisation) ----------------------------------------- --
 local AssetParseBlock<const>, CoreLog<const>, CoreOnTick<const>,
-  CoreStack<const>, CoreWrite<const>, DisplayReset<const>, FboDraw<const>,
-  CoreCatchup<const>, InputSetCursor<const>, InputSetCursorCentre<const>,
-  CoreTime<const>, SShotFbo<const>, TextureCreate<const>, UtilBlank<const>,
+  CoreStack<const>, CoreWrite<const>, FboDraw<const>,
+  CoreCatchup<const>, InputSetCursor<const>,
+  CoreTime<const>, TextureCreate<const>, UtilBlank<const>,
   UtilClamp<const>, UtilDuration<const>, UtilExplode<const>,
   UtilImplode<const>, UtilIsFunction<const>, UtilIsInteger<const>,
   UtilIsNumber<const>, UtilIsString<const>, UtilIsTable<const>,
   VariableRegister<const> =
     Asset.ParseBlock, Core.Log, Core.OnTick, Core.Stack, Core.Write,
-    Display.Reset, Fbo.Draw, Core.Catchup, Input.SetCursor,
-    Input.SetCursorCentre, Core.Time, SShot.Fbo, Texture.Create, Util.Blank,
+    Fbo.Draw, Core.Catchup, Input.SetCursor,
+    Core.Time, Texture.Create, Util.Blank,
     Util.Clamp, Util.Duration, Util.Explode, Util.Implode, Util.IsFunction,
     Util.IsInteger, Util.IsNumber, Util.IsString, Util.IsTable,
     Variable.Register;
@@ -57,8 +57,8 @@ local iStageBottom = iStageHeight;     -- Bottom of stage
 -- Library functions loaded later ------------------------------------------ --
 local aLevelsData, aObjectTypes, aRacesData, ClearStates, InitCredits,
   InitTitleCredits, InitDebugPlay, InitEnding, InitFail, InitIntro,
-  InitNewGame, InitScene, InitScore, InitSetup, InitTitle, JoystickProc,
-  LoadLevel, MusicVolume;
+  InitNewGame, InitScene, InitScore, InitTitle, JoystickProc, LoadLevel,
+  MusicVolume;
 -- These could be called even though they aren't initialised yet ----------- --
 local SetKeys, SetCursor = UtilBlank, UtilBlank;
 -- Constants for loader ---------------------------------------------------- --
@@ -510,7 +510,7 @@ local function fcbTick()
   Fbo.OnRedraw(RefreshViewportInfo);
   RefreshViewportInfo();
   -- Initialise base API functions
-  ParseScriptResult("main", { A={ BCBlit = BCBlit, Fade = Fade,
+  ParseScriptResult("main", { F=UtilBlank, A={ BCBlit = BCBlit, Fade = Fade,
     GetCallbacks = GetCallbacks, GetTestMode = GetTestMode,
     IsFading = IsFading, LoadResources = LoadResources,
     RefreshViewportInfo = RefreshViewportInfo,
@@ -518,8 +518,8 @@ local function fcbTick()
     RenderFade = RenderFade, RenderShadow = RenderShadow,
     SetBottomRightTip = SetBottomRightTip,
     SetBottomRightTipAndShadow = SetBottomRightTipAndShadow,
-    SetCallbacks = SetCallbacks, TimeIt = TimeIt }, F=UtilBlank
-  });
+    SetErrorMessage = SetErrorMessage, SetCallbacks = SetCallbacks,
+    TimeIt = TimeIt } });
   -- Empty callback function for CVar events
   local function fcbEmpty() return true end;
   -- Register file data CVar
@@ -545,17 +545,17 @@ local function fcbTick()
   texSpr:TileSTC(1024);
   -- Initialise function callbacks
   SetCallbacks(nil, nil, nil);
-  -- Base code scripts that are to be loaded
+  -- Base code scripts that are to be loaded (setup must be last)
   local aBaseScripts<const> = {
-    {T=9,F="audio",   P={}}, {T=9,F="bank",    P={}}, {T=9,F="book",   P={}},
-    {T=9,F="cntrl",   P={}}, {T=9,F="credits", P={}}, {T=9,F="data",   P={}},
-    {T=9,F="debug",   P={}}, {T=9,F="end",     P={}}, {T=9,F="ending", P={}},
-    {T=9,F="fail",    P={}}, {T=9,F="file",    P={}}, {T=9,F="game",   P={}},
-    {T=9,F="input",   P={}}, {T=9,F="intro",   P={}}, {T=9,F="lobby",  P={}},
-    {T=9,F="map",     P={}}, {T=9,F="pause",   P={}}, {T=9,F="post",   P={}},
-    {T=9,F="race",    P={}}, {T=9,F="scene",   P={}}, {T=9,F="score",  P={}},
-    {T=9,F="setup",   P={}}, {T=9,F="shop",    P={}}, {T=9,F="title",  P={}},
-    {T=9,F="tcredits",P={}}, {T=9,F="tntmap",  P={}},
+    {T=9,F="audio",  P={}}, {T=9,F="bank",    P={}}, {T=9,F="book",     P={}},
+    {T=9,F="cntrl",  P={}}, {T=9,F="credits", P={}}, {T=9,F="data",     P={}},
+    {T=9,F="debug",  P={}}, {T=9,F="end",     P={}}, {T=9,F="ending",   P={}},
+    {T=9,F="fail",   P={}}, {T=9,F="file",    P={}}, {T=9,F="game",     P={}},
+    {T=9,F="input",  P={}}, {T=9,F="intro",   P={}}, {T=9,F="lobby",    P={}},
+    {T=9,F="map",    P={}}, {T=9,F="pause",   P={}}, {T=9,F="post",     P={}},
+    {T=9,F="race",   P={}}, {T=9,F="scene",   P={}}, {T=9,F="score",    P={}},
+    {T=9,F="shop",   P={}}, {T=9,F="title",   P={}}, {T=9,F="tcredits", P={}},
+    {T=9,F="tntmap", P={}}, {T=9,F="setup",   P={}},
   };
   -- Base fonts that are to be loaded
   local aBaseFonts<const> = {
@@ -659,13 +659,13 @@ local function fcbTick()
     -- Load dependecies we need on this module
     aLevelsData, aObjectTypes, aRacesData, ClearStates, InitCredits,
       InitDebugPlay, InitEnding, InitFail, InitIntro, InitNewGame, InitScene,
-      InitScore, InitSetup, InitTitle, InitTitleCredits, JoystickProc,
-      LoadLevel, MusicVolume, SetCursor, SetKeys =
+      InitScore, InitTitle, InitTitleCredits, JoystickProc, LoadLevel,
+      MusicVolume, SetCursor, SetKeys =
         GetAPI("aLevelsData", "aObjectTypes", "aRacesData", "ClearStates",
           "InitCredits", "InitDebugPlay", "InitEnding", "InitFail",
-          "InitIntro", "InitNewGame", "InitScene", "InitScore", "InitSetup",
-          "InitTitle", "InitTitleCredits", "JoystickProc", "LoadLevel",
-          "MusicVolume", "SetCursor", "SetKeys");
+          "InitIntro", "InitNewGame", "InitScene", "InitScore", "InitTitle",
+          "InitTitleCredits", "JoystickProc", "LoadLevel", "MusicVolume",
+          "SetCursor", "SetKeys");
     -- Assign loaded sound effects (audio.hpp)
     GetAPI("RegisterSounds")(aData, iBaseSounds, #aBaseSounds);
     -- We need the cursor ids for the arrow and waiting (input.hpp)
@@ -674,20 +674,6 @@ local function fcbTick()
     iCursorWait = aCursorIdData.WAIT;
     -- Get cursor render function (input.hpp)
     local CursorRender<const> = aAPI.CursorRender;
-    -- Global function key callbacks
-    local function GkCbConfig() InitSetup(1) end;
-    local function GkCbReadme() InitSetup(2) end;
-    local function GkCbBinds() InitSetup(3) end;
-    local function GkCbSShot() SShotFbo(fboMain) end;
-    -- Register the global function keys
-    GetAPI("RegisterGlobalKeys")({ [Input.States.PRESS] = {
-      { aKeys.F1,  GkCbConfig,           "Setup screen" };
-      { aKeys.F2,  GkCbReadme,           "Show credits" },
---    { aKeys.F3,  GkCbBinds,            "Setup keybinds" },
-      { aKeys.F10, InputSetCursorCentre, "Set cursor centre" },
-      { aKeys.F11, DisplayReset,         "Reset window size" },
-      { aKeys.F12, GkCbSShot,            "Take screenshot" },
-    }});
     -- Main procedure callback
     local function MainCallback()
       -- Poll joysticks (input.hpp)

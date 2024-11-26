@@ -23,7 +23,7 @@ local aAssets<const> = { { T = 1, F = "grass", P= { 16, 16, 0, 0, 0 } },
                          { T = 2, F = "title", P= { 0 } },
                          { T = 8, F = "intro", P= { } } };
 -- Locals ------------------------------------------------------------------ --
-local iKeyBank;                        -- Keybank id
+local iKeyBankId;                        -- Keybank id
 local iStageST = 0;                    -- Subtitle position
 local iStageW, iStageH, iStageL;       -- Stage width, height and left
 local iStageT, iStageR, iStageB;       -- Stage top, right and bottom
@@ -255,7 +255,7 @@ local function OnLoaded(aResources, bAndSetup)
       if IsButtonPressed(0) then Finish() end;
     end
     -- Enable keybank
-    SetKeys(true, iKeyBank);
+    SetKeys(true, iKeyBankId);
     -- Set intro callbacks
     SetCallbacks(nil, Render, InputProc);
     -- Load setup now
@@ -285,7 +285,7 @@ local function OnReady(GetAPI)
     fontLittle:GetWidth(), fontLittle:GetHeight(), 5;
   -- Register keybinds
   local aKeys<const>, aStates<const> = Input.KeyCodes, Input.States;
-  iKeyBank = GetAPI("RegisterKeys")({
+  iKeyBankId = GetAPI("RegisterKeys")("INTRO", {
     [aStates.PRESS] = { { aKeys.ESCAPE, Finish } }
   });
 end
