@@ -52,15 +52,15 @@ local function InitFail()
   -- Load music and when finished
   LoadResources("No More Zones", aAssets, OnLoaded);
 end
--- Exports and imports ----------------------------------------------------- --
-return { A = { InitFail = InitFail }, F = function(GetAPI)
-  -- Imports --------------------------------------------------------------- --
+-- Scripts have been loaded ------------------------------------------------ --
+local function OnReady(GetAPI)
+  -- Grab imports
   Fade, InitScore, IsButtonReleased, LoadResources, PlayMusic, PlayStaticSound,
-  SetCallbacks, SetCursor, aCursorIdData, aSfxData, fontLarge
-  = -- --------------------------------------------------------------------- --
-  GetAPI("Fade", "InitScore", "IsButtonReleased",  "LoadResources",
-    "PlayMusic", "PlayStaticSound", "SetCallbacks", "SetCursor",
-    "aCursorIdData", "aSfxData", "fontLarge");
-  -- ----------------------------------------------------------------------- --
-end };
+    SetCallbacks, SetCursor, aCursorIdData, aSfxData, fontLarge =
+      GetAPI("Fade", "InitScore", "IsButtonReleased",  "LoadResources",
+        "PlayMusic", "PlayStaticSound", "SetCallbacks", "SetCursor",
+        "aCursorIdData", "aSfxData", "fontLarge");
+end
+-- Exports and imports ----------------------------------------------------- --
+return { A = { InitFail = InitFail }, F = OnReady };
 -- End-of-File ============================================================= --

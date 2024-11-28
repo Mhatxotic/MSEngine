@@ -280,21 +280,21 @@ local function InitBook(bFromInGame)
   -- Load the resources
   LoadResources("The Book", aAssets, OnLoadResources);
 end
+-- Scripts have been loaded ------------------------------------------------ --
+local function OnReady(GetAPI)
+  -- Grab imports
+  Fade, GameProc, InitCon, InitContinueGame, IsButtonPressed, IsButtonReleased,
+    IsMouseInBounds, IsMouseNotInBounds, IsScrollingDown,IsScrollingUp,
+    LoadResources, PlayMusic, PlayStaticSound, RenderInterface, RenderShadow,
+    SetBottomRightTip, SetBottomRightTipAndShadow, SetCallbacks, SetCursor,
+    aCursorIdData, aSfxData =
+      GetAPI("Fade", "GameProc", "InitCon", "InitContinueGame",
+        "IsButtonPressed", "IsButtonReleased", "IsMouseInBounds",
+        "IsMouseNotInBounds", "IsScrollingDown", "IsScrollingUp",
+        "LoadResources", "PlayMusic", "PlayStaticSound", "RenderInterface",
+        "RenderShadow", "SetBottomRightTip", "SetBottomRightTipAndShadow",
+        "SetCallbacks", "SetCursor", "aCursorIdData", "aSfxData");
+end
 -- Exports and imports ----------------------------------------------------- --
-return { A = { InitBook = InitBook }, F = function(GetAPI)
-  -- Imports --------------------------------------------------------------- --
-  LoadResources, SetCallbacks, SetCursor, IsMouseInBounds, PlayStaticSound,
-  Fade, IsMouseNotInBounds, aCursorIdData, aSfxData, InitCon, PlayMusic,
-  IsButtonPressed, IsButtonReleased, IsScrollingDown, IsScrollingUp,
-  SetBottomRightTip, SetBottomRightTipAndShadow, RenderInterface,
-  InitContinueGame, RenderShadow, GameProc
-  = -- --------------------------------------------------------------------- --
-  GetAPI("LoadResources", "SetCallbacks", "SetCursor", "IsMouseInBounds",
-    "PlayStaticSound", "Fade", "IsMouseNotInBounds", "aCursorIdData",
-    "aSfxData", "InitCon", "PlayMusic", "IsButtonPressed", "IsButtonReleased",
-    "IsScrollingDown", "IsScrollingUp", "SetBottomRightTip",
-    "SetBottomRightTipAndShadow", "RenderInterface", "InitContinueGame",
-    "RenderShadow", "GameProc");
-  -- ----------------------------------------------------------------------- --
-end };
+return { A = { InitBook = InitBook }, F = OnReady };
 -- End-of-File ============================================================= --

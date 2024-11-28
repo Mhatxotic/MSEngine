@@ -181,19 +181,21 @@ local function InitTNTMap()
   -- Load TNT map resources
   LoadResources("TNT Map", aAssets, OnLoaded);
 end
--- Exports and imports ----------------------------------------------------- --
-return { A = { InitTNTMap = InitTNTMap }, F = function(GetAPI)
-  -- Imports --------------------------------------------------------------- --
+-- Scripts have been loaded ------------------------------------------------ --
+local function OnReady(GetAPI)
+  -- Grab imports
   Fade, GameProc, GetGameTicks, InitContinueGame, IsButtonHeld,
-  IsMouseInBounds, IsMouseNotInBounds, LoadResources, PlayStaticSound,
-  RenderInterface, RenderShadow, SetBottomRightTip, SetCallbacks, SetCursor,
-  aCursorIdData, aLevelData, aObjects, aSfxData, aTileData, aTileFlags, texSpr
-  = -- --------------------------------------------------------------------- --
-  GetAPI("Fade", "GameProc", "GetGameTicks","InitContinueGame", "IsButtonHeld",
-    "IsMouseInBounds", "IsMouseNotInBounds", "LoadResources",
-    "PlayStaticSound", "RenderInterface", "RenderShadow", "SetBottomRightTip",
-    "SetCallbacks", "SetCursor", "aCursorIdData", "aLevelData",  "aObjects",
-    "aSfxData", "aTileData", "aTileFlags", "texSpr");
-  -- ----------------------------------------------------------------------- --
-end };
+    IsMouseInBounds, IsMouseNotInBounds, LoadResources, PlayStaticSound,
+    RenderInterface, RenderShadow, SetBottomRightTip, SetCallbacks, SetCursor,
+    aCursorIdData, aLevelData, aObjects, aSfxData, aTileData, aTileFlags,
+    texSpr =
+      GetAPI("Fade", "GameProc", "GetGameTicks","InitContinueGame",
+        "IsButtonHeld", "IsMouseInBounds", "IsMouseNotInBounds",
+        "LoadResources", "PlayStaticSound", "RenderInterface", "RenderShadow",
+        "SetBottomRightTip", "SetCallbacks", "SetCursor", "aCursorIdData",
+        "aLevelData",  "aObjects", "aSfxData", "aTileData", "aTileFlags",
+        "texSpr");
+end
+-- Exports and imports ----------------------------------------------------- --
+return { A = { InitTNTMap = InitTNTMap }, F = OnReady };
 -- End-of-File ============================================================= --

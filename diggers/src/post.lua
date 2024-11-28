@@ -108,10 +108,10 @@ local function ScrollLeft() AdjustViewPortX(-16) end;
 local function ScrollRight() AdjustViewPortX(16) end;
 -- Post mortem input ------------------------------------------------------- --
 local function InputPostMortem()
-  -- Mouse wheel is scrolling up or L1 pressed? Goto previous object
-  if IsScrollingUp() or IsButtonPressed(4) then PreviousObject();
-  -- Mouse wheel is scrolling down or L2 pressed? Goto next object
-  elseif IsScrollingDown() or IsButtonPressed(5) then NextObject();
+  -- Mouse wheel is scrolling up? Goto previous object
+  if IsScrollingUp() then PreviousObject();
+  -- Mouse wheel is scrolling down? Goto next object
+  elseif IsScrollingDown() then NextObject();
   -- Mouse at top edge of screen?
   elseif IsMouseXLessThan(16) then
     SetCursor(aCursorIdData.LEFT);
@@ -216,14 +216,17 @@ local function OnReady(GetAPI)
   -- Register keybinds
   local aKeys<const>, aStates<const> = Input.KeyCodes, Input.States;
   local aScrUp<const>, aScrDown<const>, aScrLeft<const>, aScrRight<const> =
-    { aKeys.UP, ScrollUp },     { aKeys.DOWN, ScrollDown },
-    { aKeys.LEFT, ScrollLeft }, { aKeys.RIGHT, ScrollRight };
+    { aKeys.UP, ScrollUp, "mpmsmu", "SCROLL MAP UP" },
+    { aKeys.DOWN, ScrollDown, "mpmsmd", "SCROLL MAP DOWN" },
+    { aKeys.LEFT, ScrollLeft, "mpmsml", "SCROLL MAP LEFT" },
+    { aKeys.RIGHT, ScrollRight, "mpmsmr", "SCROLL MAP RIGHT" };
   iKeyBankId = GetAPI("RegisterKeys")("MAP POST MORTEM", {
-    [aStates.PRESS] = { { aKeys.ESCAPE, FadeToLobby },
-                        { aKeys.MINUS, PreviousObject },
-                        { aKeys.EQUAL, NextObject },
-                        aScrUp, aScrDown, aScrLeft, aScrRight },
-    [aStates.REPEAT] = { aScrUp, aScrDown, aScrLeft, aScrRight },
+    [aStates.PRESS] = {
+      { aKeys.ESCAPE, FadeToLobby, "mpmc", "LEAVE SCREEN" },
+      { aKeys.MINUS, PreviousObject, "mpmop", "PREVIOUS OBJECT" },
+      { aKeys.EQUAL, NextObject, "mpmon", "NEXT OBJECT" },
+      aScrUp, aScrDown, aScrLeft, aScrRight
+    }, [aStates.REPEAT] = { aScrUp, aScrDown, aScrLeft, aScrRight },
   });
 end
 -- Exports and imports ----------------------------------------------------- --

@@ -30,7 +30,7 @@ local CoreStack<const>, CoreTicks<const>, DisplayReset<const>,
   Util.IsBoolean, Util.IsFunction, Util.IsInteger, Util.IsString, Util.IsTable,
   Fbo.Main();
 -- Diggers function and data aliases --------------------------------------- --
-local InitSetup, SetErrorMessage, aCursorData, aCursorIdData, texSpr;
+local InitSetup, IsFading, SetErrorMessage, aCursorData, aCursorIdData, texSpr;
 -- Globals ----------------------------------------------------------------- --
 local aKeys<const> = Input.KeyCodes;   -- Keyboard scan codes
 local iCursorMin, iCursorMax;          -- Cursor minimum and maximum
@@ -65,22 +65,6 @@ local function IsMouseYLessThan(iY) return iCursorY < iY end;
 local function IsMouseYGreaterEqualThan(iY) return iCursorY >= iY end;
 local function GetMouseX() return iCursorX end;
 local function GetMouseY() return iCursorY end;
--- Get mouse scrolling state ----------------------------------------------- --
-local function IsScrollingLeft()
-  if nWheelX <= 0 then return false else nWheelX = 0 return true end;
-end
--- Get mouse scrolling state ----------------------------------------------- --
-local function IsScrollingRight()
-  if nWheelX >= 0 then return false else nWheelX = 0 return true end;
-end
--- Get mouse scrolling state ----------------------------------------------- --
-local function IsScrollingUp()
-  if nWheelY <= 0 then return false else nWheelY = 0 return true end;
-end
--- Get mouse scrolling state ----------------------------------------------- --
-local function IsScrollingDown()
-  if nWheelY >= 0 then return false else nWheelY = 0 return true end;
-end
 -- Returns current mouse button state -------------------------------------- --
 local function GetMouseState(iButton) return aMouseState[iButton] or 0 end;
 -- Clears the specified mouse button state --------------------------------- --
@@ -126,6 +110,30 @@ end
 -- Returns true if specified mouse or joystick button is released ---------- --
 local function IsButtonReleased(iButton)
   return IsMouseReleased(iButton) and IsJoyReleased(iButton);
+end
+-- Get mouse scrolling state ----------------------------------------------- --
+local function IsScrollingLeft()
+  if not IsJoyPressed(6) and nWheelX <= 0 then return false end;
+  nWheelX = 0;
+  return true;
+end
+-- Get mouse scrolling state ----------------------------------------------- --
+local function IsScrollingRight()
+  if not IsJoyPressed(7) and nWheelX >= 0 then return false end;
+  nWheelX = 0;
+  return true;
+end
+-- Get mouse scrolling state ----------------------------------------------- --
+local function IsScrollingUp()
+  if not IsJoyPressed(4) and nWheelY <= 0 then return false end;
+  nWheelY = 0;
+  return true;
+end
+-- Get mouse scrolling state ----------------------------------------------- --
+local function IsScrollingDown()
+  if not IsJoyPressed(5) and nWheelY >= 0 then return false end;
+  nWheelY = 0;
+  return true;
 end
 -- When a key is pressed --------------------------------------------------- --
 local function OnKey(iKey, iState)
@@ -201,6 +209,10 @@ local function OnJoyState(iJ, bState)
             InputSetCursorPos(iCursorX, iCursorY);
           -- No axis pressed
           end
+          -- Return if fading
+          if IsFading() then return end;
+          -- Check for setup buttons
+          if IsJoyPressed(8) then InitSetup(1) end;
         end
         -- Real update mouse info
         fcbJoystick = JoystickMoveCallback;
@@ -237,8 +249,8 @@ local function SetCursor(iId)
   -- Set cursor id
   iCId = iId;
 end
--- Register keys from other module and return to them an identifier -------- --
-local function RegisterKeys(sName, aKeys)
+-- Categorise the keys ----------------------------------------------------- --
+local function RegisterCategorise(sName, aKeys)
   -- Check that given table is valid
   if not UtilIsTable(aKeys) then
     error("Key table is invalid! "..tostring(aKeys)) end;
@@ -263,18 +275,38 @@ local function RegisterKeys(sName, aKeys)
       local fcbCb<const> = aBind[2];
       if not UtilIsFunction(fcbCb) then
         error("Invalid callback "..tostring(fcbCb).." at index "..iIndex) end;
-      -- Check description (this is optional so it doesn't show on keybinds)
-      local sDesc<const> = aBind[3];
-      if sDesc ~= nil then
-        -- Check is valid string before accepting
-        if not UtilIsString(sDesc) and #sDesc > 0 then
-          error("Invalid label "..tostring(sDesc).." at index "..iIndex) end;
+      -- Check label
+      local sId<const> = aBind[3];
+      if not UtilIsString(sId) or #sId == 0 then
+        error("Invalid id "..tostring(sId).." at index "..iIndex) end;
+      -- Check description
+      local sDesc<const> = aBind[4];
+      if not UtilIsString(sDesc) or #sDesc == 0 then
+        error("Invalid label "..tostring(sDesc).." at index "..iIndex) end;
+      -- We haven't registered this identifier already?
+      if not aKeyBankCats[sId] then
+        -- Must be 4 variables ONLY
+        if #aBind ~= 4 then
+          error("Required 4 (not "..#aBind..") members at index "..iIndex) end;
+        -- Backup key (used for default key)
+        aBind[5] = aBind[1];
+        -- Create full name of bind for setup screen
+        aBind[6] = sName..": "..aBind[4];
+        -- Set data with identifier. Duplicates will overwrite each other. This
+        -- is the whole point since we may need to use the same bind but for
+        -- different key states.
+        aKeyBankCats[1 + #aKeyBankCats] = aBind;
+        aKeyBankCats[sId] = aBind;
       end
     end
   end
+end
+-- Register keys from other module and return to them an identifier -------- --
+local function RegisterKeys(sName, aKeys)
+  -- Categories the keys
+  RegisterCategorise(sName, aKeys);
   -- Add keybinds to key bank
-  aKeyBank[1 + #aKeyBank] = aKeys;
-  aKeyBankCats[1 + #aKeyBankCats] = { sName, aKeys };
+  aKeyBank[1 + #aKeyBank] = { sName, aKeys };
   -- Return identifier
   return #aKeyBank;
 end
@@ -320,7 +352,7 @@ local function SetKeys()
     if not UtilIsTable(aKeys) then
       error("Invalid table index not registered: "..iIdentifier) end;
     -- Add binds from key bank to currently active keybinds
-    for iCategory, aBinds in pairs(aKeys) do
+    for iCategory, aBinds in pairs(aKeys[2]) do
       local aKeyBindsCat<const> = aKeyBinds[iCategory];
       for iIndex = 1, #aBinds do
         local aBind<const> = aBinds[iIndex];
@@ -367,27 +399,26 @@ end
 local function DisableKeyHandlers()
   InputOnJoyState(nil);
   InputOnKey(nil);
-  InputOnMouseClick(nil);
-  InputOnMouseScroll(nil);
 end
 -- Restore key handlers ---------------------------------------------------- --
 local function RestoreKeyHandlers()
   InputOnJoyState(OnJoyState);
   InputOnKey(OnKey);
-  InputOnMouseClick(OnMouseClick);
-  InputOnMouseMove(OnMouseMove);
-  InputOnMouseScroll(OnMouseScroll);
 end
 -- Script has been initialised --------------------------------------------- --
 local function OnReady(GetAPI)
   -- Get imports
-  InitSetup, SetErrorMessage, aCursorData, aCursorIdData, texSpr =
-    GetAPI("InitSetup", "SetErrorMessage", "aCursorData", "aCursorIdData",
-      "texSpr");
+  InitSetup, IsFading, SetErrorMessage, aCursorData, aCursorIdData, texSpr =
+    GetAPI("InitSetup", "IsFading", "SetErrorMessage", "aCursorData",
+           "aCursorIdData", "texSpr");
   -- Enable cursor clamper when fbo changes
   GetAPI("RegisterFBUCallback")("input", OnFrameBufferUpdate);
   -- Enable input capture events
-  RestoreKeyHandlers();
+  InputOnJoyState(OnJoyState);
+  InputOnKey(OnKey);
+  InputOnMouseClick(OnMouseClick);
+  InputOnMouseMove(OnMouseMove);
+  InputOnMouseScroll(OnMouseScroll);
   -- Global function key callbacks
   local function GkCbConfig() InitSetup(1) end;
   local function GkCbBinds() InitSetup(2) end;
@@ -395,15 +426,15 @@ local function OnReady(GetAPI)
   local function GkCbSShot() SShotFbo(fboMain) end;
   -- Set the global keybinds
   aGlobalKeyBinds = { [Input.States.PRESS] = {
-    { aKeys.F1,  GkCbConfig,           "SETUP SCREEN" };
-    { aKeys.F2,  GkCbBinds,            "SETUP KEYBINDS" },
-    { aKeys.F3,  GkCbReadme,           "SHOW CREDITS" },
-    { aKeys.F10, InputSetCursorCentre, "SET CURSOR CENTRE" },
-    { aKeys.F11, DisplayReset,         "RESET WINDOW SIZE" },
-    { aKeys.F12, GkCbSShot,            "TAKE SCREENSHOT" },
+    { aKeys.F1, GkCbConfig, "gksc", "SETUP SCREEN" };
+    { aKeys.F2, GkCbBinds, "gksb", "SETUP KEYBINDS" },
+    { aKeys.F3, GkCbReadme, "gksa", "SHOW ACKNOWLEDGEMENTS" },
+    { aKeys.F10, InputSetCursorCentre, "gkcc", "SET CURSOR CENTRE" },
+    { aKeys.F11, DisplayReset, "gkwr", "RESET WINDOW SIZE" },
+    { aKeys.F12, GkCbSShot, "gkss", "TAKE SCREENSHOT" },
   }}
   -- Add keybinds to key bank categories for configuration
-  aKeyBankCats[1 + #aKeyBankCats] = { "GLOBAL", aGlobalKeyBinds };
+  RegisterCategorise("GLOBAL", aGlobalKeyBinds);
 end
 -- Exports and imports ----------------------------------------------------- --
 return { F = OnReady, A = { ClearMouseState = ClearMouseState,

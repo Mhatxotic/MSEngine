@@ -277,23 +277,23 @@ local function InitLobby(aActiveObject, bNoSetMusic, iSaveMusicPos)
   -- Load closed lobby texture
   LoadResources("Lobby", aAssets, OnLoaded);
 end
--- Exports and imports------------------------------------------------------ --
-return { A = { InitLobby = InitLobby }, F = function(GetAPI)
-  -- Imports --------------------------------------------------------------- --
+-- Scripts have been loaded ------------------------------------------------ --
+local function OnReady(GetAPI)
+  -- Grab imports
   EndConditionsCheck, Fade, GameProc, InitBank, InitCon, InitContinueGame,
   InitScene, InitShop, InitTitle, IsButtonReleased, IsMouseInBounds,
   IsMouseNotInBounds, LoadResources, PlayMusic, PlayStaticSound,
   RegisterFBUCallback, RenderInterface, RenderShadow, SetBottomRightTip,
   SetBottomRightTipAndShadow, SetCallbacks, SetCursor, aCursorIdData,
-  aGlobalData, aSfxData, fontSpeech
-  = -- --------------------------------------------------------------------- --
-  GetAPI("EndConditionsCheck", "Fade", "GameProc", "InitBank", "InitCon",
-    "InitContinueGame", "InitScene", "InitShop", "InitTitle",
-    "IsButtonReleased", "IsMouseInBounds", "IsMouseNotInBounds",
-    "LoadResources", "PlayMusic", "PlayStaticSound", "RegisterFBUCallback",
-    "RenderInterface", "RenderShadow", "SetBottomRightTip",
-    "SetBottomRightTipAndShadow", "SetCallbacks", "SetCursor", "aCursorIdData",
-    "aGlobalData", "aSfxData", "fontSpeech");
-  -- ----------------------------------------------------------------------- --
-end };
+  aGlobalData, aSfxData, fontSpeech =
+    GetAPI("EndConditionsCheck", "Fade", "GameProc", "InitBank", "InitCon",
+      "InitContinueGame", "InitScene", "InitShop", "InitTitle",
+      "IsButtonReleased", "IsMouseInBounds", "IsMouseNotInBounds",
+      "LoadResources", "PlayMusic", "PlayStaticSound", "RegisterFBUCallback",
+      "RenderInterface", "RenderShadow", "SetBottomRightTip",
+      "SetBottomRightTipAndShadow", "SetCallbacks", "SetCursor",
+      "aCursorIdData", "aGlobalData", "aSfxData", "fontSpeech");
+end
+-- Exports and imports------------------------------------------------------ --
+return { A = { InitLobby = InitLobby }, F = OnReady };
 -- End-of-File ============================================================= --

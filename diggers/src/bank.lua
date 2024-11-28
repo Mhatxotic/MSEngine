@@ -242,23 +242,25 @@ local function InitBank(aActiveObject)
   -- Load bank texture
   LoadResources("Bank", aAssets, OnLoaded);
 end
--- Exports and imports ----------------------------------------------------- --
-return { A = { InitBank = InitBank }, F = function(GetAPI)
-  -- Imports --------------------------------------------------------------- --
+-- Scripts have been loaded ------------------------------------------------ --
+local function OnReady(GetAPI)
+  -- Grab imports
   Fade, GameProc, GetGameTicks, HaveZogsToWin, InitLobby, IsButtonPressed,
-  IsMouseInBounds, IsMouseNotInBounds, IsScrollingDown, IsScrollingUp,
-  LoadResources, PlayMusic, PlayStaticSound, RenderInterface, RenderShadow,
-  SellSpecifiedItems, SetBottomRightTip, SetCallbacks, SetCursor,
-  aCursorIdData, aGemsAvailable, aObjectActions, aObjectData,
-  aObjectDirections, aObjectJobs, aObjectTypes, aSfxData, fontSpeech, texSpr
-  = -- --------------------------------------------------------------------- --
-  GetAPI("Fade", "GameProc", "GetGameTicks", "HaveZogsToWin", "InitLobby",
-    "IsButtonPressed", "IsMouseInBounds", "IsMouseNotInBounds",
-    "IsScrollingDown", "IsScrollingUp", "LoadResources", "PlayMusic",
-    "PlayStaticSound", "RenderInterface", "RenderShadow", "SellSpecifiedItems",
-    "SetBottomRightTip", "SetCallbacks", "SetCursor", "aCursorIdData",
-    "aGemsAvailable", "aObjectActions", "aObjectData", "aObjectDirections",
-    "aObjectJobs", "aObjectTypes", "aSfxData", "fontSpeech", "texSpr");
-  -- ----------------------------------------------------------------------- --
-end };
+    IsMouseInBounds, IsMouseNotInBounds, IsScrollingDown, IsScrollingUp,
+    LoadResources, PlayMusic, PlayStaticSound, RenderInterface, RenderShadow,
+    SellSpecifiedItems, SetBottomRightTip, SetCallbacks, SetCursor,
+    aCursorIdData, aGemsAvailable, aObjectActions, aObjectData,
+    aObjectDirections, aObjectJobs, aObjectTypes, aSfxData, fontSpeech,
+    texSpr =
+      GetAPI("Fade", "GameProc", "GetGameTicks", "HaveZogsToWin", "InitLobby",
+        "IsButtonPressed", "IsMouseInBounds", "IsMouseNotInBounds",
+        "IsScrollingDown", "IsScrollingUp", "LoadResources", "PlayMusic",
+        "PlayStaticSound", "RenderInterface", "RenderShadow",
+        "SellSpecifiedItems", "SetBottomRightTip", "SetCallbacks", "SetCursor",
+        "aCursorIdData", "aGemsAvailable", "aObjectActions", "aObjectData",
+        "aObjectDirections", "aObjectJobs", "aObjectTypes", "aSfxData",
+        "fontSpeech", "texSpr");
+end
+-- Exports and imports ----------------------------------------------------- --
+return { A = { InitBank = InitBank }, F = OnReady };
 -- End-of-File ============================================================= --

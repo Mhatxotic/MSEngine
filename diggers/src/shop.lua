@@ -272,24 +272,24 @@ local function InitShop(aActiveObject)
   -- Load shop resources
   LoadResources("Shop", aAssets, OnLoaded);
 end
--- Exports and imports ----------------------------------------------------- --
-return { A = { InitShop = InitShop }, F = function(GetAPI)
-  -- Imports --------------------------------------------------------------- --
+-- Scripts have been loaded ------------------------------------------------ --
+local function OnReady(GetAPI)
+  -- Grab imports
   BuyItem, Fade, GameProc, InitCon, InitLobby, IsButtonPressed,
-  IsButtonReleased, IsMouseInBounds, IsMouseNotInBounds, IsScrollingDown,
-  IsScrollingUp, LoadResources, LoopStaticSound, PlayMusic, PlayStaticSound,
-  RenderInterface, RenderShadow, SetBottomRightTip, SetCallbacks, SetCursor,
-  StopSound, aCursorIdData, aObjectActions, aObjectData, aObjectDirections,
-  aObjectJobs, aSfxData, aShopData, fontLittle, fontSpeech, fontTiny
-  = -- --------------------------------------------------------------------- --
-  GetAPI("BuyItem", "Fade", "GameProc","InitCon", "InitLobby",
-    "IsButtonPressed", "IsButtonReleased", "IsMouseInBounds",
-    "IsMouseNotInBounds", "IsScrollingDown", "IsScrollingUp", "LoadResources",
-    "LoopStaticSound", "PlayMusic", "PlayStaticSound", "RenderInterface",
-    "RenderShadow", "SetBottomRightTip", "SetCallbacks", "SetCursor",
-    "StopSound", "aCursorIdData", "aObjectActions", "aObjectData",
-    "aObjectDirections", "aObjectJobs", "aSfxData", "aShopData", "fontLittle",
-    "fontSpeech", "fontTiny");
-  -- ----------------------------------------------------------------------- --
-end };
+    IsButtonReleased, IsMouseInBounds, IsMouseNotInBounds, IsScrollingDown,
+    IsScrollingUp, LoadResources, LoopStaticSound, PlayMusic, PlayStaticSound,
+    RenderInterface, RenderShadow, SetBottomRightTip, SetCallbacks, SetCursor,
+    StopSound, aCursorIdData, aObjectActions, aObjectData, aObjectDirections,
+    aObjectJobs, aSfxData, aShopData, fontLittle, fontSpeech, fontTiny =
+      GetAPI("BuyItem", "Fade", "GameProc","InitCon", "InitLobby",
+        "IsButtonPressed", "IsButtonReleased", "IsMouseInBounds",
+        "IsMouseNotInBounds", "IsScrollingDown", "IsScrollingUp",
+        "LoadResources", "LoopStaticSound", "PlayMusic", "PlayStaticSound",
+        "RenderInterface", "RenderShadow", "SetBottomRightTip", "SetCallbacks",
+        "SetCursor", "StopSound", "aCursorIdData", "aObjectActions",
+        "aObjectData", "aObjectDirections", "aObjectJobs", "aSfxData",
+        "aShopData", "fontLittle", "fontSpeech", "fontTiny");
+end
+-- Exports and imports ----------------------------------------------------- --
+return { A = { InitShop = InitShop }, F = OnReady };
 -- End-of-File ============================================================= --

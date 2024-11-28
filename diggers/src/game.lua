@@ -40,7 +40,7 @@ local function MediumPriorityVars()
 local ACT, AI, BCBlit, DF, DIR, Fade, GetCallbacks, GetMouseX, GetMouseY,
   GetTestMode, InitBook, InitLobby, InitLose, InitLoseDead, InitPause,
   InitTNTMap, InitWin, InitWinDead, IsButtonHeld, IsButtonPressed,
-  IsButtonPressedNoRelease, IsJoyPressed, IsMouseInBounds, IsMouseXLessThan,
+  IsButtonPressedNoRelease, IsMouseInBounds, IsMouseXLessThan,
   IsScrollingDown, IsScrollingUp, JOB, LoadResources, MFL, MNU, OFL, PlayMusic,
   PlaySound, PlayStaticSound, RegisterFBUCallback, RenderFade, RenderShadow,
   SetBottomRightTip, SetCallbacks, SetCursor, SetKeys, TYP, aAIChoicesData,
@@ -4442,7 +4442,7 @@ local function OnReady(GetAPI)
     aJumpFallData, IsButtonPressed, IsButtonHeld, GetMouseX,
     GetMouseY, PlayStaticSound, PlaySound, IsButtonPressedNoRelease, aMenuData,
     MFL, MNU, IsMouseXLessThan, InitBook, aObjToUIData,
-    RenderFade, IsJoyPressed, InitWin, InitWinDead, InitLose, InitLoseDead,
+    RenderFade, InitWin, InitWinDead, InitLose, InitLoseDead,
     InitPause, InitTNTMap, InitLobby, texSpr, fontLarge, fontLittle, fontTiny,
     aDigBlockData, aExplodeDirData, SetCursor, SetKeys, aCursorIdData,
     RegisterFBUCallback, GetCallbacks, GetTestMode, RenderShadow,
@@ -4459,7 +4459,7 @@ local function OnReady(GetAPI)
         "IsButtonHeld", "GetMouseX", "GetMouseY", "PlayStaticSound",
         "PlaySound", "IsButtonPressedNoRelease", "aMenuData", "aMenuFlags",
         "aMenuIds", "IsMouseXLessThan", "InitBook", "aObjToUIData",
-        "RenderFade", "IsJoyPressed", "InitWin", "InitWinDead",
+        "RenderFade", "InitWin", "InitWinDead",
         "InitLose", "InitLoseDead", "InitPause", "InitTNTMap", "InitLobby",
         "texSpr", "fontLarge", "fontLittle", "fontTiny", "aDigBlockData",
         "aExplodeDirData", "SetCursor", "SetKeys", "aCursorIdData",
@@ -4595,41 +4595,49 @@ local function OnReady(GetAPI)
   local function ScrollDown() if GetTestMode() then ScrollV(16) end end;
   local function ScrollLeft() if GetTestMode() then ScrollH(-16) end end;
   local function ScrollRight() if GetTestMode() then ScrollH(16) end end;
-  -- Setup keybank
+  -- Repeated key events
   local aKeys<const>, aStates<const> = Input.KeyCodes, Input.States;
-  iKeyBankId = GetAPI("RegisterKeys")("GAME KEYS", {
+  local aJennite<const>, aReveal<const>, aExplode<const>, aScrollUp<const>,
+        aScrollDown<const>, aScrollLeft<const>, aScrollRight<const> =
+    { aKeys.J, SpawnJennite, "igdmsj", "SPAWN JENNITE (DEBUG)"  },
+    { aKeys.O, ShroudReveal, "igdmsr", "SHROUD REVEAL (DEBUG)" },
+    { aKeys.P, CauseExplosion, "igdmce", "CAUSE EXPLOSION (DEBUG)" },
+    { aKeys.HOME, ScrollUp, "igdmsmu", "SCROLL MAP UP (DEBUG)" },
+    { aKeys.END, ScrollDown, "igdmsmd", "SCROLL MAP DOWN (DEBUG)" },
+    { aKeys.DELETE, ScrollLeft, "igdmsml", "SCROLL MAP LEFT (DEBUG)" },
+    { aKeys.PAGE_DOWN, ScrollRight, "igdmsmr", "SCROLL MAP RIGHT (DEBUG)" };
+  -- Setup keybank
+  iKeyBankId = GetAPI("RegisterKeys")("IN-GAME", {
     [aStates.PRESS] = {
-      { aKeys.ONE,       SetDiggerOne,    "SELECT FIRST DIGGER"  },
-      { aKeys.TWO,       SetDiggerTwo,    "SELECT SECOND DIGGER"  },
-      { aKeys.THREE,     SetDiggerThree,  "SELECT THIRD DIGGER"  },
-      { aKeys.FOUR,      SetDiggerFour,   "SELECT FOURTH DIGGER"  },
-      { aKeys.FIVE,      SetDiggerFive,   "SELECT FIFTH DIGGER" },
-      { aKeys.SPACE,     SelectDevice,    "CYCLE DEVICES" },
-      { aKeys.F5,        SelectInventory, "TOGGLE DIGGER INVENTORY STATUS" },
-      { aKeys.F6,        SelectLocation,  "TOGGLE DIGGER LOCATIONS" },
-      { aKeys.F7,        SelectStatus,    "TOGGLE GAME STATUS" },
-      { aKeys.F8,        SelectBook,      "SHOW THE BOOK" },
-      { aKeys.UP,        JumpDigger,      "JUMP THE DIGGER" },
-      { aKeys.LEFT,      MoveLeft,        "WALK OR RUN DIGGER LEFT" },
-      { aKeys.RIGHT,     MoveRight,       "WALK OR RUN DIGGER RIGHT" },
-      { aKeys.Q,         DigUpLeft,       "DIG DIAGONALLY UP-LEFT" },
-      { aKeys.R,         DigUpRight,      "DIG DIAGONALLY UP-RIGHT" },
-      { aKeys.A,         DigLeft,         "DIG LEFT" },
-      { aKeys.D,         DigRight,        "DIG RIGHT" },
-      { aKeys.Z,         DigDownLeft,     "DIG DIAGONALLY DOWN-LEFT" },
-      { aKeys.X,         DigDown,         "DIG DOWN" },
-      { aKeys.C,         DigDownRight,    "DIG DOWN-RIGHT" },
-      { aKeys.BACKSPACE, Teleport,        "TELEPORT HOME OR TELEPOLE" },
-      { aKeys.ENTER,     GrabItems,       "GRAB COLLIDING ITEMS" },
-      { aKeys.DOWN,      StopDigger,      "STOP ALL ACTIVITY IF NOT BUSY" },
-      { aKeys.ESCAPE,    InitPause,       "PAUSE THE GAME" },
-      { aKeys.J,         SpawnJennite,    "SPAWN JENNITE (DEBUG MODE)"  },
-      { aKeys.O,         ShroudReveal,    "SHROUD REVEAL (DEBUG MODE)" },
-      { aKeys.P,         CauseExplosion,  "CAUSE EXPLOSION (DEBUG MODE)" },
-      { aKeys.HOME,      ScrollUp,        "SCROLL MAP UP (DEBUG MODE)" },
-      { aKeys.END,       ScrollDown,      "SCROLL MAP DOWN (DEBUG MODE)" },
-      { aKeys.DELETE,    ScrollLeft,      "SCROLL MAP LEFT (DEBUG MODE)" },
-      { aKeys.PAGE_DOWN, ScrollRight,     "SCROLL MAP RIGHT (DEBUG MODE)" },
+      { aKeys.ONE, SetDiggerOne, "igsdon", "SELECT 1ST DIGGER"  },
+      { aKeys.TWO, SetDiggerTwo, "igsdtw", "SELECT 2ND DIGGER"  },
+      { aKeys.THREE, SetDiggerThree, "igsdth", "SELECT 3RD DIGGER"  },
+      { aKeys.FOUR, SetDiggerFour, "igsdfo", "SELECT 4TH DIGGER"  },
+      { aKeys.FIVE, SetDiggerFive, "igsdfi", "SELECT 5TH DIGGER" },
+      { aKeys.SPACE, SelectDevice, "igsd", "CYCLE DEVICES" },
+      { aKeys.F5, SelectInventory, "igshi", "SHOW DIGGER INVENTORY" },
+      { aKeys.F6, SelectLocation, "igshl", "SHOW DIGGER LOCATIONS" },
+      { aKeys.F7, SelectStatus, "igshs", "SHOW GAME STATUS" },
+      { aKeys.F8, SelectBook, "igshb", "SHOW THE BOOK" },
+      { aKeys.UP, JumpDigger, "igdj", "JUMP THE DIGGER" },
+      { aKeys.LEFT, MoveLeft, "igdml", "WALK OR RUN DIGGER LEFT" },
+      { aKeys.RIGHT, MoveRight, "igdmr", "WALK OR RUN DIGGER RIGHT" },
+      { aKeys.Q, DigUpLeft, "igddul", "DIG DIAGONALLY UP-LEFT" },
+      { aKeys.R, DigUpRight, "igddur", "DIG DIAGONALLY UP-RIGHT" },
+      { aKeys.A, DigLeft, "igddl", "DIG LEFT" },
+      { aKeys.D, DigRight, "igddr", "DIG RIGHT" },
+      { aKeys.Z, DigDownLeft, "igdddl", "DIG DIAGONALLY DOWN-LEFT" },
+      { aKeys.X, DigDown, "igdd", "DIG DOWN" },
+      { aKeys.C, DigDownRight, "igdddr", "DIG DOWN-RIGHT" },
+      { aKeys.BACKSPACE, Teleport, "igdt", "TELEPORT HOME OR TELEPOLE" },
+      { aKeys.ENTER, GrabItems, "igdgi", "GRAB COLLIDING ITEMS" },
+      { aKeys.DOWN, StopDigger, "igds", "STOP ALL ACTIVITY IF NOT BUSY" },
+      { aKeys.ESCAPE, InitPause, "igp", "PAUSE THE GAME" },
+      aJennite, aReveal, aExplode, aScrollUp, aScrollDown, aScrollLeft,
+      aScrollRight
+    }, [aStates.REPEAT] = {
+      aJennite, aReveal, aExplode, aScrollUp, aScrollDown, aScrollLeft,
+      aScrollRight
     }
   });
   -- Pre-initialisations

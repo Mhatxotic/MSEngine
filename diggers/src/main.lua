@@ -12,9 +12,10 @@
 -- Lua aliases (optimisation) ---------------------------------------------- --
 local collectgarbage<const>, error<const>, floor<const>, format<const>,
   max<const>, min<const>, pairs<const>, random<const>, remove<const>,
-  tonumber<const>, tostring<const>, unpack<const> =
+  rep<const>, tonumber<const>, tostring<const>, type<const>, unpack<const> =
     collectgarbage, error, math.floor, string.format, math.max, math.min,
-    pairs, math.random, table.remove, tonumber, tostring, table.unpack;
+    pairs, math.random, table.remove, string.rep, tonumber, tostring, type,
+    table.unpack;
 -- M-Engine aliases (optimisation) ----------------------------------------- --
 local AssetParseBlock<const>, CoreLog<const>, CoreOnTick<const>,
   CoreStack<const>, CoreWrite<const>, FboDraw<const>,
@@ -68,6 +69,37 @@ local aPFlags<const> = Pcm.Flags;      -- Get waveform loading flags
 local iOGG<const> = aPFlags.FCE_OGG;   -- Get forced wave format
 local aPrFlags<const> = Asset.Progress;-- Asset progress flags
 local iFStart<const> = aPrFlags.FILESTART; -- File opened with information
+-- Table debug function (global) ------------------------------------------- --
+function Debug(aData)
+  -- Printing function
+  local function Print(iIndent, sWhat) CoreWrite(rep(" ", iIndent)..sWhat) end
+  -- Debug a variable
+  local function DoDump(sName, aData, iLv)
+    -- Print variable name
+    Print(iLv, sName.." ("..tostring(aData)..") = {");
+    -- Index
+    local iI = 0;
+    -- Increase indent
+    iLv = iLv + 2;
+    -- Enumerate keys and values
+    for sK, vV in pairs(aData) do
+      -- Recurse if a table
+      if type(vV) == "table" then DoDump(sK, vV, iLv);
+      -- Print key and value
+      else Print(iLv, sK.." : "..type(vV).." = "..tostring(vV)) end;
+      -- Increment counter
+      iI = iI + 1;
+    end
+    -- Decrease indent
+    iLv = iLv - 2;
+    -- Print total
+    Print(iLv, "} = "..iI.." ["..#aData.."]");
+  end
+  -- Must be a table
+  if type(aData) == "table" then return DoDump("ROOT", aData, 0) end;
+  -- Just a variable
+  Print(0, type(aData).." = "..tostring(aData));
+end
 -- Generic function to return a handle ------------------------------------- --
 local function GenericReturnHandle(hH) return hH end;
 -- Parse the return value of a script -------------------------------------- --
@@ -510,8 +542,8 @@ local function fcbTick()
   Fbo.OnRedraw(RefreshViewportInfo);
   RefreshViewportInfo();
   -- Initialise base API functions
-  ParseScriptResult("main", { F=UtilBlank, A={ BCBlit = BCBlit, Fade = Fade,
-    GetCallbacks = GetCallbacks, GetTestMode = GetTestMode,
+  ParseScriptResult("main", { F=UtilBlank, A={ BCBlit = BCBlit,
+    Fade = Fade, GetCallbacks = GetCallbacks, GetTestMode = GetTestMode,
     IsFading = IsFading, LoadResources = LoadResources,
     RefreshViewportInfo = RefreshViewportInfo,
     RegisterFBUCallback = RegisterFrameBufferUpdateCallback,
@@ -520,25 +552,6 @@ local function fcbTick()
     SetBottomRightTipAndShadow = SetBottomRightTipAndShadow,
     SetErrorMessage = SetErrorMessage, SetCallbacks = SetCallbacks,
     TimeIt = TimeIt } });
-  -- Empty callback function for CVar events
-  local function fcbEmpty() return true end;
-  -- Register file data CVar
-  local aCVF<const> = Variable.Flags;
-  -- Default CVar flags for string storage
-  local iCFR<const> = aCVF.STRINGSAVE|aCVF.TRIM|aCVF.PROTECTED|aCVF.DEFLATE;
-  -- Default CVar flags for boolean storage
-  local iCFB<const> = aCVF.BOOLEANSAVE;
-  -- 4 save slots so 4 save variables
-  for iI = 1, 4 do
-    aAPI["VarGameData"..iI] =
-      VariableRegister("gam_data"..iI, "", iCFR, fcbEmpty);
-  end
-  -- ...and a CVar that lets us show setup for the first time
-  aAPI.VarGameSetup = VariableRegister("gam_setup", 1, iCFB, fcbEmpty);
-  -- ...and a CVar that lets us skip the intro
-  aAPI.VarGameIntro = VariableRegister("gam_intro", 1, iCFB, fcbEmpty);
-  -- ...and a CVar that lets us start straight into a level
-  aAPI.VarGameTest = VariableRegister("gam_test", "", aCVF.STRING, fcbEmpty);
   -- Setup a default sprite set until the real sprite is loaded since we are
   -- loading everything asynchronously.
   texSpr = TextureCreate(Image.Blank("placeholder", 1, 1, false, true), 0);
@@ -651,6 +664,25 @@ local function fcbTick()
       -- Unpack returns table and return all the functions requested
       return unpack(tRets);
     end
+    -- Empty callback function for CVar events
+    local function fcbEmpty() return true end;
+    -- Register file data CVar
+    local aCVF<const> = Variable.Flags;
+    -- Default CVar flags for string storage
+    local iCFR<const> = aCVF.STRINGSAVE|aCVF.TRIM|aCVF.PROTECTED|aCVF.DEFLATE;
+    -- Default CVar flags for boolean storage
+    local iCFB<const> = aCVF.BOOLEANSAVE;
+    -- 4 save slots so 4 save variables
+    for iI = 1, 4 do
+      aAPI["cvData"..iI] =
+        VariableRegister("gam_data"..iI, "", iCFR, fcbEmpty);
+    end
+    -- ...and a CVar that lets us show setup for the first time
+    aAPI.cvSetup = VariableRegister("gam_setup", 1, iCFB, fcbEmpty);
+    -- ...and a CVar that lets us skip the intro
+    aAPI.cvIntro = VariableRegister("gam_intro", 1, iCFB, fcbEmpty);
+    -- ...and a CVar that lets us start straight into a level
+    aAPI.cvTest = VariableRegister("gam_test", "", aCVF.STRING, fcbEmpty);
     -- Ask modules to grab needed functions from the API
     for iI = 1, #aModules do
       local aModData<const> = aModules[iI];
@@ -694,7 +726,7 @@ local function fcbTick()
     -- Hide the cursor
     InputSetCursor(false);
     -- Tests
-    local sTestValue<const> = aAPI.VarGameTest:Get();
+    local sTestValue<const> = aAPI.cvTest:Get();
     if #sTestValue > 0 then
       -- Test mode enabled
       bTestMode = true;
@@ -728,16 +760,16 @@ local function fcbTick()
       end
     end
     -- If being run for first time
-    if 0 == tonumber(aAPI.VarGameSetup:Get()) then
+    if 0 == tonumber(aAPI.cvSetup:Get()) then
       -- Skip intro? Initialise title screen
-      if 0 == tonumber(aAPI.VarGameIntro:Get()) then return InitTitle() end;
+      if 0 == tonumber(aAPI.cvIntro:Get()) then return InitTitle() end;
       -- Initialise intro with setup dialog
       return InitIntro(false);
     end
     -- Initialise setup screen by default
     InitIntro(true);
     -- No longer show setup screen
-    aAPI.VarGameSetup:Set(0);
+    aAPI.cvSetup:Set(0);
   end
   -- Start loading assets
   local fcbProgress<const> = LoadResources("Core", aBaseAssets, OnLoaded);

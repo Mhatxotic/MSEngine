@@ -12,9 +12,9 @@
 -- Core function aliases --------------------------------------------------- --
 local cos<const>, floor<const>, format<const>, ipairs<const>, len<const>,
   max<const>, min<const>, pairs<const>, remove<const>, rep<const>, sin<const>,
-  tonumber<const>, tostring<const> =
+  sort<const>, tonumber<const>, tostring<const> =
     math.cos, math.floor, string.format, ipairs, utf8.len, math.max, math.min,
-    pairs, table.remove, string.rep, math.sin, tonumber, tostring;
+    pairs, table.remove, string.rep, math.sin, table.sort, tonumber, tostring;
 -- M-Engine function and variable aliases ---------------------------------- --
 local AudioGetNumPBDs<const>, AudioGetPBDName<const>, AudioReset<const>,
   CoreCPUUsage<const>, CoreEngine<const>, CoreLibrary<const>,
@@ -24,18 +24,18 @@ local AudioGetNumPBDs<const>, AudioGetPBDName<const>, AudioReset<const>,
   DisplayVidModeData<const>, DisplayVidModes<const>, DisplayVReset<const>,
   InputGetKeyName<const>, InputOnKey<const>, UtilClamp<const>,
   UtilClampInt<const>, UtilExplode<const>, UtilGetRatio<const>,
-  UtilWordWrap<const>, VariableGetInt<const>, VariableResetInt<const>,
-  VariableSetInt<const>, aCVars<const>, aKeys<const>, aMods<const>,
-  aStates<const>, iCredits<const>, iNativeMode<const> =
+  UtilWordWrap<const>, VariableGetInt<const>, VariableRegister<const>,
+  VariableResetInt<const>, VariableSetInt<const>, aCVars<const>, aKeys<const>,
+  aMods<const>, aStates<const>, iCredits<const>, iNativeMode<const> =
     Audio.GetNumPBDevices, Audio.GetPBDeviceName, Audio.Reset, Core.CPUUsage,
     Core.Engine, Core.Library, Core.License, Core.RAM, Core.Time,
     Display.FSType, Display.GetSize, Display.GPUFPS, Display.Monitor,
     Display.MonitorData, Display.Monitors, Display.Reset, Display.VidModeData,
     Display.VidModes, Display.VReset, Input.GetKeyName, Input.OnKey,
     Util.Clamp, Util.ClampInt, Util.Explode, Util.GetRatio, Util.WordWrap,
-    Variable.GetInt, Variable.ResetInt, Variable.SetInt, Variable.Internal,
-    Input.KeyCodes, Input.KeyMods, Input.States, Core.Libraries.MAX,
-    Display.FSTypes.NATIVE;
+    Variable.GetInt, Variable.Register, Variable.ResetInt, Variable.SetInt,
+    Variable.Internal, Input.KeyCodes, Input.KeyMods, Input.States,
+    Core.Libraries.MAX, Display.FSTypes.NATIVE;
 -- Read and prepare engine version information ----------------------------- --
 local sAppTitle, sAppVendor, iAppMajor<const>, iAppMinor<const>,
   iAppBuild<const>, iAppRevision<const>, _, _, sAppExeType = CoreEngine();
@@ -437,6 +437,40 @@ local function RenderReadme()
                           else fontTiny:SetCRGBA(0.75, 0.75, 0.75, 1) end;
 end
 -- ------------------------------------------------------------------------- --
+local function SetTip(nNewTipId, sTip)
+  -- Ignore if tip set
+  if nNewTipId == nTipId then return end;
+  -- Set new tip
+  nTipId = nNewTipId;
+  -- No tip? Reset
+  if not sTip then
+    -- Save status line
+    sStatusLine2 = sStatusLineSave;
+    -- Re-calculate size and reset position
+    nStatusLineSize, nStatusLinePos = -1, -1;
+    -- Done
+    return;
+  end
+  -- Get size of tip
+  local sTipPlusSep = sTip.." -+- "
+  local nTipSizePixels = fontTiny:PrintS(sTipPlusSep);
+  local nMaxLine = 304+nTipSizePixels;
+  -- Fill the line until it is big enough to scroll seamlessly
+  sStatusLine2, nStatusLineSize = "", nTipSizePixels;
+  while nStatusLineSize < nMaxLine do
+    -- Set the tip and append a separator for seamless repeating
+    sStatusLine2 = sStatusLine2..sTipPlusSep;
+    -- Calculate size
+    nStatusLineSize = fontTiny:PrintS(sStatusLine2);
+  end
+  -- Reset size to tip length
+  nStatusLineSize = nTipSizePixels;
+  -- Add more text so we can have a seamless repeating
+  sStatusLine2 = sStatusLine2..sTip;
+  -- Reset position
+  nStatusLinePos = -304;
+end
+-- ------------------------------------------------------------------------- --
 local function UpdateReadmeLines()
   -- Clear displayed lines
   aReadmeVisibleLines = { };
@@ -454,11 +488,14 @@ local function UpdateReadmeLines()
   -- Update statuses
   sStatusLine1 = "DISPLAYING LINE "..iReadmeIndexBegin.." TO "..
     iReadmeIndexEnd.." OF "..#aReadmeData.." OF THESE ACKNOWLEDGEMENTS";
-  sStatusLine2 =
-    "CURSORS+PGUP+PGDN+HOME+END+LMB+JB1:SCROLL  F2+RMB+JB2:SETUP  ESC:CANCEL";
-  -- Remove marquee settings
-  sStatusLineSave, nStatusLineSize, nStatusLinePos, nTipId =
-    nil, nil, nil, nil;
+  -- Make sure marquee is showing
+  SetTip(0, "MOVE THE CURSOR TO THE BOTTOM OR TOP OF THE SCREEN AND PRESS \z
+    RMB, JB1 OR PRESS "..
+    aKeyBankCats.srmpu[9]..", "..aKeyBankCats.srmpd[9]..", "..
+    aKeyBankCats.srmh[9]..", "..aKeyBankCats.srme[9]..", "..
+    aKeyBankCats.srmu[9].." OR "..aKeyBankCats.srmd[9].." TO SCROLL THE \z
+    README. "..aKeyBankCats.gksc[9]..", RMB OR JB2 TO RETURN TO SETUP. "..
+    aKeyBankCats.sf[9].." TO LEAVE SETUP.");
 end
 -- ------------------------------------------------------------------------- --
 local function SetReadme(Line)
@@ -506,6 +543,8 @@ local function InitReadme()
   sTitle = "ABOUT";
   -- Set readme lines
   aReadmeData = aCreditLines;
+  -- This make sure the status tip is updated
+  nTipId = -1;
   -- Initialise readme lines
   UpdateReadmeLines();
   -- At least one tick
@@ -516,40 +555,6 @@ local function InitReadme()
   SetKeys(true, iKeyBankReadme);
   -- Set readme procedures
   SetCallbacks(ProcReadme, RenderReadme, ProcReadmeInput);
-end
--- ------------------------------------------------------------------------- --
-local function SetTip(nNewTipId, sTip)
-  -- Ignore if tip set
-  if nNewTipId == nTipId then return end;
-  -- Set new tip
-  nTipId = nNewTipId;
-  -- No tip? Reset
-  if not sTip then
-    -- Save status line
-    sStatusLine2 = sStatusLineSave;
-    -- Re-calculate size and reset position
-    nStatusLineSize, nStatusLinePos = -1, -1;
-    -- Done
-    return;
-  end
-  -- Get size of tip
-  local sTipPlusSep = sTip.." -+- "
-  local nTipSizePixels = fontTiny:PrintS(sTipPlusSep);
-  local nMaxLine = 304+nTipSizePixels;
-  -- Fill the line until it is big enough to scroll seamlessly
-  sStatusLine2, nStatusLineSize = "", nTipSizePixels;
-  while nStatusLineSize < nMaxLine do
-    -- Set the tip and append a separator for seamless repeating
-    sStatusLine2 = sStatusLine2..sTipPlusSep;
-    -- Calculate size
-    nStatusLineSize = fontTiny:PrintS(sStatusLine2);
-  end
-  -- Reset size to tip length
-  nStatusLineSize = nTipSizePixels;
-  -- Add more text so we can have a seamless repeating
-  sStatusLine2 = sStatusLine2..sTip;
-  -- Reset position
-  nStatusLinePos = -304;
 end
 -- ------------------------------------------------------------------------- --
 local function RenderSetup()
@@ -697,13 +702,17 @@ local function InitConfig()
     sGameWebsite;
   sStatusLine2 = sAppVendor.." PROUDLY PRESENTS "..sGameName.."! A REMAKE \z
     FOR MODERN OPERATING SYSTEMS AND HARDWARE FROM THE CLASSIC CD32 AND DOS \z
-    DAYS. THIS IS THE CONFIGURATION SCREEN. PRESS ESCAPE OR THE 'DONE' \z
-    BUTTON TO RETURN TO THE GAME OR MOVE YOUR MOUSE OVER AN OPTION TO HAVE \z
-    MORE EXPLAINED ABOUT IT HERE. USE YOUR MOUSE OR JOYSTICK TO MOVE THE \z
-    CURSOR AND THE BUTTONS TO CHANGE OPTIONS. PRESS F1 AT ANY TIME TO SEE \z
-    THIS SCREEN, F2 FOR DOCUMENTATION OR F3 TO CONFIGURE THE INPUT BINDS. \z
-    PRESS ALT+ENTER AT ANY TIME TO TOGGLE FULL-SCREEN AND WINDOW. PRESS F11 \z
-    TO RESET THE WINDOW SIZE AND F12 TO TAKE A SCREENSHOT";
+    DAYS. THIS IS THE CONFIGURATION SCREEN. PRESS "..aKeyBankCats.sf[9].." \z
+    OR THE 'DONE' BUTTON TO RETURN TO THE GAME OR MOVE YOUR MOUSE OVER AN \z
+    OPTION TO HAVE MORE EXPLAINED ABOUT IT HERE. USE YOUR MOUSE OR JOYSTICK \z
+    TO MOVE THE CURSOR AND THE BUTTONS TO CHANGE OPTIONS. PRESS "..
+    aKeyBankCats.gksc[9].." AT ANY TIME TO SEE THIS SCREEN, "..
+    aKeyBankCats.gksb[9].." TO CHANGE KEYBINDINGS OR "..
+    aKeyBankCats.gksa[9].." TO SEE THE ACKNOWLEDGEMENTS. \z
+    PRESS ALT+ENTER AT ANY TIME TO TOGGLE FULL-SCREEN AND WINDOW. PRESS "..
+    aKeyBankCats.gkcc[9].." TO FIX THE MOUSE CURSOR, PRESS "..
+    aKeyBankCats.gkwr[9].." TO RESTORE THE WINDOW POSITION OR PRESS "..
+    aKeyBankCats.gkss[9].." TO TAKE A SCREENSHOT.";
   sStatusLineSave = sStatusLine2;
   SetTip(0, sStatusLineSave);
   -- Refresh all settings
@@ -724,7 +733,9 @@ local function UpdateBindsLines()
     min(iBindsIndexBegin + iReadmeRows, #aBindingsList) do
     -- Get line and truncate it if it is too long
     local aBind<const> = aBindingsList[iIndex];
-    local sLine = format("%-55s %20s", aBind[3], aBind[4]);
+    local sLine = aBind[6];
+    local sBind<const> = aBind[8];
+    sLine = sLine.." "..rep(".", 74 - #sLine - #sBind).." "..sBind;
     if #sLine > iReadmeColsM1 then sLine = sLine:sub(1, iReadmeColsM1) end;
     -- Insert visible line
     local iY<const> =
@@ -733,13 +744,17 @@ local function UpdateBindsLines()
       { iReadmePaddingX, iY, sLine, iReadmePaddingX+304, iY+6, aBind };
   end
   -- Update statuses
-  sStatusLine1 = "DISPLAYING LINE "..iBindsIndexBegin.." TO "..
-    iBindsIndexEnd.." OF "..#aBindingsList.." OF INPUT BINDINGS";
-  sStatusLine2 =
-    "CURSORS+PGUP+PGDN+HOME+END+LMB+JB1:SCROLL  F2+RMB+JB2:SETUP  ESC:CANCEL";
-  -- Remove marquee settings
-  sStatusLineSave, nStatusLineSize, nStatusLinePos, nTipId =
-    nil, nil, nil, nil;
+  sStatusLine1 = "DISPLAYING INPUT BINDING "..iBindsIndexBegin.." TO "..
+    iBindsIndexEnd.." OF "..#aBindingsList.." OF ALL CONFIGURABLE INPUT \z
+    BINDINGS";
+  -- Make sure marquee is showing
+  SetTip(0, "MOVE THE CURSOR TO A BIND YOU WANT TO CHANGE AND PRESS RMB OR \z
+    JB1 ON IT TO CHANGE THE KEY BINDING FOR IT. PRESS "..
+    aKeyBankCats.sbpu[9]..", "..aKeyBankCats.sbpd[9]..", "..
+    aKeyBankCats.sbh[9]..", "..aKeyBankCats.sbe[9]..", "..
+    aKeyBankCats.sbu[9].." OR "..aKeyBankCats.sbd[9].." TO SCROLL THE \z
+    BINDS. "..aKeyBankCats.gksc[9]..", RMB OR JB2 TO RETURN TO SETUP. "..
+    aKeyBankCats.sf[9].." TO LEAVE SETUP.");
 end
 -- ------------------------------------------------------------------------- --
 local function SetBinds(iLine)
@@ -765,6 +780,36 @@ local function ScrollBindsDown() ScrollBinds(1) end;
 local function ScrollBindsHome() SetBinds(1) end;
 local function ScrollBindsEnd() SetBinds(#aBindingsList) end;
 -- ------------------------------------------------------------------------- --
+local function RenderBinds()
+  -- Render default background
+  RenderBackgroundStart(757);
+  -- Draw readme
+  for iIndex = 1, #aReadmeVisibleLines do
+    -- Get data
+    local aData<const> = aReadmeVisibleLines[iIndex];
+    -- Calculate gradient colour
+    local iCol<const> = aReadmeColourData[iIndex];
+    -- Return if no option is selected
+    local nIntensity;
+    if iSelectedOption == iIndex then
+      -- Get currently selected line data and render a selection rectangle
+      texSpr:SetCRGB(0, 1, 0);
+      RenderFade(0.75, aData[1], aData[2], aData[4], aData[5], 1022);
+      texSpr:SetCRGB(1, 1, 1);
+      nIntensity = 1;
+    else
+      -- Calculate intensity
+      nIntensity = 0.75 + (((iIndex / #aReadmeVisibleLines) + nTime) % 0.25);
+    end
+    -- Set text colour and print the bind line
+    fontTiny:SetCRGB(nIntensity, nIntensity, nIntensity);
+    fontTiny:Print(aData[1], aData[2], aData[3]);
+  end
+  -- Set alternating title colour based on current time
+  if nTime % 0.43 < 0.215 then fontTiny:SetCRGBA(0.5, 0.5, 0.5, 1);
+                          else fontTiny:SetCRGBA(0.75, 0.75, 0.75, 1) end;
+end
+-- ------------------------------------------------------------------------- --
 local function ProcBindsInput()
   -- Check for mouse scroll wheel moving
   if IsScrollingLeft() then ScrollBindsPageUp();
@@ -779,9 +824,13 @@ local function ProcBindsInput()
     local aBind<const> = aReadmeVisibleLines[iSelectedOption];
     local aBindData<const> = aBind[6];
     -- Set text to receive key
-    aBindData[4] = "???";
+    local sTextSave<const> = aBindData[8];
+    aBindData[8] = "???";
     -- Update readme lines
     UpdateBindsLines();
+    -- Remove marquee settings
+    sStatusLineSave, nStatusLineSize, nStatusLinePos, nTipId =
+      nil, nil, nil, nil;
     -- Update tip at the bottom
     sStatusLine1 = "PRESS ANY KEY TO USE AS NEW KEY BINDING";
     sStatusLine2 = "CTRL+ESC:CANCEL  \z
@@ -790,7 +839,7 @@ local function ProcBindsInput()
     -- Get current callbacks
     local CBProc<const>, CBRender<const>, CBInput<const> = GetCallbacks();
     -- Disable everything but rendering and animations
-    SetCallbacks(ProcSysInfo, RenderReadme, nil);
+    SetCallbacks(ProcSysInfo, RenderBinds, nil);
     -- Set cursor to busy
     SetCursor(aCursorIdData.WAIT);
     -- Disable all input events
@@ -806,17 +855,18 @@ local function ProcBindsInput()
           -- Backspace was pressed? Set unbound
           if iKey == aKeys.BACKSPACE then iKey = 0;
           -- Escape was pressed? Keep existing key
-          elseif iKey == aKeys.ESCAPE then iKey = aBindData[1][1];
+          elseif iKey == aKeys.ESCAPE then iKey = aBindData[1];
           -- Space key was pressed? Use default
-          elseif iKey == aKeys.SPACE then iKey = aBindData[2];
+          elseif iKey == aKeys.SPACE then iKey = aBindData[5];
           -- Not recognised? Ignore press
           else return end;
         -- Do not process key with mods
         else return end;
       end
-      -- Set key code
-      aBindData[1][1] = iKey;
-      aBindData[4] = aKeyToLiteral[iKey] or aKeyToLiteral.UNKNOWN;
+      -- Apply bind to cvar the cvar callback will change the text to the
+      -- new value but won't if the value could not be changed in which we
+      -- restore the original text value here.
+      if aBindData[7]:Set(iKey) ~= 0 then aBindData[8] = sTextSave end;
       -- Restore input handlers
       RestoreKeyHandlers();
       -- Update readme lines
@@ -834,18 +884,6 @@ local function ProcBindsInput()
     elseif IsMouseYLessThan(32) then ScrollBindsUp() end;
   end
 end
--- ------------------------------------------------------------------------- --
-local function RenderBinds()
-  -- Render default background
-  RenderReadme();
-  -- Return if no option is selected
-  if not iSelectedOption then return end;
-  -- Get currently selected line data and render a selection rectangle
-  local aData<const> = aReadmeVisibleLines[iSelectedOption];
-  if IsMouseInBounds(aData[1], aData[2], aData[4], aData[5]) then
-    RenderFade(0.25, aData[1], aData[2], aData[4], aData[5]);
-  end
-end;
 -- ------------------------------------------------------------------------- --
 local function ProcBinds()
   -- Set system info
@@ -878,10 +916,12 @@ local function InitBinds()
   iSelectedOption = 0;
   -- Set title
   sTitle = "BINDINGS";
-  -- Clear status bars
-  SetTip(0, sStatusLineSave);
+  -- Clear status line
+  sStatusLineSave = nil;
   -- Arrow cursor
   SetCursor(aCursorIdData.ARROW);
+  -- This make sure the status tip is updated
+  nTipId = -1;
   -- Update binds lines
   UpdateBindsLines();
   -- Restore original keys
@@ -955,7 +995,8 @@ local function OnReady(GetAPI)
     RegisterFBUCallback, RegisterKeys, RenderFade, RenderShadow,
     RestoreKeyHandlers, SetCallbacks, SetCursor, SetKeys, StopMusic,
     aCursorIdData, aKeyBankCats, aKeyToLiteral, aSetupButtonData,
-    aSetupOptionData, aSfxData, fontLarge, fontLittle, fontTiny, texSpr =
+    aSetupOptionData, aSfxData, fontLarge, fontLittle, fontTiny,
+    texSpr =
       GetAPI("DisableKeyHandlers", "GetCallbacks", "GetCursor", "GetKeyBank",
         "GetMouseY", "GetMusic", "IsButtonHeld", "IsButtonPressed",
         "IsMouseInBounds", "IsMouseYGreaterEqualThan", "IsMouseYLessThan",
@@ -1223,21 +1264,21 @@ local function OnReady(GetAPI)
     aOptionItem[5] = aF[3];
   end
   -- Setup key bank
-  local aGenericEscape<const> = { aKeys.ESCAPE, Finish };
+  local aGenericEscape<const> = { aKeys.ESCAPE, Finish, "sf", "CLOSE SETUP" };
   local aOnlyEscape<const> = { [aStates.PRESS] = { aGenericEscape } };
   -- Setup configuration keys
-  iKeyBankSetup = RegisterKeys("CONFIGURATION", aOnlyEscape);
+  iKeyBankSetup = RegisterKeys("SETUP", aOnlyEscape);
   -- Setup readme keys
   local aReadmePageUp<const>, aReadmePageDown<const>,
         aReadmeHome<const>,   aReadmeEnd<const>,
         aReadmeUp<const>,     aReadmeDown<const> =
-    { aKeys.PAGE_UP,   ScrollReadmePageUp },
-    { aKeys.PAGE_DOWN, ScrollReadmePageDown },
-    { aKeys.HOME,      ScrollReadmeHome },
-    { aKeys.END,       ScrollReadmeEnd },
-    { aKeys.UP,        ScrollReadmeUp },
-    { aKeys.DOWN,      ScrollReadmeDown };
-  iKeyBankReadme = RegisterKeys("README", {
+    { aKeys.PAGE_UP, ScrollReadmePageUp, "srmpu", "SCROLL UP A PAGE" },
+    { aKeys.PAGE_DOWN, ScrollReadmePageDown, "srmpd", "SCROLL DOWN A PAGE" },
+    { aKeys.HOME, ScrollReadmeHome, "srmh", "SCROLL TO THE START" },
+    { aKeys.END, ScrollReadmeEnd, "srme", "SCROLL TO THE END" },
+    { aKeys.UP, ScrollReadmeUp, "srmu", "SCROLL UP A LINE" },
+    { aKeys.DOWN, ScrollReadmeDown, "srmd", "SCROLL DOWN A LINE" };
+  iKeyBankReadme = RegisterKeys("SETUP ACKNOWLEDGEMENTS", {
     [aStates.PRESS] = { aGenericEscape, aReadmePageUp, aReadmePageDown,
       aReadmeHome, aReadmeEnd, aReadmeUp, aReadmeDown },
     [aStates.REPEAT] = { aReadmePageUp, aReadmePageDown, aReadmeHome,
@@ -1247,13 +1288,13 @@ local function OnReady(GetAPI)
   local aBindsPageUp<const>, aBindsPageDown<const>,
         aBindsHome<const>,   aBindsEnd<const>,
         aBindsUp<const>,     aBindsDown<const> =
-    { aKeys.PAGE_UP,   ScrollBindsPageUp },
-    { aKeys.PAGE_DOWN, ScrollBindsPageDown },
-    { aKeys.HOME,      ScrollBindsHome },
-    { aKeys.END,       ScrollBindsEnd },
-    { aKeys.UP,        ScrollBindsUp },
-    { aKeys.DOWN,      ScrollBindsDown };
-  iKeyBankBind = RegisterKeys("BINDINGS", {
+    { aKeys.PAGE_UP, ScrollBindsPageUp, "sbpu", "SCROLL UP A PAGE"},
+    { aKeys.PAGE_DOWN, ScrollBindsPageDown, "sbpd", "SCROLL DOWN A PAGE" },
+    { aKeys.HOME, ScrollBindsHome, "sbh", "SCROLL TO THE START" },
+    { aKeys.END, ScrollBindsEnd, "sbe", "SCROLL TO THE END"},
+    { aKeys.UP, ScrollBindsUp, "sbu", "SCROLL UP A LINE" },
+    { aKeys.DOWN, ScrollBindsDown, "sbd", "SCROLL DOWN A LINE" };
+  iKeyBankBind = RegisterKeys("SETUP BINDINGS", {
     [aStates.PRESS] = { aGenericEscape, aBindsPageUp, aBindsPageDown,
       aBindsHome, aBindsEnd, aBindsUp, aBindsDown },
     [aStates.REPEAT] = { aBindsPageUp, aBindsPageDown, aBindsHome,
@@ -1337,27 +1378,34 @@ local function OnReady(GetAPI)
   -- Truncate bottom empty lines
   while #aCreditLines > 0 and #aCreditLines[#aCreditLines] == 0 do
     remove(aCreditLines, #aCreditLines) end;
+  -- Get flag for a unsigned integer saveable cvar type
+  local iSS<const> = Variable.Flags.UINTEGERSAVE;
   -- Build bindings list
-  for iKeyBank = 1, #aKeyBankCats do
-    -- Get keybank data
-    local aTopicData<const> = aKeyBankCats[iKeyBank];
-    local sName<const> = aTopicData[1];
-    local aKeyCats<const> = aTopicData[2];
-    for iKeyCat = 1, #aKeyCats do
-      -- Get category data
-      local aButtons<const> = aKeyCats[iKeyCat];
-      for iBind = 1, #aButtons do
-        -- Add to bindings list if a comment is set
-        local aBind<const> = aButtons[iBind];
-        local iKey<const> = aBind[1];
-        if aBind[3] then
-          aBindingsList[1 + #aBindingsList] =
-            { aBind, iKey, sName..": "..aBind[3],
-              aKeyToLiteral[iKey] or aKeyToLiteral.UNKNOWN };
-        end
-      end
+  for iBind = 1, #aKeyBankCats do
+    -- Get bind data
+    local aBind<const> = aKeyBankCats[iBind];
+    -- Create a cvar for key
+    local function CVarModified(sV)
+      -- Convert to number and check it
+      sV = floor(tonumber(sV));
+      if sV < 0 and sV >= 1000 then return false end;
+      -- Update actual keybind and literal value
+      aBind[1] = sV;
+      local sValue<const> = aKeyToLiteral[sV] or aKeyToLiteral.UNKNOWN;
+      aBind[8] = sValue.." ["..sV.."]";
+      aBind[9] = sValue;
+      -- Accepted
+      return true;
     end
+    -- Register a variable for it
+    aBind[7] = VariableRegister("gam_key_"..aBind[3], aBind[1], iSS,
+      CVarModified);
+    -- Put in bindings list
+    aBindingsList[1 + #aBindingsList] = aBind;
   end
+  -- Sort the bindings list
+  local function BindSortFunction(aA, aB) return aA[6] < aB[6] end;
+  sort(aBindingsList, BindSortFunction);
 end
 -- Return imports and exports ---------------------------------------------- --
 return { A = { InitSetup = InitSetup }, F = OnReady };

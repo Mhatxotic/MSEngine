@@ -299,24 +299,22 @@ local function InitWin(iLId, aP, aOP)
   InitEnd(iLId, aP, aOP, aWinAssets,  2, "YOU RAISED THE CASH") end;
 local function InitLose(iLId, aP, aOP)
   InitEnd(iLId, aP, aOP, aLoseAssets, 3, "YOUR OPPONENT WON") end;
--- Exports and imports ----------------------------------------------------- --
-return { A = {                         -- Exports
-  -- Exports ------------------------------------------------------------- --
-  InitWin = InitWin,                   InitWinDead = InitWinDead,
-  InitLose = InitLose,                 InitLoseDead = InitLoseDead
-  -- --------------------------------------------------------------------- --
-  }, F = function(GetAPI)              -- Imports
-  -- Imports ------------------------------------------------------------- --
+-- Scripts have been loaded ------------------------------------------------ --
+local function OnReady(GetAPI)
+  -- Grab imports
   Fade, GetCapitalValue, GetGameTicks, InitPost, InitScore, IsButtonReleased,
-  LoadResources, PlayMusic, PlayStaticSound, RenderFade, RenderObjects,
-  RenderTerrain, SetCallbacks, SetCursor, SetKeys, aCursorIdData,
-  aGemsAvailable, aGlobalData, aSfxData, fontLarge
-  = -- ------------------------------------------------------------------- --
-  GetAPI("Fade", "GetCapitalValue", "GetGameTicks", "InitPost", "InitScore",
-    "IsButtonReleased", "LoadResources", "PlayMusic", "PlayStaticSound",
-    "RenderFade", "RenderObjects", "RenderTerrain", "SetCallbacks",
-    "SetCursor", "SetKeys", "aCursorIdData", "aGemsAvailable", "aGlobalData",
-    "aSfxData", "fontLarge");
-  -- --------------------------------------------------------------------- --
-end };
+    LoadResources, PlayMusic, PlayStaticSound, RenderFade, RenderObjects,
+    RenderTerrain, SetCallbacks, SetCursor, SetKeys, aCursorIdData,
+    aGemsAvailable, aGlobalData, aSfxData, fontLarge =
+      GetAPI("Fade", "GetCapitalValue", "GetGameTicks", "InitPost",
+        "InitScore", "IsButtonReleased", "LoadResources", "PlayMusic",
+        "PlayStaticSound", "RenderFade", "RenderObjects", "RenderTerrain",
+        "SetCallbacks", "SetCursor", "SetKeys", "aCursorIdData",
+        "aGemsAvailable", "aGlobalData", "aSfxData", "fontLarge");
+end
+-- Exports and imports ----------------------------------------------------- --
+return { F = OnReady, A = { InitWin = InitWin,
+                            InitWinDead = InitWinDead,
+                            InitLose = InitLose,
+                            InitLoseDead = InitLoseDead } };
 -- End-of-File ============================================================= --

@@ -17,13 +17,17 @@ local CoreRAM<const>, DisplayVRAM<const>, UtilBytes<const>,
 -- Consts ------------------------------------------------------------------ --
 local iCVAppTitle<const> = Variable.Internal.app_version;
 local strVersion<const> = VariableGetInt(iCVAppTitle).." ";
+local sAppTitle, sAppVendor, iAppMajor<const>, iAppMinor<const>,
+  iAppBuild<const>, iAppRevision<const>, _, _, sAppExeType = Core.Engine();
+sAppTitle, sAppVendor, sAppExeType =
+  sAppTitle:upper(), sAppVendor:upper(), sAppExeType:upper();
 -- Diggers function and data aliases --------------------------------------- --
-local aCursorIdData, aLevelsData, aObjects, aObjectTypes, aSfxData,
-  DeInitLevel, Fade, fontTiny, GameProc, GetActivePlayer, GetGameTicks,
+local DeInitLevel, Fade, GameProc, GetActivePlayer, GetGameTicks,
   GetOpponentPlayer, InitLobby, InitNewGame, InitTitleCredits,
   IsButtonReleased, IsMouseInBounds, LoadLevel, LoadResources, LoadSaveData,
   PlayStaticSound, ProcessViewPort, RegisterFBUCallback, RenderObjects,
-  RenderTerrain, SelectObject, SetCallbacks, SetCursor;
+  RenderTerrain, SelectObject, SetCallbacks, SetCursor, aCursorIdData,
+  aKeyBankCats, aLevelsData, aObjectTypes, aObjects, aSfxData, fontTiny;
 -- Assets required --------------------------------------------------------- --
 local aAssets<const> = { { T = 2, F = "title", P = { 0 } } };
 -- Initialise the title screen function ------------------------------------ --
@@ -42,9 +46,11 @@ local function InitTitle(texTitle)
     local strCredits<const> =
       "ORIGINAL VERSIONS BY TOBY SIMPSON AND MIKE FROGGATT\n\z
        (C) 1994 MILLENNIUM INTERACTIVE LTD. ALL RIGHTS RESERVED\n\rcffffff4f\z
-       POWERED BY MHATXOTIC ENGINE (C) 2024 MHATXOTIC DESIGN.\z
+       POWERED BY "..sAppTitle.." (C) 2024 "..sAppVendor..". \z
          ALL RIGHTS RESERVED\n\z
-       PRESS F1 TO SETUP THE ENGINE OR F2 FOR ACKNOWLEDGEMENTS AT ANY TIME";
+       PRESS "..aKeyBankCats.gksc[9].." TO SETUP, "..
+         aKeyBankCats.gksb[9].." TO SET KEYS OR "..
+         aKeyBankCats.gksa[9].." TO SEE ACKNOWLEDGEMENTS AT ANY TIME";
     -- Main demo level loader
     local function LoadDemoLevel(strTitle)
       -- Setup frame buffer updated callback
@@ -276,20 +282,19 @@ end
 -- Script ready function --------------------------------------------------- --
 local function OnReady(GetAPI)
   -- Get imports
-  aCursorIdData, aLevelsData, aObjects, aObjectTypes, aSfxData, DeInitLevel,
-    Fade, fontTiny, GameProc, GetActivePlayer, GetGameTicks, GetOpponentPlayer,
-    InitLobby, InitNewGame, InitTitleCredits, IsButtonReleased,
-    IsMouseInBounds, LoadLevel, LoadResources, LoadSaveData, PlayStaticSound,
-    ProcessViewPort, RegisterFBUCallback, RenderObjects, RenderTerrain,
-    SelectObject, SetCallbacks, SetCursor =
-      GetAPI("aCursorIdData", "aLevelsData", "aObjects", "aObjectTypes",
-        "aSfxData", "DeInitLevel", "Fade", "fontTiny", "GameProc",
-        "GetActivePlayer", "GetGameTicks", "GetOpponentPlayer", "InitLobby",
-        "InitNewGame", "InitTitleCredits", "IsButtonReleased",
-        "IsMouseInBounds", "LoadLevel", "LoadResources", "LoadSaveData",
-        "PlayStaticSound", "ProcessViewPort", "RegisterFBUCallback",
-        "RenderObjects", "RenderTerrain", "SelectObject", "SetCallbacks",
-        "SetCursor");
+  DeInitLevel, Fade, GameProc, GetActivePlayer, GetGameTicks,
+  GetOpponentPlayer, InitLobby, InitNewGame, InitTitleCredits,
+  IsButtonReleased, IsMouseInBounds, LoadLevel, LoadResources, LoadSaveData,
+  PlayStaticSound, ProcessViewPort, RegisterFBUCallback, RenderObjects,
+  RenderTerrain, SelectObject, SetCallbacks, SetCursor, aCursorIdData,
+  aKeyBankCats, aLevelsData, aObjectTypes, aObjects, aSfxData, fontTiny =
+    GetAPI("DeInitLevel", "Fade", "GameProc", "GetActivePlayer",
+       "GetGameTicks", "GetOpponentPlayer", "InitLobby", "InitNewGame",
+      "InitTitleCredits", "IsButtonReleased", "IsMouseInBounds", "LoadLevel",
+      "LoadResources", "LoadSaveData", "PlayStaticSound", "ProcessViewPort",
+      "RegisterFBUCallback", "RenderObjects", "RenderTerrain", "SelectObject",
+      "SetCallbacks", "SetCursor", "aCursorIdData", "aKeyBankCats",
+      "aLevelsData", "aObjectTypes", "aObjects", "aSfxData", "fontTiny");
 end
 -- Return imports and exports ---------------------------------------------- --
 return { A = { InitTitle = InitTitle }, F = OnReady };

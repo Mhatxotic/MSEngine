@@ -438,23 +438,23 @@ local function InitDebugPlay(iId)
   -- Play sound effects
   SetPlaySounds(true);
 end
--- Exports and imports ----------------------------------------------------- --
-return { A = { InitDebugPlay = InitDebugPlay }, F = function(GetAPI)
-  -- Imports --------------------------------------------------------------- --
+-- Scripts have been loaded ------------------------------------------------ --
+local function OnReady(GetAPI)
+  -- Grab imports
   BCBlit, Fade, GameProc, GetActiveObject, GetActivePlayer, GetGameTicks,
-  GetLevelInfo, GetMouseX, GetMouseY, GetOpponentPlayer, GetViewportData,
-  HaveZogsToWin, LoadLevel, ProcInput, RegisterFBUCallback, RenderObjects,
-  RenderShroud, RenderTerrain, SelectObject, SetCallbacks, SetPlaySounds,
-  UpdateShroud, aLevelsData, aObjects, aPlayers, fontLarge, fontLittle,
-  fontTiny, texSpr
-  = -- --------------------------------------------------------------------- --
-  GetAPI("BCBlit", "Fade", "GameProc", "GetActiveObject", "GetActivePlayer",
-    "GetGameTicks", "GetLevelInfo", "GetMouseX", "GetMouseY",
-    "GetOpponentPlayer", "GetViewportData", "HaveZogsToWin", "LoadLevel",
-    "ProcInput", "RegisterFBUCallback", "RenderObjects", "RenderShroud",
-    "RenderTerrain", "SelectObject", "SetCallbacks", "SetPlaySounds",
-    "UpdateShroud", "aLevelsData", "aObjects", "aPlayers", "fontLarge",
-    "fontLittle", "fontTiny", "texSpr");
-  -- ----------------------------------------------------------------------- --
-end };
+    GetLevelInfo, GetMouseX, GetMouseY, GetOpponentPlayer, GetViewportData,
+    HaveZogsToWin, LoadLevel, ProcInput, RegisterFBUCallback, RenderObjects,
+    RenderShroud, RenderTerrain, SelectObject, SetCallbacks, SetPlaySounds,
+    UpdateShroud, aLevelsData, aObjects, aPlayers, fontLarge, fontLittle,
+    fontTiny, texSpr =
+      GetAPI("BCBlit", "Fade", "GameProc", "GetActiveObject",
+        "GetActivePlayer", "GetGameTicks", "GetLevelInfo", "GetMouseX",
+        "GetMouseY", "GetOpponentPlayer", "GetViewportData", "HaveZogsToWin",
+        "LoadLevel", "ProcInput", "RegisterFBUCallback", "RenderObjects",
+        "RenderShroud", "RenderTerrain", "SelectObject", "SetCallbacks",
+        "SetPlaySounds", "UpdateShroud", "aLevelsData", "aObjects", "aPlayers",
+        "fontLarge", "fontLittle", "fontTiny", "texSpr");
+end
+-- Exports and imports ----------------------------------------------------- --
+return { F = OnReady, A = { InitDebugPlay = InitDebugPlay } };
 -- End-of-File ============================================================= --

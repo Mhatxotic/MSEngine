@@ -97,14 +97,14 @@ local function InitScene(iZoneId)
   -- Load resources
   LoadResources("Scene "..aLevelInfo.n.."/"..aTerrain.n, aAssets, OnLoaded);
 end
--- Exports and imports ----------------------------------------------------- --
-return { A = { InitScene = InitScene }, F = function(GetAPI)
-  -- Imports --------------------------------------------------------------- --
+-- Scripts have been loaded ------------------------------------------------ --
+local function OnReady(GetAPI)
+  -- Grab imports
   Fade, LoadLevel, LoadResources, PlayMusic, SetCallbacks, aGlobalData,
-  aLevelTypesData, aLevelsData, fontLarge
-  = -- --------------------------------------------------------------------- --
-  GetAPI("Fade", "LoadLevel", "LoadResources", "PlayMusic", "SetCallbacks",
-    "aGlobalData", "aLevelTypesData", "aLevelsData", "fontLarge");
-  -- ----------------------------------------------------------------------- --
-end };
+    aLevelTypesData, aLevelsData, fontLarge =
+      GetAPI("Fade", "LoadLevel", "LoadResources", "PlayMusic", "SetCallbacks",
+        "aGlobalData", "aLevelTypesData", "aLevelsData", "fontLarge");
+end
+-- Exports and imports ----------------------------------------------------- --
+return { A = { InitScene = InitScene }, F = OnReady };
 -- End-of-File ============================================================= --

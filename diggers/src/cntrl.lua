@@ -223,19 +223,19 @@ local function InitCon()
   -- Load resources
   LoadResources("Controller", aAssets, OnLoaded);
 end
--- Exports and imports ----------------------------------------------------- --
-return { A = { InitCon = InitCon }, F = function(GetAPI)
-  -- Imports --------------------------------------------------------------- --
+-- Scripts have been loaded ------------------------------------------------ --
+local function OnReady(GetAPI)
+  -- Grab imports
   Fade, InitBook, InitFile, InitLobby, InitMap, InitRace, IsButtonReleased,
-  IsMouseInBounds, IsMouseNotInBounds, LoadResources, PlayStaticSound,
-  RenderShadow, SetBottomRightTipAndShadow, SetCallbacks, SetCursor,
-  aCursorIdData, aGlobalData, aSfxData, fontSpeech
-  = -- --------------------------------------------------------------------- --
-  GetAPI("Fade", "InitBook", "InitFile", "InitLobby", "InitMap", "InitRace",
-    "IsButtonReleased", "IsMouseInBounds", "IsMouseNotInBounds",
-    "LoadResources", "PlayStaticSound", "RenderShadow",
-    "SetBottomRightTipAndShadow", "SetCallbacks", "SetCursor", "aCursorIdData",
-    "aGlobalData", "aSfxData", "fontSpeech");
-  -- ----------------------------------------------------------------------- --
-end };
+    IsMouseInBounds, IsMouseNotInBounds, LoadResources, PlayStaticSound,
+    RenderShadow, SetBottomRightTipAndShadow, SetCallbacks, SetCursor,
+    aCursorIdData, aGlobalData, aSfxData, fontSpeech =
+      GetAPI("Fade", "InitBook", "InitFile", "InitLobby", "InitMap",
+        "InitRace", "IsButtonReleased", "IsMouseInBounds",
+        "IsMouseNotInBounds", "LoadResources", "PlayStaticSound",
+        "RenderShadow", "SetBottomRightTipAndShadow", "SetCallbacks",
+        "SetCursor", "aCursorIdData", "aGlobalData", "aSfxData", "fontSpeech");
+end
+-- Exports and imports ----------------------------------------------------- --
+return { A = { InitCon = InitCon }, F = OnReady };
 -- End-of-File ============================================================= --

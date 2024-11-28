@@ -265,7 +265,7 @@ local function OnLoaded(aResources, bAndSetup)
   Fade(1, 0, 0.025, Render, OnFadeIn);
 end
 -- Intro initialisation function ------------------------------------------- --
-local function InitIntro()
+local function InitIntro(bAndSetup)
   -- Load resources asynchronously. Note: use 'ffmpeg2theora' and not 'ffmpeg'
   -- to encode proper quality videos.
   LoadResources("Intro", aAssets, OnLoaded, bAndSetup);
@@ -286,7 +286,7 @@ local function OnReady(GetAPI)
   -- Register keybinds
   local aKeys<const>, aStates<const> = Input.KeyCodes, Input.States;
   iKeyBankId = GetAPI("RegisterKeys")("INTRO", {
-    [aStates.PRESS] = { { aKeys.ESCAPE, Finish } }
+    [aStates.PRESS] = { { aKeys.ESCAPE, Finish, "ic", "CANCEL" } }
   });
 end
 -- Exports and imports ----------------------------------------------------- --

@@ -14,8 +14,9 @@
 local CoreTime<const>, UtilFormatNTime<const> = Core.Time, Util.FormatNTime;
 -- Diggers function and data aliases --------------------------------------- --
 local DrawInfoFrameAndTitle, GetCallbacks, GetKeyBank, GetMusic, InitLose,
-  IsJoyPressed, PlayMusic, RenderInterface, RenderFade, SetBottomRightTip,
-  SetCallbacks, SetKeys, StopMusic, TriggerEnd, fontLittle, fontTiny;
+  IsButtonPressed, PlayMusic, RenderInterface, RenderFade, SetBottomRightTip,
+  SetCallbacks, SetKeys, StopMusic, TriggerEnd, aKeyBankCats, fontLittle,
+  fontTiny;
 -- Statics ------------------------------------------------------------------ --
 local iPauseX<const> = 160;            -- Pause text X position
 local iPauseY<const> = 72;             -- Pause text Y position
@@ -67,23 +68,25 @@ local function RenderPause()
 end
 -- Pause input callback ---------------------------------------------------- --
 local function InputPause()
-  -- Return if pause button not pressed
-  if not IsJoyPressed(9) then return end;
-  -- If thumb buttons pressed? Allow the quit
-  if IsJoyPressed(4) and IsJoyPressed(5) then EndGame();
-  -- Normal unpause
-  else ContinueGame() end;
+  -- Return if right mouse button or joystick button 1 not pressed
+  if IsButtonPressed(1) then return ContinueGame() end;
+  -- If thumb buttons or joystick button 3 and 4 pressed? Allow the quit
+  if IsButtonPressed(3) and IsButtonPressed(4) then EndGame() end;
 end
 -- Init pause screen ------------------------------------------------------- --
 local function InitPause()
   -- Consts
-  sInstruction = "Press ESCAPE or START to unpause.\n\z
-                  \n\z
-                  Press Q or START+JB4+JB5 to give up.";
-  sSmallTips = "F1 OR SELECT+START BUTTON FOR SETUP\n\z
-                F2 FOR THE GAME AND ENGINE CREDITS\n\z
-                F11 TO RESET WINDOW SIZE AND POSITION\n\z
-                F12 TO TAKE A SCREENSHOT";
+  sInstruction =
+    "Press "..aKeyBankCats.igpc[9]..", RMB or JB1 to unpause.\n\z
+    \n\z
+    Press "..aKeyBankCats.igpq[9].." or MB3/JB3 and MB4/JB4 to give up.";
+  sSmallTips =
+    aKeyBankCats.gksc[9].." OR SELECT+START BUTTON FOR SETUP\n"..
+    aKeyBankCats.gksb[9].." TO CHANGE KEY BINDINGS\n"..
+    aKeyBankCats.gksa[9].." FOR THE GAME AND ENGINE CREDITS\n"..
+    aKeyBankCats.gkcc[9].." TO RESET CURSOR POSITION\n"..
+    aKeyBankCats.gkwr[9].." TO RESET WINDOW SIZE AND POSITION\n"..
+    aKeyBankCats.gkss[9].." TO TAKE A SCREENSHOT";
   -- Save current music
   muMusic = GetMusic();
   -- Save callbacks
@@ -103,16 +106,20 @@ end
 local function OnReady(GetAPI)
   -- Get imports
   DrawInfoFrameAndTitle, GetCallbacks, GetKeyBank, GetMusic, InitLose,
-    IsJoyPressed, PlayMusic, RenderInterface, RenderFade, SetBottomRightTip,
-    SetCallbacks, SetKeys, StopMusic, TriggerEnd, fontLittle, fontTiny =
+    IsButtonPressed, PlayMusic, RenderInterface, RenderFade, SetBottomRightTip,
+    SetCallbacks, SetKeys, StopMusic, TriggerEnd, aKeyBankCats, fontLittle,
+    fontTiny =
       GetAPI("DrawInfoFrameAndTitle", "GetCallbacks", "GetKeyBank", "GetMusic",
-        "InitLose", "IsJoyPressed", "PlayMusic", "RenderInterface",
+        "InitLose", "IsButtonPressed", "PlayMusic", "RenderInterface",
         "RenderFade", "SetBottomRightTip", "SetCallbacks", "SetKeys",
-        "StopMusic", "TriggerEnd", "fontLittle", "fontTiny");
+        "StopMusic", "TriggerEnd", "aKeyBankCats", "fontLittle", "fontTiny");
   -- Setup keybank
   local aKeys<const>, aStates<const> = Input.KeyCodes, Input.States;
-  iKeyBankId = GetAPI("RegisterKeys")("PAUSE SCREEN", {
-    [aStates.PRESS] = { { aKeys.Q, EndGame }, { aKeys.ESCAPE, ContinueGame } }
+  iKeyBankId = GetAPI("RegisterKeys")("IN-GAME PAUSE", {
+    [aStates.PRESS] = {
+      { aKeys.Q, EndGame, "igpq", "QUIT THE GAME" },
+      { aKeys.ESCAPE, ContinueGame, "igpc", "CONTINUE GAME" }
+    }
   });
 end
 -- Exports and imports ----------------------------------------------------- --

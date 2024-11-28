@@ -144,19 +144,19 @@ local function InitRace()
   -- Load resources
   LoadResources("Race Select", aAssets, OnLoaded);
 end
--- Exports and imports ----------------------------------------------------- --
-return { A = { InitRace = InitRace }, F = function(GetAPI)
-  -- Imports --------------------------------------------------------------- --
+-- Scripts have been loaded ------------------------------------------------ --
+local function OnReady(GetAPI)
+  -- Grab imports
   Fade, InitCon, IsButtonPressed, IsMouseInBounds, IsMouseNotInBounds,
-  IsScrollingDown, IsScrollingUp, LoadResources, PlayStaticSound, RenderShadow,
-  SetBottomRightTipAndShadow, SetCallbacks, SetCursor, aCursorIdData,
-  aGlobalData, aRaceStatData, aSfxData, texSpr
-  = -- --------------------------------------------------------------------- --
-  GetAPI("Fade", "InitCon", "IsButtonPressed", "IsMouseInBounds",
-    "IsMouseNotInBounds", "IsScrollingDown", "IsScrollingUp", "LoadResources",
-    "PlayStaticSound", "RenderShadow", "SetBottomRightTipAndShadow",
-    "SetCallbacks", "SetCursor", "aCursorIdData", "aGlobalData",
-    "aRaceStatData", "aSfxData", "texSpr");
-  -- ----------------------------------------------------------------------- --
-end };
+    IsScrollingDown, IsScrollingUp, LoadResources, PlayStaticSound,
+    RenderShadow, SetBottomRightTipAndShadow, SetCallbacks, SetCursor,
+    aCursorIdData, aGlobalData, aRaceStatData, aSfxData, texSpr =
+      GetAPI("Fade", "InitCon", "IsButtonPressed", "IsMouseInBounds",
+        "IsMouseNotInBounds", "IsScrollingDown", "IsScrollingUp",
+        "LoadResources", "PlayStaticSound", "RenderShadow",
+        "SetBottomRightTipAndShadow", "SetCallbacks", "SetCursor",
+        "aCursorIdData", "aGlobalData", "aRaceStatData", "aSfxData", "texSpr");
+end
+-- Exports and imports ----------------------------------------------------- --
+return { A = { InitRace = InitRace }, F = OnReady };
 -- End-of-File ============================================================= --

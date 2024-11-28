@@ -317,27 +317,24 @@ local function InitFile()
   -- Load file screen texture
   LoadResources("File", aAssets, OnLoaded);
 end
--- Exports and imports ----------------------------------------------------- --
-return {
-  -- Exports --------------------------------------------------------------- --
-  A = { aGlobalData = aGlobalData,     InitFile = InitFile,
-        InitNewGame = InitNewGame,     LoadSaveData = LoadSaveData },
-  -- Imports --------------------------------------------------------------- --
-  F = function(GetAPI)
-    -- --------------------------------------------------------------------- --
-    Fade, InitCon, IsButtonReleased, IsMouseInBounds, IsMouseNotInBounds,
+-- Scripts have been loaded ------------------------------------------------ --
+local function OnReady(GetAPI)
+  -- Grab imports
+  Fade, InitCon, IsButtonReleased, IsMouseInBounds, IsMouseNotInBounds,
     LoadResources, PlayStaticSound, RenderShadow, SetBottomRightTipAndShadow,
     SetCallbacks, SetCursor, aCursorIdData, aLevelsData, aObjectData,
-    aObjectTypes, aSaveSlot[1],  aSaveSlot[2], aSaveSlot[3], aSaveSlot[4],
-    aSfxData, fontSpeech, texSpr
-    = -- ------------------------------------------------------------------- --
-    GetAPI("Fade", "InitCon", "IsButtonReleased", "IsMouseInBounds",
-      "IsMouseNotInBounds", "LoadResources", "PlayStaticSound", "RenderShadow",
-      "SetBottomRightTipAndShadow", "SetCallbacks", "SetCursor",
-      "aCursorIdData", "aLevelsData", "aObjectData", "aObjectTypes",
-      "VarGameData1", "VarGameData2", "VarGameData3", "VarGameData4",
-      "aSfxData", "fontSpeech", "texSpr");
-    -- --------------------------------------------------------------------- --
-  end
-};
+    aObjectTypes, aSaveSlot[1], aSaveSlot[2], aSaveSlot[3], aSaveSlot[4],
+    aSfxData, fontSpeech, texSpr =
+      GetAPI("Fade", "InitCon", "IsButtonReleased", "IsMouseInBounds",
+        "IsMouseNotInBounds", "LoadResources", "PlayStaticSound",
+        "RenderShadow", "SetBottomRightTipAndShadow", "SetCallbacks",
+        "SetCursor", "aCursorIdData", "aLevelsData", "aObjectData",
+        "aObjectTypes", "cvData1", "cvData2", "cvData3", "cvData4", "aSfxData",
+        "fontSpeech", "texSpr");
+end
+-- Exports and imports ----------------------------------------------------- --
+return { F = OnReady, A = { InitFile = InitFile,
+                            InitNewGame = InitNewGame,
+                            LoadSaveData = LoadSaveData,
+                            aGlobalData = aGlobalData } };
 -- End-of-File ============================================================= --

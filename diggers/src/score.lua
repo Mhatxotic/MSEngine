@@ -60,22 +60,26 @@ local function InitScore()
       if #aTotals % 2 == 0 then
         -- Start from left
         nStartX = -480 - (#aTotals * 16);
-        -- Set call back to move in from left
-        fcbMove = function(aData)
+        -- Move in from left callback
+        local function MoveFromLeft(aData)
           -- Ignore if in centre of screen
           if aData[7] >= 0 then return end;
           aData[7] = min(0, aData[7] + 8);
         end
+        -- Set call back to move in from left
+        fcbMove = MoveFromLeft;
       -- If next id is even?
       else
         -- Start from right
         nStartX = 480+(#aTotals*16)
-        -- Set call back to move in from right
-        fcbMove = function(aData)
+        -- Move in from right functino
+        local function MoveFromRight(aData)
           -- Ignore if in centre of screen
           if aData[7] <= 0 then return end;
           aData[7] = max(0, aData[7] - 8);
         end
+        -- Set call back to move in from right
+        fcbMove = MoveFromRight;
       end
       -- Prepare the category in the categories list
       aTotals[1 + #aTotals] = {
@@ -374,17 +378,17 @@ local function InitScore()
   -- Load score assets
   LoadResources("Game Over", aAssets, OnLoaded);
 end
+-- Scripts have been loaded ------------------------------------------------ --
+local function OnReady(GetAPI)
+  -- Grab imports
+  Fade, InitTitle, IsButtonReleased, LoadResources, PlayMusic, PlayStaticSound,
+  RegisterFBUCallback, RenderFade, SetCallbacks, SetCursor, aCursorIdData,
+  aGlobalData, aSfxData, fontLittle, fontTiny, texSpr =
+    GetAPI("Fade", "InitTitle", "IsButtonReleased", "LoadResources",
+      "PlayMusic", "PlayStaticSound", "RegisterFBUCallback", "RenderFade",
+      "SetCallbacks", "SetCursor", "aCursorIdData", "aGlobalData", "aSfxData",
+      "fontLittle", "fontTiny", "texSpr");
+end
 -- Exports and imports ----------------------------------------------------- --
-return { A = { InitScore = InitScore }, F = function(GetAPI)
-  -- Imports --------------------------------------------------------------- --
-  LoadResources, SetCallbacks, SetCursor, aCursorIdData, aSfxData, PlayStaticSound,
-  Fade, InitTitle, PlayMusic, IsButtonReleased, RenderFade, texSpr, fontLittle,
-  fontTiny, RegisterFBUCallback, aGlobalData
-  = -- --------------------------------------------------------------------- --
-  GetAPI("LoadResources", "SetCallbacks", "SetCursor", "aCursorIdData",
-    "aSfxData", "PlayStaticSound", "Fade", "InitTitle", "PlayMusic",
-    "IsButtonReleased", "RenderFade", "texSpr", "fontLittle", "fontTiny",
-    "RegisterFBUCallback", "aGlobalData");
-  -- ----------------------------------------------------------------------- --
-end };
+return { A = { InitScore = InitScore }, F = OnReady };
 -- End-of-File ============================================================= --
