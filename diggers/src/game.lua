@@ -548,10 +548,9 @@ local function DestroyObject(iObj, aObj)
       error("Invalid object specified! "..tostring(aObj)) end;
     -- Return if list empty
     if #aList == 0 then return end;
-    -- For each object end to start because we are deleting items
+    -- Enumerate each object from the end to the start of the list. If target
+    -- object is our object then delete it from the list
     for iObj = #aList, 1, -1 do
-      -- If target object is our object then delete it from the
-      -- specified list else increment to the next object id.
       if aList[iObj] == aObj then remove(aList, iObj) end;
     end
   end
@@ -571,20 +570,17 @@ local function DestroyObject(iObj, aObj)
   -- If pursuer had a target? Remove pursuer from targets pursuer list
   local aTarget<const> = aObj.T;
   if aTarget then aTarget.TL[aObj.U] = nil end;
-  -- Get objects owner and if no player owner?
-  local aPlayer<const> = aObj.P;
-  if not aPlayer then
-    -- If selected object is this object then unselect the object
-    if aActiveObject == aObj then aActiveObject = nil end;
+  -- Get digger id and if it was not a Digger?
+  local iDiggerId<const> = aObj.DI;
+  if not iDiggerId then
+    -- Deselect the object and its menu
+    if aActiveObject == aObj then aActiveMenu, aActiveObject = nil, nil end;
     -- Success
     return true;
   end
-  -- Get digger id and if it was a Digger? Mark it as dead and reduce players'
-  -- digger count.
-  local iDiggerId<const> = aObj.DI;
-  if iDiggerId then
-    aPlayer.D[iDiggerId], aPlayer.DC = false, aPlayer.DC - 1;
-  end
+  -- Get player owner and mark it as dead and reduce players' digger count
+  local aPlayer<const> = aObj.P;
+  aPlayer.D[iDiggerId], aPlayer.DC = false, aPlayer.DC - 1;
   -- Remove pursuers and reset pursuer targets
   local aPursuers<const> = aObj.TL;
   for iUId, aPursuer in pairs(aPursuers) do
@@ -602,49 +598,50 @@ local function DestroyObjectUnknown(aObject)
   -- Check id specified
   if not UtilIsTable(aObject) then
     error("Invalid object specified! "..tostring(aObject)) end;
-  -- Enumerate through each global object (while because we modify the list)
-  for iTargetIndex = 1, #aObjects do
-    -- Get object from global list and destroy object if matches and return
-    local aTargetObject<const> = aObjects[iTargetIndex];
-    if aTargetObject == aObject then
-      return DestroyObject(iTargetIndex, aObject) end;
-    -- Try next object
-    iTargetIndex = iTargetIndex + 1;
+  -- Enumerate through each global object and find the specified object and
+  -- destroy it if we find it.
+  for iIndex = 1, #aObjects do
+    if aObjects[iIndex] == aObject then
+      return DestroyObject(iIndex, aObject)
+    end
   end
+  -- Failed to find object
+  return false;
 end
 -- Add to inventory -------------------------------------------------------- --
-local function AddToInventory(aObj, aInvObj, bOnlyTreasure)
+local function AddToInventory(aOwnObj, aTakeObj, bOnlyTreasure)
   -- Check parameters
-  if not UtilIsTable(aObj) then
-    error("Invalid object specified! "..tostring(aObj)) end;
-  if not UtilIsTable(aInvObj) then
-    error("Invalid inventory object specified! "..tostring(aInvObj)) end;
-  -- Find object in objects array
+  if not UtilIsTable(aOwnObj) then
+    error("Invalid owner object specified! "..tostring(aOwnObj)) end;
+  if not UtilIsTable(aTakeObj) then
+    error("Invalid take object specified! "..tostring(aTakeObj)) end;
+  -- Failed if the object to take is...
+  if aTakeObj.F & OFL.BUSY ~= 0 or        -- ...busy? -or-
+    #aTakeObj.I > 0 or                    -- ...has inventory? -or-
+    (bOnlyTreasure and                    -- ...only pick up treasure? -and-
+     aTakeObj.F & OFL.TREASURE == 0) then -- ...treasure flag not set?
+    -- We cannot pickup this object!
+    return false;
+  end
+  -- Find object in objects array and when we find it?
   for iObj = 1, #aObjects do
-    -- Get object and if it...
-    if aObjects[iObj] == aInvObj and       -- ...matches the object? -and-
-       #aInvObj.I == 0 and                 -- ...doesn't have inventory -and-
-      (not bOnlyTreasure or                -- ...don't pickup treasure -or-
-       aInvObj.F & OFL.TREASURE ~= 0) then -- ...treasure flag set?
-      -- Remove object and add object to player inventory
+    if aObjects[iObj] == aTakeObj then
+      -- Remove object and add requested object to owners inventory
       remove(aObjects, iObj);
-      local aObjInv<const> = aObj.I;
-      aObjInv[1 + #aObjInv] = aInvObj;
-      -- If object is phasing then reset the object
-      if aInvObj.A == ACT.PHASE then
-        SetAction(aInvObj, ACT.STOP, JOB.NONE, DIR.NONE) end;
-      -- Add weight
-      aObj.IW = aObj.IW + aInvObj.W;
-      -- Set active inventory object to this object
-      aObj.IS = aInvObj;
-      -- If item picked up was active object close it and menu
-      if aActiveObject == aInvObj then
+      local aOwnObjInv<const> = aOwnObj.I;
+      aOwnObjInv[1 + #aOwnObjInv] = aTakeObj;
+      -- Add weight and set active inventory object to this object
+      aOwnObj.IW, aOwnObj.IS = aOwnObj.IW + aTakeObj.W, aTakeObj;
+      -- Stop the taken object for inventory preview purposes
+      SetAction(aTakeObj, ACT.STOP, JOB.NONE, DIR.NONE);
+      -- If item picked up was the active object then deselect it and its menu
+      if aActiveObject == aTakeObj then
         aActiveObject, aActiveMenu = nil, nil end;
       -- Success
       return true;
     end
   end
-  -- Failed
+  -- This shouldn't happen! The object should be in the objects list!
   return false;
 end
 -- Buy an item ------------------------------------------------------------- --
@@ -675,24 +672,23 @@ local function BuyItem(aObj, iItemId)
   return true;
 end
 -- Drop Object ------------------------------------------------------------- --
-local function DropObject(aObj, aInvObj)
-  -- Get object inventory and walk inventory
-  local aInvObjs<const> = aObj.I;
-  for iInvObj = 1, #aInvObjs do
-    -- Object matches?
-    if aInvObjs[iInvObj] == aInvObj then
-      -- Remove object from inventory
-      remove(aObj.I, iInvObj);
+local function DropObject(aOwnObj, aDropObj)
+  -- Get object inventory and enumerate it until we find the object
+  local aOwnObjInv<const> = aOwnObj.I;
+  for iIndex = 1, #aOwnObjInv do
+    if aOwnObjInv[iIndex] == aDropObj then
+      -- Remove object from owner inventory
+      remove(aOwnObjInv, iIndex);
       -- Set new position of object
-      SetPosition(aInvObj, aObj.X, aObj.Y);
+      SetPosition(aDropObj, aOwnObj.X, aOwnObj.Y);
       -- Add back to playfield
-      aObjects[1 + #aObjects] = aInvObj;
+      aObjects[1 + #aObjects] = aDropObj;
       -- Reduce carrying weight
-      aObj.IW = aObj.IW - aInvObj.W;
+      aOwnObj.IW = aOwnObj.IW - aDropObj.W;
       -- Select next object
-      aObj.IS = aObj.I[iInvObj];
+      aOwnObj.IS = aOwnObjInv[iIndex];
       -- If invalid select first object
-      if not aObj.IS then aObj.IS = aObj.I[1] end;
+      if not aOwnObj.IS then aOwnObj.IS = aOwnObjInv[1] end;
       -- Success!
       return true;
     end
@@ -701,26 +697,26 @@ local function DropObject(aObj, aInvObj)
   return false;
 end
 -- Sell an item ------------------------------------------------------------ --
-local function SellItem(aObj, aInvObj)
+local function SellItem(aOwnObj, aSellObj)
   -- Check parameters
-  if not UtilIsTable(aObj) then
-    error("Invalid object specified! "..tostring(aObj)) end;
-  if not UtilIsTable(aInvObj) then
-    error("Invalid inventory object specified! "..tostring(aInvObj)) end;
+  if not UtilIsTable(aOwnObj) then
+    error("Invalid object specified! "..tostring(aOwnObj)) end;
+  if not UtilIsTable(aSellObj) then
+    error("Invalid inventory object specified! "..tostring(aSellObj)) end;
   -- Remove object from inventory and return if failed
-  if not DropObject(aObj, aInvObj) then return false end;
+  if not DropObject(aOwnObj, aSellObj) then return false end;
   -- Increment funds but deduct value according to damage
-  local aParent<const> = aObj.P;
-  aParent.M = aParent.M + floor((aInvObj.OD.VALUE / 2) * (aInvObj.H / 100));
+  local aParent<const> = aOwnObj.P;
+  aParent.M = aParent.M + floor((aSellObj.OD.VALUE / 2) * (aSellObj.H / 100));
   -- Plus time added value if treasure
-  if aInvObj.F & OFL.TREASURE ~= 0 then
+  if aSellObj.F & OFL.TREASURE ~= 0 then
     aParent.GS = aParent.GS + 1;
     local iAmount<const> = iGameTicks // 18000;
     aParent.GI = aParent.GI + iAmount;
     aParent.M = aParent.M + iAmount;
   end
   -- Destroy the object
-  DestroyObjectUnknown(aInvObj);
+  DestroyObjectUnknown(aSellObj);
   -- Sold
   return true;
 end
@@ -1106,12 +1102,11 @@ local function InitSetAction()
     -- Get deploy function and if deployable?
     local fcbDeployFunc<const> = aDeployments[O.ID];
     if fcbDeployFunc and fcbDeployFunc(O) then
-      -- Destroy the object
-      DestroyObjectUnknown(O)
-      -- Success
+      -- Destroy the object and return success
+      DestroyObjectUnknown(O);
       return true, true;
     end
-    -- Failed
+    -- Failed so return failure
     return true, false;
   end
   -- Jump requested?

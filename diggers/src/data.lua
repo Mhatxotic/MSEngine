@@ -528,14 +528,14 @@ local aDiggerKeys<const> = {
   [ACT.DROP]  = aObjectJobDirKeep,
   [ACT.GRAB]  = aObjectJobDirKeep,
   [ACT.JUMP]  = aObjectJobDirKeep,
-  [ACT.PHASE] = { [JOB.PHASE] = { [DIR.U] = true } };
+  [ACT.PHASE] = { [JOB.PHASE] = { [DIR.U] = true } },
   [ACT.RUN]   = aDiggerMovement,
   [ACT.STOP]  = aObjectStop,
   [ACT.WALK]  = aDiggerMovement,
 }
 -- Small and large tuneller accepted keys ---------------------------------- --
 local aTunnellerKeys<const> = {
-  [ACT.STOP] = aObjectStop;
+  [ACT.STOP] = aObjectStop,
   [ACT.WALK] = { [JOB.NONE] = aObjectLeftRight,
                  [JOB.DIG] = aObjectLeftRight }
 };
@@ -1576,8 +1576,8 @@ local aObjectData<const> = {           -- Objects data
   [DIR.NONE] = { 451, 454 },
   FLAGS      = OFL.BUSY
  }, KEYS = {
-   [ACT.STOP] = aObjectStop;
-   [ACT.CREEP] = { [JOB.NONE] = { [DIR.U] = true, [DIR.D] = true } };
+   [ACT.STOP] = aObjectStop,
+   [ACT.CREEP] = { [JOB.NONE] = { [DIR.U] = true, [DIR.D] = true } }
  },
  ACTION     = ACT.STOP,                AITYPE     = AI.LIFT,
  ANIMTIMER  = aTimerData.ANIMNORMAL,   ATTACHMENT = TYP.LIFTC,

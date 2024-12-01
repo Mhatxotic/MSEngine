@@ -26,41 +26,26 @@
 ## [Status](#status)…
 This Diggers fan remake was started in 2006 as a basic Win32 C application using DirectDraw, DirectSound and DirectMedia then rewritten from scratch in C++ from the ground up with a new fully customisable engine called *Mhatxotic Engine* to utilise open source, cross-platform technologies and conformed to ISO coding standards.
 
-Diggers will always be a work-in-progress since it is difficult and incredibly time consuming to work on a game single-handedly and there are always issues with upstream code due to the balancing of modernisation and compatibility. However, the following information is the current estimated status of the game…
+Diggers is a completely playable game from start to finish but will always be a work-in-progress since it is difficult and incredibly time consuming to work on a game single-handedly and there are always issues with upstream code due to the balancing of modernisation and compatibility. However, the following information is the current estimated status of the game…
 
-* *Engine:* `100%`…
-  * _Windows:_ `100%`…
-    * All functions accounted for.
-  * _MacOS:_ `100%`…
-    * All functions accounted for.
-  * _Linux:_ `100%`…
-    * Sometimes the full-screen/window toggle key might not work properly because of duplicated input keys. Hopefully will be fixed in Ubuntu 24.04 LTS.
-    * Skipping one rendered frame every few seconds only on Wayland, perhaps when only using a `59.97hz` NTSC display. Probably need to make animations based on time and not frames which could be extremely difficult.
-    * All other functions accounted for.
-* *Graphics*: `100%`…
-  * All other graphics accounted for.
-* *Sound*: `100%`…
-  * All music and sound accounted for.
-* *Input*: `100%`…
-  * Keyboard, mouse and controller accounted for but controller and keyboard inputs are suboptimal.
-* *Levels*: `100%`…
-  * All levels accounted for.
-* *Gameplay*: `95%`…
-  * Need proper ending movie with the stranger flying away in his pod.
-  * All other gameplay accounted for.
-* *Localisation*: `25%`…
-  * No French book, intro nor UI localisations yet.
-  * No German book, intro nor UI localisations yet.
-  * No Italian book, intro nor UI localisations yet.
-  * Only British translation so far.
+### MacOS engine outstanding issues…
+* If the game quits uncleanly, you have to run the game with `app_clearmutex=1` to clear the mutex that controls only allowing one instance of the game.
+
+### Linux engine outstanding issues…
+* Sometimes the full-screen/window toggle key might not work properly because of duplicated input keys. Hopefully will be fixed in Ubuntu 24.04 LTS.
+* Skipping one rendered frame every few seconds only on Wayland, perhaps when only using a `59.97hz` NTSC display. Probably need to make animations based on time and not frames which could be extremely difficult.
+
+### Game outstanding issues…
+* Need proper ending movie with the stranger flying away in his pod.
+* No French, German or Italian book, intro nor UI localisations yet.
 
 ## [System Requirements](#system-requirements)…
 | | Minimum | Recommended | Note |
 | --- | --- | --- | --- |
 | **Processor** | Dual-Core 2GHz  | Multi-Core 2GHz+ | Multithreaded! |
-| **System** *(Windows)* | XP SP3 *(X86/X64)* | 7/8.X/1X+ *(X64)* | 32 and 64bit executable. |
+| **System** *(Windows)* | XP *(SP3 X86/SP2 X64)* | 7/8.X/1X+ *(X64)* | 32 and 64bit executable. |
 | **Memory** *(Windows)* | 16MB *(XP/X86)* | 128MB+ *(Win7/X64)* | Close estimate. |
-| **System** *(MacOS)* | 10.7 *(Intel)* / 11 *(Arm)* | 13.0+ *(Arm)* | FAT Universal executable. |
+| **System** *(MacOS)* | 10.11 *(Intel)* / 11 *(Arm)* | 11.0+ *(Arm)* | FAT Universal executable. |
 | **Memory** *(MacOS)* | 256MB *(Intel)* | 512MB *(Arm)* | Close estimate. |
 | **System** *(Linux)* | Ubuntu 23.10 *(X64)* | Ubuntu 23.04+ *(X64)* | See below for packages. |
 | **Memory** *(Linux)* | 16MB | 128MB+ | Wild estimate. |
@@ -289,8 +274,6 @@ You can change cvars by opening up the console with the `GRAVE` key (key under `
   - A. You can start the game with the `log_file=...` (filename) parameter to give a pretty detailed log of what the app is doing so you can send me that along with as much info as possible such as the `.log` `.crt` `.dbg` and `.udb` files that the app generates. Neither of these files will contain any personal information, only technical information to help me squash the problem.
 * **Q. I've picked the wrong game-engine settings and the game crashed/won't start.**
   - A. Try specifying the parameter `sql_defaults=1` command-line option to reset all the engine settings to default. If this doesn't work you'll have to delete the `.udb` file or set `sql_defaults=2` and start again from scratch thus losing all your Diggers saved game data. All that said though, the game shouldn't really crash though so please send me any logs/crash dumps you may have.
-* **Q. Diggers crashed and then when I start Diggers on MacOS, nothing happens.**
-  - A. If Diggers terminates uncleanly, you need to run it again manually with the `app_clearmutex=1` parameter. Also restarting your Mac helps but this is way too overkill. This problem does not affect Windows or Linux versions.
 * **Q. Why does the game run faster than the Amiga version?**
   - A. A fixed polling frequency of 60hz is used for the game logic and I originally enjoyed playing this game on a 486 DX2/66 with the original MS-DOS version that ran at refresh frequency of 70hz (in 320x200 mode X) which is quite speedy compared to the slow gameplay of the Amiga version and I always preferred the fast logic of the MS-DOS version.
 * **Q. Can I speed run or T.A.S. this game?**
