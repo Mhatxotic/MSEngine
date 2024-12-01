@@ -621,14 +621,15 @@ local function AddToInventory(aObj, aInvObj, bOnlyTreasure)
     error("Invalid inventory object specified! "..tostring(aInvObj)) end;
   -- Find object in objects array
   for iObj = 1, #aObjects do
-    -- Get object and if it matches the specified object to pickup?
-    if aObjects[iObj] == aInvObj and
-      (not bOnlyTreasure or
-           aInvObj.F & OFL.TREASURE ~= 0) then
+    -- Get object and if it...
+    if aObjects[iObj] == aInvObj and       -- ...matches the object? -and-
+       #aInvObj.I == 0 and                 -- ...doesn't have inventory -and-
+      (not bOnlyTreasure or                -- ...don't pickup treasure -or-
+       aInvObj.F & OFL.TREASURE ~= 0) then -- ...treasure flag set?
       -- Remove object and add object to player inventory
       remove(aObjects, iObj);
       local aObjInv<const> = aObj.I;
-      aObjInv[1 + #aObjInv] = aInvObj
+      aObjInv[1 + #aObjInv] = aInvObj;
       -- If object is phasing then reset the object
       if aInvObj.A == ACT.PHASE then
         SetAction(aInvObj, ACT.STOP, JOB.NONE, DIR.NONE) end;
@@ -1219,17 +1220,20 @@ local function InitSetAction()
     -- Continue function execution
     return false;
   end
+  -- Dig requested? Save current action to restore when digging completes
+  local function ACTDig(O) O.LA = O.A return false end;
   -- Actions to perform depending on action. They return a boolean and if
   -- false then execution of the action continues, else the action is blocked
   -- from further processing and an additional boolean is returned of the
   -- success of that action (used by the the player interface).
   local aActions<const> = {
-    [ACT.DEATH] = ACTDeathOrEaten,     [ACT.EATEN]  = ACTDeathOrEaten,
-    [ACT.MAP]   = ACTDisplayMap,       [ACT.OPEN]   = ACTOpenCloseGate,
-    [ACT.CLOSE] = ACTOpenCloseGate,    [ACT.DEPLOY] = ACTDeployObject,
-    [ACT.JUMP]  = ACTJump,             [ACT.GRAB]   = ACTGrabItem,
-    [ACT.DROP]  = ACTDropItem,         [ACT.NEXT]   = ACTNextItem,
-    [ACT.PREV]  = ACTPreviousItem,     [ACT.PHASE]  = ACTPhase,
+    [ACT.DEATH]  = ACTDeathOrEaten,    [ACT.DIG]   = ACTDig,
+    [ACT.EATEN]  = ACTDeathOrEaten,    [ACT.MAP]   = ACTDisplayMap,
+    [ACT.OPEN]   = ACTOpenCloseGate,   [ACT.CLOSE] = ACTOpenCloseGate,
+    [ACT.DEPLOY] = ACTDeployObject,    [ACT.JUMP]  = ACTJump,
+    [ACT.GRAB]   = ACTGrabItem,        [ACT.DROP]  = ACTDropItem,
+    [ACT.NEXT]   = ACTNextItem,        [ACT.PREV]  = ACTPreviousItem,
+    [ACT.PHASE]  = ACTPhase,
   };
   -- Going left or right?
   local function DIRLeftRight(_, A, J, D)
@@ -1324,8 +1328,7 @@ local function InitSetAction()
     [JOB.KEEP]     = JOBKeep
   };
   -- Do set action function
-  local function SetAction(aObject, iAction, iJob, iDirection,
-    bResetJobTimer)
+  local function SetAction(aObject, iAction, iJob, iDirection, bResetJobTimer)
     -- Check parameters
     if not UtilIsTable(aObject) then
       error("Invalid object table specified! "..tostring(aObject)) end;
@@ -1360,7 +1363,7 @@ local function InitSetAction()
       -- If object can stop? Keep busy unset!
       if aObject.CS then aObject.F = aObject.F & ~OFL.BUSY;
       -- Can't stop? Set default action and move in opposite direction
-      else return DoSetAction(aObject, aObjInitData.ACTION,
+      else return SetAction(aObject, aObjInitData.ACTION,
                     JOB.KEEP, DIR.OPPOSITE) end;
     -- Keep existing job? Keep existing action!
     elseif iAction == ACT.KEEP then iAction = aObject.A end;
@@ -2597,8 +2600,9 @@ local function MoveX(aObj, iX)
   end
   -- Ignore if falling
   if aObj.FD > 0 then return end;
-  -- Get object job and set action for it because it was blocked
+  -- Get action to perform when object blocked
   local aBlockData<const> = aDigBlockData[aObj.J];
+  -- Set action requested
   SetAction(aObj, aBlockData[1], aBlockData[2], aBlockData[3]);
 end
 -- Check for colliding objects and move them ------------------------------- --
@@ -3882,20 +3886,29 @@ local function ProcessObjects()
       -- Object is digging and digging delay reached?
       elseif aObj.A == ACT.DIG and aObj.AT >= aObj.DID then
         -- Terrain dig was successful?
-        if DigTile(aObj) == true then
-          -- Continue to walk in the direction
-          SetAction(aObj, ACT.WALK, JOB.KEEP, DIR.KEEP);
+        if DigTile(aObj) then
+          -- Get last dig action and if set?
+          local iLast<const> = aObj.LA;
+          if iLast then
+            -- Continue to move in the direction
+            SetAction(aObj, iLast, JOB.KEEP, DIR.KEEP);
+            -- Remove the last action
+            aObj.LA = nil;
+          -- Impossible but stop the object's actions completely
+          else SetAction(aObj, ACT.STOP, JOB.NONE, DIR.KEEP) end;
           -- Increase dig count
           SetObjectAndParentCounter(aObj, "DUG");
           -- Update dig time for AI
           aObj.LDT = iGameTicks;
         -- Not successful
         else
+          -- Remove the last action if set
+          aObj.LA = nil;
           -- Update failed dig direction
           aObj.FDD = aObj.D;
           -- Set impatient
           aObj.JT = aObj.PW;
-          -- stop the object's actions completely
+          -- Stop the object's actions completely
           SetAction(aObj, ACT.STOP, JOB.NONE, DIR.KEEP);
         end;
       end
@@ -4554,7 +4567,7 @@ local function OnReady(GetAPI)
       -- If object can creep? Set to creep
       elseif aObjData[ACT.CREEP] then iAction = ACT.CREEP;
       -- Show error
-      else error("Invalid action!") end;
+      else return end;
     end
     -- Return if action, job and direction is not allowed
     local aKeyData<const> = aObjData.KEYS;
@@ -4656,9 +4669,9 @@ local function OnReady(GetAPI)
       { aKeys.R, DigUpRight, "igddur", "DIG DIAGONALLY UP-RIGHT" },
       { aKeys.A, DigLeft, "igdl", "DIG LEFT" },
       { aKeys.D, DigRight, "igdr", "DIG RIGHT" },
-      { aKeys.Z, DigDownLeft, "igdddl", "DIG DIAGONALLY DOWN-LEFT" },
+      { aKeys.Z, DigDownLeft, "igddl", "DIG DIAGONALLY DOWN-LEFT" },
       { aKeys.S, DigDown, "igdd", "DIG DOWN" },
-      { aKeys.C, DigDownRight, "igddr", "DIG DOWN-RIGHT" },
+      { aKeys.C, DigDownRight, "igddr", "DIG DIAGONALLY DOWN-RIGHT" },
       { aKeys.BACKSLASH, DropItems, "igdi", "DROP INVENTORY ITEM" },
       { aKeys.BACKSPACE, Teleport, "igt", "TELEPORT HOME OR TELEPOLE" },
       { aKeys.ENTER, GrabItems, "iggi", "GRAB COLLIDING ITEMS" },

@@ -1310,7 +1310,7 @@ local aObjectData<const> = {           -- Objects data
   [DIR.D] = { 288, 288 },
   FLAGS   = OFL.FALL|OFL.PICKUP|OFL.PHASETARGET
  }, [ACT.CREEP] = {
-  [DIR.L] = { 288, 290 }, [DIR.R] = { 288, 290 },
+  [DIR.L] = { 288, 290 }, [DIR.R] = { 288, 290 }, [DIR.D] = { 288, 290 },
   FLAGS   = OFL.FALL|OFL.PICKUP|OFL.PHASETARGET
  }, [ACT.DIG] = {
   [DIR.D] = { 288, 290 },
@@ -1410,12 +1410,12 @@ local aObjectData<const> = {           -- Objects data
  ANIMTIMER = aTimerData.ANIMNORMAL,
  DESC      = "VIEW THE ENTIRE ZONE\nLAYOUT WITH THIS MAP",
  DIRECTION = DIR.NONE,                 FLAGS     = OFL.SELLABLE|OFL.DEVICE,
- KEYS      = { [ACT.MAP] = aObjectStop },
- JOB       = JOB.NONE,                 LONGNAME  = "TNT MAP",
- LUNGS     = 32,                       MENU      = MNU.MAP,
- NAME      = "MAP",                    STAMINA   = -1,
- STRENGTH  = 0,                        TELEDELAY = 200,
- VALUE     = 300,                      WEIGHT    = 3,
+ JOB       = JOB.NONE,                 KEYS      = { [ACT.MAP] = aObjectStop },
+ LONGNAME  = "TNT MAP",                LUNGS     = 32,
+ MENU      = MNU.MAP,                  NAME      = "MAP",
+ STAMINA   = -1,                       STRENGTH  = 0,
+ TELEDELAY = 200,                      VALUE     = 300,
+ WEIGHT    = 3,
 -- ------------------------------------------------------------------------- --
 }, [TYP.TRACK] = {
  [ACT.STOP] = {
@@ -1576,6 +1576,7 @@ local aObjectData<const> = {           -- Objects data
   [DIR.NONE] = { 451, 454 },
   FLAGS      = OFL.BUSY
  }, KEYS = {
+   [ACT.STOP] = aObjectStop;
    [ACT.CREEP] = { [JOB.NONE] = { [DIR.U] = true, [DIR.D] = true } };
  },
  ACTION     = ACT.STOP,                AITYPE     = AI.LIFT,
