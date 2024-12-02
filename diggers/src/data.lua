@@ -173,37 +173,39 @@ local OFL<const> = {          -- Max 64-bits
   RESPAWN      = 0x000000001, -- Object respawns where it was created
   BUSY         = 0x000000002, -- Object is busy and commands disabled
   FALL         = 0x000000004, -- Object should fall
-  DELICATE     = 0x000000008, -- Object is delicate (takes more damage)
-  INWATER      = 0x000000010, -- Object is in water
-  PHASETARGET  = 0x000000020, -- Object is a valid random phase target
-  SOUNDLOOP    = 0x000000040, -- Object sound looped when sprite anim is reset
-  NOANIMLOOP   = 0x000000080, -- Object is not allowed to loop its animation
-  DIGGER       = 0x000000100, -- Object is a digger
-  REGENERATE   = 0x000000200, -- Object can regenerate health?
-  TPMASTER     = 0x000000400, -- Object is master at teleporting
-  IMPATIENT    = 0x000000800, -- Object is a digger and becoming impatient
-  JUMPFALL     = 0x000001000, -- Object is falling (while jumping)
-  JUMPRISE     = 0x000002000, -- Object is jumping
-  EXPLODE      = 0x000004000, -- Object explodes on death
-  FLOAT        = 0x000008000, -- Object floats in water
-  FLOATING     = 0x000010000, -- Object is floating right now
-  HURTDIGGER   = 0x000020000, -- Object hurts diggers
-  PHASEDIGGER  = 0x000040000, -- Object teleports diggers anywhere
-  PICKUP       = 0x000080000, -- Object can be picked up
-  PURSUEDIGGER = 0x000100000, -- Object follows a digger when colliding
-  RNGSPRITE    = 0x000200000, -- Object selects a random sprite in animation.
-  SELLABLE     = 0x000400000, -- Object is sellable to shop
-  STATIONARY   = 0x000800000, -- Object does not move and is stationary
-  TRACK        = 0x001000000, -- Object can only move on tracks
-  TREASURE     = 0x002000000, -- Object is treasure
-  DANGEROUS    = 0x004000000, -- Object is dangerous and diggers run away
-  WATERBASED   = 0x008000000, -- Object is water based
-  AQUALUNG     = 0x010000000, -- Object can breathe in water
-  BLOCK        = 0x020000000, -- Object is a platform for diggers
-  DEVICE       = 0x040000000, -- Object is a device
-  HEALNEARBY   = 0x080000000, -- Object heals nearby Diggers
-  CONSUME      = 0x100000000, -- Object consumes another object
-  NOHOME       = 0x200000000, -- Object cannot enter home
+  LIVING       = 0x000000008, -- Object is a living object
+  ENEMY        = 0x000000010, -- Object is an enemy
+  DELICATE     = 0x000000020, -- Object is delicate (takes more damage)
+  INWATER      = 0x000000040, -- Object is in water
+  PHASETARGET  = 0x000000080, -- Object is a valid random phase target
+  SOUNDLOOP    = 0x000000100, -- Object sound looped when sprite anim is reset
+  NOANIMLOOP   = 0x000000200, -- Object is not allowed to loop its animation
+  DIGGER       = 0x000000400, -- Object is a digger
+  REGENERATE   = 0x000000800, -- Object can regenerate health?
+  TPMASTER     = 0x000001000, -- Object is master at teleporting
+  IMPATIENT    = 0x000002000, -- Object is a digger and becoming impatient
+  JUMPFALL     = 0x000004000, -- Object is falling (while jumping)
+  JUMPRISE     = 0x000008000, -- Object is jumping
+  EXPLODE      = 0x000010000, -- Object explodes on death
+  FLOAT        = 0x000020000, -- Object floats in water
+  FLOATING     = 0x000040000, -- Object is floating right now
+  HURTDIGGER   = 0x000080000, -- Object hurts diggers
+  PHASEDIGGER  = 0x000100000, -- Object teleports diggers anywhere
+  PICKUP       = 0x000200000, -- Object can be picked up
+  PURSUEDIGGER = 0x000400000, -- Object follows a digger when colliding
+  RNGSPRITE    = 0x000800000, -- Object selects a random sprite in animation.
+  SELLABLE     = 0x001000000, -- Object is sellable to shop
+  STATIONARY   = 0x002000000, -- Object does not move and is stationary
+  TRACK        = 0x004000000, -- Object can only move on tracks
+  TREASURE     = 0x008000000, -- Object is treasure
+  DANGEROUS    = 0x010000000, -- Object is dangerous and diggers run away
+  WATERBASED   = 0x020000000, -- Object is water based
+  AQUALUNG     = 0x040000000, -- Object can breathe in water
+  BLOCK        = 0x080000000, -- Object is a platform for diggers
+  DEVICE       = 0x100000000, -- Object is a device
+  HEALNEARBY   = 0x200000000, -- Object heals nearby Diggers
+  CONSUME      = 0x400000000, -- Object consumes another object
+  NOHOME       = 0x800000000, -- Object cannot enter home
 };
 OFL.JUMPMASK = OFL.JUMPRISE|OFL.JUMPFALL;
 -- Jumping ----------------------------------------------------------------- --
@@ -635,7 +637,8 @@ local aObjectData<const> = {           -- Objects data
  },
  ACTION       = ACT.STOP,              AITYPE       = AI.DIGGER,
  ANIMTIMER    = aTimerData.ANIMNORMAL, DIGDELAY     = 60,
- DIRECTION    = DIR.NONE,              FLAGS        = OFL.DIGGER|OFL.DELICATE,
+ DIRECTION    = DIR.NONE,
+ FLAGS        = OFL.DIGGER|OFL.DELICATE|OFL.LIVING,
  INTELLIGENCE = 0.7,                   JOB          = JOB.NONE,
  KEYS         = aDiggerKeys,           LONGNAME     = "F'TARG",
  LUNGS        = 4,                     MENU         = MNU.MAIN,
@@ -698,7 +701,7 @@ local aObjectData<const> = {           -- Objects data
  ACTION       = ACT.STOP,              AITYPE       = AI.DIGGER,
  ANIMTIMER    = aTimerData.ANIMNORMAL, DIGDELAY     = 70,
  DIRECTION    = DIR.NONE,
- FLAGS        = OFL.DIGGER|OFL.DELICATE|OFL.TPMASTER,
+ FLAGS        = OFL.DIGGER|OFL.DELICATE|OFL.TPMASTER|OFL.LIVING,
  INTELLIGENCE = 0.9,                   JOB          = JOB.NONE,
  KEYS         = aDiggerKeys,           LONGNAME     = "HABBISH",
  LUNGS        = 12,                    MENU         = MNU.MAIN,
@@ -757,7 +760,8 @@ local aObjectData<const> = {           -- Objects data
  },
  ACTION       = ACT.STOP,              AITYPE       = AI.DIGGER,
  ANIMTIMER    = aTimerData.ANIMNORMAL, DIGDELAY     = 50,
- DIRECTION    = DIR.NONE,              FLAGS        = OFL.DIGGER|OFL.DELICATE,
+ DIRECTION    = DIR.NONE,
+ FLAGS        = OFL.DIGGER|OFL.DELICATE|OFL.LIVING,
  INTELLIGENCE = 0.8,                   JOB          = JOB.NONE,
  KEYS         = aDiggerKeys,           LONGNAME     = "GRABLIN",
  LUNGS        = 8,                     MENU         = MNU.MAIN,
@@ -816,7 +820,7 @@ local aObjectData<const> = {           -- Objects data
  },
  ACTION       = ACT.STOP,              AITYPE       = AI.DIGGER,
  ANIMTIMER    = aTimerData.ANIMNORMAL, DIGDELAY     = 80,
- DIRECTION    = DIR.NONE,              FLAGS        = OFL.DIGGER,
+ DIRECTION    = DIR.NONE,              FLAGS        = OFL.DIGGER|OFL.LIVING,
  INTELLIGENCE = 0.6,                   JOB          = JOB.NONE,
  KEYS         = aDiggerKeys,           LONGNAME     = "QUARRIOR",
  LUNGS        = 16,                    MENU         = MNU.MAIN,
@@ -937,7 +941,7 @@ local aObjectData<const> = {           -- Objects data
  },
  ACTION    = ACT.STOP,                 AITYPE    = AI.RANDOM,
  ANIMTIMER = aTimerData.ANIMFAST,      DIRECTION = DIR.NONE,
- FLAGS     = OFL.AQUALUNG,             JOB       = JOB.NONE,
+ FLAGS     = OFL.AQUALUNG|OFL.ENEMY,   JOB       = JOB.NONE,
  LONGNAME  = "PHANTOM",                NAME      = "PHANTOM",
  STAMINA   = -1,                       STRENGTH  = 0,
  TELEDELAY = 200,                      VALUE     = 0,
@@ -955,7 +959,7 @@ local aObjectData<const> = {           -- Objects data
  },
  ACTION    = ACT.STOP,                 AITYPE    = AI.FINDSLOW,
  ANIMTIMER = aTimerData.ANIMNORMAL,    DIRECTION = DIR.NONE,
- FLAGS     = OFL.AQUALUNG,             JOB       = JOB.NONE,
+ FLAGS     = OFL.AQUALUNG|OFL.ENEMY,   JOB       = JOB.NONE,
  LONGNAME  = "SKELETON",               NAME      = "SKELETON",
  STAMINA   = -1,                       STRENGTH  = 0,
  TELEDELAY = 200,                      VALUE     = 0,
@@ -973,7 +977,7 @@ local aObjectData<const> = {           -- Objects data
  },
  ACTION    = ACT.STOP,                 AITYPE    = AI.FIND,
  ANIMTIMER = aTimerData.ANIMNORMAL,    DIRECTION = DIR.NONE,
- FLAGS     = OFL.AQUALUNG,             JOB       = JOB.NONE,
+ FLAGS     = OFL.AQUALUNG|OFL.ENEMY,   JOB       = JOB.NONE,
  LONGNAME  = "ZOMBIE",                 NAME      = "ZOMBIE",
  STAMINA   = -1,                       STRENGTH  = 0,
  TELEDELAY = 200,                      VALUE     = 0,
@@ -991,7 +995,7 @@ local aObjectData<const> = {           -- Objects data
  },
  ACTION    = ACT.STOP,                 AITYPE    = AI.FINDSLOW,
  ANIMTIMER = aTimerData.ANIMNORMAL,    DIRECTION = DIR.NONE,
- FLAGS     = OFL.AQUALUNG,             JOB       = JOB.NONE,
+ FLAGS     = OFL.AQUALUNG|OFL.ENEMY,   JOB       = JOB.NONE,
  LONGNAME  = "GHOST",                  NAME      = "GHOST",
  STAMINA   = -1,                       STRENGTH  = 0,
  TELEDELAY = 200,                      VALUE     = 0,
@@ -1009,7 +1013,7 @@ local aObjectData<const> = {           -- Objects data
  },
  ACTION    = ACT.STOP,                 AITYPE    = AI.FINDSLOW,
  ANIMTIMER = aTimerData.ANIMNORMAL,    DIRECTION = DIR.NONE,
- FLAGS     = OFL.AQUALUNG,             JOB       = JOB.NONE,
+ FLAGS     = OFL.AQUALUNG|OFL.ENEMY,   JOB       = JOB.NONE,
  LONGNAME  = "ZIPPER",                 NAME      = "ZIPPER",
  STAMINA   = -1,                       STRENGTH  = 0,
  TELEDELAY = 200,                      VALUE     = 0,
@@ -1027,7 +1031,7 @@ local aObjectData<const> = {           -- Objects data
  },
  ACTION    = ACT.STOP,                 AITYPE    = AI.FIND,
  ANIMTIMER = aTimerData.ANIMFAST,      DIRECTION = DIR.NONE,
- FLAGS     = OFL.AQUALUNG,             JOB       = JOB.NONE,
+ FLAGS     = OFL.AQUALUNG|OFL.ENEMY,   JOB       = JOB.NONE,
  LONGNAME  = "SWIRLYPORT",             NAME      = "SWRLYPRT",
  STAMINA   = -1,                       STRENGTH  = 0,
  TELEDELAY = 200,                      VALUE     = 0,
@@ -1046,7 +1050,7 @@ local aObjectData<const> = {           -- Objects data
  },
  ACTION    = ACT.STOP,                 AITYPE    = AI.NONE,
  ANIMTIMER = aTimerData.ANIMNORMAL,    DIRECTION = DIR.NONE,
- FLAGS     = OFL.STATIONARY,           JOB       = JOB.NONE,
+ FLAGS     = OFL.STATIONARY|OFL.LIVING,JOB       = JOB.NONE,
  LONGNAME  = "PIRANA PLANT",           LUNGS     = 128,
  NAME      = "PIRANA",                 STAMINA   = -1,
  STRENGTH  = 0,                        TELEDELAY = 200,
@@ -1065,7 +1069,7 @@ local aObjectData<const> = {           -- Objects data
  },
  ACTION    = ACT.STOP,                 AITYPE    = AI.NONE,
  ANIMTIMER = aTimerData.ANIMNORMAL,    DIRECTION = DIR.NONE,
- FLAGS     = OFL.STATIONARY|OFL.AQUALUNG,
+ FLAGS     = OFL.STATIONARY|OFL.AQUALUNG|OFL.LIVING,
  JOB       = JOB.NONE,                 LONGNAME  = "FUNGUS",
  NAME      = "FUNGUS",                 STAMINA   = -1,
  STRENGTH  = 0,                        TELEDELAY = 200,
@@ -1081,11 +1085,11 @@ local aObjectData<const> = {           -- Objects data
  },
  ACTION    = ACT.RUN,                  AITYPE    = AI.NONE,
  ANIMTIMER = aTimerData.ANIMNORMAL,    DIRECTION = DIR.LR,
- JOB       = JOB.BOUNCE,               LONGNAME  = "ALIEN",
- LUNGS     = 32,                       NAME      = "ALIEN",
- STAMINA   = -1,                       STRENGTH  = 0,
- TELEDELAY = 20,                       VALUE     = 0,
- WEIGHT    = 0
+ FLAGS     = OFL.ENEMY,                JOB       = JOB.BOUNCE,
+ LONGNAME  = "ALIEN",                  LUNGS     = 32,
+ NAME      = "ALIEN",                  STAMINA   = -1,
+ STRENGTH  = 0,                        TELEDELAY = 20,
+ VALUE     = 0,                        WEIGHT    = 0
 -- ------------------------------------------------------------------------- --
 }, [TYP.EGG] = {
  [ACT.STOP]  = {
@@ -1100,11 +1104,11 @@ local aObjectData<const> = {           -- Objects data
  },
  ACTION    = ACT.PHASE,                AITYPE    = AI.NONE,
  ANIMTIMER = aTimerData.ANIMNORMAL,    DIRECTION = DIR.NONE,
- JOB       = JOB.SPAWN,                LONGNAME  = "MYSTERIOUS EGG",
- LUNGS     = 128,                      NAME      = "EGG",
- STAMINA   = -1,                       STRENGTH  = 0,
- TELEDELAY = 3600,                     VALUE     = 0,
- WEIGHT    = 0
+ FLAGS     = OFL.ENEMY,                JOB       = JOB.SPAWN,
+ LONGNAME  = "MYSTERIOUS EGG",         LUNGS     = 128,
+ NAME      = "EGG",                    STAMINA   = -1,
+ STRENGTH  = 0,                        TELEDELAY = 3600,
+ VALUE     = 0,                        WEIGHT    = 0
 -- ------------------------------------------------------------------------- --
 }, [TYP.BIRD] = {
  [ACT.STOP] = {
@@ -1114,11 +1118,11 @@ local aObjectData<const> = {           -- Objects data
  },
  ACTION    = ACT.STOP,                 AITYPE    = AI.CRITTER,
  ANIMTIMER = aTimerData.ANIMNORMAL ,   DIRECTION = DIR.LR,
- JOB       = JOB.BOUNCE,               LONGNAME  = "BIRD",
- LUNGS     = 2,                        NAME      = "BIRD",
- STAMINA   = -1,                       STRENGTH  = 0,
- TELEDELAY = 200,                      VALUE     = 0,
- WEIGHT    = 0
+ FLAGS     = OFL.LIVING,               JOB       = JOB.BOUNCE,
+ LONGNAME  = "BIRD",                   LUNGS     = 2,
+ NAME      = "BIRD",                   STAMINA   = -1,
+ STRENGTH  = 0,                        TELEDELAY = 200,
+ VALUE     = 0,                        WEIGHT    = 0
 -- ------------------------------------------------------------------------- --
 }, [TYP.FISH] = {
  [ACT.STOP] = {
@@ -1129,7 +1133,7 @@ local aObjectData<const> = {           -- Objects data
  },
  ACTION    = ACT.STOP,                 AITYPE    = AI.CRITTERSLOW,
  ANIMTIMER = aTimerData.ANIMNORMAL,    DIRECTION = DIR.LR,
- FLAGS     = OFL.AQUALUNG|OFL.WATERBASED,
+ FLAGS     = OFL.AQUALUNG|OFL.WATERBASED|OFL.LIVING,
  JOB       = JOB.BOUNCE,               LONGNAME  = "GOLDFISH",
  NAME      = "FISH",                   STAMINA   = -1,
  STRENGTH  = 0,                        TELEDELAY = 200,
@@ -1144,11 +1148,11 @@ local aObjectData<const> = {           -- Objects data
  },
  ACTION    = ACT.RUN,                  AITYPE    = AI.NONE,
  ANIMTIMER = aTimerData.ANIMNORMAL,    DIRECTION = DIR.LR,
- JOB       = JOB.BOUNCE,               LONGNAME  = "VELOCIRAPTOR",
- LUNGS     = 16,                       NAME      = "VRAPTOR",
- STAMINA   = -1,                       STRENGTH  = 0,
- TELEDELAY = 200,                      VALUE     = 0,
- WEIGHT    = 0,
+ FLAGS     = OFL.LIVING,               JOB       = JOB.BOUNCE,
+ LONGNAME  = "VELOCIRAPTOR",           LUNGS     = 16,
+ NAME      = "VRAPTOR",                STAMINA   = -1,
+ STRENGTH  = 0,                        TELEDELAY = 200,
+ VALUE     = 0,                        WEIGHT    = 0,
 -- ------------------------------------------------------------------------- --
 }, [TYP.ROTARY] = {
  [ACT.WALK] = {
@@ -1160,11 +1164,11 @@ local aObjectData<const> = {           -- Objects data
  },
  ACTION    = ACT.WALK,                 AITYPE    = AI.NONE,
  ANIMTIMER = aTimerData.ANIMNORMAL,    DIRECTION = DIR.LR,
- JOB       = JOB.BOUNCE,               LONGNAME  = "ROTARYSAURUS",
- LUNGS     = 16,                       NAME      = "RTRYSRUS",
- STAMINA   = -1,                       STRENGTH  = 0,
- TELEDELAY = 200,                      VALUE     = 0,
- WEIGHT    = 0
+ FLAGS     = OFL.LIVING,               JOB       = JOB.BOUNCE,
+ LONGNAME  = "ROTARYSAURUS",           LUNGS     = 16,
+ NAME      = "RTRYSRUS",               STAMINA   = -1,
+ STRENGTH  = 0,                        TELEDELAY = 200,
+ VALUE     = 0,                        WEIGHT    = 0
 -- ------------------------------------------------------------------------- --
 }, [TYP.STEGO] = {
  [ACT.CREEP] = {
@@ -1176,11 +1180,12 @@ local aObjectData<const> = {           -- Objects data
  },
  ACTION     = ACT.CREEP,               AITYPE     = AI.NONE,
  ANIMTIMER  = aTimerData.ANIMNORMAL,   ATTACHMENT = TYP.STEGOB,
- DIRECTION  = DIR.LR,                  JOB        = JOB.BOUNCE,
- LONGNAME   = "STEGOSAURUS",           LUNGS      = 16,
- NAME       = "STEGSAUR",              STAMINA    = -1,
- STRENGTH   = 0,                       TELEDELAY  = 200,
- VALUE      = 0,                       WEIGHT     = 0,
+ DIRECTION  = DIR.LR,                  FLAGS      = OFL.LIVING,
+ JOB        = JOB.BOUNCE,              LONGNAME   = "STEGOSAURUS",
+ LUNGS      = 16,                      NAME       = "STEGSAUR",
+ STAMINA    = -1,                      STRENGTH   = 0,
+ TELEDELAY  = 200,                     VALUE      = 0,
+ WEIGHT     = 0,
 -- ------------------------------------------------------------------------- --
 }, [TYP.STEGOB] = {
  [ACT.CREEP] = {
@@ -1199,7 +1204,7 @@ local aObjectData<const> = {           -- Objects data
  },
  ACTION    = ACT.STOP,                 AITYPE    = AI.CRITTER,
  ANIMTIMER = aTimerData.ANIMNORMAL,    DIRECTION = DIR.LR,
- FLAGS     = OFL.AQUALUNG|OFL.WATERBASED,
+ FLAGS     = OFL.AQUALUNG|OFL.WATERBASED|OFL.LIVING,
  JOB       = JOB.BOUNCE,               LONGNAME  = "TURTLE",
  NAME      = "TURTLE",                 STAMINA   = -1,
  STRENGTH  = 0,                        TELEDELAY = 200,
@@ -1229,7 +1234,7 @@ local aObjectData<const> = {           -- Objects data
  },
  ACTION    = ACT.STOP,                 AITYPE    = AI.BIGFOOT,
  ANIMTIMER = aTimerData.ANIMNORMAL,    DIRECTION = DIR.LR,
- FLAGS     = OFL.AQUALUNG,             JOB       = JOB.BOUNCE,
+ FLAGS     = OFL.AQUALUNG|OFL.LIVING,  JOB       = JOB.BOUNCE,
  LONGNAME  = "SKINWALKER",             NAME      = "BIGFOOT",
  STAMINA   = -1,                       STRENGTH  = 100,
  TELEDELAY = 100,                      VALUE     = 0,

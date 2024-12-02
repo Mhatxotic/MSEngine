@@ -971,8 +971,6 @@ local function DoInitSetup(iMode)
     nButtonIntensity, nButtonIntensityIncrement = 1, 0.01;
     -- Backup old callbacks (Return to them later)
     fcbLogic, fcbRender, fcbInput = CBProc, CBRender, CBInput;
-    -- Backup current cursor id
-    iLastCursorId = GetCursor();
     -- Get time
     nTime = CoreTime();
     -- Calculate bottom of categories
@@ -980,6 +978,8 @@ local function DoInitSetup(iMode)
     -- Call the mode init function
     aMode[1]();
   end
+  -- Backup current cursor id
+  iLastCursorId = GetCursor();
   -- Register frame buffer update
   RegisterFBUCallback("setup", OnFrameBufferUpdate);
   -- Load bank texture

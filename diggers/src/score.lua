@@ -12,9 +12,9 @@
 -- Core function aliases --------------------------------------------------- --
 local unpack<const>, error<const>, pairs<const>, ipairs<const>, max<const>,
   min<const>, floor<const>, sin<const>, cos<const>, tostring<const>,
-  mininteger<const> =
+  maxinteger<const>, mininteger<const> =
     table.unpack, error, pairs, ipairs, math.max, math.min, math.floor,
-    math.sin, math.cos, tostring, math.mininteger;
+    math.sin, math.cos, tostring, math.maxinteger, math.mininteger;
 -- M-Engine function aliases ----------------------------------------------- --
 local CoreTime<const>, UtilIsInteger<const>, UtilIsString<const> =
   Core.Time, Util.IsInteger, Util.IsString;
@@ -33,19 +33,23 @@ local aTotals,                         -- Score categories
       iScoreItem,                      -- Score for current item
       iTotalId,                        -- Currently active line
       iTotalScore,                     -- Total score
+      nWidth, nAspect, nHeight,        -- Logo positioning
+      nWidthN, nHeightN, nLX1, nRX1,   -- Logo positioning
       strScoreC,                       -- Stringified category score
       strScore,                        -- Stringified grand score
       texTitle;                        -- Title textures
 -- Statics ----------------------------------------------------------------- --
 local sTitleText<const> = "GAME OVER -- HOW WELL DID YOU DO?";
 local aRanks<const> = {
-  { 600000, "Grand Master" }, {     550000, "Master"       },
-  { 500000, "Professional" }, {     450000, "Genius"       },
-  { 400000, "Expert"       }, {     350000, "Advanced"     },
-  { 300000, "Intermediate" }, {     250000, "Adept"        },
-  { 200000, "Amateur"      }, {     150000, "Apprentice"   },
-  { 100000, "Novice"       }, {      50000, "Beginner"     },
-  {      0, "Newbie"       }, { mininteger, "Slug"         }
+  {  maxinteger, "Hacker"       }, {  0x80000000, "Cheater"      },
+  {     1200000, "Grand Master" }, {     1100000, "Master"       },
+  {     1000000, "Professional" }, {      900000, "Genius"       },
+  {      800000, "Expert"       }, {      700000, "Advanced"     },
+  {      600000, "Intermediate" }, {      500000, "Adept"        },
+  {      400000, "Amateur"      }, {      300000, "Apprentice"   },
+  {      200000, "Novice"       }, {      100000, "Beginner"     },
+  {           0, "Newbie"       }, { -0x80000000, "Slug"         },
+  {  mininteger, "Cheater"      }
 };
 -- Assets required --------------------------------------------------------- --
 local aAssets<const> = { { T = 2, F = "title", P = { 0 } },
@@ -61,28 +65,27 @@ end
 local function DrawLogos()
   -- Don't draw anything if in 4:3 mode
   if iStageL >= 0 then return end;
-  -- Draw sidebar scrolling logo's
-  local Width = -iStageL-4;
-  local Aspect = 208/58;
-  local Height = Width*Aspect;
-  local LX = (CoreTime()*100)%240;
-  local LY = -LX;
-  local X = iStageL+4;
+  -- Draw right moving down and left moving up logogs
+  local nLX = (CoreTime() * 100) % 240;
+  local nLY = -nLX;
+  local nRH = nHeight + nLY;
   texTitle:SetCA(0.25);
-  texTitle:BlitSLTRB(1,         X, -240+LX,    X+Width,-240+Height+LX);
-  texTitle:BlitSLTRB(1,         X,      LX,    X+Width,     Height+LX);
-  texTitle:BlitSLTRB(1,         X,  240+LX,    X+Width, 240+Height+LX);
-  texTitle:BlitSLTRB(1, 320+Width,      Height+LY, 320,     LY);
-  texTitle:BlitSLTRB(1, 320+Width,  240+Height+LY, 320, 240+LY);
-  texTitle:BlitSLTRB(1, 320+Width,  480+Height+LY, 320, 480+LY);
-  LX = -LX;
-  LY = -LY - 240;
-  texTitle:BlitSLTRB(1,         X, -240+LX,    X+Width,-240+Height+LX);
-  texTitle:BlitSLTRB(1,         X,      LX,    X+Width,     Height+LX);
-  texTitle:BlitSLTRB(1,         X,  240+LX,    X+Width, 240+Height+LX);
-  texTitle:BlitSLTRB(1, 320+Width,      Height+LY, 320,     LY);
-  texTitle:BlitSLTRB(1, 320+Width,  240+Height+LY, 320, 240+LY);
-  texTitle:BlitSLTRB(1, 320+Width,  480+Height+LY, 320, 480+LY);
+  texTitle:BlitSLTWH(1, nLX1,-240+nLX, nWidth,  nHeight);
+  texTitle:BlitSLTWH(1, nLX1,     nLX, nWidth,  nHeight);
+  texTitle:BlitSLTWH(1, nLX1, 240+nLX, nWidth,  nHeight);
+  texTitle:BlitSLTWH(1, nRX1,     nRH, nWidthN, nHeightN);
+  texTitle:BlitSLTWH(1, nRX1, 240+nRH, nWidthN, nHeightN);
+  texTitle:BlitSLTWH(1, nRX1, 480+nRH, nWidthN, nHeightN);
+  -- Draw left moving down and right moving up logogs
+  nLX = -nLX;
+  nLY = -nLY - 240;
+  nRH = nHeight + nLY;
+  texTitle:BlitSLTWH(1, nLX1,-240+nLX, nWidth,  nHeight);
+  texTitle:BlitSLTWH(1, nLX1,     nLX, nWidth,  nHeight);
+  texTitle:BlitSLTWH(1, nLX1, 240+nLX, nWidth,  nHeight);
+  texTitle:BlitSLTWH(1, nRX1,     nRH, nWidthN, nHeightN);
+  texTitle:BlitSLTWH(1, nRX1, 240+nRH, nWidthN, nHeightN);
+  texTitle:BlitSLTWH(1, nRX1, 480+nRH, nWidthN, nHeightN);
   -- Reset lobby texture colour
   texTitle:SetCRGBA(1, 1, 1, 1);
 end
@@ -351,13 +354,21 @@ local function AddTotal(sLabel, iValue, iScorePerTick)
   };
 end
 -- When the main fbo dimensions changed ------------------------------------ --
-local function OnFBOCallback(...)
+local function OnFrameBufferUpdate(...)
   local _ _, _, iStageL, _, _, _ = ...;
+  -- Update logo positions
+  nWidth = -iStageL - 4;
+  nAspect = 208 / 58;
+  nHeight = nWidth * nAspect;
+  nWidthN = -nWidth;
+  nHeightN = -nHeight
+  nLX1 = iStageL + 4;
+  nRX1 = 320 + nWidth;
 end
 -- When score assets have loaded? ------------------------------------------ --
 local function OnLoaded(aResources)
   -- Register frame buffer update
-  RegisterFBUCallback("score", OnFBOCallback);
+  RegisterFBUCallback("score", OnFrameBufferUpdate);
   -- Play score music
   PlayMusic(aResources[2]);
   -- Setup lobby texture
@@ -373,19 +384,19 @@ local function OnLoaded(aResources)
     iZonesComplete = iZonesComplete + 1 end;
   -- Add score categories
   for iI, aData in ipairs({
-    { "Zones completed",   iZonesComplete,             10000 },
-    { "Bank balance",      aGlobalData.gBankBalance,      10 },
-    { "Capital carried",   aGlobalData.gTotalCapital,    100 },
-    { "Items purchased",   aGlobalData.gTotalPurchases, 1000 },
-    { "Items value",       aGlobalData.gTotalPurchExp,    10 },
-    { "Terrain dug",       aGlobalData.gTotalDug,          1 },
-    { "Gems found",        aGlobalData.gTotalGemsFound,  100 },
-    { "Gems sold",         aGlobalData.gTotalGemsSold,   100 },
-    { "Gems value",        aGlobalData.gTotalIncome,      10 },
-    { "Salary paid",       aGlobalData.gTotalSalaryPaid,  10 },
-    { "Death duties",      aGlobalData.gTotalDeaths,    1000 },
-    { "Death duties paid", aGlobalData.gTotalDeathExp,    10 },
-    { "Time taken",       -aGlobalData.gTotalTimeTaken,    1 }
+    { "Bank balance",      aGlobalData.gBankBalance,        10 },
+    { "Zones completed",   iZonesComplete,               10000 },
+    { "Terrain dug",       aGlobalData.gTotalDug,            1 },
+    { "Exploration",       aGlobalData.gTotalExploration,    1 },
+    { "Gems found",        aGlobalData.gTotalGemsFound,    100 },
+    { "Gems sold",         aGlobalData.gTotalGemsSold,     100 },
+    { "Gems value",        aGlobalData.gTotalIncome,        10 },
+    { "Items purchased",   aGlobalData.gTotalPurchases,   1000 },
+    { "Capital carried",   aGlobalData.gTotalCapital,      100 },
+    { "Fiends eliminated", aGlobalData.gTotalEnemyKills, 10000 },
+    { "Homicide duties",  -aGlobalData.gTotalHomicides,   1000 },
+    { "Mortality duties", -aGlobalData.gTotalDeaths,      1000 },
+    { "Time taken",       -aGlobalData.gTotalTimeTaken,      1 },
   }) do AddTotal(unpack(aData)) end;
   -- Fade in
   Fade(1, 0, 0.025, RenderSimple, OnFadeIn);

@@ -35,6 +35,7 @@ static const class Common final        // Members initially private
                    strPeriod,          // C++ string as "."
                    strTwoPeriod,       // C++ string as ".."
                    strLuaName;         // C++ string as "__name"
+  const char       cFSlash;            // Forward slash character
   const char*const cpBlank;            // Blank C-String
   const locale     lLocaleCurrent;     // Current locale
   /* --------------------------------------------------------------- */ public:
@@ -71,6 +72,8 @@ static const class Common final        // Members initially private
   /* ----------------------------------------------------------------------- */
   const string &FSlash(void) const { return strFSlash; }
   /* ----------------------------------------------------------------------- */
+  char CFSlash(void) const { return cFSlash; }
+  /* ----------------------------------------------------------------------- */
   const string &Unspec(void) const { return strUnspec; }
   /* ----------------------------------------------------------------------- */
   const string &Null(void) const { return strNull; }
@@ -92,8 +95,8 @@ static const class Common final        // Members initially private
     strLfCr{ strLf + strCr },          strFSlash{ "/" },
     strUnspec{ "<Unspecified>" },      strNull{ "<NullPtr>" },
     strPeriod{ "." },                  strTwoPeriod{ ".." },
-    strLuaName{ "__name" },            cpBlank(strBlank.c_str()),
-    lLocaleCurrent{ strBlank }
+    strLuaName{ "__name" },            cFSlash(strFSlash[0]),
+    cpBlank(strBlank.c_str()),         lLocaleCurrent{ strBlank }
     /* -- No code ---------------------------------------------------------- */
     { }
 } /* ----------------------------------------------------------------------- */
@@ -183,6 +186,13 @@ template<typename IntType>
   static const string StrReadableFromNum(const IntType itVal,
     const int iPrec=0)
       { return StdMove(StrAppendImbue(fixed, setprecision(iPrec), itVal)); }
+/* -- Trim specified characters from end of string ------------------------- */
+static const string StrTrimSuffix(const string &strStr, const char cChar)
+{ // Return empty string if source string is empty or calculate ending
+  // misoccurance of character then copy and return the string
+  return strStr.empty() ?
+    strStr : strStr.substr(0, strStr.find_last_not_of(cChar) + 1);
+}
 /* -- Trim specified characters from string -------------------------------- */
 static const string StrTrim(const string &strStr, const char cChar)
 { // Return empty string if source string is empty

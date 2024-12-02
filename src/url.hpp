@@ -65,16 +65,16 @@ struct Url                             // Members initially public
     for(size_t stPos = stProtPos + 1, stPosEnd = stPos + 1;
                stPos < stPosEnd;
              ++stPos)
-      if(strUrl[stPos] != '/') { rResult = R_INVPROTO; return; }
+      if(strUrl[stPos] != cCommon->CFSlash()) { rResult = R_INVPROTO; return; }
     // Copy the protocol part and throw error if empty string
     strProtocol = strUrl.substr(0, stProtPos);
     if(strProtocol.empty()) { rResult = R_EMPROTO; return; }
     // Find hostname and if we couldn't find it?
     const size_t stLocStartPos = stProtPos + 3,
-                 stHostPos = strUrl.find('/', stLocStartPos);
+                 stHostPos = strUrl.find(cCommon->CFSlash(), stLocStartPos);
     if(stHostPos == string::npos)
     { // Set default resource to root
-      strResource = '/';
+      strResource = cCommon->CFSlash();
       // Finalise hostname
       strHost = strUrl.substr(stLocStartPos);
     } // Request not found

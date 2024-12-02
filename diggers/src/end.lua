@@ -20,7 +20,7 @@ local UtilIsBoolean<const>, UtilIsInteger<const>, UtilIsString<const>,
 local Fade, GetCapitalValue, GetGameTicks, InitPost, InitScore,
   IsButtonReleased, LoadResources, PlayMusic, PlayStaticSound, RenderFade,
   RenderObjects, RenderTerrain, SetCallbacks, SetCursor, SetKeys,
-  aGemsAvailable, aGlobalData, fontLarge;
+  aGemsAvailable, aGlobalData, aShroudData, fontLarge;
 -- Locals ------------------------------------------------------------------ --
 local aCollections,                    -- All texts
       aLinesBottom,                    -- Bottom lines of texts
@@ -30,6 +30,7 @@ local aCollections,                    -- All texts
       iCOK, iCExit, iCWait,            -- Cursor ids
       iDeadCost,                       -- Death duties total
       iEndTexId,                       -- End tile id chosen from texture
+      iExploration,                    -- Total explored
       iGameTicks,                      -- Total game ticks
       iGameTime,                       -- Total game time
       iKeyBankLoseId,                  -- Lose screen key bank id
@@ -245,16 +246,19 @@ local function OnLoaded(aResources, aActivePlayer, aOpponentPlayer, sMsg)
   -- Get cost of capital
   aGlobalData.gCapitalCarried = GetCapitalValue();
   -- Get cost of digger deaths
-  iDeadCost, iSalary = 0, 0;
-  local aActivePlayerDiggers<const> = aActivePlayer.D;
-  for iI = 1, #aActivePlayerDiggers do
-    local aDigger<const> = aActivePlayerDiggers[iI];
-    if not aDigger then
-      aGlobalData.gTotalDeaths = aGlobalData.gTotalDeaths + 1;
-      iDeadCost = iDeadCost + 65;
-    else
-      iSalary = iSalary + 30;
-    end
+  local iPRemain<const> = aActivePlayer.DC;
+  local iPDeaths<const> = #aActivePlayer.D - iPRemain;
+  aGlobalData.gTotalDeaths = aGlobalData.gTotalDeaths + iPDeaths
+  iDeadCost, iSalary = iPDeaths * 65, iPRemain * 30;
+  -- Add enemy kills
+  local iPKills<const> = aActivePlayer.EK;
+  aGlobalData.gTotalEnemyKills = aGlobalData.gTotalEnemyKills + iPKills;
+  -- Add homicides of opponent playerss
+  aGlobalData.gTotalHomicides = aGlobalData.gTotalHomicides + aActivePlayer.LK;
+  -- Calculate exploration data
+  iExploration = 0;
+  for iI = 1, #aShroudData do
+    if aShroudData[iI][2] == 0xF then iExploration = iExploration + 1 end;
   end
   -- Get game ticks and time
   iGameTicks = GetGameTicks();
@@ -266,10 +270,8 @@ local function OnLoaded(aResources, aActivePlayer, aOpponentPlayer, sMsg)
     aGlobalData.gTotalGemsSold + aActivePlayer.GS;
   aGlobalData.gTotalCapital =
     aGlobalData.gTotalCapital + aGlobalData.gCapitalCarried;
-  aGlobalData.gTotalDeathExp =
-    aGlobalData.gTotalDeathExp + iDeadCost;
-  aGlobalData.gTotalPurchExp =
-    aGlobalData.gTotalPurchExp + aActivePlayer.BP;
+  aGlobalData.gTotalExploration =
+    aGlobalData.gTotalExploration + iExploration;
   aGlobalData.gTotalTimeTaken =
     aGlobalData.gTotalTimeTaken + iGameTicks // 60;
   aGlobalData.gTotalIncome =
@@ -278,8 +280,6 @@ local function OnLoaded(aResources, aActivePlayer, aOpponentPlayer, sMsg)
     aGlobalData.gTotalDug + aActivePlayer.DUG;
   aGlobalData.gTotalPurchases =
     aGlobalData.gTotalPurchases + aActivePlayer.PUR;
-  aGlobalData.gTotalSalaryPaid =
-    aGlobalData.gTotalSalaryPaid + iSalary;
   aGlobalData.gBankBalance =
     aGlobalData.gBankBalance + (aActivePlayer.M - iDeadCost - iSalary);
   aGlobalData.gPercentCompleted =
@@ -360,12 +360,12 @@ local function OnReady(GetAPI)
   Fade, GetCapitalValue, GetGameTicks, InitPost, InitScore, IsButtonReleased,
     LoadResources, PlayMusic, PlayStaticSound, RenderFade, RenderObjects,
     RenderTerrain, SetCallbacks, SetCursor, SetKeys, aGemsAvailable,
-    aGlobalData, fontLarge =
+    aGlobalData, aShroudData, fontLarge =
       GetAPI("Fade", "GetCapitalValue", "GetGameTicks", "InitPost",
         "InitScore", "IsButtonReleased", "LoadResources", "PlayMusic",
         "PlayStaticSound", "RenderFade", "RenderObjects", "RenderTerrain",
         "SetCallbacks", "SetCursor", "SetKeys", "aGemsAvailable",
-        "aGlobalData", "fontLarge");
+        "aGlobalData", "aShroudData", "fontLarge");
   -- Register keybinds
   local aKeys<const>, aStates<const> = Input.KeyCodes, Input.States;
   local iPress<const> = aStates.PRESS;

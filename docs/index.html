@@ -1,7 +1,7 @@
 <!DOCTYPE html>
-<!-- Reference for the Mhatxotic Engine API version 24.11.27.1 -->
-<!-- Automatically built at Wed Nov 27 19:34:49 2024 +0000 -->
-<!-- With Mhatxotic Engine Project Management Utility version 24.11.27.1 -->
+<!-- Reference for the Mhatxotic Engine API version 24.12.2.26 -->
+<!-- Automatically built at Mon Dec 02 13:58:55 2024 +0000 -->
+<!-- With Mhatxotic Engine Project Management Utility version 24.12.2.26 -->
 <!-- Copyright (c) 2006-2024 Mhatxotic Design, All Rights Reserved Worldwide -->
 <HTML lang="en-GB">
 <HEAD>
@@ -11,18 +11,18 @@
 	<META name="apple-mobile-web-app-title" content="Mhatxotic Engine API">
 	<META name="author" content="Mhatxotic Design">
 	<META name="copyright" content="Copyright © 2006-2024 Mhatxotic Design, All Rights Reserved">
-	<META name="description" content="Reference for the Mhatxotic Engine API version 24.11.27.1">
+	<META name="description" content="Reference for the Mhatxotic Engine API version 24.12.2.26">
 	<META name="format-detection" content="telephone=no">
-	<META name="generator" content="Mhatxotic Engine Project Management Utility version 24.11.27.1">
+	<META name="generator" content="Mhatxotic Engine Project Management Utility version 24.12.2.26">
 	<META name="google-site-verification" content="BvWxrqmgaIxqe_W8AW3OGK0fdCI_JfB_-gcOOxCF9_4">
 	<META name="googlebot" content="index,follow">
-	<META name="og:description" content="Reference for the Mhatxotic Engine API version 24.11.27.1">
+	<META name="og:description" content="Reference for the Mhatxotic Engine API version 24.12.2.26">
 	<META name="og:image" content="https://repository-images.githubusercontent.com/611875607/ee7aa468-9797-4763-9a2d-ea3d782ef413">
-	<META name="og:title" content="Mhatxotic Engine 24.11.27.1 API reference">
+	<META name="og:title" content="Mhatxotic Engine 24.12.2.26 API reference">
 	<META name="og:url" content="https://mhatxotic.github.io/Engine/">
 	<META name="robots" content="index,follow">
 	<META name="viewport" content="width=device-width, initial-scale=1">
-	<TITLE>Mhatxotic Engine 24.11.27.1 API reference</TITLE>
+	<TITLE>Mhatxotic Engine 24.12.2.26 API reference</TITLE>
 	<STYLE media="screen">
 	* { margin:0; padding:0 }
 	BODY { background-color:#111; border:0; font-family:sans-serif; overflow-x:hidden; text-shadow: 1px 1px #111 }
@@ -60,7 +60,7 @@
 	</STYLE>
 </HEAD>
 <BODY id="idx.top">
-	<H1>Mhatxotic Engine 24.11.27.1 API reference</H1>
+	<H1>Mhatxotic Engine 24.12.2.26 API reference</H1>
 	<NOSCRIPT>
 		<H2>JavaScript is required to show and hide elements.</H2>
 	</NOSCRIPT>
@@ -99,7 +99,7 @@
 	</SCRIPT>
 	<DIV id="idx" style="display:none">
 		<H2>Table of contents:-</H2>
-		<P>This build of the Mhatxotic Engine API consists of 821 functions (386 members, 435 methods) and 27 consts in 29 namespaces with 83 commands and 206 cvars.</P>
+		<P>This build of the Mhatxotic Engine API consists of 821 functions (386 members, 435 methods) and 27 consts in 29 namespaces with 83 commands and 207 cvars.</P>
 		<OL id="toc">
 			<LI id="idx.ns">
 				<DIV>
@@ -1745,13 +1745,12 @@
 			<LI id="idx.cv">
 				<DIV>
 					<DIV>
-						<A href="#cvars">CVars</A> <I>(206 cvars)</I>
+						<A href="#cvars">CVars</A> <I>(207 cvars)</I>
 						<OL>
 							<LI><P>Variables that change the behaviour of the engine.</P></LI>
 							<LI>
 								<OL>
 									<LI><A href="#cv.app_author">app_author</A></LI>
-									<LI><A href="#cv.app_basedir">app_basedir</A></LI>
 									<LI><A href="#cv.app_cflags">app_cflags</A></LI>
 									<LI><A href="#cv.app_clearmutex">app_clearmutex</A></LI>
 									<LI><A href="#cv.app_cmdline">app_cmdline</A></LI>
@@ -1759,7 +1758,6 @@
 									<LI><A href="#cv.app_copyright">app_copyright</A></LI>
 									<LI><A href="#cv.app_delay">app_delay</A></LI>
 									<LI><A href="#cv.app_description">app_description</A></LI>
-									<LI><A href="#cv.app_homedir">app_homedir</A></LI>
 									<LI><A href="#cv.app_icon">app_icon</A></LI>
 									<LI><A href="#cv.app_longname">app_longname</A></LI>
 									<LI><A href="#cv.app_shortname">app_shortname</A></LI>
@@ -1767,10 +1765,13 @@
 									<LI><A href="#cv.app_title">app_title</A></LI>
 									<LI><A href="#cv.app_version">app_version</A></LI>
 									<LI><A href="#cv.app_website">app_website</A></LI>
+									<LI><A href="#cv.ast_basedir">ast_basedir</A></LI>
 									<LI><A href="#cv.ast_bundles">ast_bundles</A></LI>
 									<LI><A href="#cv.ast_exebundle">ast_exebundle</A></LI>
 									<LI><A href="#cv.ast_fsoverride">ast_fsoverride</A></LI>
+									<LI><A href="#cv.ast_homedir">ast_homedir</A></LI>
 									<LI><A href="#cv.ast_lzmabuffer">ast_lzmabuffer</A></LI>
+									<LI><A href="#cv.ast_modbundle">ast_modbundle</A></LI>
 									<LI><A href="#cv.ast_pipebuffer">ast_pipebuffer</A></LI>
 									<LI><A href="#cv.aud_check">aud_check</A></LI>
 									<LI><A href="#cv.aud_delay">aud_delay</A></LI>
@@ -11199,11 +11200,6 @@
 		<PRE>Specifies the author of the guest application&#x2e; This is used for display purposes only and can be requested by the guest and only set in the app&#x2e;cfg file&#x2e;<BR></PRE>
 		<H4><A href="#idx.cv">&#x25B2; Return to table of contents</A></H4>
 	</DIV>
-	<DIV id="cv.app_basedir" style="display:none">
-		<H3>app_basedir</H3>
-		<PRE>Specifies the base directory of where the executable was started from&#x2e; It is only readable by the end&#x2d;user and the host&#x2c; but not the guest&#x2e;<BR></PRE>
-		<H4><A href="#idx.cv">&#x25B2; Return to table of contents</A></H4>
-	</DIV>
 	<DIV id="cv.app_cflags" style="display:none">
 		<H3>app_cflags</H3>
 		<PRE>Specifies how the host wants to be run with the following flags&#x2e;&#x2e;&#x2e;<BR>[0x1] CFL_TERMINAL &#x3d; Opens &#x28;Win32&#x29; or reuses &#x28;Unix&#x29; a console window&#x2e;<BR>[0x2] CFL_AUDIO    &#x3d; Initialises an OpenAL audio context and exposes API&#x2e;<BR>[0x4] CFL_VIDEO    &#x3d; Initialises an OpenGL context&#x2b;window and exposes API&#x2e;<BR></PRE>
@@ -11237,11 +11233,6 @@
 	<DIV id="cv.app_description" style="display:none">
 		<H3>app_description</H3>
 		<PRE>Specifies a description for the guest application&#x2e; It is purely for display purposes only to the end&#x2d;user&#x2e; It can be requested by the guest and only set in the app&#x2e;cfg file&#x2e;<BR></PRE>
-		<H4><A href="#idx.cv">&#x25B2; Return to table of contents</A></H4>
-	</DIV>
-	<DIV id="cv.app_homedir" style="display:none">
-		<H3>app_homedir</H3>
-		<PRE>Species the users home directory where files are written to if they cannot be written to the working directory&#x2e; It is only readable by the end&#x2d;user and the host&#x2c; but not the guest&#x2e;<BR></PRE>
 		<H4><A href="#idx.cv">&#x25B2; Return to table of contents</A></H4>
 	</DIV>
 	<DIV id="cv.app_icon" style="display:none">
@@ -11279,6 +11270,11 @@
 		<PRE>Specifies a website for the guest application&#x2e; It is purely for display purposes only to the end&#x2d;user&#x2e; It can be requested by the guest and only set in the app&#x2e;cfg file&#x2e;<BR></PRE>
 		<H4><A href="#idx.cv">&#x25B2; Return to table of contents</A></H4>
 	</DIV>
+	<DIV id="cv.ast_basedir" style="display:none">
+		<H3>ast_basedir</H3>
+		<PRE>Specifies the base directory of where the executable was started from&#x2e; It is only readable by the end&#x2d;user and the host&#x2c; but not the guest&#x2e;<BR></PRE>
+		<H4><A href="#idx.cv">&#x25B2; Return to table of contents</A></H4>
+	</DIV>
 	<DIV id="cv.ast_bundles" style="display:none">
 		<H3>ast_bundles</H3>
 		<PRE>Specifies the [&#x2e;ext]ension to use as 7&#x2d;zip archives&#x2e; These filenames will be checked for at startup and automatically loaded by the engine&#x2e;<BR></PRE>
@@ -11294,9 +11290,19 @@
 		<PRE>Specifies whether the engine is allowed to override internal files from archives with files&#x2e; This is makes it easier to update and mod resource if true&#x2e; It is by default disabled on release builds and enabled on all other builds&#x2e;<BR></PRE>
 		<H4><A href="#idx.cv">&#x25B2; Return to table of contents</A></H4>
 	</DIV>
+	<DIV id="cv.ast_homedir" style="display:none">
+		<H3>ast_homedir</H3>
+		<PRE>Species the users home directory where files are written to if they cannot be written to the working directory&#x2e; It is only readable by the end&#x2d;user and the host&#x2c; but not the guest&#x2e;<BR></PRE>
+		<H4><A href="#idx.cv">&#x25B2; Return to table of contents</A></H4>
+	</DIV>
 	<DIV id="cv.ast_lzmabuffer" style="display:none">
 		<H3>ast_lzmabuffer</H3>
 		<PRE>Specifies the decompression buffer size &#x28;in bytes&#x29; for the lzma api&#x2e; The default value is 256 kilobytes&#x2e;<BR></PRE>
+		<H4><A href="#idx.cv">&#x25B2; Return to table of contents</A></H4>
+	</DIV>
+	<DIV id="cv.ast_modbundle" style="display:none">
+		<H3>ast_modbundle</H3>
+		<PRE>Scans the directory pointed at &#x27;ast_homedir&#x27; to be scanned for archives ending in the value specified by &#x27;ast_bundles&#x27; which can override any game asset &#x28;except app&#x2e;cfg&#x29;&#x2e; The default is false &#x28;no&#x29;&#x2e;<BR></PRE>
 		<H4><A href="#idx.cv">&#x25B2; Return to table of contents</A></H4>
 	</DIV>
 	<DIV id="cv.ast_pipebuffer" style="display:none">
@@ -12225,6 +12231,6 @@
 		<H4><A href="#idx.cv">&#x25B2; Return to table of contents</A></H4>
 	</DIV>
 	<ADDRESS>Copyright &copy; 2024 Mhatxotic Design, All Rights Reserved.<BR>
-	This document was generated at Wed Nov 27 19:34:49 2024 +0000</ADDRESS>
+	This document was generated at Mon Dec 02 13:58:55 2024 +0000</ADDRESS>
 </BODY>
 </HTML>

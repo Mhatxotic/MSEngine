@@ -84,11 +84,11 @@ const CVarItemStaticList cvislList{ {  // Default cvars (from cvars.hpp)
 { CFL_NONE, "ast_exebundle", cCommon->One(),
   CB(ArchiveInitExe, bool), TBOOLEAN|PBOOT },
 /* ------------------------------------------------------------------------- */
-// ! APP_BASEDIR
+// ! AST_BASEDIR
 // ? Specifies the base directory of where the executable was started from. It
 // ? is only readable by the end-user and the host, but not the guest.
 /* ------------------------------------------------------------------------- */
-{ CFL_NONE, "app_basedir", cCommon->Blank(),
+{ CFL_NONE, "ast_basedir", cCommon->Blank(),
   CBSTR(cSystem->SetWorkDir), CONFIDENTIAL|TSTRING|CTRUSTEDFN|MTRIM|PBOOT },
 /* ------------------------------------------------------------------------- */
 // ! AST_BUNDLES
@@ -123,13 +123,21 @@ const CVarItemStaticList cvislList{ {  // Default cvars (from cvars.hpp)
 { CFL_NONE, "app_shortname", "Untitled", CBSTR(cSystem->SetGuestShortTitle),
   TSTRING|CNOTEMPTY|MTRIM|PSYSTEM },
 /* ------------------------------------------------------------------------- */
-// ! APP_HOMEDIR
+// ! AST_HOMEDIR
 // ? Species the users home directory where files are written to if they cannot
 // ? be written to the working directory. It is only readable by the end-user
 // ? and the host, but not the guest.
 /* ------------------------------------------------------------------------- */
-{ CFL_NONE, "app_homedir", cCommon->Blank(),
+{ CFL_NONE, "ast_homedir", cCommon->Blank(),
   CBSTR(cCore->CoreSetHomeDir), CONFIDENTIAL|TSTRING|CTRUSTEDFN|MTRIM|PBOOT },
+/* ------------------------------------------------------------------------- */
+// ! AST_MODBUNDLE
+// ? Scans the directory pointed at 'ast_homedir' to be scanned for archives
+// ? ending in the value specified by 'ast_bundles' which can override any game
+// ? asset (except app.cfg). The default is false (no).
+/* ------------------------------------------------------------------------- */
+{ CFL_NONE, "ast_modbundle", "0",
+  CB(ArchiveInitPersist, bool), TBOOLEAN|PBOOT|PSYSTEM },
 /* ------------------------------------------------------------------------- */
 // ! SQL_DB
 // ? Specifies the Sql database filename to use. This filename is subject

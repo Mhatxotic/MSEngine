@@ -483,14 +483,14 @@ for(const Archive*const aPtr : *cArchives)
   const Archive &aRef = *aPtr;
   // Goto next archive if directory specified and is not found
   const StrUIntMap &suimDirs = aRef.GetDirList();
-  if(!strDir.empty() && !suimDirs.contains(strDir)) continue;
   // Enumerate directories
   for(const StrUIntMapPair &suimpPair : suimDirs)
   { // Skip directory if start of directory does not match
     if(strDir != suimpPair.first.substr(0, strDir.length())) continue;
     // Get filename, and continue again if it is a sub-directory/file
-    string strName{ StrTrim(suimpPair.first.substr(strDir.length()), '/') };
-    if(strName.find('/') != string::npos) continue;
+    string strName{ StrTrim(
+      suimpPair.first.substr(strDir.length()), cCommon->CFSlash()) };
+    if(strName.find(cCommon->CFSlash()) != string::npos) continue;
     // Add to directory list and increment directory count
     silDirs.insert({ StdMove(strName),
       { StdMaxUInt64, suimpPair.second, aRef.IdentGet() } });
@@ -500,8 +500,9 @@ for(const Archive*const aPtr : *cArchives)
   { // Skip file if start of directory does not match
     if(strDir != suimpPair.first.substr(0, strDir.length())) continue;
     // Get filename, and continue again if it is a sub-directory/file
-    string strName{ StrTrim(suimpPair.first.substr(strDir.length()), '/') };
-    if(strName.find('/') != string::npos) continue;
+    string strName{ StrTrim(
+      suimpPair.first.substr(strDir.length()), cCommon->CFSlash()) };
+    if(strName.find(cCommon->CFSlash()) != string::npos) continue;
     // Add to file list and increment total bytes and file count
     const uint64_t uqSize = aRef.GetSize(suimpPair.second);
     silFiles.insert({ StdMove(strName),

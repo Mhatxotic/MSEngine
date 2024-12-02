@@ -60,7 +60,7 @@ The engine looks for the specified file named via the `lua_script` variable whic
 | MacOS | `/Users/<UserName>/Library/Application Support/<AuthorName>/<AppShortName>` |
 | Linux | `/home/<UserName>/.local/<AuthorName>/<AppShortName>` |
 
-The engine does not allow the use of `..` (*parent*), the use of a `/` (*root*) directory nor `X:/` (*Windows drive*) prefix for the accessing of any out of scope assets to maintain a sandbox-like safe environment. The only exception is the start-up database name `sql_db` and the working directory `app_basedir` which can only be set on the command-line. In Windows, all backslashes (`\`) in pathnames are automatically replaced with forward-slashes (`/`) for cross-platform compatibility as MSVC's standard C library file and Windows API functions support unix forward-slashes natively.
+The engine does not allow the use of `..` (*parent*), the use of a `/` (*root*) directory nor `X:/` (*Windows drive*) prefix for the accessing of any out of scope assets to maintain a sandbox-like safe environment. The only exception is the start-up database name `sql_db` and the working directory `ast_basedir` which can only be set on the command-line. In Windows, all backslashes (`\`) in pathnames are automatically replaced with forward-slashes (`/`) for cross-platform compatibility as MSVC's standard C library file and Windows API functions support unix forward-slashes natively.
 
 See this [automatically generated document](https://Mhatxotic.github.io/Engine) for a complete rundown of all configuration variables and scripting functions. LUA core reference manual is [here](https://www.lua.org/manual/5.4/).
 
