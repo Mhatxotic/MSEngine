@@ -61,20 +61,13 @@ const CVarItemStaticList cvislList{ {  // Default cvars (from cvars.hpp)
   CB(AssetSetPipeBufferSize, size_t), TUINTEGER|CPOW2|PANY },
 /* ------------------------------------------------------------------------- */
 // ! AST_FSOVERRIDE
-// ? Specifies whether the engine is allowed to override internal files from
-// ? archives with files. This is makes it easier to update and mod resource
-// ? if true. It is by default disabled on release builds and enabled on
-// ? all other builds.
+// ? Specifies the order in which to load resources. Specify '0' to only allow
+// ? the files to be loaded from archives, '1' to search the disk first and
+// ? then archives, '2' to load from archives first and then try the disk or
+// ? '3' to load from disk only.
 /* ------------------------------------------------------------------------- */
-{ CFL_NONE, "ast_fsoverride",
-/* ------------------------------------------------------------------------- */
-#if defined(RELEASE)                   // Default disabled in release builds
-  cCommon->Zero(),
-#else                                  // Default enabled in other builds
-  cCommon->One(),
-#endif                                 // Build type check
-  /* ----------------------------------------------------------------------- */
-  CB(AssetSetFSOverride, bool), TBOOLEAN|PSYSTEM },
+{ CFL_NONE, "ast_fsoverride", "2",
+  CB(AssetSetFSOverride, FSOverrideType), TUINTEGER|PBOOT|PSYSTEM },
 /* ------------------------------------------------------------------------- */
 // ! AST_EXEBUNDLE
 // ? A boolean to specify if the executable file should be checked for a

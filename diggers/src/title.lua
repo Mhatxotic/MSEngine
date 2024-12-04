@@ -33,6 +33,7 @@ local fcbEnterAnimProc,                -- Enter animation procedure
       iNextUpdate,                     -- Next system information update
       iSSelect,                        -- Select sound id
       iStageL, iStageR,                -- Stage bounds
+      iTexScale,                       -- Texture scale
       texTitle,                        -- Texture tile
       strCredits,                      -- Credits
       strSubTitle;                     -- Version and system information text
@@ -47,6 +48,8 @@ sAppTitle, sAppVendor, sAppExeType =
 local function RenderEnterAnimProc()
   -- Scroll in amount
   local n1, n2 = 160, 168;
+  -- Centre of screen
+  local iCentreX<const> = 160 * iTexScale;
   -- Initial animation procedure
   local function RenderAnimProcInitial()
     -- Render terrain and game objects
@@ -58,8 +61,8 @@ local function RenderEnterAnimProc()
     texTitle:BlitSLT(2, (iStageR - 168) + n2, 72);
     -- Render status text
     fontTiny:SetCRGB(1, 0.9, 0);
-    fontTiny:PrintC(160, 58 - n1, strSubTitle);
-    fontTiny:PrintC(160, 206 + n1, strCredits);
+    fontTiny:PrintC(iCentreX, 58 - n1, strSubTitle);
+    fontTiny:PrintC(iCentreX, 206 + n1, strCredits);
     -- Move components in
     n1 = n1 - (n1 * 0.1);
     n2 = n2 - (n2 * 0.1);
@@ -75,8 +78,8 @@ local function RenderEnterAnimProc()
       texTitle:BlitSLT(2, iStageR - 168, 72);
       -- Render status text
       fontTiny:SetCRGB(1, 0.9, 0);
-      fontTiny:PrintC(160, 58, strSubTitle);
-      fontTiny:PrintC(160, 206, strCredits);
+      fontTiny:PrintC(iCentreX, 58, strSubTitle);
+      fontTiny:PrintC(iCentreX, 206, strCredits);
     end
     -- Set finished callback and execute it
     fcbEnterAnimProc = RenderAnimProcFinished;
@@ -90,6 +93,8 @@ end
 local function RenderLeaveAnimProc()
   -- Scroll in amount
   local n1, n2 = 160, 168;
+  -- Centre of screen
+  local iCentreX<const> = 160 * iTexScale;
   -- Initial animation procedure
   local function RenderAnimProcInitial()
     -- Render terrain and game objects
@@ -101,8 +106,8 @@ local function RenderLeaveAnimProc()
     texTitle:BlitSLT(2, iStageR - n2, 72);
     -- Render status text
     fontTiny:SetCRGB(1, 0.9, 0);
-    fontTiny:PrintC(160, 58 - n1, strSubTitle);
-    fontTiny:PrintC(160, 370 - n1, strCredits);
+    fontTiny:PrintC(iCentreX, 58 - n1, strSubTitle);
+    fontTiny:PrintC(iCentreX, 370 - n1, strCredits);
     -- Move components in
     n1 = n1 - (n1 * 0.05);
     n2 = n2 - (n2 * 0.05);
@@ -287,9 +292,12 @@ local function OnTitleLoaded(aResources, bNoMusic)
   texTitle = aResources[1];
   texTitle:SetCRGBA(1, 1, 1, 1);
   texTitle:TileSTC(1);
-  texTitle:TileS(0,   0, 240, 162, 281);
-  texTitle:TileA(     0, 344, 150, 512);
-  texTitle:TileA(   344, 344, 512, 512);
+  texTitle:TileS(0,   0,             240 * iTexScale,
+                    162 * iTexScale, 281 * iTexScale);
+  texTitle:TileA(     0,             344 * iTexScale,
+                    150 * iTexScale, 512 * iTexScale);
+  texTitle:TileA(   344 * iTexScale, 344 * iTexScale,
+                    512 * iTexScale, 512 * iTexScale);
   -- Initialise credits
   strCredits = "ORIGINAL VERSIONS BY TOBY SIMPSON AND MIKE FROGGATT\n\z
    (C) 1994 MILLENNIUM INTERACTIVE LTD. ALL RIGHTS RESERVED\n\rcffffff4f\z
@@ -313,14 +321,14 @@ local function OnReady(GetAPI)
     IsButtonReleased, IsMouseInBounds, LoadLevel, LoadResources, LoadSaveData,
     PlayStaticSound, ProcessViewPort, RegisterFBUCallback, RenderObjects,
     RenderTerrain, SelectObject, SetCursor, aKeyBankCats, aLevelsData,
-    aObjectTypes, aObjects, fontTiny =
+    aObjectTypes, aObjects, fontTiny, iTexScale =
       GetAPI("DeInitLevel", "Fade", "GameProc", "GetActivePlayer",
         "GetGameTicks", "GetOpponentPlayer", "InitLobby", "InitNewGame",
         "InitTitleCredits", "IsButtonReleased", "IsMouseInBounds", "LoadLevel",
         "LoadResources", "LoadSaveData", "PlayStaticSound", "ProcessViewPort",
         "RegisterFBUCallback", "RenderObjects", "RenderTerrain",
         "SelectObject", "SetCursor", "aKeyBankCats", "aLevelsData",
-        "aObjectTypes", "aObjects", "fontTiny");
+        "aObjectTypes", "aObjects", "fontTiny", "iTexScale");
   -- Register keybinds
   local aKeys<const> = Input.KeyCodes;
   iKeyBankId = GetAPI("RegisterKeys")("TITLE SCREEN", {

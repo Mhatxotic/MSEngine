@@ -787,6 +787,26 @@ static class Display final :
   }
   /* -- ReInit matrix ------------------------------------------------------ */
   void ForceReInitMatrix(void) { SetDefaultMatrix(true); }
+  /* -- Alter default matrix ----------------------------------------------- */
+  bool AlterDefaultMatrix(const GLfloat fNewWidth, const GLfloat fNewHeight)
+  { // If width changed?
+    if(fNewWidth != fMatrixWidth)
+    { // Update width
+      fMatrixWidth = fNewWidth;
+      // If height changed? Update the height
+      if(fNewHeight != fMatrixHeight) fMatrixHeight = fNewHeight;
+      // Fall through to re-initialise the fbo
+    } // If height changed? Update the height and fall through to re-init
+    else if(fNewHeight != fMatrixHeight) fMatrixHeight = fNewHeight;
+    // Not modified so don't change the fbo
+    else return false;
+    // Re-initialise the matrix
+    ForceReInitMatrix();
+    // Send event to addons that the matrix changed
+    cEvtMain->Add(EMC_VID_MATRIX_REINIT);
+    // Success
+    return true;
+  }
   /* -- ReInit matrix ------------------------------------------------------ */
   void ReInitMatrix(void)
   { // Force-reinitialise matrix

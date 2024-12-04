@@ -1,7 +1,7 @@
 <!DOCTYPE html>
-<!-- Reference for the Mhatxotic Engine API version 24.12.2.26 -->
-<!-- Automatically built at Mon Dec 02 13:58:55 2024 +0000 -->
-<!-- With Mhatxotic Engine Project Management Utility version 24.12.2.26 -->
+<!-- Reference for the Mhatxotic Engine API version 24.12.4.43 -->
+<!-- Automatically built at Wed Dec 04 23:51:39 2024 +0000 -->
+<!-- With Mhatxotic Engine Project Management Utility version 24.12.4.43 -->
 <!-- Copyright (c) 2006-2024 Mhatxotic Design, All Rights Reserved Worldwide -->
 <HTML lang="en-GB">
 <HEAD>
@@ -11,18 +11,18 @@
 	<META name="apple-mobile-web-app-title" content="Mhatxotic Engine API">
 	<META name="author" content="Mhatxotic Design">
 	<META name="copyright" content="Copyright © 2006-2024 Mhatxotic Design, All Rights Reserved">
-	<META name="description" content="Reference for the Mhatxotic Engine API version 24.12.2.26">
+	<META name="description" content="Reference for the Mhatxotic Engine API version 24.12.4.43">
 	<META name="format-detection" content="telephone=no">
-	<META name="generator" content="Mhatxotic Engine Project Management Utility version 24.12.2.26">
+	<META name="generator" content="Mhatxotic Engine Project Management Utility version 24.12.4.43">
 	<META name="google-site-verification" content="BvWxrqmgaIxqe_W8AW3OGK0fdCI_JfB_-gcOOxCF9_4">
 	<META name="googlebot" content="index,follow">
-	<META name="og:description" content="Reference for the Mhatxotic Engine API version 24.12.2.26">
+	<META name="og:description" content="Reference for the Mhatxotic Engine API version 24.12.4.43">
 	<META name="og:image" content="https://repository-images.githubusercontent.com/611875607/ee7aa468-9797-4763-9a2d-ea3d782ef413">
-	<META name="og:title" content="Mhatxotic Engine 24.12.2.26 API reference">
+	<META name="og:title" content="Mhatxotic Engine 24.12.4.43 API reference">
 	<META name="og:url" content="https://mhatxotic.github.io/Engine/">
 	<META name="robots" content="index,follow">
 	<META name="viewport" content="width=device-width, initial-scale=1">
-	<TITLE>Mhatxotic Engine 24.12.2.26 API reference</TITLE>
+	<TITLE>Mhatxotic Engine 24.12.4.43 API reference</TITLE>
 	<STYLE media="screen">
 	* { margin:0; padding:0 }
 	BODY { background-color:#111; border:0; font-family:sans-serif; overflow-x:hidden; text-shadow: 1px 1px #111 }
@@ -60,7 +60,7 @@
 	</STYLE>
 </HEAD>
 <BODY id="idx.top">
-	<H1>Mhatxotic Engine 24.12.2.26 API reference</H1>
+	<H1>Mhatxotic Engine 24.12.4.43 API reference</H1>
 	<NOSCRIPT>
 		<H2>JavaScript is required to show and hide elements.</H2>
 	</NOSCRIPT>
@@ -99,7 +99,7 @@
 	</SCRIPT>
 	<DIV id="idx" style="display:none">
 		<H2>Table of contents:-</H2>
-		<P>This build of the Mhatxotic Engine API consists of 821 functions (386 members, 435 methods) and 27 consts in 29 namespaces with 83 commands and 207 cvars.</P>
+		<P>This build of the Mhatxotic Engine API consists of 822 functions (387 members, 435 methods) and 27 consts in 29 namespaces with 83 commands and 207 cvars.</P>
 		<OL id="toc">
 			<LI id="idx.ns">
 				<DIV>
@@ -521,7 +521,7 @@
 						<OL>
 							<LI><P>The fbo class allows the programmer to create an OpenGL frame-buffer object which they can use to create seperate drawing canvases which they can apply special effects to without modifying other canvases.</P></LI>
 							<LI>
-								<B>Members</B> <I>(10 members)</I>
+								<B>Members</B> <I>(11 members)</I>
 								<OL>
 									<LI><A href="#Fbo.ConEnabled">ConEnabled</A></LI>
 									<LI><A href="#Fbo.ConHeight">ConHeight</A></LI>
@@ -532,6 +532,7 @@
 									<LI><A href="#Fbo.IsDrawing">IsDrawing</A></LI>
 									<LI><A href="#Fbo.Main">Main</A></LI>
 									<LI><A href="#Fbo.OnRedraw">OnRedraw</A></LI>
+									<LI><A href="#Fbo.Resize">Resize</A></LI>
 									<LI><A href="#Fbo.SetBlend">SetBlend</A></LI>
 								</OL>
 							</LI>
@@ -4016,6 +4017,18 @@
 		<PRE><U>Func</U> <I>(function)</I> = The main redraw function to change to<BR></PRE>
 		<H4>Synopsis:-</H4>
 		<PRE>When OpenGL needs to be reinitialised&#x2c; the specified callback will be called so the guest can redraw FBO&#x27;s and maybe do other stuff&#x2e; All texture and fbo data is already preserved so there is no need to reinitialise any of that&#x2c; you just need to redraw them&#x2e;<BR></PRE>
+		<H4><A href="#idx:Fbo">&#x25B2; Return to table of contents</A></H4>
+	</DIV>
+	<DIV id="Fbo.Resize" style="display:none">
+		<H3>Fbo.Resize</H3>
+		<H4>Syntax:-</H4>
+		<PRE><U>Width</U>, <U>Height</U> = Fbo.Resize(<I><U>Success</U></I>)</PRE>
+		<H4>Function Parameters:-</H4>
+		<PRE><U>Success</U> <I>(boolean)</I> = Returns whether the frame buffer changed or not.<BR></PRE>
+		<H4>Return Parameters:-</H4>
+		<PRE><U>Width</U> <I>(number)</I> = The new width of the main frame buffer<BR><U>Height</U> <I>(number)</I> = The new height of the main frame buffer<BR></PRE>
+		<H4>Synopsis:-</H4>
+		<PRE>This is a run&#x2d;time override for &#x27;vid_orwidth&#x27; and &#x27;vid_orheight&#x27; cvars in which the main frame buffer viewport is re&#x2d;calculated and re&#x2d;initialised to these dimensions&#x2e; Note that this modifies the console size as well&#x2e;<BR></PRE>
 		<H4><A href="#idx:Fbo">&#x25B2; Return to table of contents</A></H4>
 	</DIV>
 	<DIV id="Fbo.SetBlend" style="display:none">
@@ -11287,7 +11300,7 @@
 	</DIV>
 	<DIV id="cv.ast_fsoverride" style="display:none">
 		<H3>ast_fsoverride</H3>
-		<PRE>Specifies whether the engine is allowed to override internal files from archives with files&#x2e; This is makes it easier to update and mod resource if true&#x2e; It is by default disabled on release builds and enabled on all other builds&#x2e;<BR></PRE>
+		<PRE>Specifies the order in which to load resources&#x2e; Specify &#x27;0&#x27; to only allow the files to be loaded from archives&#x2c; &#x27;1&#x27; to search the disk first and then archives&#x2c; &#x27;2&#x27; to load from archives first and then try the disk or &#x27;3&#x27; to load from disk only&#x2e;<BR></PRE>
 		<H4><A href="#idx.cv">&#x25B2; Return to table of contents</A></H4>
 	</DIV>
 	<DIV id="cv.ast_homedir" style="display:none">
@@ -11302,7 +11315,7 @@
 	</DIV>
 	<DIV id="cv.ast_modbundle" style="display:none">
 		<H3>ast_modbundle</H3>
-		<PRE>Scans the directory pointed at &#x27;ast_homedir&#x27; to be scanned for archives ending in the value specified by &#x27;ast_bundles&#x27; which can override any game asset &#x28;except app&#x2e;cfg&#x29;&#x2e; The default is false &#x28;no&#x29;&#x2e;<BR></PRE>
+		<PRE>Scans the directory pointed at &#x27;ast_homedir&#x27; to be scanned for archives ending in the value specified by &#x27;ast_bundles&#x27; which can override any game asset &#x28;except app&#x2e;cfg&#x29;&#x2e; The default is true &#x28;yes&#x29;&#x2e;<BR></PRE>
 		<H4><A href="#idx.cv">&#x25B2; Return to table of contents</A></H4>
 	</DIV>
 	<DIV id="cv.ast_pipebuffer" style="display:none">
@@ -12231,6 +12244,6 @@
 		<H4><A href="#idx.cv">&#x25B2; Return to table of contents</A></H4>
 	</DIV>
 	<ADDRESS>Copyright &copy; 2024 Mhatxotic Design, All Rights Reserved.<BR>
-	This document was generated at Mon Dec 02 13:58:55 2024 +0000</ADDRESS>
+	This document was generated at Wed Dec 04 23:51:39 2024 +0000</ADDRESS>
 </BODY>
 </HTML>

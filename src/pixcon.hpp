@@ -98,21 +98,15 @@ class SysCon :                         // All members initially private
     // am just going to put this here just incase.
     if(isendwin()) return;
     // Get new size of terminal window and return if not changed
-#if defined(LINUX)
-    const int iNewW = getmaxx(stdscr)+1, // getmaxx(stdscr)
-              iNewH = getmaxy(stdscr)+1; // getmaxy(stdscr)
-#else
-    const int iNewW = stdscr->_maxx+1, // getmaxx(stdscr)
-              iNewH = stdscr->_maxy+1; // getmaxy(stdscr)
-#endif
+    const int iNewW = getmaxx(stdscr) + 1, iNewH = getmaxy(stdscr) + 1;
     if(iNewW == DimGetWidth() && iNewH == DimGetHeight()) return;
     // Log the new size
     cLog->LogDebugExSafe("SysCon resized from $x$ to $x$.",
       iNewW, iNewH, DimGetWidth(), DimGetHeight());
     // Update size
     DimSet(iNewW, iNewH);
-    diSizeM1.DimSet(DimGetWidth()-1, DimGetHeight()-1);
-    diSizeM2.DimSet(DimGetWidth()-2, DimGetHeight()-2);
+    diSizeM1.DimSet(DimGetWidth() - 1, DimGetHeight() - 1);
+    diSizeM2.DimSet(DimGetWidth() - 2, DimGetHeight() - 2);
     // Update cursor position if invalid
     if(ciCursor.CoordGetX() >= DimGetWidth())
       ciCursor.CoordSetX(diSizeM1.DimGetWidth());

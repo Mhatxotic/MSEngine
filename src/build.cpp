@@ -3013,6 +3013,53 @@ int ExtLibScript(const string &strOpt, const string &strOpt2)
                         { "LD=\"link\"", "LD=LLD-LINK" }
 #define STRREPCLANG64 { STRREPCLANG, { "/MT", "-m64 /MT" } }
 #define STRREPCLANG32 { STRREPCLANG, { "/MT", "-m32 /MT" } }
+    const string strInstallDataPm{
+      "package OpenSSL::safe::installdata;\n"
+      "\n"
+      "use strict;\n"
+      "use warnings;\n"
+      "use Exporter;\n"
+      "our @ISA = qw(Exporter);\n"
+      "our @EXPORT = qw(\n"
+      "    @PREFIX\n"
+      "    @libdir\n"
+      "    @BINDIR @BINDIR_REL_PREFIX\n"
+      "    @LIBDIR @LIBDIR_REL_PREFIX\n"
+      "    @INCLUDEDIR @INCLUDEDIR_REL_PREFIX\n"
+      "    @APPLINKDIR @APPLINKDIR_REL_PREFIX\n"
+      "    @ENGINESDIR @ENGINESDIR_REL_LIBDIR\n"
+      "    @MODULESDIR @MODULESDIR_REL_LIBDIR\n"
+      "    @PKGCONFIGDIR @PKGCONFIGDIR_REL_LIBDIR\n"
+      "    @CMAKECONFIGDIR @CMAKECONFIGDIR_REL_LIBDIR\n"
+      "    $VERSION @LDLIBS\n"
+      ");\n"
+      "\n"
+      "our @PREFIX                     = ( '' );\n"
+      "our @libdir                     = ( 'lib' );\n"
+      "our @BINDIR                     = ( 'bin' );\n"
+      "our @BINDIR_REL_PREFIX          = ( 'bin' );\n"
+      "our @LIBDIR                     = ( 'lib' );\n"
+      "our @LIBDIR_REL_PREFIX          = ( 'lib' );\n"
+      "our @INCLUDEDIR                 = ( 'include' );\n"
+      "our @INCLUDEDIR_REL_PREFIX      = ( 'include' );\n"
+      "our @APPLINKDIR                 = ( 'include\\openssl' );
+      "our @APPLINKDIR_REL_PREFIX      = ( 'include/openssl' );\n"
+      "our @ENGINESDIR                 = ( 'lib\\engines-3' );\n"
+      "our @ENGINESDIR_REL_LIBDIR      = ( 'engines-3' );\n"
+      "our @MODULESDIR                 = ( 'lib\\ossl-modules' );\n"
+      "our @MODULESDIR_REL_LIBDIR      = ( 'ossl-modules' );\n"
+      "our @PKGCONFIGDIR               = ( 'lib' );\n"
+      "our @PKGCONFIGDIR_REL_LIBDIR    = ( '' );\n"
+      "our @CMAKECONFIGDIR             = ( 'lib\\cmake\\OpenSSL' );\n"
+      "our @CMAKECONFIGDIR_REL_LIBDIR  = ( 'cmake\\OpenSSL' );\n"
+      "our $VERSION                    = '3.4.0';\n"
+      "our @LDLIBS                     =\n"
+      "    # Unix and Windows use space separation, VMS uses comma separation\n"
+      "    $^O eq 'VMS'\n"
+      "    ? split(/ *, */, 'ws2_32.lib gdi32.lib advapi32.lib crypt32.lib user32.lib ')\n"
+      "    : split(/ +/, 'ws2_32.lib gdi32.lib advapi32.lib crypt32.lib user32.lib ');\n"
+      "\n"
+      "1;\n"
     // Setup the repo
     SetupTarRepo(strLibPath, strTmp, PSLib.strFile, PSLibR.strFile);
     // Perl configure parameters
@@ -3032,6 +3079,7 @@ int ExtLibScript(const string &strOpt, const string &strOpt2)
     if(uiFlags & PF_X64)
     { // Do compile 64-bit release version
       System(strPerl64Rel);
+      FStream{ "installdata.pm", FM_W_B }.WriteString(strInstallDataPm);
       ReplaceTextMulti("makefile", STRREPRELEASE64);
       if(envActive.cpCCX == envWindowsLLVMcompat.cpCCX)
         ReplaceTextMulti("makefile", STRREPCLANG64);
@@ -3046,8 +3094,8 @@ int ExtLibScript(const string &strOpt, const string &strOpt2)
     } // Compile 32-bit release version
     if(uiFlags & PF_X86)
     { // Do compile 32-bit release version
-      System("swap");
       System(strPerl32Rel);
+      FStream{ "installdata.pm", FM_W_B }.WriteString(strInstallDataPm);
       ReplaceTextMulti("makefile", STRREPRELEASE32);
       if(envActive.cpCCX == envWindowsLLVMcompat.cpCCX)
         ReplaceTextMulti("makefile", STRREPCLANG32);
@@ -3217,7 +3265,7 @@ int ExtLibScript(const string &strOpt, const string &strOpt2)
         SystemF("$/$.asm -o $$",
           strCompRel64, strFile, strFile, envActive.cpOBJ);
       GenericExtLibBuild(StrFormat("$ $ $ $/jsimd.c", strRelFlags64,
-        strJPTSpecific, strJPT, strBase64), strL64, strTmp, "jpeg64");
+        strJPTSpecific, strJPT, strBase64), strL64, strTmp, "jpeg64", true);
     }
     // We need to activate cmake once to init jpegturbo config and other things
     System("rm -rf CMakeFiles *.cmake CMakeCache.txt jconfig.h");

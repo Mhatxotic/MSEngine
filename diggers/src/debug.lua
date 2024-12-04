@@ -180,7 +180,7 @@ local function InitDebugPlay(iId)
         -- Got an attachment? Draw it too!
         if aObject.STA then
           iXX, iYY = iXX + aObject.OFXA, iYY + aObject.OFYA;
-          BCBlit(texSpr, aObject.SA, iXX, iYY, iXX + 16, iYY + 16);
+          BCBlit(aObject.SA, iXX, iYY, iXX + 16, iYY + 16);
         end
       end
     end

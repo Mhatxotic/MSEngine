@@ -29,27 +29,29 @@ local CoreStack<const>, CoreTicks<const>, DisplayReset<const>,
     Util.Clamp, Util.IsBoolean, Util.IsFunction, Util.IsInteger, Util.IsString,
     Util.IsTable, Fbo.Main();
 -- Diggers function and data aliases --------------------------------------- --
-local InitSetup, IsFading, SetErrorMessage, aCursorData, texSpr;
--- Globals ----------------------------------------------------------------- --
+local InitSetup, IsFading, SetErrorMessage, aCursorData, iTexScale, texSpr;
+-- Keyboard ---------------------------------------------------------------- --
 local aKeys<const> = Input.KeyCodes;   -- Keyboard scan codes
+local aGlobalKeyBinds;                 -- Global keybinds (defined later)
+local aKeyBank<const> = { };           -- All keys
+local aKeyBankCats<const> = { };       -- All keys categorised
+local aKeyBinds;                       -- Key/state/func translation lookup
+local iKeyBank = 0;                    -- Currently active keybank
+-- Mouse ------------------------------------------------------------------- --
+local aMouseState<const> = { };        -- Formatted mouse state
+local iCursorX, iCursorY = 0, 0;       -- Cursor position
+local iCursorRX, iCursorRX;            -- Cursor render position
 local iCursorMin, iCursorMax;          -- Cursor minimum and maximum
 local iCursorAdjX, iCursorAdjY;        -- Cursor origin co-ordinates
 local iCId;                            -- Current cursor id
+local nWheelX, nWheelY = 0, 0;         -- Mouse wheel state
+-- Joystick ---------------------------------------------------------------- --
+local nJoyAX, nJoyAY = 0, 0;           -- Joystick axis values
+local aJoy<const> = { };               -- Joysticks connected data
+local iJoyActive;                      -- Currently active joystick
+-- Stage ------------------------------------------------------------------- --
 local iStageLeft, iStageRight;         -- Stage left and top
 local iStageTop, iStageBottom;         -- Stage right and bottom
--- Input handling variables ------------------------------------------------ --
-local aMouseState<const>  = { };       -- Formatted mouse state
-local iCursorX, iCursorY  = 160, 120;  -- Cursor position
-local nWheelX, nWheelY    = 0, 0;      -- Mouse wheel state
-local nJoyAX, nJoyAY      = 0, 0;      -- Joystick axis values
-local aJoy<const>         = { };       -- Joysticks connected data
-local iJoyActive;                      -- Currently active joystick
--- Current polled keybinds and all available key binds --------------------- --
-local aGlobalKeyBinds;                 -- Global keybinds (defined later)
-local aKeyBinds;                       -- Key/state/func translation lookup
-local aKeyBank<const> = { };           -- All keys
-local aKeyBankCats<const> = { };       -- All keys categorised
-local iKeyBank = 0;                    -- Currently active keybank
 -- Mouse is in specified bounds -------------------------------------------- --
 local function IsMouseInBounds(iX1, iY1, iX2, iY2)
   return iCursorX >= iX1 and iCursorY >= iY1 and
@@ -180,12 +182,9 @@ local function JoystickProc()
     else nJoyAY = 0 end;
     -- Axis moving?
     if nJoyAX ~= 0 or nJoyAY ~= 0 then
-      -- Adjust mouse position
-      iCursorX, iCursorY =
-        UtilClamp(iCursorX + nJoyAX, iStageLeft, iStageRight - 1),
-        UtilClamp(iCursorY + nJoyAY, iStageTop, iStageBottom - 1);
       -- Update mouse position
-      InputSetCursorPos(iCursorX, iCursorY);
+      InputSetCursorPos(UtilClamp(iCursorX + nJoyAX, iStageLeft, iStageRight - 1),
+                        UtilClamp(iCursorY + nJoyAY, iStageTop, iStageBottom - 1));
     -- No axis pressed
     end
     -- Check for setup buttons
@@ -226,7 +225,8 @@ end
 local function OnMouseScroll(nX, nY) nWheelX, nWheelY = nX, nY end;
 -- When the mouse is moved ------------------------------------------------- --
 local function OnMouseMove(nX, nY)
-  iCursorX, iCursorY = floor(nX), floor(nY);
+  iCursorRX, iCursorRY = floor(nX), floor(nY);
+  iCursorX, iCursorY = iCursorRX / iTexScale, iCursorRY / iTexScale;
 end
 -- Get cursor -------------------------------------------------------------- --
 local function GetCursor() return iCId end;
@@ -378,7 +378,7 @@ end
 -- Renders the mouse cursor ------------------------------------------------ --
 local function CursorRender()
   texSpr:BlitSLT(CoreTicks() // 4 % iCursorMax + iCursorMin,
-    iCursorX + iCursorAdjX, iCursorY + iCursorAdjY);
+    iCursorRX + iCursorAdjX, iCursorRY + iCursorAdjY);
 end
 -- When the fbo is resized ------------------------------------------------- --
 local function OnFrameBufferUpdate(_, _, nLeft, nTop, nRight, nBottom)
@@ -407,17 +407,17 @@ end
 -- Script has been initialised --------------------------------------------- --
 local function OnReady(GetAPI)
   -- Get imports
-  InitSetup, IsFading, SetErrorMessage, aCursorData, texSpr =
+  InitSetup, IsFading, SetErrorMessage, aCursorData, iTexScale, texSpr =
     GetAPI("InitSetup", "IsFading", "SetErrorMessage", "aCursorData",
-      "texSpr");
-  -- Enable cursor clamper when fbo changes
-  GetAPI("RegisterFBUCallback")("input", OnFrameBufferUpdate);
+      "iTexScale", "texSpr");
   -- Enable input capture events
   InputOnJoyState(OnJoyState);
   InputOnKey(OnKey);
   InputOnMouseClick(OnMouseClick);
   InputOnMouseMove(OnMouseMove);
   InputOnMouseScroll(OnMouseScroll);
+  -- Enable cursor clamper when fbo changes
+  GetAPI("RegisterFBUCallback")("input", OnFrameBufferUpdate);
   -- Global function key callbacks
   local function GkCbConfig() InitSetup(1) end;
   local function GkCbBinds() InitSetup(2) end;

@@ -48,6 +48,7 @@ local fontLarge;                       -- Large font (16px)
 local fontLittle;                      -- Little font (8px)
 local fontTiny;                        -- Tiny font (5px)
 local fontSpeech;                      -- Speech font (10px)
+local iTexScale;                       -- Scale of textures
 -- Stage dimensions -------------------------------------------------------- --
 local iStageWidth  = 320;              -- Width of stage
 local iStageHeight = 240;              -- Height of stage
@@ -418,13 +419,6 @@ local function SetBottomRightTipAndShadow(strTip)
    -- Render tip shadow
   RenderShadow(232, 216, 312, 232);
 end
--- Bounds checking painter ------------------------------------------------- --
-local function BCBlit(texHandle, iTexIndex, iLeft, iTop, iRight, iBottom)
-  -- Return if draw is not in bounds (occlusion)
-  if min(iRight, iStageRight)   <= max(iLeft, iStageLeft) or
-     min(iBottom, iStageBottom) <= max(iTop, iStageTop) then return end;
-  texHandle:BlitSLTRB(iTexIndex, iLeft, iTop, iRight, iBottom);
-end
 -- Is fading --------------------------------------------------------------- --
 local function IsFading() return not not fcbFading end;
 -- Fade -------------------------------------------------------------------- --
@@ -553,7 +547,7 @@ local function fcbTick()
   Fbo.OnRedraw(RefreshViewportInfo);
   RefreshViewportInfo();
   -- Initialise base API functions
-  ParseScriptResult("main", { F=UtilBlank, A={ BCBlit = BCBlit,
+  ParseScriptResult("main", { F=UtilBlank, A={
     Fade = Fade, GetCallbacks = GetCallbacks, GetTestMode = GetTestMode,
     IsFading = IsFading, LoadResources = LoadResources,
     RefreshViewportInfo = RefreshViewportInfo,
@@ -569,6 +563,20 @@ local function fcbTick()
   texSpr:TileSTC(1024);
   -- Initialise function callbacks
   SetCallbacks(nil, nil, nil);
+  -- Load texture scale (overridable by texture mods)
+  local asScale<const> = Asset.File("tex/scale.txt", 0);
+  iTexScale = floor(tonumber(asScale:ToString()));
+  if iTexScale ~= 1 and iTexScale ~= 2 and
+     iTexScale ~= 4 and iTexScale ~= 8 then
+    error("Invalid texture scale '"..iScale.."'!") end;
+  aAPI.iTexScale = iTexScale;
+  -- Resize frame buffer if texture scale different
+  if iTexScale ~= 1 then
+    local VariableGetInt<const>, aVariables<const> =
+      Variable.GetInt, Variable.Internal;
+    Fbo.Resize(VariableGetInt(aVariables.vid_orwidth) * iTexScale,
+               VariableGetInt(aVariables.vid_orheight) * iTexScale);
+  end
   -- Base code scripts that are to be loaded (setup must be last)
   local aBaseScripts<const> = {
     { T=9, F="audio"  }, { T=9, F="bank"    }, { T=9, F="book"     },
@@ -587,13 +595,14 @@ local function fcbTick()
     { T=3, F="font5"  }, { T=3, F="font10" },
   };
   -- Base textures that are to be loaded
+  local iTileScaled<const> = 16 * iTexScale;
   local aBaseTextures<const> = {
-    { T=1, F="sprites", P={16,16,0,0,0} },
+    { T=1, F="sprites", P={ iTileScaled, iTileScaled, 0, 0, 0 } },
   };
   -- Base masks that are to be loaded
   local aBaseMasks<const> = {
-    { T=6, F="lmask", P={16,16} },
-    { T=6, F="smask", P={16,16} }
+    { T=6, F="lmask", P={ 16, 16 } },
+    { T=6, F="smask", P={ 16, 16 } }
   };
   -- Base sound effects that are to be loaded
   local aBaseSounds<const> = {
@@ -782,16 +791,17 @@ local function fcbTick()
   local fcbProgress<const> = LoadResources("Core", aBaseAssets, OnLoaded);
   -- Get console font and do positional calculations
   local fSolid<const> = TextureCreate(Image.Colour(0xFFFFFFFF), 0);
-  local iWidth<const>, iHeight<const>, iBorder<const> = 300, 2, 1;
-  local iX<const> = 160-(iWidth/2)-iBorder;
-  local iY<const> = 120-(iHeight/2)-iBorder;
-  local iBorderX2<const> = iBorder*2;
-  local iXPlus1<const>, iYPlus1<const> = iX+iBorder, iY+iBorder;
-  local iXBack<const> = iX+iWidth+iBorderX2
-  local iYBack<const> = iY+iHeight+iBorderX2;
-  local iXBack2<const> = iX+iWidth+iBorder;
-  local iYBack2<const> = iY+iHeight+(iBorderX2-iBorder);
-  local iXText<const>, iYText<const> = iX+iWidth+iBorderX2, iY - 12;
+  local iWidth<const>, iHeight<const>, iBorder<const> =
+    (300 * iTexScale), (2 * iTexScale), (1 * iTexScale);
+  local iX<const> = (160 * iTexScale) - (iWidth / 2) - iBorder;
+  local iY<const> = (120 * iTexScale) - (iHeight / 2) - iBorder;
+  local iBorderX2<const> = iBorder * 2;
+  local iXPlus1<const>, iYPlus1<const> = iX + iBorder, iY + iBorder;
+  local iXBack<const> = iX + iWidth + iBorderX2
+  local iYBack<const> = iY + iHeight + iBorderX2;
+  local iXBack2<const> = iX + iWidth + iBorder;
+  local iYBack2<const> = iY + iHeight + (iBorderX2 - iBorder);
+  local iXText<const>, iYText<const> = iX + iWidth + iBorderX2, iY - 12;
   -- Last percentage
   local nLastPercentage = -1;
   -- Loader display function
@@ -807,10 +817,10 @@ local function fcbTick()
     fSolid:BlitLTRB(iXPlus1, iYPlus1, iXBack2, iYBack2);
     fSolid:SetCRGBA(1, 1, 1, 1);        -- Progress
     fSolid:BlitLTRB(iXPlus1, iYPlus1, iXPlus1+(nPercent*iWidth), iYBack2);
+    fFont:SetSize(iTexScale);
     fFont:SetCRGBA(1, 1, 1, 1);         -- Filename & percentage
-    fFont:SetSize(1);
-    fFont:Print(iX, iYText, sFile);
-    fFont:PrintR(iXText, iYText, format("%.f%% Completed", nPercent*100));
+    fFont:PrintU(iX, iYText, sFile);
+    fFont:PrintUR(iXText, iYText, format("%.f%% Completed", nPercent * 100));
     -- Catchup accumulator (we don't care about it);
     CoreCatchup();
     -- Draw screen at end of LUA tick

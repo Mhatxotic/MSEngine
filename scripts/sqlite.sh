@@ -19,14 +19,14 @@ ZIP=$ARCHIVE/$FILE.zip
 if [ ! -e $ZIP ]; then
   echo Error: $ZIP not found!
   LS=`ls $ARCHIVE/$FILEPREFIX* 2>/dev/null`
-  if [ ! -z $LS ]; then
+  if [ ! -z "$LS" ]; then
     echo Available files...
     echo $LS
   fi
   exit 2;
 fi
 
-7z x -aos $ZIP
+7zz x -aos $ZIP
 if [ ! $? -eq 0 ]; then
   exit 3;
 fi

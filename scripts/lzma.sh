@@ -26,7 +26,7 @@ if [ ! -e $ZIP ]; then
   exit 2;
 fi
 
-7z x -aos $ZIP -o$FILE
+7zz x -aos $ZIP -o$FILE
 if [ ! $? -eq 0 ]; then
   exit 3;
 fi

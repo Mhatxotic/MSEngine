@@ -35,7 +35,7 @@ local aAssetsNoMusic<const>   = { aLvlTerrainAsset, aLvlObjectAsset,
         aLvlTextureAsset };
 local aContAssets<const>      = { { T = 7, F = "game" } };
 -- Diggers shared functions and data --------------------------------------- --
-local ACT, AI, BCBlit, DF, DIR, Fade, GetCallbacks, GetMouseX, GetMouseY,
+local ACT, AI, DF, DIR, Fade, GetCallbacks, GetMouseX, GetMouseY,
   GetTestMode, InitBook, InitLobby, InitLose, InitLoseDead, InitPause,
   InitTNTMap, InitWin, InitWinDead, IsButtonHeld, IsButtonPressed,
   IsButtonPressedNoRelease, IsMouseInBounds, IsMouseXLessThan, IsScrollingDown,
@@ -47,7 +47,7 @@ local ACT, AI, BCBlit, DF, DIR, Fade, GetCallbacks, GetMouseX, GetMouseY,
   aLevelsData, aMenuData, aObjToUIData, aObjectData, aSfxData, aShopData,
   aShroudCircle, aShroudTileLookup, aTileData, aTileFlags, aTimerData,
   aTrainTrackData, fontLarge, fontLittle, fontTiny, iCArrow, iPosX, iPosY,
-  texSpr;
+  iTexScale, texSpr;
 -- High priority variables (because of MAXVARS limit) ---------------------- --
 local function HighPriorityVars()
 -- Prototype functions (assigned later) ------------------------------------ --
@@ -59,7 +59,8 @@ local aContextMenu, aActiveObject, aActivePlayer, aFloodData, aGemsAvailable,
   iAbsCenPosX, iAbsCenPosY, iAnimMoney, iGameTicks, iKeyBankId, iLevelId,
   iLLAbsHmVP, iLLAbsWmVP, iLLPixHmVP, iLLPixWmVP, iMenuBottom, iMenuLeft,
   iMenuRight, iMenuTop, iPixCenPosX, iPixCenPosY, iPixPosTargetX,
-  iPixPosTargetY, iPixPosX, iPixPosY, iScrTilesH, iScrTilesHd2, iScrTilesHd2p1,
+  iPixPosTargetY, iPixPosX, iPixPosY, iScaleTile,
+  iScrTilesH, iScrTilesHd2, iScrTilesHd2p1,
   iScrTilesHm1, iScrTilesHmVPS, iScrTilesW, iScrTilesWd2, iScrTilesWd2p1,
   iScrTilesWm1, iScrTilesWmVPS, iScrollRate, iStageB, iStageH, iStageL,
   iStageR, iStageT, iStageW, iTilesHeight, iTilesWidth, iUniqueId, iViewportH,
@@ -69,7 +70,7 @@ local aContextMenu, aActiveObject, aActivePlayer, aFloodData, aGemsAvailable,
     nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil,
     nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil,
     nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil,
-    nil, nil, nil, nil, nil, nil, nil, nil;
+    nil, nil, nil, nil, nil, nil, nil, nil, nil;
 -- Level limits ------------------------------------------------------------ --
 local iLLAbsW<const>   = 128;                -- Total # of horizontal tiles
 local iLLAbsH<const>   = 128;                -- Total # of vertical tiles
@@ -84,6 +85,13 @@ local iLLPixWm1<const> = iLLPixW - 1;        -- Total H pixels minus one
 local iLLPixHm1<const> = iLLPixH - 1;        -- Total V pixels minus one
 -- Other consts ------------------------------------------------------------ --
 local iVPScrollThreshold<const> = 4;         -- Limit before centring viewport
+-- Bounds checking sprite blitter ------------------------------------------ --
+local function BCBlit(iTexIndex, iLeft, iTop, iRight, iBottom)
+  -- Draw only if not occluded outside the viewport
+  if min(iRight, iStageR) > max(iLeft, iStageL) or
+     min(iBottom, iStageB) > max(iTop, iStageT) then
+    texSpr:BlitSLTRB(iTexIndex, iLeft, iTop, iRight, iBottom) end;
+end
 -- Function to play a sound ------------------------------------------------ --
 local function DoPlaySoundAtObject(aObject, iSfxId, nPitch)
   -- Check that object is in the players view
@@ -2097,11 +2105,11 @@ local function RenderTerrain()
     -- Calculate the Y position to grab from the level data
     local iYdest<const> = 1 + (iPosY + iY) * iLLAbsW;
     -- Calculate the Y pixel position to draw at
-    local iYdraw<const> = iStageT + iPixCenPosY + (iY * 16);
+    local iYdraw<const> = iStageT + iPixCenPosY + (iY * iScaleTile);
     -- For each screen column to draw tile at, draw the tile from level data
     for iX = 0, iTilesWidth do
       texLev:BlitSLT(aLevelData[iYdest + iPosX + iX],
-        iXdraw + (iX * 16), iYdraw);
+        iXdraw + (iX * iScaleTile), iYdraw);
     end
   end
 end
@@ -2140,11 +2148,11 @@ local function RenderObjects()
     -- Holds objects render position on-screen
     local iXX, iYY = aObject.X - nVPX + aObject.OFX,
                      aObject.Y - nVPY + aObject.OFY;
-    BCBlit(texSpr, aObject.S, iXX, iYY, iXX + 16, iYY + 16);
+    BCBlit(aObject.S, iXX, iYY, iXX + iScaleTile, iYY + iScaleTile);
     -- Got an attachment? Draw it too!
     if aObject.STA then
       iXX, iYY = iXX + aObject.OFXA, iYY + aObject.OFYA;
-      BCBlit(texSpr, aObject.SA, iXX, iYY, iXX + 16, iYY + 16);
+      BCBlit(aObject.SA, iXX, iYY, iXX + iScaleTile, iYY + iScaleTile);
     end
   end
 end
@@ -2361,10 +2369,10 @@ local function RenderInterface()
       -- Get sub-menu data
       local aSMData<const> = aMData[iIndex];
       -- Render the button
-      BCBlit(texSpr, aSMData[1], iLeft, iTop, iRight, iBottom);
+      BCBlit(aSMData[1], iLeft, iTop, iRight, iBottom);
       -- Render a dim if object is busy and tile data says we should
       if bBusy and aSMData[2] & MFL.BUSY ~= 0 then
-        BCBlit(texSpr, 801, iLeft, iTop, iRight, iBottom);
+        BCBlit(801, iLeft, iTop, iRight, iBottom);
       -- If mouse over this button? Set the tip for this object
       elseif IsMouseInBounds(iLeft, iTop, iRight, iBottom) then
         sTip = aSMData[7] end;
@@ -4321,6 +4329,11 @@ local function LoadLevel(iLId, sMusic, iKB, iRace1, bAI1, iRace2, bAI2,
   local aAssets;
   if sMusic then aAssets, aAssetsMusic[4].F = aAssetsMusic, sMusic;
   else aAssets = aAssetsNoMusic end;
+  -- Set correct scale on tileset
+  local aTexParams<const> = aLvlTextureAsset.P;
+  iScaleTile = 16 * iTexScale;
+  aTexParams[1] = iScaleTile;
+  aTexParams[2] = aTexParams[1];
   -- Update asset filenames to load
   local sLevelFile<const> = aLevelInfo.f;
   aAssets[1].F = "lvl/"..sLevelFile..".dat";
@@ -4343,7 +4356,7 @@ local function LoadLevel(iLId, sMusic, iKB, iRace1, bAI1, iRace2, bAI2,
     -- Each level supports 480 tiles right now (512 on texture)
     texLev:TileSTC(480);
     -- Grab the background part
-    texBg = texLev:TileA(0, 256, 512, 512);
+    texBg = texLev:TileA(0, 256*iTexScale, 512*iTexScale, 512*iTexScale);
     -- Makes sure we have the same number of sprite masks as sprite tiles
     local iMaskSpr<const>, iMaskSprExpect<const> =
       maskSpr:Count(), texSpr:TileGTC();
@@ -4567,7 +4580,7 @@ local function OnReady(GetAPI)
     SetBottomRightTip, aRacesData, aDugRandShaftData, aFloodGateData,
     aTrainTrackData, aExplodeAboveData, maskLev, maskSpr, aGlobalData,
     aShopData, IsScrollingDown, IsScrollingUp, aAIChoicesData, aShroudCircle,
-    aShroudTileLookup =
+    aShroudTileLookup, iTexScale =
       GetAPI("aObjectTypes", "aLevelsData", "LoadResources", "aObjectData",
         "aObjectActions", "aObjectJobs", "aObjectDirections", "aTimerData",
         "aAITypesData", "aObjectFlags", "aDigTileData", "PlayMusic",
@@ -4585,7 +4598,7 @@ local function OnReady(GetAPI)
         "aFloodGateData", "aTrainTrackData", "aExplodeAboveData", "maskLevel",
         "maskSprites", "aGlobalData", "aShopData", "IsScrollingDown",
         "IsScrollingUp", "aAIChoicesData", "aShroudCircle",
-        "aShroudTileLookup");
+        "aShroudTileLookup", "iTexScale");
   -- Get arrow cursor
   iCArrow = GetAPI("aCursorIdData").ARROW;
   -- Select digger if active
@@ -4775,6 +4788,7 @@ end
 -- Exports and imports ----------------------------------------------------- --
 return { F = OnReady, A = { AdjustObjectHealth = AdjustObjectHealth,
   AdjustViewPortX = AdjustViewPortX, AdjustViewPortY = AdjustViewPortY,
+  BCBlit = BCBlit,
   BuyItem = BuyItem, CreateObject = CreateObject, DeInitLevel = DeInitLevel,
   DrawInfoFrameAndTitle = DrawInfoFrameAndTitle,
   EndConditionsCheck = EndConditionsCheck, GameProc = GameProc,
