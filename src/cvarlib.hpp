@@ -134,9 +134,16 @@ const CVarItemStaticList cvislList{ {  // Default cvars (from cvars.hpp)
 // ! AST_MODBUNDLE
 // ? Scans the directory pointed at 'ast_homedir' to be scanned for archives
 // ? ending in the value specified by 'ast_bundles' which can override any game
-// ? asset (except app.cfg). The default is false (no).
+// ? asset (except app.cfg). The default is true (yes).
 /* ------------------------------------------------------------------------- */
-{ CFL_NONE, "ast_modbundle", "0",
+{ CFL_NONE, "ast_modbundle",
+/* ------------------------------------------------------------------------- */
+#if defined(RELEASE)                   // Default disabled in release builds
+  cCommon->Zero(),
+#else                                  // Default enabled in other builds
+  cCommon->One(),
+#endif                                 // Build type check
+  /* ----------------------------------------------------------------------- */
   CB(ArchiveInitPersist, bool), TBOOLEAN|PBOOT|PSYSTEM },
 /* ------------------------------------------------------------------------- */
 // ! SQL_DB

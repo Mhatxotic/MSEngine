@@ -338,7 +338,7 @@ envMacOSLLVM =                         // XCode/LLVM on MacOS
   /* CCAB       */ "-DBETA -O2",
   /* CCAR       */ "-DRELEASE -O3",
   /* CCPP       */ envWindowsLLVM.cpCCPP,
-  /* CC4        */ "-mmacosx-version-min=10.11 -arch x86_64 -mtune=generic",
+  /* CC4        */ "-mmacosx-version-min=10.15 -arch x86_64 -mtune=generic",
   /* CC8        */ "-mmacosx-version-min=11.0 -arch arm64 -mtune=apple-m1",
   /* CCOBJ      */ "-o",
   /* CCRES      */ "",
@@ -362,7 +362,7 @@ envMacOSLLVM =                         // XCode/LLVM on MacOS
   /* LDE8       */ "",
   /* LDB4       */ "",
   /* LDB8       */ "",
-  /* LD4        */ "-arch x86_64 -platform_version macos 10.11 10.11 "
+  /* LD4        */ "-arch x86_64 -platform_version macos 10.15 10.15 "
                    "-lcrt1.10.6.o",
   /* LD8        */ "-arch arm64 -platform_version macos 11.0 11.0",
   /* LDL        */ "-lc -lc++ -lSystem -framework AudioUnit "
@@ -2290,7 +2290,7 @@ int BuildDistro(void)
       "\t\t<key>CFBundleVersion</key>\n"
       "\t\t<string>$</string>\n"
       "\t\t<key>LSMinimumSystemVersion</key>\n"
-      "\t\t<string>10.11</string>\n"
+      "\t\t<string>10.15</string>\n"
       "\t\t<key>LSApplicationCategoryType</key>\n"
       "\t\t<string>public.app-category.games</string>\n"
       "\t\t<key>NSHighResolutionCapable</key>\n"
@@ -3292,13 +3292,14 @@ int ExtLibScript(const string &strOpt, const string &strOpt2)
   } // = OPENALSOFT SCRIPT ====================================================
   else if(strLib.length() >= 12 && strLib.substr(0, 12) == "openal-soft-")
   { // Setup the repository
-    SetupTarRepo(strLibPath, strTmp, PSLib.strFile, PSLibR.strFile);
+    SetupZipRepo(strLibPath, strTmp, PSLib.strFile);
     // We need to activate cmake once to build openal config and other things
     System("rm -rf CMakeFiles *.cmake CMakeCache.txt");
     // One time only build
     SystemF("$ -Wno-dev "
               "-DALSOFT_TESTS=OFF "
               "-DALSOFT_BACKEND_WAVE=FALSE "
+              "-DALSOFT_BACKEND_WASAPI=FALSE "
               "-DALSOFT_DLOPEN=FALSE "
               "-DALSOFT_EMBED_HRTF_DATA=FALSE "
               "-DALSOFT_EXAMPLES=FALSE "
@@ -3310,6 +3311,7 @@ int ExtLibScript(const string &strOpt, const string &strOpt2)
               "-DALSOFT_INSTALL=FALSE "
               "-DALSOFT_NO_CONFIG_UTIL=TRUE "
               "-DALSOFT_REQUIRE_SDL2=FALSE "
+              "-DALSOFT_REQUIRE_WASAPI=FALSE "
               "-DALSOFT_UPDATE_BUILD_VERSION=FALSE "
               "-DALSOFT_UTILS=FALSE "
               "-DSDL2_CORE_LIBRARY=FALSE "
@@ -3330,13 +3332,17 @@ int ExtLibScript(const string &strOpt, const string &strOpt2)
     ReplaceText("core/mixer/mixer_c.cpp", "hrtf_inc.cpp", "hrtf_inc.h");
     ReplaceText("core/mixer/mixer_sse.cpp", "hrtf_inc.cpp", "hrtf_inc.h");
     ReplaceText("core/mixer/mixer_sse2.cpp", "hrtf_inc.cpp", "hrtf_inc.h");
+    ReplaceText("alc/alconfig.cpp",
+      "#if !defined(_GAMING_XBOX)", "#if 0");
+    ReplaceText("core/helpers.cpp",
+      "#if !ALSOFT_UWP && !defined(_GAMING_XBOX)", "#if 0");
     // ReplaceText("core/mixer/mixer_sse3.cpp", "hrtf_inc.cpp", "hrtf_inc.h");
     ReplaceText("core/mixer/mixer_sse41.cpp", "hrtf_inc.cpp", "hrtf_inc.h");
     // Remove existing files
     System("if exist alc/alc_* rm -rfv alc/alc_*");
     System("if exist al/effects/al_effect_* rm -rfv al/effects/al_effect_*");
     System("if exist alc/effects/alc_effect_* "
-           "rm -rfv alc/effects/alc_effect_*");
+             "rm -rfv alc/effects/alc_effect_*");
     // We need to rename files to prevent .obj's overwriting each other
     { const Dir dALEffects("al/effects", ".cpp");
       for(const DirEntMapPair &dempPair : dALEffects.GetFiles())
@@ -3354,7 +3360,8 @@ int ExtLibScript(const string &strOpt, const string &strOpt2)
     //  "const uint8_t hrtf_default", "hrtf_default.h");
     // Add openal specific flags
     const string strALSpecific{
-      "-std:c++17 -D_CRT_NONSTDC_NO_DEPRECATE -D_CRT_SECURE_NO_WARNINGS "
+      "-std:c++20 -D_SILENCE_ALL_CXX20_DEPRECATION_WARNINGS "
+      "-D_CRT_NONSTDC_NO_DEPRECATE -D_CRT_SECURE_NO_WARNINGS "
       "-D_LARGE_FILES -D_LARGEFILE_SOURCE -D_WIN32 -D_WINDOWS "
       "-DAL_ALEXT_PROTOTYPES -DAL_BUILD_LIBRARY -DAL_LIBTYPE_STATIC "
       "-DHAVE_STRUCT_TIMESPEC -DNOMINMAX -DRESTRICT=__restrict "
@@ -3369,7 +3376,7 @@ int ExtLibScript(const string &strOpt, const string &strOpt2)
       "alc/backends/dsound.cpp "
       "alc/backends/loopback.cpp "
       "alc/backends/null.cpp "
-      "alc/backends/wasapi.cpp "
+      // "alc/backends/wasapi.cpp "
       "alc/backends/wave.cpp "
       "alc/backends/winmm.cpp "
       "alc/effects/*.cpp "
@@ -3377,8 +3384,8 @@ int ExtLibScript(const string &strOpt, const string &strOpt2)
       "core/*.cpp "
       "core/filters/*.cpp "
       "core/mixer/*.cpp" };
-    strRelFlags64 += strALSpecific;
-    strRelFlags32 += strALSpecific;
+    strRelFlags64 += "-D_WIN32_WINNT=0x0502 " + strALSpecific;
+    strRelFlags32 += "-D_WIN32_WINNT=0x0501 " + strALSpecific;
     // Compile 64-bit version
     GenericExtLibBuildBits(strRelFlags64, strL64, strTmp, "al", 64);
     // Compile 32-bit release version

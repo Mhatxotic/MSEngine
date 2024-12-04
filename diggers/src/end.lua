@@ -17,10 +17,10 @@ local UtilIsBoolean<const>, UtilIsInteger<const>, UtilIsString<const>,
   UtilIsTable<const> = Util.IsBoolean, Util.IsInteger, Util.IsString,
   Util.IsTable;
 -- Diggers function and data aliases --------------------------------------- --
-local Fade, GetCapitalValue, GetGameTicks, InitPost, InitScore,
-  IsButtonReleased, LoadResources, PlayMusic, PlayStaticSound, RenderFade,
-  RenderObjects, RenderTerrain, SetCallbacks, SetCursor, SetKeys,
-  aGemsAvailable, aGlobalData, aShroudData, fontLarge;
+local Fade, GetGameTicks, InitPost, InitScore, IsButtonReleased, LoadResources,
+  PlayMusic, PlayStaticSound, RenderFade, RenderObjects, RenderTerrain,
+  SetCallbacks, SetCursor, SetKeys, aGemsAvailable, aGlobalData, aObjects,
+  aShroudData, fontLarge;
 -- Locals ------------------------------------------------------------------ --
 local aCollections,                    -- All texts
       aLinesBottom,                    -- Bottom lines of texts
@@ -29,8 +29,8 @@ local aCollections,                    -- All texts
       fcbOnFadeIn,                     -- Function to call when faded in
       iCOK, iCExit, iCWait,            -- Cursor ids
       iDeadCost,                       -- Death duties total
+      iDeviceId,                       -- Object flag for device
       iEndTexId,                       -- End tile id chosen from texture
-      iExploration,                    -- Total explored
       iGameTicks,                      -- Total game ticks
       iGameTime,                       -- Total game time
       iKeyBankLoseId,                  -- Lose screen key bank id
@@ -230,6 +230,46 @@ local function ProcAnimateEnd()
     ProcCollection(aCollections[iCollectionId]);
   end
 end
+-- Calculate capital carried ----------------------------------------------- --
+local function GetCapitalCarried()
+  -- Capital value
+  local nCapitalValue = 0;
+  -- Check object and sell it if it's a device
+  local function SellDevice(aObj, nDivisor)
+    -- Failed if not a device
+    if aObj.F & iDeviceId == 0 then return end;
+    -- Add capital value (25% value minus current quality)
+    nCapitalValue = nCapitalValue +
+      (aObj.OD.VALUE / nDivisor) * (aObj.H / 100);
+  end
+  -- Enumerate all game objects
+  for iObjIndex = 1, #aObjects do
+    -- Get object and if it is owned by the active player?
+    local aObj<const> = aObjects[iObjIndex];
+    if aActivePlayer == aObj.P then
+      -- If object is a device? Add 25% of it's value minus quality because
+      -- it cost's money to recover the device. :-)
+      SellDevice(aObj, 4);
+      -- Get object's inventory and sell it all 50% of it's value since the
+      -- object or digger is already carrying the item.
+      local aObjInv<const> = aObj.I;
+      for iInvIndex = 1, #aObjInv do SellDevice(aObjInv[iInvIndex], 2) end;
+    end
+  end
+  -- Return value
+  return floor(nCapitalValue);
+end
+-- Calculate exploration count --------------------------------------------- --
+local function GetExploration()
+  -- Exploration amount to return
+  local iExploration = 0;
+  -- Enumerate shroud data and add one for every fully revealed tile
+  for iI = 1, #aShroudData do
+    if aShroudData[iI][2] == 0xF then iExploration = iExploration + 1 end;
+  end
+  -- Return amount
+  return iExploration;
+end
 -- On loaded event function ------------------------------------------------ --
 local function OnLoaded(aResources, aActivePlayer, aOpponentPlayer, sMsg)
   -- Keep waiting cursor for animation
@@ -243,8 +283,8 @@ local function OnLoaded(aResources, aActivePlayer, aOpponentPlayer, sMsg)
   texEnd:TileSD(1, 159,  0, 159, 95);
   texEnd:TileSD(2, 318,  0, 159, 95);
   texEnd:TileSD(3,   0, 95, 159, 95);
-  -- Get cost of capital
-  aGlobalData.gCapitalCarried = GetCapitalValue();
+  -- Get capital carried
+  aGlobalData.gCapitalCarried = GetCapitalCarried();
   -- Get cost of digger deaths
   local iPRemain<const> = aActivePlayer.DC;
   local iPDeaths<const> = #aActivePlayer.D - iPRemain;
@@ -255,11 +295,9 @@ local function OnLoaded(aResources, aActivePlayer, aOpponentPlayer, sMsg)
   aGlobalData.gTotalEnemyKills = aGlobalData.gTotalEnemyKills + iPKills;
   -- Add homicides of opponent playerss
   aGlobalData.gTotalHomicides = aGlobalData.gTotalHomicides + aActivePlayer.LK;
-  -- Calculate exploration data
-  iExploration = 0;
-  for iI = 1, #aShroudData do
-    if aShroudData[iI][2] == 0xF then iExploration = iExploration + 1 end;
-  end
+  -- Calculate exploration amount
+  aGlobalData.gTotalExploration =
+    aGlobalData.gTotalExploration + GetExploration();
   -- Get game ticks and time
   iGameTicks = GetGameTicks();
   iGameTime = iGameTicks // 3600;
@@ -270,8 +308,6 @@ local function OnLoaded(aResources, aActivePlayer, aOpponentPlayer, sMsg)
     aGlobalData.gTotalGemsSold + aActivePlayer.GS;
   aGlobalData.gTotalCapital =
     aGlobalData.gTotalCapital + aGlobalData.gCapitalCarried;
-  aGlobalData.gTotalExploration =
-    aGlobalData.gTotalExploration + iExploration;
   aGlobalData.gTotalTimeTaken =
     aGlobalData.gTotalTimeTaken + iGameTicks // 60;
   aGlobalData.gTotalIncome =
@@ -357,15 +393,15 @@ local function InitLose(iLId, aP, aOP)
 -- Scripts have been loaded ------------------------------------------------ --
 local function OnReady(GetAPI)
   -- Grab imports
-  Fade, GetCapitalValue, GetGameTicks, InitPost, InitScore, IsButtonReleased,
-    LoadResources, PlayMusic, PlayStaticSound, RenderFade, RenderObjects,
-    RenderTerrain, SetCallbacks, SetCursor, SetKeys, aGemsAvailable,
-    aGlobalData, aShroudData, fontLarge =
-      GetAPI("Fade", "GetCapitalValue", "GetGameTicks", "InitPost",
-        "InitScore", "IsButtonReleased", "LoadResources", "PlayMusic",
-        "PlayStaticSound", "RenderFade", "RenderObjects", "RenderTerrain",
-        "SetCallbacks", "SetCursor", "SetKeys", "aGemsAvailable",
-        "aGlobalData", "aShroudData", "fontLarge");
+  Fade, GetGameTicks, InitPost, InitScore, IsButtonReleased, LoadResources,
+    PlayMusic, PlayStaticSound, RenderFade, RenderObjects, RenderTerrain,
+    SetCallbacks, SetCursor, SetKeys, aGemsAvailable, aGlobalData, aObjects,
+    aShroudData, fontLarge =
+      GetAPI("Fade", "GetGameTicks", "InitPost", "InitScore",
+        "IsButtonReleased", "LoadResources", "PlayMusic", "PlayStaticSound",
+        "RenderFade", "RenderObjects", "RenderTerrain", "SetCallbacks",
+        "SetCursor", "SetKeys", "aGemsAvailable", "aGlobalData", "aObjects",
+        "aShroudData", "fontLarge");
   -- Register keybinds
   local aKeys<const>, aStates<const> = Input.KeyCodes, Input.States;
   local iPress<const> = aStates.PRESS;
@@ -379,6 +415,8 @@ local function OnReady(GetAPI)
   iKeyBankWinStatusId = GetAPI("RegisterKeys")("IN-GAME WIN", {
     [iPress] = { { iEnter, GoPostMortem, "igwpm", "POST MORTEM" } }
   });
+  -- Get object flag device id for calculating capital carried
+  iDeviceId = GetAPI("aObjectFlags").DEVICE;
   -- Set sound effect ids
   iSSelect = GetAPI("aSfxData").SELECT;
   -- Set cursor ids

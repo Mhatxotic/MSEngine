@@ -13,10 +13,10 @@
 local random<const>, remove<const> = math.random, table.remove;
 -- Diggers function and data aliases --------------------------------------- --
 local DeInitLevel, Fade, GameProc, GetMusic, InitScore, LoadLevel,
-  LoadResources, LockViewPort, PlayMusic, ProcessViewPort, RegisterFBUCallback,
-  RenderObjects, RenderTerrain, SelectObject, SetCallbacks, SetCursor,
-  aCreditsData, aCreditsXData, aEndLoadData, aLevelTypesData, aLevelsData,
-  aObjectTypes, aObjects, aPlayers, fontLarge, fontLittle;
+  LoadResources, LockViewPort, PlayMusic, RegisterFBUCallback, RenderObjects,
+  RenderTerrain, SelectObject, SetCallbacks, SetCursor, aCreditsData,
+  aCreditsXData, aEndLoadData, aLevelTypesData, aLevelsData, aObjectTypes,
+  aObjects, aPlayers, fontLarge, fontLittle;
 -- Assets required --------------------------------------------------------- --
 local aAssets<const> = { { T = 2, F = "vignette", P = { 0 } } };
 local aEndLevelData<const> = { n = "END", f = "end", t = false };
@@ -233,17 +233,16 @@ end
 local function OnReady(GetAPI)
   -- Imports
   DeInitLevel, Fade, GameProc, GetMusic, InitScore, LoadLevel, LoadResources,
-    LockViewPort, PlayMusic, ProcessViewPort, RegisterFBUCallback,
-    RenderObjects, RenderTerrain, SelectObject, SetCallbacks, SetCursor,
-    aCreditsData, aCreditsXData, aLevelTypesData, aLevelsData,
-    aObjectTypes, aObjects, aPlayers, fontLarge, fontLittle =
+    LockViewPort, PlayMusic, RegisterFBUCallback, RenderObjects, RenderTerrain,
+    SelectObject, SetCallbacks, SetCursor, aCreditsData, aCreditsXData,
+    aLevelTypesData, aLevelsData, aObjectTypes, aObjects, aPlayers, fontLarge,
+    fontLittle =
       GetAPI("DeInitLevel", "Fade", "GameProc", "GetMusic", "InitScore",
         "LoadLevel", "LoadResources", "LockViewPort", "PlayMusic",
-        "ProcessViewPort", "RegisterFBUCallback", "RenderObjects",
-        "RenderTerrain", "SelectObject", "SetCallbacks", "SetCursor",
-        "aCreditsData", "aCreditsXData", "aLevelTypesData",
-        "aLevelsData", "aObjectTypes", "aObjects", "aPlayers", "fontLarge",
-        "fontLittle");
+        "RegisterFBUCallback", "RenderObjects", "RenderTerrain",
+        "SelectObject", "SetCallbacks", "SetCursor", "aCreditsData",
+        "aCreditsXData", "aLevelTypesData", "aLevelsData", "aObjectTypes",
+        "aObjects", "aPlayers", "fontLarge", "fontLittle");
   -- Set ending level load data
   aEndLevelData.t = aLevelTypesData[4];
 end

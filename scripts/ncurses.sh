@@ -75,7 +75,7 @@ build()
   fi
 }
 
-build x86_64 generic 10.11
+build x86_64 generic 10.15
 build arm64 apple-m1 11.0
 
 lipo nc64-*.a -create -output "${LIB}/nc64.ma"

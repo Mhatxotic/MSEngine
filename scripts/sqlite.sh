@@ -38,7 +38,7 @@ fi
 
 build()
 {
-  gcc -O3 -arch $1 -mtune=$2 -mmacosx-version-min=10.11 \
+  gcc -O3 -arch $1 -mtune=$2 -mmacosx-version-min=10.15 \
     -DSQLITE_DEFAULT_AUTOVACUUM=2 -DSQLITE_TEMP_STORE=2 \
     -DSQLITE_ENABLE_NULL_TRIM -DSQLITE_OS_UNIX -DSQLITE_OMIT_LOAD_EXTENSION \
     -DSQLITE_OMIT_WAL -DSQLITE_OMIT_UTF16 -DSQLITE_OMIT_DEPRECATED \

@@ -121,8 +121,8 @@
 #   error This MacOS architechture being compiled with is not supported!
 #  endif                               // Done checking architechture
 #  include <AvailabilityMacros.h>      // Get minimum operating system version
-#  if MAC_OS_X_VERSION_MIN_REQUIRED < MAC_OS_X_VERSION_10_11
-#   error This project recommends at least MacOS 10.11 ElCapitan or later!
+#  if MAC_OS_X_VERSION_MIN_REQUIRED < MAC_OS_X_VERSION_10_15
+#   error This project recommends at least MacOS 10.15 Catalina or later!
 #  endif                               // MacOS version check
 # else                                 // Not targeting MacOS?
 #  error This Apple target being compiled with is not yet supported!

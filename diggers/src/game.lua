@@ -83,7 +83,7 @@ local iLLPixH<const>   = iLLAbsH * 16;       -- Total # of vertical pixels
 local iLLPixWm1<const> = iLLPixW - 1;        -- Total H pixels minus one
 local iLLPixHm1<const> = iLLPixH - 1;        -- Total V pixels minus one
 -- Other consts ------------------------------------------------------------ --
-local iVPScrollThreshold<const> = 4;
+local iVPScrollThreshold<const> = 4;         -- Limit before centring viewport
 -- Function to play a sound ------------------------------------------------ --
 local function DoPlaySoundAtObject(aObject, iSfxId, nPitch)
   -- Check that object is in the players view
@@ -92,16 +92,13 @@ local function DoPlaySoundAtObject(aObject, iSfxId, nPitch)
   local nY<const> = (aObject.Y / 16) - iPosY;
   if nY < -1 or nY > iScrTilesH then return end;
   -- Play the sound and clamp the pan value as engine requires
-  PlaySound(iSfxId,
-    UtilClamp(-1 + ((nX / iScrTilesW) * 2), -1, 1), nPitch);
+  PlaySound(iSfxId, UtilClamp(-1 + ((nX / iScrTilesW) * 2), -1, 1), nPitch);
 end
 -- Enable or disable playing sounds ---------------------------------------- --
 local function SetPlaySounds(bState)
   if bState then PlaySoundAtObject = DoPlaySoundAtObject;
             else PlaySoundAtObject = UtilBlank end;
 end
--- Dump mask to disk ------------------------------------------------------- --
-function DumpLevelMask(strFile) maskZone:Save(0, strFile or "mask") end;
 -- Update viewport data ---------------------------------------------------- --
 local function UpdateViewPort(nPos, iTLMVPS, iTTD2, iTT, iTL)
   -- Obey limits of level
@@ -141,27 +138,11 @@ local function ProcessViewPort()
     AdjustViewPortX(-ceil((iPixPosX - iPixPosTargetX) / iScrollRate));
   elseif iPixPosTargetX > iPixPosX then
     AdjustViewPortX(ceil((iPixPosTargetX - iPixPosX) / iScrollRate)) end;
+  -- Move vertically if not over requested viewport
   if iPixPosTargetY < iPixPosY then
     AdjustViewPortY(-ceil((iPixPosY - iPixPosTargetY) / iScrollRate));
   elseif iPixPosTargetY > iPixPosY then
     AdjustViewPortY(ceil((iPixPosTargetY - iPixPosY) / iScrollRate)) end;
-end
--- The frame buffer was updated -------------------------------------------- --
-local function FrameBufferUpdated(...)
-  -- Set new stage bounds
-  iStageW, iStageH, iStageL, iStageT, iStageR, iStageB = ...;
-  -- Set new limits based on frame buffer size
-  iScrTilesW, iScrTilesH = ceil(iStageW / 16), ceil(iStageH / 16);
-  -- Used in game so calculate them now to prevent unnecessary math
-  iScrTilesWd2, iScrTilesHd2 = iScrTilesW // 2, iScrTilesH // 2;
-  iScrTilesWd2p1, iScrTilesHd2p1 = iScrTilesWd2 + 1, iScrTilesHd2 + 1;
-  iScrTilesWm1, iScrTilesHm1 = iScrTilesW - 1, iScrTilesH - 1;
-  -- Level width minus viewport size
-  iLLAbsWmVP, iLLAbsHmVP = iLLAbsW - iScrTilesW, iLLAbsH - iScrTilesH;
-  iLLPixWmVP, iLLPixHmVP = iLLAbsWmVP * 16, iLLAbsHmVP * 16;
-  -- Update viewport limits
-  AdjustViewPortX(0);
-  AdjustViewPortY(0);
 end
 -- Update new viewport ----------------------------------------------------- --
 local function SetViewPort(iX, iY) SetViewPortX(iX) SetViewPortY(iY) end
@@ -174,10 +155,7 @@ end
 -- Force viewport position without scrolling ------------------------------- --
 local function ForceViewport() SetViewPort(iPixPosTargetX, iPixPosTargetY) end;
 -- Lock viewport to top left ----------------------------------------------- --
-local function LockViewPort()
-  ScrollViewPortTo(0, 0);
-  ForceViewport();
-end
+local function LockViewPort() ScrollViewPortTo(0, 0) ForceViewport() end;
 -- Focus on object --------------------------------------------------------- --
 local function ObjectFocus(aObj)
   -- This object is not selected? Ignore it
@@ -518,36 +496,28 @@ local function SelectInfoScreen()
 end
 -- De-init the level ------------------------------------------------------- --
 local function DeInitLevel()
-  -- Volatile arrays to clear
-  local aVolatileData<const> = { aObjects, aPlayers, aFloodData,
-    aRacesAvailable, aGemsAvailable, aLevelData, aShroudData };
-  -- Real function
-  local function DeInitLevelInitialised()
-    -- Unset FBU callback
-    RegisterFBUCallback("game");
-    -- De-init information screen
-    SelectInfoScreen();
-    -- Dereference loaded assets for garbage collector
-    texBg, texLev, maskZone = nil, nil, nil;
-    -- Clear current objects, players, flood, races and gems data
-    for iVolId = 1, #aVolatileData do
-      local aTable<const> = aVolatileData[iVolId];
-      while #aTable > 0 do remove(aTable, #aTable) end;
-    end
-    -- Reset positions and other variables
-    iPixPosTargetX, iPixPosTargetY, iPixPosX, iPixPosY, iGameTicks, iAnimMoney,
-      iLevelId, iWinLimit, sMoney, iUniqueId =
-        0, 0, 0, 0, 0, 0, nil, nil, nil, 0;
-    -- Reset active objects, menus and players
-    aActivePlayer, aOpponentPlayer, aActiveObject, aContextMenu =
-      nil, nil, nil, nil;
-    -- We don't want to hear sounds
-    SetPlaySounds(false);
+  -- Unset FBU callback
+  RegisterFBUCallback("game");
+  -- De-init information screen
+  SelectInfoScreen();
+  -- Dereference loaded assets for garbage collector
+  texBg, texLev, maskZone = nil, nil, nil;
+  -- Flush specified tables whilst keeping the actual table
+  local aTables<const> = { aObjects, aPlayers, aFloodData, aRacesAvailable,
+    aGemsAvailable, aLevelData, aShroudData };
+  for iIndex = 1, #aTables do
+    local aTable<const> = aTables[iIndex];
+    while #aTable > 0 do remove(aTable, #aTable) end;
   end
-  -- Set real function
-  DeInitLevel = DeInitLevelInitialised;
-  -- Call it
-  DeInitLevelInitialised();
+  -- Reset positions and other variables
+  iPixPosTargetX, iPixPosTargetY, iPixPosX, iPixPosY, iGameTicks, iAnimMoney,
+    iLevelId, iWinLimit, sMoney, iUniqueId =
+      0, 0, 0, 0, 0, 0, nil, nil, nil, 0;
+  -- Reset active objects, menus and players
+  aActivePlayer, aOpponentPlayer, aActiveObject, aContextMenu =
+    nil, nil, nil, nil;
+  -- We don't want to hear sounds
+  SetPlaySounds(false);
 end
 -- Get level tile location from absolute ca-ordinates ---------------------- --
 local function GetTileOffsetFromAbsCoordinates(iAbsX, iAbsY)
@@ -950,14 +920,18 @@ local function BuyItem(aObj, iItemId)
   -- If objects owner doesn't have enough money or strength then failed
   local aParent<const> = aObj.P;
   local iValue<const> = aObjData.VALUE;
-  if iValue > aParent.M or aObj.IW + aObjData.WEIGHT > aObj.STR or
+  local iParentMoney<const> = aParent.M;
+  if iValue > iParentMoney or aObj.IW + aObjData.WEIGHT > aObj.STR or
     not AddToInventory(aObj,
       CreateObject(iItemId, aObj.X, aObj.Y, aParent)) then
         return false end;
   -- Reduce money
-  aParent.M = aParent.M - iValue;
+  aParent.M = iParentMoney - iValue;
   -- Total purchases plus one
   aParent.PUR = aParent.PUR + 1
+  -- Log the purchase
+  CoreLog(aObj.OD.NAME.." "..aObj.DI.." purchased "..aObjData.NAME..
+    " for "..iValue.." Zogs ("..iParentMoney..">"..aParent.M..")!");
   -- Success!
   return true;
 end
@@ -997,16 +971,27 @@ local function SellItem(aOwnObj, aSellObj)
   if not DropObject(aOwnObj, aSellObj) then return false end;
   -- Increment funds but deduct value according to damage
   local aParent<const> = aOwnObj.P;
-  aParent.M = aParent.M + floor((aSellObj.OD.VALUE / 2) * (aSellObj.H / 100));
-  -- Plus time added value if treasure
+  local nValue<const> = aSellObj.OD.VALUE / 2;
+  local nDamage<const> = aSellObj.H / 100;
+  local iValue<const> = floor(nValue * nDamage);
+  local iValuePenalty<const> = floor(nValue) - iValue;
+  local iMoney<const>, iAdded = aParent.M;
+  aParent.M = iMoney + iValue;
+  -- If treasure?
   if aSellObj.F & OFL.TREASURE ~= 0 then
+    -- Add value based on time
     aParent.GS = aParent.GS + 1;
-    local iAmount<const> = iGameTicks // 18000;
-    aParent.GI = aParent.GI + iAmount;
-    aParent.M = aParent.M + iAmount;
-  end
+    iAdded = iGameTicks // 18000;
+    aParent.GI = aParent.GI + iAdded;
+    aParent.M = aParent.M + iAdded;
+  -- No added value
+  else iAdded = 0 end;
   -- Destroy the object
   DestroyObjectUnknown(aSellObj);
+  -- Log the destruction
+  CoreLog(aOwnObj.OD.NAME.." "..aOwnObj.DI.." sold "..aSellObj.OD.NAME..
+    " for "..iValue.." Zogs (P:"..iValuePenalty..";A:"..iAdded..";"..
+    iMoney..">"..aParent.M..")!");
   -- Sold
   return true;
 end
@@ -1967,27 +1952,30 @@ local function AdjustObjectHealth(aVictimObj, iAmount, aCauseObj)
   -- Remove jump and falling status from object
   local iFlags<const> = aVictimObj.F & ~(OFL.JUMPRISE|OFL.JUMPFALL);
   aVictimObj.F = iFlags;
+  -- Get victim name
+  local sVictim<const> = aVictimObj.OD.NAME..
+    "["..aVictimObj.U.."] at X:"..aVictimObj.X.." Y:"..aVictimObj.Y;
   -- If caused by another object?
   if aCauseObj then
+    -- Get causer name
+    local sCauser<const> = aCauseObj.OD.NAME..
+       "["..aCauseObj.U.."] at X:"..aCauseObj.X.." Y:"..aCauseObj.Y;
     -- Was victim a living thing?
     if iFlags & OFL.LIVING ~= 0 then
-      -- Write kill in log
-      CoreLog(aCauseObj.OD.LONGNAME.." killed "..aVictimObj.OD.LONGNAME.."!");
-      -- Get causer player data and increase their living kills count
-      local aPlayer<const> = aCauseObj.P;
-      if aPlayer then aPlayer.LK = aPlayer.LK + 1 end;
+      -- increase their living kills count and log the kill
+      CoreLog(sCauser.." killed "..sVictim.."!");
+      SetObjectAndParentCounter(aCauseObj, "LK");
     -- Was victim an enemy?
     elseif iFlags & OFL.ENEMY ~= 0 then
-      -- Write kill in log
-      CoreLog(aCauseObj.OD.LONGNAME.." destroyed enemy "..
-        aVictimObj.OD.LONGNAME.."!");
-      -- Get causer player data and increase their enemy kills count
-      local aPlayer<const> = aCauseObj.P;
-      if aPlayer then aPlayer.EK = aPlayer.EK + 1 end;
-    -- Anything else? Write to log
-    else CoreLog(aCauseObj.OD.LONGNAME.." destroyed "..
-      aVictimObj.OD.LONGNAME.."!") end;
-  end
+      -- Increase their enemy kills count and log the kill
+      CoreLog(sCauser.." destroyed enemy "..sVictim.."!");
+      SetObjectAndParentCounter(aCauseObj, "EK");
+    -- Anything else? Log the destruction
+    else CoreLog(sCauser.." destroyed "..sVictim.."!") end;
+  -- No killer and is living
+  elseif iFlags & OFL.LIVING ~= 0 then CoreLog(sVictim.." died!");
+  -- No killer? Log the destruction
+  else CoreLog(sVictim.." was destroyed!") end;
   -- Object explodes on death?
   if aVictimObj.F & OFL.EXPLODE ~= 0 then
     -- Enumerate possible destruct positions again. We can't have the TERRAIN
@@ -3388,6 +3376,7 @@ local function InitCreateObject()
       DD   = { },                        -- Reference to direction data
       DID  = aObjData.DIGDELAY,          -- Digging delay
       DUG  = 0,                          -- Successful dig count
+      EK   = 0,                          -- Fiends killed
       F    = aObjData.FLAGS or 0,        -- Object flags (OFL.*)
       FD   = 0,                          -- Amount the object has fallen by
       FDD  = DIR.NONE,                   -- Last failed dig direction
@@ -3404,6 +3393,7 @@ local function InitCreateObject()
       JT   = 0,                          -- Job timer
       LC   = aObjData.LUNGS,             -- Lung capacity
       LDT  = iGameTicks,                 -- Last successful dig time
+      LK   = 0,                          -- Living things killed
       OD   = aObjData,                   -- Object data table
       OFX  = 0, OFY  = 0,                -- Drawing offset
       OFXA = 0, OFYA = 0,                -- Attachment drawing offset
@@ -3784,6 +3774,23 @@ local function ProcessObjectMovement()
   -- Return new function
   return ProcessObjectMovement;
 end
+-- Process object jump logic ----------------------------------------------- --
+local function ProcessJumpLogic(aObj, aData, iLimit, iStep)
+  -- More pixels to jump?
+  local iActionTimer<const> = aObj.AT;
+  if iActionTimer < #aData then
+    -- Get amount to move by and ignore if not moving this frame
+    local iYMove<const> = aData[1 + iActionTimer];
+    if iYMove == 0 then return end;
+    -- Check each pixel whilst jumping
+    for iY = iYMove, iLimit, iStep do
+      -- No collision? Move and return to continue to next frame
+      if not IsCollideY(aObj, iY) then return AdjustPosY(aObj, iY) end;
+    end
+  end
+  -- Can't move anymore so tell caller that
+  return true;
+end
 -- Process object logic ---------------------------------------------------- --
 local function ProcessObjects()
   -- Enumerate through all objects (while/do because they could be deleted)
@@ -3797,31 +3804,22 @@ local function ProcessObjects()
     if not CheckObjectFalling(aObj) then
       -- Object is jumping?
       if aObj.F & OFL.JUMPRISE ~= 0 then
-        -- Object can move up and the rise limit hasn't been reached yet
-        if not IsCollideY(aObj, -1) and aObj.AT < #aJumpRiseData then
-          -- We can actually move up? Move up!
-          if aJumpRiseData[aObj.AT+1] > 0 then MoveY(aObj, -1) end;
-        -- Object cannot move up or action timer is the last frame
-        else
+        -- Test for rising and if object has finished jumping?
+        if ProcessJumpLogic(aObj, aJumpRiseData, -1, 1) then
           -- Remove rising and set falling flags
           aObj.F = (aObj.F | OFL.JUMPFALL) & ~OFL.JUMPRISE;
           -- Reset action timer
           aObj.AT = 0;
         end
-      -- Object is falling (during the jump)?
+      -- Object is falling
       elseif aObj.F & OFL.JUMPFALL ~= 0 then
-        -- Object can fall down and the fall limit hasn't been reached yet
-        if not IsCollideY(aObj, 1) and aObj.AT < #aJumpFallData then
-          -- And we can drop down? Drop down
-          if aJumpFallData[aObj.AT+1] > 0 then MoveY(aObj, 1) end;
-        -- Object cannot move down or action timer is the last frame
-        else
+        -- Test for falling and if object has finished falling?
+        if ProcessJumpLogic(aObj, aJumpFallData, 1, -1) then
           -- Let object fall normally now and remove busy and falling flags
           aObj.F = (aObj.F | OFL.FALL) & ~(OFL.JUMPFALL | OFL.BUSY);
           -- Thus little tweak makes sure the user can't jump again by just
           -- modifying the fall speed as ACT.JUMP requires it to be 1.
           aObj.FS = 2;
-          -- Reset action timer
         end
       end
       -- Object is...
@@ -4118,185 +4116,198 @@ local function SelectBook()
   -- Init the book
   InitBook(true);
 end
+-- Select an adjacent digger ----------------------------------------------- --
+local function SelectAdjacentDigger(iNegate)
+  -- Find the object we selected first
+  local iCurrentDigger;
+  for iI = 1, 5 do
+    if aActiveObject == aActivePlayer.D[iI] then iCurrentDigger = iI end
+  end
+  -- No active digger? Find a digger we own
+  if not iCurrentDigger then
+    for iI = 1, 5 do if aActivePlayer.D[iI] then iCurrentDigger = iI end end;
+  end
+  -- Find currently active digger and return if not found
+  if not iCurrentDigger then return end;
+  -- Walk through the next 4 diggers
+  for iI = 1, 4 do
+    -- Get next digger wrapped and select and return it if found
+    local aDigger<const> =
+      aActivePlayer.D[1 + (((iCurrentDigger + iNegate) - 1) % 5)];
+    if aDigger then return SelectObject(aDigger) end;
+  end
+end
 -- Check input state ------------------------------------------------------- --
 local function ProcInput()
-  -- Select an adjacent digger --------------------------------------------- --
-  local function SelectAdjacentDigger(iNegate)
-    -- Find the object we selected first
-    local iCurrentDigger;
-    for iI = 1, 5 do
-      if aActiveObject == aActivePlayer.D[iI] then iCurrentDigger = iI end
-    end
-    -- No active digger? Find a digger we own
-    if not iCurrentDigger then
-      for iI = 1, 5 do if aActivePlayer.D[iI] then iCurrentDigger = iI end end;
-    end
-    -- Find currently active digger and return if not found
-    if not iCurrentDigger then return end;
-    -- Walk through the next 4 diggers
-    for iI = 1, 4 do
-      -- Get next digger wrapped and select and return it if found
-      local aDigger<const> =
-        aActivePlayer.D[1 + (((iCurrentDigger + iNegate) - 1) % 5)];
-      if aDigger then return SelectObject(aDigger) end;
-    end
+  -- Process viewport scrolling
+  ProcessViewPort();
+  -- Left button pressed?
+  if IsButtonPressed(6) or IsScrollingDown() then
+    -- Cycle to previous item if digger inventory menu open?
+    if aContextMenu and aContextMenu == aMenuData[MNU.DROP] then
+      CycleObjInventory(aActiveObject, -1);
+    -- Else select previous digger
+    else SelectAdjacentDigger(-1) end;
+    -- Done
+    return;
   end
-  -- We'll set ProcInput to this so we can keep aliases local to this routine.
-  local function ProcInputInitialised()
-    -- Process viewport scrolling
-    ProcessViewPort();
-    -- Left button pressed?
-    if IsButtonPressed(6) or IsScrollingDown() then
-      -- Cycle to previous item if digger inventory menu open?
-      if aContextMenu and aContextMenu == aMenuData[MNU.DROP] then
-        CycleObjInventory(aActiveObject, -1);
-      -- Else select previous digger
-      else SelectAdjacentDigger(-1) end;
+  -- Right button pressed?
+  if IsButtonPressed(7) or IsScrollingUp() then
+    -- Cycle to next item if digger inventory menu open?
+    if aContextMenu and aContextMenu == aMenuData[MNU.DROP] then
+      CycleObjInventory(aActiveObject, 1);
+    -- Else select next digger
+    else SelectAdjacentDigger(1) end;
+    -- Done
+    return;
+  end
+  -- If pause key or button pressed?
+  if IsButtonPressed(9) then InitPause() end;
+  -- Left mouse button clicked?
+  if IsButtonPressed(0) then
+    -- Menu is open and mouse is in its bounds? Process menu click
+    if aContextMenu and
+      IsMouseInBounds(iMenuLeft, iMenuTop, iMenuRight, iMenuBottom) then
+      -- Calculate button pressed and absolute index
+      local iIndex<const> =
+        ((GetMouseY() - iMenuTop) // 16 * aContextMenu[1]) +
+        ((GetMouseX() - iMenuLeft) // 16 + 1);
+      -- Get menu data for id
+      local aMIData<const> = aContextMenu[3][iIndex];
+      if not UtilIsTable(aMIData) then
+        error("Invalid menu item data for "..iIndex.."! "..
+          tostring(aMIData)) end;
+      -- If tile denies if object is busy? Disallow action and play sound
+      if aMIData[2] & MFL.BUSY ~= 0 and aActiveObject.F & OFL.BUSY ~= 0 then
+        PlayStaticSound(aSfxData.ERROR);
+      -- New menu specified? Set new menu and play sound
+      elseif aMIData[3] ~= MNU.NONE then
+        SetContextMenu(aMIData[3], false);
+        PlayStaticSound(aSfxData.SELECT);
+      -- New action specified?
+      elseif aMIData[4] ~= 0 and aMIData[5] ~= 0 and aMIData[6] ~= 0 then
+        -- Play the click sound
+        PlayStaticSound(aSfxData.SELECT);
+        -- Set the action and if failed? Play the error sound
+        if not SetAction(aActiveObject, aMIData[4], aMIData[5], aMIData[6], true)
+          then PlayStaticSound(aSfxData.ERROR) end;
+      end
       -- Done
       return;
     end
-    -- Right button pressed?
-    if IsButtonPressed(7) or IsScrollingUp() then
-      -- Cycle to next item if digger inventory menu open?
-      if aContextMenu and aContextMenu == aMenuData[MNU.DROP] then
-        CycleObjInventory(aActiveObject, 1);
-      -- Else select next digger
-      else SelectAdjacentDigger(1) end;
+    -- Utility buttons clicked?
+    if IsMouseInBounds(232, 216, 312, 232) then
+      -- Device button?
+      if IsMouseXLessThan(248) then return SelectDevice() end;
+      -- Inventory information? Set selected button and info screen
+      if IsMouseXLessThan(264) then return SelectInventoryScreen() end;
+      -- Location information? Set selected button and info screen
+      if IsMouseXLessThan(280) then return SelectLocationScreen() end;
+      -- Status? Set selected button and info screen
+      if IsMouseXLessThan(296) then return SelectStatusScreen() end;
+      -- Set book proc and return to here when done
+      return SelectBook();
+    end
+    -- Digger button clicked? Process digger button click
+    if IsMouseInBounds(144, 216, 224, 232) then
+      -- Get which button was clicked
+      local iButtonId<const> = (GetMouseX() - 144) // 16 + 1;
+      -- Get digger associated with the button id and return failure if dead
+      local aObject<const> = aActivePlayer.D[iButtonId];
+      if not aObject then return PlayStaticSound(aSfxData.ERROR) end;
+      -- Select digger and kill menu
+      SelectObject(aObject);
+      -- Play select sound
+      PlayStaticSound(aSfxData.CLICK);
       -- Done
       return;
     end
-    -- If pause key or button pressed?
-    if IsButtonPressed(9) then InitPause() end;
-    -- Left mouse button clicked?
-    if IsButtonPressed(0) then
-      -- Menu is open and mouse is in its bounds? Process menu click
-      if aContextMenu and
-        IsMouseInBounds(iMenuLeft, iMenuTop, iMenuRight, iMenuBottom) then
-        -- Calculate button pressed and absolute index
-        local iIndex<const> =
-          ((GetMouseY() - iMenuTop) // 16 * aContextMenu[1]) +
-          ((GetMouseX() - iMenuLeft) // 16 + 1);
-        -- Get menu data for id
-        local aMIData<const> = aContextMenu[3][iIndex];
-        if not UtilIsTable(aMIData) then
-          error("Invalid menu item data for "..iIndex.."! "..
-            tostring(aMIData)) end;
-        -- If tile denies if object is busy? Disallow action and play sound
-        if aMIData[2] & MFL.BUSY ~= 0 and aActiveObject.F & OFL.BUSY ~= 0 then
-          PlayStaticSound(aSfxData.ERROR);
-        -- New menu specified? Set new menu and play sound
-        elseif aMIData[3] ~= MNU.NONE then
-          SetContextMenu(aMIData[3], false);
-          PlayStaticSound(aSfxData.SELECT);
-        -- New action specified?
-        elseif aMIData[4] ~= 0 and aMIData[5] ~= 0 and aMIData[6] ~= 0 then
-          -- Play the click sound
-          PlayStaticSound(aSfxData.SELECT);
-          -- Set the action and if failed? Play the error sound
-          if not SetAction(aActiveObject, aMIData[4], aMIData[5], aMIData[6], true)
-            then PlayStaticSound(aSfxData.ERROR) end;
-        end
-        -- Done
-        return;
-      end
-      -- Utility buttons clicked?
-      if IsMouseInBounds(232, 216, 312, 232) then
-        -- Device button?
-        if IsMouseXLessThan(248) then return SelectDevice() end;
-        -- Inventory information? Set selected button and info screen
-        if IsMouseXLessThan(264) then return SelectInventoryScreen() end;
-        -- Location information? Set selected button and info screen
-        if IsMouseXLessThan(280) then return SelectLocationScreen() end;
-        -- Status? Set selected button and info screen
-        if IsMouseXLessThan(296) then return SelectStatusScreen() end;
-        -- Set book proc and return to here when done
-        return SelectBook();
-      end
-      -- Digger button clicked? Process digger button click
-      if IsMouseInBounds(144, 216, 224, 232) then
-        -- Get which button was clicked
-        local iButtonId<const> = (GetMouseX() - 144) // 16 + 1;
-        -- Get digger associated with the button id and return failure if dead
-        local aObject<const> = aActivePlayer.D[iButtonId];
-        if not aObject then return PlayStaticSound(aSfxData.ERROR) end;
-        -- Select digger and kill menu
+    -- Translate current mouse position to absolute level position
+    local nMouseX<const>, nMouseY<const> = GetAbsMousePos();
+    -- Walk through objects in backwards order. This is because objects are
+    -- drawn from oldest to newest.
+    for iIndex = #aObjects, 1, -1 do
+      -- Get object
+      local aObject<const> = aObjects[iIndex];
+      -- Mouse cursor collides with object? Set object and return success
+      if IsSpriteCollide(479, nMouseX, nMouseY,
+           aObject.S, aObject.X, aObject.Y) then
         SelectObject(aObject);
-        -- Play select sound
-        PlayStaticSound(aSfxData.CLICK);
-        -- Done
-        return;
+        return PlayStaticSound(aSfxData.SELECT);
       end
-      -- Translate current mouse position to absolute level position
-      local nMouseX<const>, nMouseY<const> = GetAbsMousePos();
-      -- Walk through objects in backwards order. This is because objects are
-      -- drawn from oldest to newest.
-      for iIndex = #aObjects, 1, -1 do
-        -- Get object
-        local aObject<const> = aObjects[iIndex];
-        -- Mouse cursor collides with object? Set object and return success
-        if IsSpriteCollide(479, nMouseX, nMouseY,
-             aObject.S, aObject.X, aObject.Y) then
-          SelectObject(aObject);
-          return PlayStaticSound(aSfxData.SELECT);
-        end
-      end
-      -- Nothing found so deselect current object
-      return SelectObject();
     end
-    -- Right mouse button button or Joystick button 1 is held?
-    if IsButtonHeld(1) then
-    -- Right mouse button held down and menu open?
-      if aContextMenu then UpdateMenuPositionAtMouseCursor();
-      -- Is the right mouse button pressed? (Don't release the click).
-      elseif aActiveObject and IsButtonPressedNoRelease(1) then
-        -- Get active objectmenu data
-        local aObjContextMenu<const> = aActiveObject.OD.MENU;
-        -- Object has menu and object belongs to active player and object isn't
-        -- dead or eaten?
-        if aObjContextMenu and
-           aActiveObject.P == aActivePlayer and
-           aActiveObject.A ~= ACT.DEATH and
-           aActiveObject.A ~= ACT.EATEN then
-          -- Object does belong to active player so play context menu sound and
-          -- set the appropriate default menu for the object.
-          PlayStaticSound(aSfxData.CLICK);
-          SetContextMenu(aObjContextMenu, true);
-        -- Object does not belong to active player?
-        else
-          -- Play error sound and
-          PlayStaticSound(aSfxData.ERROR);
-          -- Force release the button
-          IsButtonPressed(1);
-        end
-      end
-      -- Done
-      return;
-    end
+    -- Nothing found so deselect current object
+    return SelectObject();
   end
-  -- Set new proc input and execute it
-  ProcInput = ProcInputInitialised;
+  -- Right mouse button button or Joystick button 1 is held?
+  if IsButtonHeld(1) then
+  -- Right mouse button held down and menu open?
+    if aContextMenu then UpdateMenuPositionAtMouseCursor();
+    -- Is the right mouse button pressed? (Don't release the click).
+    elseif aActiveObject and IsButtonPressedNoRelease(1) then
+      -- Get active objectmenu data
+      local aObjContextMenu<const> = aActiveObject.OD.MENU;
+      -- Object has menu and object belongs to active player and object isn't
+      -- dead or eaten?
+      if aObjContextMenu and
+         aActiveObject.P == aActivePlayer and
+         aActiveObject.A ~= ACT.DEATH and
+         aActiveObject.A ~= ACT.EATEN then
+        -- Object does belong to active player so play context menu sound and
+        -- set the appropriate default menu for the object.
+        PlayStaticSound(aSfxData.CLICK);
+        SetContextMenu(aObjContextMenu, true);
+      -- Object does not belong to active player?
+      else
+        -- Play error sound and
+        PlayStaticSound(aSfxData.ERROR);
+        -- Force release the button
+        IsButtonPressed(1);
+      end
+    end
+    -- Done
+    return;
+  end
 end
-ProcInput();
 -- Load level -------------------------------------------------------------- --
-local function LoadLevel(Id, Music, iKB, P1R, P1AI, P2R, P2AI, TP, TR, TI)
+local function LoadLevel(iLId, sMusic, iKB, iRace1, bAI1, iRace2, bAI2,
+  fcbProc, fcbRender, fcbInput)
   -- Set default callbacks if not set
-  if not TP then TP = GameProc end;
-  if not TR then TR = RenderInterface end;
-  if not TI then TI = ProcInput end;
+  if not fcbProc then fcbProc = GameProc end;
+  if not fcbRender then fcbRender = RenderInterface end;
+  if not fcbInput then fcbInput = ProcInput end;
   -- Set default players if not set
-  if not P1R then P1R = aGlobalData.gSelectedRace or TYP.DIGRANDOM end;
-  if not P1AI then P1AI = false end;
-  if not P2R then P2R = TYP.DIGRANDOM end;
-  if not P2AI then P2AI = true end;
+  if not iRace1 then iRace1 = aGlobalData.gSelectedRace or TYP.DIGRANDOM end;
+  if not bAI1 then bAI1 = false end;
+  if not iRace2 then iRace2 = TYP.DIGRANDOM end;
+  if not bAI2 then bAI2 = true end;
   -- De-init/Reset current level
   DeInitLevel();
   -- Set FBU callback
-  RegisterFBUCallback("game", FrameBufferUpdated);
+  local function OnFrameBufferUpdated(...)
+    -- Set new stage bounds
+    iStageW, iStageH, iStageL, iStageT, iStageR, iStageB = ...;
+    -- Set new limits based on frame buffer size
+    iScrTilesW, iScrTilesH = ceil(iStageW / 16), ceil(iStageH / 16);
+    -- Used in game so calculate them now to prevent unnecessary math
+    iScrTilesWd2, iScrTilesHd2 = iScrTilesW // 2, iScrTilesH // 2;
+    iScrTilesWd2p1, iScrTilesHd2p1 = iScrTilesWd2 + 1, iScrTilesHd2 + 1;
+    iScrTilesWm1, iScrTilesHm1 = iScrTilesW - 1, iScrTilesH - 1;
+    -- Level width minus viewport size
+    iLLAbsWmVP, iLLAbsHmVP = iLLAbsW - iScrTilesW, iLLAbsH - iScrTilesH;
+    iLLPixWmVP, iLLPixHmVP = iLLAbsWmVP * 16, iLLAbsHmVP * 16;
+    -- Update viewport limits
+    AdjustViewPortX(0);
+    AdjustViewPortY(0);
+  end
+  RegisterFBUCallback("game", OnFrameBufferUpdated);
   -- Set level number and get data for it.
   local aLevelInfo;
-  if UtilIsTable(Id) then iLevelId, aLevelInfo = 1, Id;
-  elseif UtilIsInteger(Id) then iLevelId, aLevelInfo = Id, aLevelsData[Id];
-  else error("Invalid id '"..tostring(Id).."' of type '"..type(Id).."'!") end;
+  if UtilIsTable(iLId) then iLevelId, aLevelInfo = 1, iLId;
+  elseif UtilIsInteger(iLId) then
+    iLevelId, aLevelInfo = iLId, aLevelsData[iLId];
+  else error("Invalid id '"..
+    tostring(iLId).."' of type '"..type(iLId).."'!") end;
   if not UtilIsTable(aLevelInfo) then
     error("Invalid level data! "..tostring(aLevelInfo)) end;
   -- Get level type data and level type
@@ -4308,7 +4319,7 @@ local function LoadLevel(Id, Music, iKB, P1R, P1AI, P2R, P2AI, TP, TR, TI)
   aShroudColour = aLevelTypeData.s;
   -- Holds required assets to set template to music or no music
   local aAssets;
-  if Music then aAssets, aAssetsMusic[4].F = aAssetsMusic, Music;
+  if sMusic then aAssets, aAssetsMusic[4].F = aAssetsMusic, sMusic;
   else aAssets = aAssetsNoMusic end;
   -- Update asset filenames to load
   local sLevelFile<const> = aLevelInfo.f;
@@ -4341,8 +4352,8 @@ local function LoadLevel(Id, Music, iKB, P1R, P1AI, P2R, P2AI, TP, TR, TI)
     end
     -- Player starting positions
     local aPlayerStartData<const> = {
-      { 195, 198, P1R, P1AI },   -- Player 1 start data
-      { 199, 202, P2R, P2AI }    -- Player 2 start data
+      { 195, 198, iRace1, bAI1 },   -- Player 1 start data
+      { 199, 202, iRace2, bAI2 }    -- Player 2 start data
     };
     -- Create a blank mask
     maskZone = MaskCreateZero(sLevelFile, iLLPixW,
@@ -4446,17 +4457,17 @@ local function LoadLevel(Id, Music, iKB, P1R, P1AI, P2R, P2AI, TP, TR, TI)
     if not aGlobalData.gSelectedRace then
       aGlobalData.gSelectedRace = aActivePlayer.R end;
     if not aGlobalData.gSelectedLevel then
-      aGlobalData.gSelectedLevel = Id end;
+      aGlobalData.gSelectedLevel = iLevelId end;
     -- Reset gems available
     local iGemStart<const> = random(#aDigTileData);
     for iId = 1, #aDigTileData do aGemsAvailable[1 + #aGemsAvailable] =
       aDigTileData[1 + ((iGemStart + iId) % #aDigTileData)] end;
     -- Play in-game music if requested
-    if Music then PlayMusic(aResources[4], 0) end;
+    if sMusic then PlayMusic(aResources[4], 0) end;
     -- Now we want to hear sounds if human player is set
-    if P1AI == false then SetPlaySounds(true) end;
+    if bAI1 == false then SetPlaySounds(true) end;
     -- Computer is main player?
-    if P1AI == true then
+    if bAI1 == true then
       -- Set auto-respawn on all objects death
       for iI = 1, #aObjects do
         local aObject<const> = aObjects[iI];
@@ -4468,7 +4479,7 @@ local function LoadLevel(Id, Music, iKB, P1R, P1AI, P2R, P2AI, TP, TR, TI)
     iWinLimit = (aLevelInfo.w or maxinteger) + aGlobalData.gCapitalCarried;
     -- Do one tick at least or the fade will try to render with variables
     -- that haven't been initialised yet
-    TP();
+    fcbProc();
     -- Do fade then set requested game callbacks
     local function OnFadeIn()
       -- Key bank rqeusted?
@@ -4479,43 +4490,12 @@ local function LoadLevel(Id, Music, iKB, P1R, P1AI, P2R, P2AI, TP, TR, TI)
         SetKeys(true, iKB);
       end
       -- Set requested callbacks
-      SetCallbacks(TP, TR, TI);
+      SetCallbacks(fcbProc, fcbRender, fcbInput);
     end
-    Fade(1, 0, 0.04, TR, OnFadeIn, not not Music);
+    Fade(1, 0, 0.04, fcbRender, OnFadeIn, not not sMusic);
   end
   -- Load level graphics resources asynchronously
   LoadResources(sLevelName, aAssets, OnLoaded);
-end
--- Return value of all capital --------------------------------------------- --
-local function GetCapitalValue()
-  -- Get type of item we want to check for
-  local iDeviceId<const> = OFL.DEVICE;
-  -- Capital value
-  local iCapitalValue = 0;
-  -- Check object and sell it if it's a device
-  local function SellDevice(aObj, nDivisor)
-    -- Failed if not a device
-    if aObj.F & iDeviceId == 0 then return end;
-    -- Add capital value (25% value minus current quality)
-    iCapitalValue = iCapitalValue +
-      (aObj.OD.VALUE / nDivisor) * (aObj.H / 100);
-  end
-  -- Enumerate all objects
-  for iObjIndex = 1, #aObjects do
-    -- Get object and if it is owned by the active player?
-    local aObj<const> = aObjects[iObjIndex];
-    if aActivePlayer == aObj.P then
-      -- If object is a device? Add 25% of it's value minus quality because
-      -- it cost's money to recover the device. :-)
-      SellDevice(aObj, 4);
-      -- Get object's inventory and sell it all 50% of it's value since the
-      -- object or digger is already carrying the item.
-      local aObjInv<const> = aObj.I;
-      for iInvIndex = 1, #aObjInv do SellDevice(aObjInv[iInvIndex], 2) end;
-    end
-  end
-  -- Return capital value rounded down
-  return floor(iCapitalValue);
 end
 -- Continue game from book or lobby ---------------------------------------- --
 local function InitContinueGame(bMusic, aObject)
@@ -4614,6 +4594,8 @@ local function OnReady(GetAPI)
     if aDigger then SelectObject(aDigger) end;
   end
   -- Select digger shortcuts
+  local function SelectLastDigger() SelectAdjacentDigger(-1) end;
+  local function SelectNextDigger() SelectAdjacentDigger(1) end;
   local function SetDiggerOne() SelectDigger(1) end;
   local function SetDiggerTwo() SelectDigger(2) end;
   local function SetDiggerThree() SelectDigger(3) end;
@@ -4718,14 +4700,9 @@ local function OnReady(GetAPI)
         CreateObject(TYP.TNT, GetTileUnderMouse()), -100, aActiveObject);
     end
   end
-  -- Adjust viewport and prevent scroll
-  local function AdjustVPXNS(iX)
-    AdjustViewPortX(iX); iPixPosTargetX = iPosX * 16 end;
-  local function AdjustVPYNS(iY)
-    AdjustViewPortY(iY); iPixPosTargetY = iPosY * 16 end;
   -- Move viewport
-  local function ScrollH(iA) AdjustVPXNS(iA) end;
-  local function ScrollV(iA) AdjustVPYNS(iA) end;
+  local function ScrollH(iX) AdjustViewPortX(iX) iPixPosTargetX = iPosX*16 end;
+  local function ScrollV(iY) AdjustViewPortY(iY) iPixPosTargetY = iPosY*16 end;
   local function ScrollUp() if GetTestMode() then ScrollV(-16) end end;
   local function ScrollDown() if GetTestMode() then ScrollV(16) end end;
   local function ScrollLeft() if GetTestMode() then ScrollH(-16) end end;
@@ -4753,6 +4730,8 @@ local function OnReady(GetAPI)
       { aKeys.BACKSPACE, Teleport, "igt", "TELEPORT HOME OR TELEPOLE" },
       { aKeys.ENTER, GrabItems, "iggi", "GRAB COLLIDING ITEMS" },
       { aKeys.ESCAPE, InitPause, "igp", "PAUSE THE GAME" },
+      { aKeys.MINUS, SelectLastDigger, "igsld", "SELECT LAST DIGGER" },
+      { aKeys.EQUAL, SelectNextDigger, "igsnd", "SELECT NEXT DIGGER" },
       { aKeys.F5, SelectInventoryScreen, "igshi", "SHOW DIGGER INVENTORY" },
       { aKeys.F6, SelectLocationScreen, "igshl", "SHOW DIGGER LOCATIONS" },
       { aKeys.F7, SelectStatusScreen, "igshs", "SHOW GAME STATUS" },
@@ -4786,6 +4765,12 @@ local function OnReady(GetAPI)
   ProcessObjectMovement = ProcessObjectMovement();
   PhaseLogic = PhaseLogic();
   SelectInfoScreen = SelectInfoScreen();
+  -- Register a console command to dump a level mask. I'm just going to sling
+  -- this cvar in the terrain asset table since it will never be used again.
+  local function DumpLevelMask(_, strFile)
+    if maskZone then maskZone:Save(0, strFile or "mask") end;
+  end
+  aLvlTerrainAsset.C = Command.Register("dump", 1, 2, DumpLevelMask);
 end
 -- Exports and imports ----------------------------------------------------- --
 return { F = OnReady, A = { AdjustObjectHealth = AdjustObjectHealth,
@@ -4794,12 +4779,11 @@ return { F = OnReady, A = { AdjustObjectHealth = AdjustObjectHealth,
   DrawInfoFrameAndTitle = DrawInfoFrameAndTitle,
   EndConditionsCheck = EndConditionsCheck, GameProc = GameProc,
   GetAbsMousePos = GetAbsMousePos, GetActiveObject = GetActiveObject,
-  GetActivePlayer = GetActivePlayer, GetCapitalValue = GetCapitalValue,
-  GetGameTicks = GetGameTicks, GetLevelInfo = GetLevelInfo,
-  GetOpponentPlayer = GetOpponentPlayer, GetViewportData = GetViewportData,
-  HaveZogsToWin = HaveZogsToWin, InitContinueGame = InitContinueGame,
-  IsSpriteCollide = IsSpriteCollide, LoadLevel = LoadLevel,
-  LockViewPort = LockViewPort, ProcInput = ProcInput,
+  GetActivePlayer = GetActivePlayer, GetGameTicks = GetGameTicks,
+  GetLevelInfo = GetLevelInfo, GetOpponentPlayer = GetOpponentPlayer,
+  GetViewportData = GetViewportData, HaveZogsToWin = HaveZogsToWin,
+  InitContinueGame = InitContinueGame, IsSpriteCollide = IsSpriteCollide,
+  LoadLevel = LoadLevel, LockViewPort = LockViewPort, ProcInput = ProcInput,
   ProcessViewPort = ProcessViewPort, RenderInterface = RenderInterface,
   RenderObjects = RenderObjects, RenderShroud = RenderShroud,
   RenderTerrain = RenderTerrain, SelectObject = SelectObject,

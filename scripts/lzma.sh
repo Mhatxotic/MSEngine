@@ -100,7 +100,7 @@ build()
 
 ISOSX=`uname`
 if [ $ISOSX = 'Darwin' ]; then
-  EXTRA="-mmacosx-version-min=10.11 -arch "
+  EXTRA="-mmacosx-version-min=10.15 -arch "
   build x86_64 generic 0
   build arm64 apple-m1 1 ../Asm/arm64/*.S
   lipo lzma64-*.a -create -output "${LIB}/lzma64.ma"

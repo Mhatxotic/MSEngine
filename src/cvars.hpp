@@ -233,7 +233,7 @@ static struct CVars final :            // Start of vars class
       { return SetInternal(cveId, StrFromNum(atV)); }
   /* ----------------------------------------------------------------------- */
   bool ParseBuffer(const string &strBuffer, const CVarFlagsConst cvfcFlags,
-    const unsigned int uiLevel=0)
+    const CVarConditionFlagsConst cvcfcFlags, const unsigned int uiLevel=0)
   { // Bail if size not acceptable
     if(strBuffer.length() <= stCVarConfigSizeMinimum ||
        strBuffer.length() > stCVarConfigSizeMaximum)
@@ -274,7 +274,7 @@ static struct CVars final :            // Start of vars class
               // Log the include and parse it
               if(ParseBuffer(
                    AssetExtract(StrTrim(spPair.second.substr(1), ' ')).
-                     MemToString(), cvfcFlags, uiNewLevel))
+                     MemToString(), cvfcFlags, cvcfcFlags, uiNewLevel))
                 ++stGood;
               else ++stBad;
               // Done
@@ -287,7 +287,7 @@ static struct CVars final :            // Start of vars class
         default:
         { // Set the variable and if succeeded increment good counter else bad
           if(SetVarOrInitial(spPair.first, spPair.second, cvfcFlags,
-            CCF_IGNOREIFMISSING|CCF_THROWONERROR|CCF_NOMARKCOMMIT))
+            cvcfcFlags|CCF_IGNOREIFMISSING|CCF_THROWONERROR|CCF_NOMARKCOMMIT))
               ++stGood;
           else ++stBad;
           // Done
@@ -426,8 +426,10 @@ static struct CVars final :            // Start of vars class
   size_t GetVarCount(void) { return cvmActive.size(); }
   const CVarMap &GetInitialVarList(void) { return cvmPending; }
   /* ----------------------------------------------------------------------- */
-  bool LoadFromFile(const string &strFile, const CVarFlagsConst cvfcFlags)
-    { return ParseBuffer(AssetExtract(strFile).MemToString(), cvfcFlags); }
+  bool LoadFromFile(const string &strFile, const CVarFlagsConst cvfcFlags,
+    const CVarConditionFlagsConst cvcfcFlags)
+      { return ParseBuffer(AssetExtract(strFile).MemToString(), cvfcFlags,
+          cvcfcFlags); }
   /* ----------------------------------------------------------------------- */
   bool SetExistingInitialVar(const string &strVar, const string &strVal,
     const CVarFlagsConst cvfcFlags=PUSR)
@@ -774,7 +776,8 @@ static struct CVars final :            // Start of vars class
   CVarReturn ExecuteAppConfig(const string &strFile, string &strVal)
   { // Build filename and deny change if failed
     const string strCfgFile{ StrAppend(strFile, "." CFG_EXTENSION) };
-    if(!LoadFromFile(strCfgFile, PSYSTEM|SAPPCFG)) return DENY;
+    if(!LoadFromFile(strCfgFile, PSYSTEM|SAPPCFG, CCF_NOIOVERRIDE))
+      return DENY;
     // We are manually updating the value with the correct filename
     strVal = StdMove(strCfgFile);
     return ACCEPT_HANDLED;

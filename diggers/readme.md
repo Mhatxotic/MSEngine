@@ -45,7 +45,7 @@ Diggers is a completely playable game from start to finish but will always be a 
 | **Processor** | Dual-Core 2GHz  | Multi-Core 2GHz+ | Multithreaded! |
 | **System** *(Windows)* | XP *(SP3 X86/SP2 X64)* | 7/8.X/1X+ *(X64)* | 32 and 64bit executable. |
 | **Memory** *(Windows)* | 16MB *(XP/X86)* | 128MB+ *(Win7/X64)* | Close estimate. |
-| **System** *(MacOS)* | 10.11 *(Intel)* / 11 *(Arm)* | 11.0+ *(Arm)* | FAT Universal executable. |
+| **System** *(MacOS)* | 10.15 *(Intel)* / 11 *(Arm)* | 11.0+ *(Arm)* | FAT Universal executable. |
 | **Memory** *(MacOS)* | 256MB *(Intel)* | 512MB *(Arm)* | Close estimate. |
 | **System** *(Linux)* | Ubuntu 23.10 *(X64)* | Ubuntu 23.04+ *(X64)* | See below for packages. |
 | **Memory** *(Linux)* | 16MB | 128MB+ | Wild estimate. |

@@ -609,7 +609,7 @@ static FileMap ArchiveExtract(const string &strFile)
     // Something bad happened so relock the mutex and keep trying other
     // archives anyway.
     ulLock.lock();
-  } // FileMap not found
+  } // File not found
   return {};
 }
 /* -- ArchiveGetNames ------------------------------------------------------ */

@@ -16,9 +16,9 @@ local max<const>, min<const>, random<const>, format<const>, ceil<const>,
 -- M-Engine function aliases ----------------------------------------------- --
 local UtilHex<const>, CoreCPUUsage<const>, CoreRAM<const>,
   DisplayGPUFPS<const>, CoreUptime<const>, CoreLUATime<const>,
-  CoreLUAUsage<const> =
+  CoreLUAUsage<const>, UtilDuration<const> =
     Util.Hex, Core.CPUUsage, Core.RAM, Display.GPUFPS, Core.Uptime,
-    Core.LUATime, Core.LUAUsage;
+    Core.LUATime, Core.LUAUsage, Util.Duration;
 -- Diggers function and data aliases --------------------------------------- --
 local Fade, GetGameTicks, GetMouseX, GetMouseY, aPlayers, aObjects,
   RenderTerrain, RenderObjects, RenderShroud, BCBlit, texSpr, fontLarge,
@@ -260,28 +260,22 @@ local function InitDebugPlay(iId)
         iViewportW, iViewportH));
     -- Draw level and duration info
     fontTiny:PrintR(iStageR - 5, 187,
-      format(         "%s [%02u]\n\z
-                         %s TYPE\n\z
-                         %u TWIN\n\z
-                         %u OBJT\n\z
-                         %u FRAM\n\z
-          %02u:%02u:%06.03f GAME\n\z
-          %02u:%02u:%06.03f LUAT\n\z
-          %02u:%02u:%06.03f ENGT",
+      format("%s [%02u]\n\z
+              %s TYPE\n\z
+              %u TWIN\n\z
+              %u OBJT\n\z
+              %u FRAM\n\z
+            %12s GAMT\n\z
+            %12s LUAT\n\z
+            %12s ENGT",
         sLevelName, iLevelId,
         sLevelType,
         iWinLimit,
         #aObjects,
         GetGameTicks(),
-        GetGameTicks() // 216000 % 1000,
-        GetGameTicks() // 3600 % 60,
-        GetGameTicks() / 60 % 60,
-        CoreLUATime() // 3600 % 1000,
-        CoreLUATime() // 60 % 60,
-        CoreLUATime() % 60,
-        CoreUptime() // 3600 % 1000,
-        CoreUptime() // 60 % 60,
-        CoreUptime() % 60));
+        UtilDuration(GetGameTicks() / 60, 2),
+        UtilDuration(CoreLUATime(), 2),
+        UtilDuration(CoreUptime(), 2)));
     -- Flash debug mode
     fontTiny:PrintR(iStageR - 5, 5, "DEBUG MODE");
     -- Draw gems and dug count
