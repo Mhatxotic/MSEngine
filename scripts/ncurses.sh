@@ -41,10 +41,9 @@ build()
   make clean 2>/dev/null
 
   ./configure --prefix=/usr --without-cxx --without-cxx-binding \
-    --without-ada --without-progs --without-curses-h \
-    --with-static --without-debug \
-    --enable-widec --enable-const --enable-ext-colors --enable-sigwinch \
-    --enable-wgetch-events --target=${1}-apple-darwin
+    --without-ada --without-progs --without-curses-h --with-static \
+    --without-debug --enable-widec --enable-const --enable-ext-colors \
+    --enable-sigwinch --enable-wgetch-events --target=${1}-apple-darwin
   if [ ! $? -eq 0 ]; then
     exit 11
   fi

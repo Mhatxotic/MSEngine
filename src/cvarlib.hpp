@@ -535,9 +535,9 @@ const CVarItemStaticList cvislList{ {  // Default cvars (from cvars.hpp)
   CB(cTimer->TimerTickRateModified, uint64_t), TUINTEGER|PSYSTEM },
 /* ------------------------------------------------------------------------- */
 // ! APP_DELAY
-// ? Specifies an artificial delay to force for bot mode in milliseconds. This
-// ? is ignored on interactive mode because a one millisecond delay is forced
-// ? for every frame under the target rate.
+// ? Specifies an artificial delay to force for terminal mode in milliseconds.
+// ? This is ignored on interactive mode because a one millisecond delay is
+// ? forced for every frame under the target rate.
 /* ------------------------------------------------------------------------- */
 { CFL_NONE, "app_delay", cCommon->One(),
   CB(cTimer->TimerSetDelay, unsigned int), TUINTEGERSAVE|PANY },
@@ -1021,15 +1021,15 @@ const CVarItemStaticList cvislList{ {  // Default cvars (from cvars.hpp)
   CB(cConsole->SetPageMoveCount, ssize_t), TUINTEGERSAVE|PANY },
 /* ------------------------------------------------------------------------- */
 // ! CON_TMCCOLS
-// ? In bot mode, this is the maximum number of columns to draw. The larger
-// ? this value is, the more text that can be displayed at once but will
-// ? increase CPU usage from the operating system.
+// ? In terminal mode, this is the maximum number of columns to draw. The
+// ? larger this value is, the more text that can be displayed at once but
+// ? will increase CPU usage from the operating system.
 /* ------------------------------------------------------------------------- */
 { CFL_TERMINAL, "con_tmccols", "80",
   CB(cSystem->ColsModified, unsigned int), TUINTEGERSAVE|PANY },
 /* ------------------------------------------------------------------------- */
 // ! CON_TMCROWS
-// ? In bot mode, this is the maximum number of rows to draw. The larger
+// ? In terminal mode, this is the maximum number of rows to draw. The larger
 // ? this value is, the more text that can be displayed at once but will
 // ? increase CPU usage from the operating system.
 /* ------------------------------------------------------------------------- */

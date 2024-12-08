@@ -32,7 +32,7 @@ local fcbEnterAnimProc,                -- Enter animation procedure
       iKeyBankId,                      -- Title key bank id
       iNextUpdate,                     -- Next system information update
       iSSelect,                        -- Select sound id
-      iStageL, iStageR,                -- Stage bounds
+      iStageL, iStageR, iStageB,       -- Stage bounds
       iTexScale,                       -- Texture scale
       texTitle,                        -- Texture tile
       strCredits,                      -- Credits
@@ -44,42 +44,42 @@ local sAppTitle, sAppVendor, iAppMajor<const>, iAppMinor<const>,
   iAppBuild<const>, iAppRevision<const>, _, _, sAppExeType = Core.Engine();
 sAppTitle, sAppVendor, sAppExeType =
   sAppTitle:upper(), sAppVendor:upper(), sAppExeType:upper();
+-- Static element positions ------------------------------------------------ --
+local iCentreX, iCreditsY, iLogoX, iLogoY, iPostQuitX, iPostY, iSubTitleY;
 -- Render in procedure ----------------------------------------------------- --
 local function RenderEnterAnimProc()
   -- Scroll in amount
   local n1, n2 = 160, 168;
-  -- Centre of screen
-  local iCentreX<const> = 160 * iTexScale;
   -- Initial animation procedure
   local function RenderAnimProcInitial()
     -- Render terrain and game objects
     RenderTerrain();
     RenderObjects();
     -- Render title objects
-    texTitle:BlitLT(79, 12 - n1);
-    texTitle:BlitSLT(1, iStageL - n1, 72);
-    texTitle:BlitSLT(2, (iStageR - 168) + n2, 72);
+    texTitle:BlitLT(iLogoX, iTexScale * (12 - n1));
+    texTitle:BlitSLT(1, iStageL - (iTexScale * n1), iPostY);
+    texTitle:BlitSLT(2, iStageR - (iTexScale * (168 - n2)), iPostY);
     -- Render status text
     fontTiny:SetCRGB(1, 0.9, 0);
-    fontTiny:PrintC(iCentreX, 58 - n1, strSubTitle);
-    fontTiny:PrintC(iCentreX, 206 + n1, strCredits);
+    fontTiny:PrintC(iCentreX, iTexScale * (58 - n1), strSubTitle);
+    fontTiny:PrintC(iCentreX, iTexScale * (206 + n1), strCredits);
     -- Move components in
     n1 = n1 - (n1 * 0.1);
     n2 = n2 - (n2 * 0.1);
-    if n1 >= 1 and n2 >= 1 then return end;
+    if n1 > 1 and n2 > 1 then return end;
     -- Animation completed
     local function RenderAnimProcFinished()
       -- Render terrain and game objects
       RenderTerrain();
       RenderObjects();
       -- Render title objects
-      texTitle:BlitLT(79, 12);
-      texTitle:BlitSLT(1, iStageL, 72);
-      texTitle:BlitSLT(2, iStageR - 168, 72);
+      texTitle:BlitLT(iLogoX, iLogoY);
+      texTitle:BlitSLT(1, iStageL, iPostY);
+      texTitle:BlitSLT(2, iPostQuitX, iPostY);
       -- Render status text
       fontTiny:SetCRGB(1, 0.9, 0);
-      fontTiny:PrintC(iCentreX, 58, strSubTitle);
-      fontTiny:PrintC(iCentreX, 206, strCredits);
+      fontTiny:PrintC(iCentreX, iSubTitleY, strSubTitle);
+      fontTiny:PrintC(iCentreX, iCreditsY, strCredits);
     end
     -- Set finished callback and execute it
     fcbEnterAnimProc = RenderAnimProcFinished;
@@ -93,15 +93,13 @@ end
 local function RenderLeaveAnimProc()
   -- Scroll in amount
   local n1, n2 = 160, 168;
-  -- Centre of screen
-  local iCentreX<const> = 160 * iTexScale;
   -- Initial animation procedure
   local function RenderAnimProcInitial()
     -- Render terrain and game objects
     RenderTerrain();
     RenderObjects();
     -- Render title objects
-    texTitle:BlitLT(79, -148 + n1);
+    texTitle:BlitLT(79, iTexScale * (-148 + n1));
     texTitle:BlitSLT(1, iStageL - 168 + n1, 72);
     texTitle:BlitSLT(2, iStageR - n2, 72);
     -- Render status text
@@ -259,7 +257,15 @@ end
 -- Framebuffer changed callback -------------------------------------------- --
 local function OnFrameBufferUpdated(...)
   -- Update stage bounds
-  local _ _, _, iStageL, _, iStageR, _ = ...;
+  local _ _, _, iStageL, _, iStageR, iStageB = ...;
+  -- Recalculate static element positions
+  iCentreX = iTexScale * 160;
+  iCreditsY = iTexScale * 206;
+  iLogoX = iTexScale * 79;
+  iLogoY = iTexScale * 12;
+  iPostQuitX = iStageR - (iTexScale * 168);
+  iPostY = iTexScale * 72;
+  iSubTitleY = iTexScale * 58;
   -- Re-detect video RAM
   DetectVRAM();
 end

@@ -1,7 +1,7 @@
 <!DOCTYPE html>
-<!-- Reference for the Mhatxotic Engine API version 24.12.4.43 -->
-<!-- Automatically built at Wed Dec 04 23:51:39 2024 +0000 -->
-<!-- With Mhatxotic Engine Project Management Utility version 24.12.4.43 -->
+<!-- Reference for the Mhatxotic Engine API version 24.12.5.12 -->
+<!-- Automatically built at Thu Dec 05 17:19:14 2024 +0000 -->
+<!-- With Mhatxotic Engine Project Management Utility version 24.12.5.12 -->
 <!-- Copyright (c) 2006-2024 Mhatxotic Design, All Rights Reserved Worldwide -->
 <HTML lang="en-GB">
 <HEAD>
@@ -11,18 +11,18 @@
 	<META name="apple-mobile-web-app-title" content="Mhatxotic Engine API">
 	<META name="author" content="Mhatxotic Design">
 	<META name="copyright" content="Copyright © 2006-2024 Mhatxotic Design, All Rights Reserved">
-	<META name="description" content="Reference for the Mhatxotic Engine API version 24.12.4.43">
+	<META name="description" content="Reference for the Mhatxotic Engine API version 24.12.5.12">
 	<META name="format-detection" content="telephone=no">
-	<META name="generator" content="Mhatxotic Engine Project Management Utility version 24.12.4.43">
+	<META name="generator" content="Mhatxotic Engine Project Management Utility version 24.12.5.12">
 	<META name="google-site-verification" content="BvWxrqmgaIxqe_W8AW3OGK0fdCI_JfB_-gcOOxCF9_4">
 	<META name="googlebot" content="index,follow">
-	<META name="og:description" content="Reference for the Mhatxotic Engine API version 24.12.4.43">
+	<META name="og:description" content="Reference for the Mhatxotic Engine API version 24.12.5.12">
 	<META name="og:image" content="https://repository-images.githubusercontent.com/611875607/ee7aa468-9797-4763-9a2d-ea3d782ef413">
-	<META name="og:title" content="Mhatxotic Engine 24.12.4.43 API reference">
+	<META name="og:title" content="Mhatxotic Engine 24.12.5.12 API reference">
 	<META name="og:url" content="https://mhatxotic.github.io/Engine/">
 	<META name="robots" content="index,follow">
 	<META name="viewport" content="width=device-width, initial-scale=1">
-	<TITLE>Mhatxotic Engine 24.12.4.43 API reference</TITLE>
+	<TITLE>Mhatxotic Engine 24.12.5.12 API reference</TITLE>
 	<STYLE media="screen">
 	* { margin:0; padding:0 }
 	BODY { background-color:#111; border:0; font-family:sans-serif; overflow-x:hidden; text-shadow: 1px 1px #111 }
@@ -60,7 +60,7 @@
 	</STYLE>
 </HEAD>
 <BODY id="idx.top">
-	<H1>Mhatxotic Engine 24.12.4.43 API reference</H1>
+	<H1>Mhatxotic Engine 24.12.5.12 API reference</H1>
 	<NOSCRIPT>
 		<H2>JavaScript is required to show and hide elements.</H2>
 	</NOSCRIPT>
@@ -3410,7 +3410,7 @@
 		<H4>Function Parameters:-</H4>
 		<PRE><U>String</U> <I>(string)</I> = Console status text.<BR></PRE>
 		<H4>Synopsis:-</H4>
-		<PRE>In bot mode&#x2c; this function will set the text to appear when no text is input into the input bar&#x2e; Useful for customised stats&#x2e; It will update every second&#x2e;<BR></PRE>
+		<PRE>In terminal mode&#x2c; this function will set the text to appear when no text is input into the input bar&#x2e; Useful for customised stats&#x2e; It will update every second&#x2e;<BR></PRE>
 		<H4><A href="#idx:Core">&#x25B2; Return to table of contents</A></H4>
 	</DIV>
 	<DIV id="Core.StatusRight" style="display:none">
@@ -3420,7 +3420,7 @@
 		<H4>Function Parameters:-</H4>
 		<PRE><U>String</U> <I>(string)</I> = Console status text.<BR></PRE>
 		<H4>Synopsis:-</H4>
-		<PRE>In bot mode&#x2c; this function will set the text to appear when no text is input into the input bar&#x2e; Useful for customised stats&#x2e; It will update every second&#x2e;<BR></PRE>
+		<PRE>In terminal mode&#x2c; this function will set the text to appear when no text is input into the input bar&#x2e; Useful for customised stats&#x2e; It will update every second&#x2e;<BR></PRE>
 		<H4><A href="#idx:Core">&#x25B2; Return to table of contents</A></H4>
 	</DIV>
 	<DIV id="Core.Suspend" style="display:none">
@@ -11240,7 +11240,7 @@
 	</DIV>
 	<DIV id="cv.app_delay" style="display:none">
 		<H3>app_delay</H3>
-		<PRE>Specifies an artificial delay to force for bot mode in milliseconds&#x2e; This is ignored on interactive mode because a one millisecond delay is forced for every frame under the target rate&#x2e;<BR></PRE>
+		<PRE>Specifies an artificial delay to force for terminal mode in milliseconds&#x2e;<BR>This is ignored on interactive mode because a one millisecond delay is forced for every frame under the target rate&#x2e;<BR></PRE>
 		<H4><A href="#idx.cv">&#x25B2; Return to table of contents</A></H4>
 	</DIV>
 	<DIV id="cv.app_description" style="display:none">
@@ -11520,7 +11520,7 @@
 	</DIV>
 	<DIV id="cv.con_tmccols" style="display:none">
 		<H3>con_tmccols</H3>
-		<PRE>In bot mode&#x2c; this is the maximum number of columns to draw&#x2e; The larger this value is&#x2c; the more text that can be displayed at once but will increase CPU usage from the operating system&#x2e;<BR></PRE>
+		<PRE>In terminal mode&#x2c; this is the maximum number of columns to draw&#x2e; The larger this value is&#x2c; the more text that can be displayed at once but will increase CPU usage from the operating system&#x2e;<BR></PRE>
 		<H4><A href="#idx.cv">&#x25B2; Return to table of contents</A></H4>
 	</DIV>
 	<DIV id="cv.con_tmcnoclose" style="display:none">
@@ -11535,7 +11535,7 @@
 	</DIV>
 	<DIV id="cv.con_tmcrows" style="display:none">
 		<H3>con_tmcrows</H3>
-		<PRE>In bot mode&#x2c; this is the maximum number of rows to draw&#x2e; The larger this value is&#x2c; the more text that can be displayed at once but will increase CPU usage from the operating system&#x2e;<BR></PRE>
+		<PRE>In terminal mode&#x2c; this is the maximum number of rows to draw&#x2e; The larger this value is&#x2c; the more text that can be displayed at once but will increase CPU usage from the operating system&#x2e;<BR></PRE>
 		<H4><A href="#idx.cv">&#x25B2; Return to table of contents</A></H4>
 	</DIV>
 	<DIV id="cv.con_tmctformat" style="display:none">
@@ -12244,6 +12244,6 @@
 		<H4><A href="#idx.cv">&#x25B2; Return to table of contents</A></H4>
 	</DIV>
 	<ADDRESS>Copyright &copy; 2024 Mhatxotic Design, All Rights Reserved.<BR>
-	This document was generated at Wed Dec 04 23:51:39 2024 +0000</ADDRESS>
+	This document was generated at Thu Dec 05 17:19:14 2024 +0000</ADDRESS>
 </BODY>
 </HTML>

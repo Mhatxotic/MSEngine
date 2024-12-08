@@ -374,7 +374,7 @@ class SysConBase :
   /* -- Base classes ------------------------------------------------------- */
   protected SysConFlags                // Flags settings
 { /* -- Typedefs --------------------------------------------------- */ public:
-  enum KeyType { KT_NONE, KT_KEY, KT_CHAR }; // GetKey return types
+  enum KeyType { KT_NONE, KT_KEY, KT_CHAR, KT_RESET }; // GetKey return types
   /* -- For handling CTRL_CLOSE_EVENT --------------------------- */ protected:
   condition_variable cvExit;           // Exit condition variable
   mutex            mExit;              // Exit mutex

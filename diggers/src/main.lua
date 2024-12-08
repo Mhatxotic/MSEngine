@@ -801,7 +801,8 @@ local function fcbTick()
   local iYBack<const> = iY + iHeight + iBorderX2;
   local iXBack2<const> = iX + iWidth + iBorder;
   local iYBack2<const> = iY + iHeight + (iBorderX2 - iBorder);
-  local iXText<const>, iYText<const> = iX + iWidth + iBorderX2, iY - 12;
+  local iXText<const> = iX + iWidth + iBorderX2;
+  local iYText<const> = iY - (3 * iTexScale);
   -- Last percentage
   local nLastPercentage = -1;
   -- Loader display function

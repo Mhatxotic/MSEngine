@@ -165,7 +165,7 @@ static class ConGraphics final :       // Members initially private
   /* -- Set Console status ------------------------------------------------- */
   void SetCantDisable(const bool bState)
   { // Ignore if not in graphical mode because CON_HEIGHT isn't defined in
-    // bot mode as it is unneeded or the flag is already set as such.
+    // terminal mode as it is unneeded or the flag is already set as such.
     if(cSystem->IsNotGraphicalMode()) return;
     // Return if state not changed
     if(cConsole->FlagIsEqualToBool(CF_CANTDISABLE, bState)) return;
@@ -291,7 +291,7 @@ static class ConGraphics final :       // Members initially private
     { GetTextureRef().ReloadTexture(); GetFontRef().ReloadTexture(); }
   /* -- Init framebuffer object -------------------------------------------- */
   void InitFBO(void)
-  { // Ignore if bot mode
+  { // Ignore if terminal mode
     if(GetFontRef().IsNotInitialised()) return;
     // Get reference to main FBO and initialise it
     cFboCore->InitConsoleFBO();
